@@ -13,7 +13,7 @@ public class BibliographicEntityGenerator {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
 
         bibliographicEntity.setCreatedDate(new Date());
-        bibliographicEntity.setContent(bibRecord.getContent());
+        bibliographicEntity.setContent(bibRecord.getBib().getContent());
 
         return bibliographicEntity;
     }

@@ -10,26 +10,17 @@ import java.util.List;
 
 @XmlRootElement
 public class BibRecord {
-    private String owningInstitutionId;
-    private String content;
+
+    private Bib bib;
     private List<Holdings> holdings;
 
     @XmlElement
-    public String getOwningInstitutionId() {
-        return owningInstitutionId;
+    public Bib getBib() {
+        return bib;
     }
 
-    public void setOwningInstitutionId(String owningInstitutionId) {
-        this.owningInstitutionId = owningInstitutionId;
-    }
-
-    @XmlElement
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setBib(Bib bib) {
+        this.bib = bib;
     }
 
     @XmlElement
@@ -40,4 +31,5 @@ public class BibRecord {
     public void setHoldings(List<Holdings> holdings) {
         this.holdings = holdings;
     }
+
 }
