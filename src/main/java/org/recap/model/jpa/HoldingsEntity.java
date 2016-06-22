@@ -21,9 +21,6 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "BIBLIOGRAPHIC_ID")
-    private Integer bibliographicId;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CREATED_DATE")
     private Date createdDate;
@@ -55,14 +52,6 @@ public class HoldingsEntity implements Serializable{
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Integer getBibliographicId() {
-        return bibliographicId;
-    }
-
-    public void setBibliographicId(Integer bibliographicId) {
-        this.bibliographicId = bibliographicId;
     }
 
     public Date getCreatedDate() {
