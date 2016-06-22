@@ -17,12 +17,15 @@ public class ProcessETLTest extends BaseTestCase {
     @Test
     public void process() throws Exception {
         String endPoint = getEndPoint();
-        reCAPCamelContext.addDynamicBibRecordStreamRoute(reCAPCamelContext, endPoint, chunkSize);
+        reCAPCamelContext.addDynamicRoute(reCAPCamelContext, endPoint, chunkSize);
+        while (reCAPCamelContext.isRunning()) {
+            Thread.sleep(10000);
+        }
     }
 
     public String getEndPoint() throws URISyntaxException {
         URL resource = getClass().getResource("nypl-10k.xml");
         File file = new File(resource.toURI());
-        return file.getAbsolutePath();
+        return file.getParent();
     }
 }

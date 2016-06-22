@@ -35,7 +35,7 @@ public class ReCAPCamelContext {
         getContext().addRoutes(routeBuilder);
     }
 
-    public void addDynamicBibRecordStreamRoute(ReCAPCamelContext camelContext, String endPointFrom, int chunkSize) throws Exception {
+    public void addDynamicRoute(ReCAPCamelContext camelContext, String endPointFrom, int chunkSize) throws Exception {
         camelContext.addRoutes(new ETLRouteBuilder(camelContext.getContext(), endPointFrom, chunkSize));
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
  * Created by pvsubrah on 6/21/16.
  */
 public class RecordAggregator implements AggregationStrategy {
+
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
         if (oldExchange == null) {

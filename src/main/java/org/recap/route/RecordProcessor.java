@@ -12,13 +12,9 @@ import java.util.List;
  */
 public class RecordProcessor implements Processor {
     private static Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
-    private int batchCount = 1;
-    private int recordIndex = 1;
-
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        //TODO : :Process Records+
         StringBuilder stringBuilder = new StringBuilder();
         if (exchange.getIn().getBody() instanceof List) {
             System.out.println("Record Size : " + ((List<String>) ((List) exchange.getIn().getBody())).size());

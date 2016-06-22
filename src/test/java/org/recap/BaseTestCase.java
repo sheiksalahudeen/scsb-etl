@@ -25,9 +25,5 @@ public class BaseTestCase {
     public void contextLoads() {
         assertNotNull(reCAPCamelContext);
         assertTrue(reCAPCamelContext.isRunning());
-
-        reCAPCamelContext.stopReCAPCamelContext();
-        assertFalse(reCAPCamelContext.isRunning());
     }
-
 }

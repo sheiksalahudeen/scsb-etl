@@ -37,6 +37,7 @@ public class ETLRouteBuilder extends RouteBuilder{
         SplitDefinition split = route.split().tokenizeXML("bibRecord");
         split.streaming();
         AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
+//        aggregator.setParallelProcessing(true);
         aggregator.completionPredicate(new SplitPredicate(chunkSize));
         aggregator.process(new RecordProcessor());
     }
