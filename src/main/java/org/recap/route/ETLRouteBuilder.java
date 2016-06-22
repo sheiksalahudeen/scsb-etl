@@ -24,10 +24,28 @@ public class ETLRouteBuilder extends RouteBuilder {
     private int chunkSize = 1;
     private BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
     private InstitutionDetailsRepository institutionDetailsRepository;
-
+    private int poolSize = 10;
+    private int maxThreads = 10;
+    private int numThreads;
 
     public ETLRouteBuilder(CamelContext context) {
         super(context);
+    }
+
+    public int getPoolSize() {
+        return poolSize;
+    }
+
+    public void setPoolSize(int poolSize) {
+        this.poolSize = poolSize;
+    }
+
+    public int getMaxThreads() {
+        return maxThreads;
+    }
+
+    public void setMaxThreads(int maxThreads) {
+        this.maxThreads = maxThreads;
     }
 
     public InstitutionDetailsRepository getInstitutionDetailsRepository() {
@@ -88,7 +106,7 @@ public class ETLRouteBuilder extends RouteBuilder {
         RecordProcessor processor = new RecordProcessor();
         processor.setBibliographicHoldingsDetailsRepository(bibliographicHoldingsDetailsRepository);
         processor.setInstitutionDetailsRepository(institutionDetailsRepository);
-        ThreadsDefinition threads = aggregator.threads(30,30);
+        ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
         threads.process(processor);
         threads.setThreadName("etlProcessingThread");
     }

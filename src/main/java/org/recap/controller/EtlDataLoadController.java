@@ -1,6 +1,9 @@
 package org.recap.controller;
 
+import org.apache.camel.CamelContext;
+import org.recap.ReCAPCamelContext;
 import org.recap.model.etl.EtlLoadRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +21,12 @@ import javax.validation.Valid;
 @Controller
 public class EtlDataLoadController {
 
+    @Autowired
+    ReCAPCamelContext reCAPCamelContext;
+
+    @Autowired
+    CamelContext camelContext;
+
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
         model.addAttribute("etlLoadRequest", new EtlLoadRequest());
@@ -33,9 +42,12 @@ public class EtlDataLoadController {
         Integer numberOfThreads = etlLoadRequest.getNumberOfThreads();
         Integer batchSize = etlLoadRequest.getBatchSize();
 
-        System.out.println("Directory Path : " + inputDirectoryPath + "\n" +
-                "Number of threads : " + numberOfThreads + "\n" +
-                "Batch Size : " + batchSize);
+        try {
+            reCAPCamelContext.addDynamicRoute(camelContext, inputDirectoryPath, batchSize, numberOfThreads);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return etlDataLoader(model);
     }
 

@@ -31,12 +31,14 @@ public class ReCAPCamelContext {
         context.addRoutes(routeBuilder);
     }
 
-    public void addDynamicRoute(CamelContext camelContext, String endPointFrom, int chunkSize) throws Exception {
+    public void addDynamicRoute(CamelContext camelContext, String endPointFrom, int chunkSize, int numThreads) throws Exception {
         ETLRouteBuilder etlRouteBuilder = new ETLRouteBuilder(camelContext);
         etlRouteBuilder.setFrom(endPointFrom);
         etlRouteBuilder.setChunkSize(chunkSize);
         etlRouteBuilder.setBibliographicHoldingsDetailsRepository(bibliographicHoldingsDetailsRepository);
         etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
+        etlRouteBuilder.setMaxThreads(50);
+        etlRouteBuilder.setPoolSize(numThreads);
         camelContext.addRoutes(etlRouteBuilder);
     }
 
