@@ -1,5 +1,6 @@
 package org.recap.route;
 
+import org.apache.camel.CamelContext;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPCamelContext;
@@ -19,13 +20,19 @@ public class ProcessETLTest extends BaseTestCase {
     @Autowired
     ReCAPCamelContext reCAPCamelContext;
 
+    @Autowired
+    CamelContext camelContext;
+
     int chunkSize = 1000;
 
     @Test
     public void process() throws Exception {
         assertNotNull(reCAPCamelContext);
         String endPoint = getEndPoint();
-        reCAPCamelContext.addDynamicRoute(reCAPCamelContext, endPoint, chunkSize);
+        reCAPCamelContext.addDynamicRoute(camelContext, endPoint, chunkSize);
+        while(reCAPCamelContext.isRunning()){
+            Thread.sleep(1000);
+        }
     }
 
     public String getEndPoint() throws URISyntaxException {

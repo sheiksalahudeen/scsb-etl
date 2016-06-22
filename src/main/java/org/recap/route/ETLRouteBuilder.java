@@ -15,16 +15,45 @@ import org.recap.repository.BibliographicDetailsRepository;
  * Created by pvsubrah on 6/21/16.
  */
 public class ETLRouteBuilder extends RouteBuilder {
-    private final String from;
+    private String from = null;
     private FileEndpoint fEPoint = null;
+    private int chunkSize = 1;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
-    private int chunkSize = 100;
 
-    public ETLRouteBuilder(CamelContext context, BibliographicDetailsRepository bibliographicDetailsRepository, String from, int chunkSize) {
+    public ETLRouteBuilder(CamelContext context) {
         super(context);
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
         this.from = from;
-        this.chunkSize = chunkSize;
+    }
+
+    public FileEndpoint getfEPoint() {
+        return fEPoint;
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public int getChunkSize() {
+        return chunkSize;
+    }
+
+    public void setfEPoint(FileEndpoint fEPoint) {
+        this.fEPoint = fEPoint;
+    }
+
+    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+    }
+
+    public void setChunkSize(int chunkSize) {
+        this.chunkSize = chunkSize;
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.recap;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.route.ETLRouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ReCAPCamelContext {
-    @Autowired
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
     private CamelContext context;
@@ -23,8 +20,12 @@ public class ReCAPCamelContext {
         context.addRoutes(routeBuilder);
     }
 
-    public void addDynamicRoute(ReCAPCamelContext camelContext, String endPointFrom, int chunkSize) throws Exception {
-        camelContext.addRoutes(new ETLRouteBuilder(context, bibliographicDetailsRepository, endPointFrom, chunkSize));
+    public void addDynamicRoute(CamelContext camelContext, String endPointFrom, int chunkSize) throws Exception {
+        ETLRouteBuilder etlRouteBuilder = new ETLRouteBuilder(camelContext);
+        etlRouteBuilder.setFrom(endPointFrom);
+        etlRouteBuilder.setChunkSize(chunkSize);
+
+        camelContext.addRoutes(etlRouteBuilder);
     }
 
     public boolean isRunning() {
