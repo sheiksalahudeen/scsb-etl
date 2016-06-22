@@ -1,6 +1,7 @@
 package org.recap.model.jaxb;
 
 import org.junit.Test;
+import org.recap.model.jaxb.marc.*;
 
 import java.util.Arrays;
 
@@ -16,20 +17,29 @@ public class JAXBHandlerTest {
         JAXBHandler jaxbHandler = JAXBHandler.getInstance();
         BibRecord bibRecord = new BibRecord();
         Bib bib = new Bib();
-       bib.setOwningInstitutionId("101");
-        //bib.setContent("marc content");
+        bib.setOwningInstitutionId("101");
+        ContentType content = new ContentType();
+        CollectionType collection = new CollectionType();
+        RecordType recordType = new RecordType();
+        DataFieldType dataField = new DataFieldType();
+        dataField.setTag("100");
+        SubfieldatafieldType subField = new SubfieldatafieldType();
+        subField.setCode("a");
+        subField.setValue("Title");
+        dataField.getSubfield().add(subField);
+        recordType.getDatafield().add(dataField);
+        collection.getRecord().add(recordType);
+        content.setCollection(collection);
+        bib.setContent(content);
         bibRecord.setBib(bib);
         Holding holding1 = new Holding();
         holding1.setOwningInstitutionHoldingsId("h-101");
-        //holding1.setContent("holding conent 1");
         Items items = new Items();
-        //items.setContent("item conent");
         holding1.setItems(Arrays.asList(items));
         Holding holding2 = new Holding();
         holding2.setOwningInstitutionHoldingsId("h-102");
         Holdings holdings = new Holdings();
         holdings.setHolding(Arrays.asList(holding1, holding2));
-        //holding2.setContent("holding content 2");
         holding2.setItems(Arrays.asList(items));
         bibRecord.setHoldings(Arrays.asList(holdings));
         jaxbHandler.marshal(bibRecord);

@@ -1,6 +1,8 @@
 package org.recap.model;
 
 import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.marc.CollectionType;
+import org.recap.model.jaxb.marc.ContentType;
 import org.recap.model.jpa.BibliographicEntity;
 
 import java.util.Date;
@@ -13,7 +15,14 @@ public class BibliographicEntityGenerator {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
 
         bibliographicEntity.setCreatedDate(new Date());
-        //bibliographicEntity.setContent(bibRecord.getBib().getContent());
+        bibliographicEntity.setOwningInstitutionBibId(bibRecord.getBib().getOwningInstitutionId());
+        bibliographicEntity.setOwningInstitutionId(101);
+        ContentType content = bibRecord.getBib().getContent();
+        CollectionType collection = content.getCollection();
+        String xmlContent = collection.serialize(collection);
+
+
+        bibliographicEntity.setContent(xmlContent);
 
         return bibliographicEntity;
     }

@@ -1,11 +1,11 @@
 package org.recap.model.jaxb;
 
-import com.sun.xml.internal.txw2.annotation.XmlCDATA;
-import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
 
-import javax.xml.bind.annotation.*;
-import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by pvsubrah on 6/21/16.
