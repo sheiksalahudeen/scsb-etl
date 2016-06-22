@@ -11,6 +11,8 @@ import org.apache.camel.model.SplitDefinition;
 import org.apache.commons.io.FilenameUtils;
 import org.recap.model.BibliographicEntityGenerator;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.BibliographicHoldingsDetailsRepository;
+import org.recap.repository.InstitutionDetailsRepository;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -19,11 +21,28 @@ public class ETLRouteBuilder extends RouteBuilder {
     private String from = null;
     private FileEndpoint fEPoint = null;
     private int chunkSize = 1;
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
-    private BibliographicEntityGenerator bibliographicEntityGenerator;
+    private BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
+    private InstitutionDetailsRepository institutionDetailsRepository;
+
 
     public ETLRouteBuilder(CamelContext context) {
         super(context);
+    }
+
+    public InstitutionDetailsRepository getInstitutionDetailsRepository() {
+        return institutionDetailsRepository;
+    }
+
+    public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
+        this.institutionDetailsRepository = institutionDetailsRepository;
+    }
+
+    public BibliographicHoldingsDetailsRepository getBibliographicHoldingsDetailsRepository() {
+        return bibliographicHoldingsDetailsRepository;
+    }
+
+    public void setBibliographicHoldingsDetailsRepository(BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository) {
+        this.bibliographicHoldingsDetailsRepository = bibliographicHoldingsDetailsRepository;
     }
 
     public String getFrom() {
@@ -38,9 +57,6 @@ public class ETLRouteBuilder extends RouteBuilder {
         return fEPoint;
     }
 
-    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
-        return bibliographicDetailsRepository;
-    }
 
     public int getChunkSize() {
         return chunkSize;
@@ -48,18 +64,6 @@ public class ETLRouteBuilder extends RouteBuilder {
 
     public void setfEPoint(FileEndpoint fEPoint) {
         this.fEPoint = fEPoint;
-    }
-
-    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
-        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
-    }
-
-    public BibliographicEntityGenerator getBibliographicEntityGenerator() {
-        return bibliographicEntityGenerator;
-    }
-
-    public void setBibliographicEntityGenerator(BibliographicEntityGenerator bibliographicEntityGenerator) {
-        this.bibliographicEntityGenerator = bibliographicEntityGenerator;
     }
 
     public void setChunkSize(int chunkSize) {
@@ -81,8 +85,8 @@ public class ETLRouteBuilder extends RouteBuilder {
         aggregator.setParallelProcessing(true);
         aggregator.completionPredicate(new SplitPredicate(chunkSize));
         RecordProcessor processor = new RecordProcessor();
-        processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
-        processor.setBibliographicEntityGenerator(bibliographicEntityGenerator);
+        processor.setBibliographicHoldingsDetailsRepository(bibliographicHoldingsDetailsRepository);
+        processor.setInstitutionDetailsRepository(institutionDetailsRepository);
         aggregator.process(processor);
     }
 

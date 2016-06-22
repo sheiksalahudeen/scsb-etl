@@ -4,6 +4,8 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.model.BibliographicEntityGenerator;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.BibliographicHoldingsDetailsRepository;
+import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.route.ETLRouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,10 +21,11 @@ public class ReCAPCamelContext {
     private CamelContext context;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
 
     @Autowired
-    BibliographicEntityGenerator bibliographicEntityGenerator;
+    InstitutionDetailsRepository institutionDetailsRepository;
+
 
     public void addRoutes(RouteBuilder routeBuilder) throws Exception {
         context.addRoutes(routeBuilder);
@@ -32,8 +35,8 @@ public class ReCAPCamelContext {
         ETLRouteBuilder etlRouteBuilder = new ETLRouteBuilder(camelContext);
         etlRouteBuilder.setFrom(endPointFrom);
         etlRouteBuilder.setChunkSize(chunkSize);
-        etlRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
-        etlRouteBuilder.setBibliographicEntityGenerator(bibliographicEntityGenerator);
+        etlRouteBuilder.setBibliographicHoldingsDetailsRepository(bibliographicHoldingsDetailsRepository);
+        etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
         camelContext.addRoutes(etlRouteBuilder);
     }
 

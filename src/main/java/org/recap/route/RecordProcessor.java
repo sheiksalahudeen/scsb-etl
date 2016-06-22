@@ -6,7 +6,9 @@ import org.recap.model.BibliographicEntityGenerator;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.BibliographicHoldingsEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,34 +24,25 @@ public class RecordProcessor implements Processor {
     private JAXBHandler jaxbHandler;
     private BibliographicEntityGenerator bibliographicEntityGenerator;
     private InstitutionDetailsRepository institutionDetailsRepository;
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
 
-    public void setBibliographicEntityGenerator(BibliographicEntityGenerator bibliographicEntityGenerator) {
-        this.bibliographicEntityGenerator = bibliographicEntityGenerator;
-    }
-
-    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
-        return bibliographicDetailsRepository;
-    }
-
-    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
-        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
-    }
 
     @Override
     public void process(Exchange exchange) throws Exception {
         if (exchange.getIn().getBody() instanceof List) {
 
-            List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+            List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = new ArrayList<>();
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
-                bibliographicEntities.add(getBibliographicEntityGenerator().generateBibliographicEntity(bibRecord));
+                BibliographicEntityGenerator bibliographicEntityGenerator = getBibliographicEntityGenerator();
+                bibliographicEntityGenerator.setInstitutionDetailsRepository(institutionDetailsRepository);
+                bibliographicHoldingsEntities.addAll(bibliographicEntityGenerator.generateBibliographicEntity(bibRecord));
             }
             long startTime = System.currentTimeMillis();
-            bibliographicDetailsRepository.save(bibliographicEntities);
+            bibliographicHoldingsDetailsRepository.save(bibliographicHoldingsEntities);
             long endTime = System.currentTimeMillis();
-            logger.info("Time taken to persist " + bibliographicEntities.size() + " bibliographic entities is: " + (endTime-startTime)/1000 + " seconds");
+            logger.info("Time taken to persist " + bibliographicHoldingsEntities.size() + " bibliographic entities is: " + (endTime-startTime)/1000 + " seconds");
         }
     }
 
@@ -60,8 +53,12 @@ public class RecordProcessor implements Processor {
         return jaxbHandler;
     }
 
-    public BibliographicEntityGenerator getBibliographicEntityGenerator() {
-        return bibliographicEntityGenerator;
+    public BibliographicHoldingsDetailsRepository getBibliographicHoldingsDetailsRepository() {
+        return bibliographicHoldingsDetailsRepository;
+    }
+
+    public void setBibliographicHoldingsDetailsRepository(BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository) {
+        this.bibliographicHoldingsDetailsRepository = bibliographicHoldingsDetailsRepository;
     }
 
     public InstitutionDetailsRepository getInstitutionDetailsRepository() {
@@ -71,4 +68,13 @@ public class RecordProcessor implements Processor {
     public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
         this.institutionDetailsRepository = institutionDetailsRepository;
     }
+
+    public BibliographicEntityGenerator getBibliographicEntityGenerator() {
+        if (null == bibliographicEntityGenerator) {
+            bibliographicEntityGenerator = new BibliographicEntityGenerator();
+        }
+        return bibliographicEntityGenerator;
+    }
+
+
 }
