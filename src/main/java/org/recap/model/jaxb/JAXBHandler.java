@@ -3,6 +3,8 @@ package org.recap.model.jaxb;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -13,14 +15,17 @@ public class JAXBHandler {
     private static JAXBContextHandler jaxbContextHandler;
 
     private JAXBHandler() {
-        jaxbHandler = new JAXBHandler();
+
     }
 
     public static JAXBHandler getInstance() {
+        if (null == jaxbHandler) {
+            jaxbHandler = new JAXBHandler();
+        }
         return jaxbHandler;
     }
 
-    public static void marshal(BibRecord bibRecord){
+    public static void marshal(BibRecord bibRecord) {
         try {
             JAXBContext jaxbContext = getJaxbContextHandler().getJAXBContextForClass(BibRecord.class);
 
@@ -43,6 +48,18 @@ public class JAXBHandler {
     }
 
     public Object unmarshal(String content, Class cl) {
-        return null;
+        BibRecord bibRecord = null;
+        try {
+            JAXBContext jaxbContextForClass = getJaxbContextHandler().getJAXBContextForClass(cl);
+
+            Unmarshaller unmarshaller = jaxbContextForClass.createUnmarshaller();
+
+            bibRecord = (BibRecord) unmarshaller.unmarshal(new StringReader(content));
+
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+        return bibRecord;
     }
 }
