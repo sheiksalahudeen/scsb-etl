@@ -30,11 +30,6 @@ public class BibliographicDetailsRepositoryTest extends BaseTestCase {
         BibliographicEntity savedbibliographictEntity = bibliographicDetailsRepository.save(bibliographicEntity);
         Integer bibliographicId = savedbibliographictEntity.getBibliographicId();
         assertNotNull(bibliographicId);
-
-        bibliographicEntity = bibliographicDetailsRepository.findOne(bibliographicId);
-        assertNotNull(bibliographicEntity);
-
-
     }
 
 }

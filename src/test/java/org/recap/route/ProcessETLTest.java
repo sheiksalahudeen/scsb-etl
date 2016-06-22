@@ -16,11 +16,11 @@ public class ProcessETLTest extends BaseTestCase {
 
     @Test
     public void process() throws Exception {
-        String endPoint = getEndPoint();
-        reCAPCamelContext.addDynamicRoute(reCAPCamelContext, endPoint, chunkSize);
-        while (reCAPCamelContext.isRunning()) {
-            Thread.sleep(10000);
-        }
+//        String endPoint = getEndPoint();
+//        reCAPCamelContext.addDynamicRoute(reCAPCamelContext, endPoint, chunkSize);
+//        while (reCAPCamelContext.isRunning()) {
+//            Thread.sleep(10000);
+//        }
     }
 
     public String getEndPoint() throws URISyntaxException {

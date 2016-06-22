@@ -2,7 +2,6 @@ package org.recap;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.recap.route.ETLRouteBuilder;
 
 /**
@@ -13,46 +12,23 @@ public class ReCAPCamelContext {
     private CamelContext context;
 
 
-    private ReCAPCamelContext() {
-        context = new DefaultCamelContext();
-        try {
-            context.start();
-        } catch (Exception e) {
-            System.out.println("Camel Context not initialized");
-            e.printStackTrace();
-        }
+    private ReCAPCamelContext(CamelContext camelContext) {
+     this.context = camelContext;
     }
 
-    public static ReCAPCamelContext getInstance() {
+    public static ReCAPCamelContext getInstance(CamelContext camelContext) {
         if (null == recapCamelContext) {
-            recapCamelContext = new ReCAPCamelContext();
+            recapCamelContext = new ReCAPCamelContext(camelContext);
         }
         return recapCamelContext;
     }
 
-
     public void addRoutes(RouteBuilder routeBuilder) throws Exception {
-        getContext().addRoutes(routeBuilder);
+        context.addRoutes(routeBuilder);
     }
 
     public void addDynamicRoute(ReCAPCamelContext camelContext, String endPointFrom, int chunkSize) throws Exception {
-        camelContext.addRoutes(new ETLRouteBuilder(camelContext.getContext(), endPointFrom, chunkSize));
-    }
-
-    public CamelContext getContext() {
-        return context;
-    }
-
-    public void setContext(CamelContext context) {
-        this.context = context;
-    }
-
-    public void stopReCAPCamelContext(){
-        try {
-            context.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        camelContext.addRoutes(new ETLRouteBuilder(context, endPointFrom, chunkSize));
     }
 
     public boolean isRunning() {
