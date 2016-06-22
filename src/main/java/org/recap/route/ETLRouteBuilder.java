@@ -8,6 +8,7 @@ import org.apache.camel.component.file.GenericFileFilter;
 import org.apache.camel.model.AggregateDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.SplitDefinition;
+import org.apache.camel.model.ThreadsDefinition;
 import org.apache.commons.io.FilenameUtils;
 import org.recap.model.BibliographicEntityGenerator;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -87,7 +88,9 @@ public class ETLRouteBuilder extends RouteBuilder {
         RecordProcessor processor = new RecordProcessor();
         processor.setBibliographicHoldingsDetailsRepository(bibliographicHoldingsDetailsRepository);
         processor.setInstitutionDetailsRepository(institutionDetailsRepository);
-        aggregator.process(processor);
+        ThreadsDefinition threads = aggregator.threads(30,30);
+        threads.process(processor);
+        threads.setThreadName("etlProcessingThread");
     }
 
     public class FileFilter implements GenericFileFilter {
