@@ -1,0 +1,52 @@
+/**
+ * Created by SheikS on 6/20/2016.
+ */
+var intervalID;
+
+jQuery(document).ready(function ($) {
+    $("#bulkingest-form").submit(function (event) {
+        event.preventDefault();
+        bulkIngest();
+    });
+});
+
+
+function refresh() {
+    var autoRefresh = $('#autoRefresh').is(':checked');
+    if(autoRefresh) {
+        intervalID= setInterval(function () {
+            updateStatus();
+        }, 5000);
+    } else {
+        clearInterval(intervalID);
+    }
+}
+
+function bulkIngest() {
+    var $form = $('#bulkingest-form');
+    $("#submit").attr('disabled', 'disabled');
+    $.ajax({
+        url: $form.attr('action'),
+        type: 'post',
+        data: $form.serialize(),
+        success: function (response) {
+            console.log("completed");
+            $("#submit").removeAttr('disabled');
+        }
+    });
+    setTimeout(function(){
+    }, 2000);
+    updateStatus();
+}
+
+
+function updateStatus() {
+    var request = $.ajax({
+        url: "etlDataLoader/report",
+        type: "GET",
+        contentType: "application/json"
+    });
+    request.done(function (msg) {
+        document.getElementById("bulkIngestStatus").value = msg;
+    });
+}
