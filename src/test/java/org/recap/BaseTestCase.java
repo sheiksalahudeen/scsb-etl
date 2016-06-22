@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Main.class)
 @WebAppConfiguration
-@Transactional(rollbackForClassName={})
+//@Transactional(rollbackForClassName={})
 public class BaseTestCase {
 
 //    @Autowired

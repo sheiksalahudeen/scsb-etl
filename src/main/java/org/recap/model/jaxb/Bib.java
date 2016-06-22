@@ -15,9 +15,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Bib {
     @XmlElement
     private String owningInstitutionId;
+    @XmlElement
+    private String owningInstitutionBibId;
     @XmlElement(required = true, nillable = true)
     protected ContentType content;
 
+    public String getOwningInstitutionBibId() {
+        return owningInstitutionBibId;
+    }
+
+    public void setOwningInstitutionBibId(String owningInstitutionBibId) {
+        this.owningInstitutionBibId = owningInstitutionBibId;
+    }
 
     public String getOwningInstitutionId() {
         return owningInstitutionId;

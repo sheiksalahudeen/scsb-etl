@@ -9,6 +9,7 @@ import org.apache.camel.model.AggregateDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.SplitDefinition;
 import org.apache.commons.io.FilenameUtils;
+import org.recap.model.BibliographicEntityGenerator;
 import org.recap.repository.BibliographicDetailsRepository;
 
 /**
@@ -19,6 +20,7 @@ public class ETLRouteBuilder extends RouteBuilder {
     private FileEndpoint fEPoint = null;
     private int chunkSize = 1;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicEntityGenerator bibliographicEntityGenerator;
 
     public ETLRouteBuilder(CamelContext context) {
         super(context);
@@ -52,6 +54,14 @@ public class ETLRouteBuilder extends RouteBuilder {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
+    public BibliographicEntityGenerator getBibliographicEntityGenerator() {
+        return bibliographicEntityGenerator;
+    }
+
+    public void setBibliographicEntityGenerator(BibliographicEntityGenerator bibliographicEntityGenerator) {
+        this.bibliographicEntityGenerator = bibliographicEntityGenerator;
+    }
+
     public void setChunkSize(int chunkSize) {
         this.chunkSize = chunkSize;
     }
@@ -70,7 +80,10 @@ public class ETLRouteBuilder extends RouteBuilder {
         AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
         aggregator.setParallelProcessing(true);
         aggregator.completionPredicate(new SplitPredicate(chunkSize));
-        aggregator.process(new RecordProcessor(bibliographicDetailsRepository));
+        RecordProcessor processor = new RecordProcessor();
+        processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
+        processor.setBibliographicEntityGenerator(bibliographicEntityGenerator);
+        aggregator.process(processor);
     }
 
     public class FileFilter implements GenericFileFilter {
