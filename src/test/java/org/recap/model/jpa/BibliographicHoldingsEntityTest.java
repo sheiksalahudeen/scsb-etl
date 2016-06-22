@@ -3,9 +3,11 @@ package org.recap.model.jpa;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
+import org.recap.repository.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -17,6 +19,9 @@ public class BibliographicHoldingsEntityTest extends BaseTestCase {
 
     @Autowired
     BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Test
     public void oneBibManyHoldings() throws Exception {
@@ -50,11 +55,20 @@ public class BibliographicHoldingsEntityTest extends BaseTestCase {
 
         BibliographicHoldingsEntity bibliographicHoldingsEntity1 = new BibliographicHoldingsEntity();
         bibliographicHoldingsEntity1.setBibliographicEntity(bibliographicEntity1);
-        holdingsEntity.setBibliographicHoldingsEntities(null);
+
         bibliographicHoldingsEntity1.setHoldingsEntity(holdingsEntity);
 
         BibliographicHoldingsEntity savedBibHoldingsRecord1 = bibliographicHoldingsDetailsRepository.save(bibliographicHoldingsEntity1);
         assertNotNull(savedBibHoldingsRecord1);
+
+        List<BibliographicHoldingsEntity> allByHoldingsId = bibliographicHoldingsDetailsRepository.findAllByHoldingsId(holdingsEntity.getHoldingsId());
+        assertTrue(allByHoldingsId.size() == 2);
+
+        List<HoldingsEntity> allById = holdingsDetailsRepository.findAllByHoldingsId(holdingsEntity.getHoldingsId());
+        assertTrue(allById.size() == 1);
+
+
+
 
     }
 
