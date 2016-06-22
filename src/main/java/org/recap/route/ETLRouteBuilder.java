@@ -9,20 +9,22 @@ import org.apache.camel.model.AggregateDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.SplitDefinition;
 import org.apache.commons.io.FilenameUtils;
+import org.recap.repository.BibliographicDetailsRepository;
 
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class ETLRouteBuilder extends RouteBuilder{
+public class ETLRouteBuilder extends RouteBuilder {
     private final String from;
     private FileEndpoint fEPoint = null;
-    private final int BULK_INGEST_POLL_INTERVAL = 1500;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
     private int chunkSize = 100;
 
-    public ETLRouteBuilder(CamelContext context, String from, int chunkSize) {
+    public ETLRouteBuilder(CamelContext context, BibliographicDetailsRepository bibliographicDetailsRepository, String from, int chunkSize) {
         super(context);
         this.from = from;
         this.chunkSize = chunkSize;
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class ETLRouteBuilder extends RouteBuilder{
         AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
 //        aggregator.setParallelProcessing(true);
         aggregator.completionPredicate(new SplitPredicate(chunkSize));
-        aggregator.process(new RecordProcessor());
+        aggregator.process(new RecordProcessor(bibliographicDetailsRepository));
     }
 
     public class FileFilter implements GenericFileFilter {

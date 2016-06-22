@@ -2,9 +2,15 @@ package org.recap.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.recap.model.BibliographicEntityGenerator;
+import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.JAXBHandler;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.repository.BibliographicDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,15 +18,41 @@ import java.util.List;
  */
 public class RecordProcessor implements Processor {
     private static Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
+    private JAXBHandler jaxbHandler;
+    private BibliographicEntityGenerator bibliographicEntityGenerator;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
+
+
+    public RecordProcessor(BibliographicDetailsRepository bibliographicDetailsRepository) {
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+    }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        StringBuilder stringBuilder = new StringBuilder();
         if (exchange.getIn().getBody() instanceof List) {
-            System.out.println("Record Size : " + ((List<String>) ((List) exchange.getIn().getBody())).size());
+
+            List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+
             for (String content : (List<String>) exchange.getIn().getBody()) {
-                stringBuilder.append(content);
+                BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
+                bibliographicEntities.add(getBibliographicEntityGenerator().generateBibliographicEntity(bibRecord));
             }
+
+            bibliographicDetailsRepository.save(bibliographicEntities);
         }
+    }
+
+    public BibliographicEntityGenerator getBibliographicEntityGenerator() {
+        if (null == bibliographicEntityGenerator) {
+            bibliographicEntityGenerator = new BibliographicEntityGenerator();
+        }
+        return bibliographicEntityGenerator;
+    }
+
+    public JAXBHandler getJaxbHandler() {
+        if (null == jaxbHandler) {
+            jaxbHandler = JAXBHandler.getInstance();
+        }
+        return jaxbHandler;
     }
 }

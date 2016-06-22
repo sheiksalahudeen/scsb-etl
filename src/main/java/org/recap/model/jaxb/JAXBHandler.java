@@ -41,4 +41,8 @@ public class JAXBHandler {
         }
         return jaxbContextHandler;
     }
+
+    public Object unmarshal(String content, Class cl) {
+        return null;
+    }
 }
