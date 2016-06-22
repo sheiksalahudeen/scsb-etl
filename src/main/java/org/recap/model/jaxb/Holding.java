@@ -1,21 +1,30 @@
 package org.recap.model.jaxb;
 
+import org.recap.model.jaxb.marc.ContentType;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
  * Created by pvsubrah on 6/21/16.
  */
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Holding {
 
+    @XmlElement
     private String owningInstitutionHoldingsId;
 
-    private String content;
-
-    private List<Items> items;
+    @XmlElement(required = true, nillable = true)
+    protected ContentType content;
 
     @XmlElement
+    private List<Items> items;
+
     public String getOwningInstitutionHoldingsId() {
         return owningInstitutionHoldingsId;
     }
@@ -24,16 +33,14 @@ public class Holding {
         this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
-    @XmlElement
-    public String getContent() {
+    public ContentType getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(ContentType content) {
         this.content = content;
     }
 
-    @XmlElement
     public List<Items> getItems() {
         return items;
     }
