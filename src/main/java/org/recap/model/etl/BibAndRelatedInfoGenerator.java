@@ -1,14 +1,12 @@
 package org.recap.model.etl;
 
-import org.recap.model.jaxb.Bib;
-import org.recap.model.jaxb.BibRecord;
-import org.recap.model.jaxb.Holding;
-import org.recap.model.jaxb.Holdings;
+import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
 import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.util.MarcUtil;
 
 import java.util.ArrayList;
@@ -26,17 +24,18 @@ public class BibAndRelatedInfoGenerator {
     public BibliographicEntity generateBibAndRelatedInfo(BibRecord bibRecord) {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
+        List<ItemEntity> itemEntities = new ArrayList<>();
 
         bibliographicEntity.setCreatedDate(new Date());
         Bib bib = bibRecord.getBib();
         bibliographicEntity.setOwningInstitutionBibId(null == bib.getOwningInstitutionBibId() ? getControlFieldValue001(bibRecord) : bib.getOwningInstitutionBibId());
-        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionId(1);//TODO need to update
         bibliographicEntity.setCreatedDate(new Date());
-        ContentType content = bib.getContent();
+        ContentType bibContent = bib.getContent();
 
-        CollectionType collection = content.getCollection();
-        String xmlContent = collection.serialize(collection);
-        bibliographicEntity.setContent(xmlContent);
+        CollectionType bibContentCollection = bibContent.getCollection();
+        String bibXmlContent = bibContentCollection.serialize(bibContentCollection);
+        bibliographicEntity.setContent(bibXmlContent);
 
         List<Holdings> holdings = bibRecord.getHoldings();
         for (Iterator<Holdings> iterator = holdings.iterator(); iterator.hasNext(); ) {
@@ -45,13 +44,53 @@ public class BibAndRelatedInfoGenerator {
             for (Iterator<Holding> holdingIterator = holding.iterator(); holdingIterator.hasNext(); ) {
                 Holding holdingEnt = holdingIterator.next();
                 HoldingsEntity holdingsEntity = new HoldingsEntity();
-                CollectionType holdingCollection = holdingEnt.getContent().getCollection();
-                holdingsEntity.setContent(holdingCollection.serialize(holdingCollection));
+                CollectionType holdingContentCollection = holdingEnt.getContent().getCollection();
+                List<RecordType> holdingRecordTypes = holdingContentCollection.getRecord();
+                RecordType holdingsRecordType = holdingRecordTypes.get(0);
+                holdingsEntity.setContent(holdingContentCollection.serialize(holdingContentCollection));
                 holdingsEntity.setCreatedDate(new Date());
                 holdingsEntities.add(holdingsEntity);
+
+                String holdingsCallNumber = getMarcUtil().getDataFieldValue(holdingsRecordType, "852", null, null, "h");
+                String holdingsCallNumberType = getMarcUtil().getInd1(holdingsRecordType, "852", "h");
+
+                List<Items> items = holdingEnt.getItems();
+                for (Items item : items) {
+                    ContentType itemContent = item.getContent();
+                    CollectionType itemContentCollection = itemContent.getCollection();
+
+                    List<RecordType> itemRrecordTypes = itemContentCollection.getRecord();
+                    for (RecordType itemRecordType : itemRrecordTypes) {
+                        ItemEntity itemEntity = new ItemEntity();
+                        itemEntity.setBarcode(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "p"));
+                        itemEntity.setCustomerCode(getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "b"));
+                        itemEntity.setCallNumber(holdingsCallNumber);
+                        itemEntity.setCallNumberType(holdingsCallNumberType);
+                        itemEntity.setItemAvailabilityStatusId(1);//TODO need to update
+                        String copyNumber = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "t");
+                        if (org.apache.commons.lang3.StringUtils.isNoneBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
+                            itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
+                        }
+                        itemEntity.setOwningInstitutionId(1);//TODO need to update
+                        String collectionGroupId = getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "a");
+                        if (org.apache.commons.lang3.StringUtils.isNoneBlank(collectionGroupId) && org.apache.commons.lang3.math.NumberUtils.isNumber(collectionGroupId)) {
+                            itemEntity.setCollectionGroupId(Integer.valueOf(collectionGroupId));
+                        } else {
+                            itemEntity.setCollectionGroupId(2);
+                        }
+                        itemEntity.setCreatedDate(new Date());
+                        itemEntity.setUseRestrictions(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h"));
+                        itemEntity.setVolumePartYear(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "3"));
+                        itemEntity.setOwningInstitutionItemId(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "a"));
+
+                        itemEntity.setHoldingsEntity(holdingsEntity);
+                        itemEntities.add(itemEntity);
+                    }
+                }
             }
         }
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
+        bibliographicEntity.setItemEntities(itemEntities);
         return bibliographicEntity;
     }
 
