@@ -230,7 +230,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         itemEntity1.setCreatedDate(new Date());
         itemEntity1.setCustomerCode("1");
         itemEntity1.setItemAvailabilityStatusId(1);
-        itemEntity1.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity1.setOwningInstitutionItemId("101");
         itemEntity1.setOwningInstitutionId(1);
         itemEntity1.setBarcode("123");
         itemEntity1.setCallNumber("x.12321");

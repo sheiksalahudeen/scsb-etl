@@ -22,6 +22,7 @@ public class RecordProcessor implements Processor {
     private JAXBHandler jaxbHandler;
     private InstitutionDetailsRepository institutionDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibAndRelatedInfoGenerator bibAndRelatedInfoGenerator;
 
 
     @Override
@@ -32,7 +33,8 @@ public class RecordProcessor implements Processor {
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
-                BibliographicEntity bibliographicEntity = new BibAndRelatedInfoGenerator().generateBibAndRelatedInfo(bibRecord);
+
+                BibliographicEntity bibliographicEntity = getBibAndRelatedInfoGenerator().generateBibAndRelatedInfo(bibRecord);
                 bibliographicEntities.add(bibliographicEntity);
             }
 
@@ -68,5 +70,16 @@ public class RecordProcessor implements Processor {
 
     public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
         this.institutionDetailsRepository = institutionDetailsRepository;
+    }
+
+    public BibAndRelatedInfoGenerator getBibAndRelatedInfoGenerator() {
+        if (null == bibAndRelatedInfoGenerator) {
+            bibAndRelatedInfoGenerator = new BibAndRelatedInfoGenerator();
+        }
+        return bibAndRelatedInfoGenerator;
+    }
+
+    public void setBibAndRelatedInfoGenerator(BibAndRelatedInfoGenerator bibAndRelatedInfoGenerator) {
+        this.bibAndRelatedInfoGenerator = bibAndRelatedInfoGenerator;
     }
 }

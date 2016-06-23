@@ -9,10 +9,7 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.util.MarcUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by pvsubrah on 6/23/16.
@@ -22,13 +19,15 @@ public class BibAndRelatedInfoGenerator {
     private MarcUtil marcUtil;
 
     public BibliographicEntity generateBibAndRelatedInfo(BibRecord bibRecord) {
+
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();
 
         bibliographicEntity.setCreatedDate(new Date());
         Bib bib = bibRecord.getBib();
-        bibliographicEntity.setOwningInstitutionBibId(null == bib.getOwningInstitutionBibId() ? getControlFieldValue001(bibRecord) : bib.getOwningInstitutionBibId());
+        String owningInstitutionBibId = getOwningInstitutionBibId(bibRecord, bib);
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
         bibliographicEntity.setOwningInstitutionId(1);//TODO need to update
         bibliographicEntity.setCreatedDate(new Date());
         ContentType bibContent = bib.getContent();
@@ -91,7 +90,12 @@ public class BibAndRelatedInfoGenerator {
         }
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
         bibliographicEntity.setItemEntities(itemEntities);
+
         return bibliographicEntity;
+    }
+
+    private String getOwningInstitutionBibId(BibRecord bibRecord, Bib bib) {
+        return null == bib.getOwningInstitutionBibId() ? getControlFieldValue001(bibRecord) : bib.getOwningInstitutionBibId();
     }
 
     private String getControlFieldValue001(BibRecord bibRecord) {
