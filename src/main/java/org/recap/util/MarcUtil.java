@@ -1,14 +1,10 @@
 package org.recap.util;
 
-import info.freelibrary.marc4j.impl.ControlFieldImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcXmlReader;
-import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
-import org.marc4j.marc.Subfield;
-import org.marc4j.marc.VariableField;
 import org.recap.model.jaxb.marc.ControlFieldType;
 import org.recap.model.jaxb.marc.DataFieldType;
 import org.recap.model.jaxb.marc.RecordType;
@@ -55,11 +51,11 @@ public class MarcUtil {
                 if (doIndicatorsMatch(indicator1, indicator2, dataField)) {
                     List<SubfieldatafieldType> subFields = dataField.getSubfield();
                     for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
-                        SubfieldatafieldType subfield = subfieldIterator.next();
-                        if (subField!=null){
-                            String data = subfield.getCode();
+                        SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
+                        if (subField!=null && subfieldatafieldType.getCode().equals(subField)){
+                            String data = subfieldatafieldType.getCode();
                             if (StringUtils.isNotBlank(data)) {
-                                values.add(subfield.getValue());
+                                values.add(subfieldatafieldType.getValue());
                             }
                         }
                     }
@@ -67,6 +63,24 @@ public class MarcUtil {
             }
         }
         return values;
+    }
+
+    public String getInd1(RecordType marcRecord, String field, String subField) {
+        List<DataFieldType> dataFields = marcRecord.getDatafield();
+
+        for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
+            DataFieldType dataField = dataFieldIterator.next();
+            if (dataField != null && dataField.getTag().equals(field)) {
+                List<SubfieldatafieldType> subFields = dataField.getSubfield();
+                for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
+                    SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
+                    if (subField != null && subfieldatafieldType.getCode().equals(subField)) {
+                        return dataField.getInd1();
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private boolean doIndicatorsMatch(String indicator1, String indicator2, DataFieldType dataField) {

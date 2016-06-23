@@ -12,11 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -41,7 +37,11 @@ public class RecordProcessor implements Processor {
             }
 
             long startTime = System.currentTimeMillis();
-            bibliographicDetailsRepository.save(bibliographicEntities);
+            try {
+                bibliographicDetailsRepository.save(bibliographicEntities);
+            } catch (Exception e) {
+                logger.info("Exception " + e.getMessage());
+            }
             long endTime = System.currentTimeMillis();
             logger.info("Time taken to persist " + bibliographicEntities.size() + " bibliographic entities is: " + (endTime - startTime) / 1000 + " seconds");
         }
