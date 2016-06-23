@@ -95,7 +95,7 @@ public class ETLRouteBuilder extends RouteBuilder {
                 "file:" + from + "?move=.done",
                 FileEndpoint.class);
         fEPoint.setFilter(new FileFilter());
-        RouteDefinition route = from(fEPoint);
+        RouteDefinition route = from(fEPoint).streamCaching();
         route.setId(from);
         SplitDefinition split = route.split().tokenizeXML("bibRecord");
         split.streaming();
@@ -108,6 +108,13 @@ public class ETLRouteBuilder extends RouteBuilder {
         ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
         threads.process(processor);
         threads.setThreadName("etlProcessingThread");
+
+
+//        AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
+//        aggregator.completionPredicate(new SplitPredicate(chunkSize));
+//        RecordProcessor processor = new RecordProcessor();
+//        processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
+//        aggregator.process(processor);
     }
 
     public class FileFilter implements GenericFileFilter {

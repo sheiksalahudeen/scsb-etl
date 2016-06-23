@@ -2,7 +2,7 @@ package org.recap.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.recap.model.BibliographicEntityInformationGeneratorCallable;
+import org.recap.model.etl.BibAndRelatedInfoGenerator;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -33,20 +32,12 @@ public class RecordProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         if (exchange.getIn().getBody() instanceof List) {
 
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
-            List<Future> futures = new ArrayList<>();
-
             List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
-                Future future = executorService.submit(new BibliographicEntityInformationGeneratorCallable(bibRecord, institutionDetailsRepository));
-                futures.add(future);
-            }
-
-            for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
-                Future future = iterator.next();
-                bibliographicEntities.add((BibliographicEntity) future.get());
+                BibliographicEntity bibliographicEntity = new BibAndRelatedInfoGenerator().generateBibAndRelatedInfo(bibRecord);
+                bibliographicEntities.add(bibliographicEntity);
             }
 
             long startTime = System.currentTimeMillis();
