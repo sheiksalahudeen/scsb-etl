@@ -85,22 +85,6 @@ public class ItemEntity implements Serializable{
     public ItemEntity() {
     }
 
-    public ItemEntity(String barcode, String customerCode, String callNumber, String callNumberType, Integer itemAvailabilityStatusId, Integer copyNumber, Integer owningInstitutionId, Integer collectionGroupId, Date createdDate, Date lastUpdatedDate, String useRestrictions, String volumePartYear, String owningInstitutionItemId, Integer notesId) {
-        this.barcode = barcode;
-        this.customerCode = customerCode;
-        this.callNumber = callNumber;
-        this.callNumberType = callNumberType;
-        this.itemAvailabilityStatusId = itemAvailabilityStatusId;
-        this.copyNumber = copyNumber;
-        this.owningInstitutionId = owningInstitutionId;
-        this.collectionGroupId = collectionGroupId;
-        this.createdDate = createdDate;
-        this.lastUpdatedDate = lastUpdatedDate;
-        this.useRestrictions = useRestrictions;
-        this.volumePartYear = volumePartYear;
-        this.owningInstitutionItemId = owningInstitutionItemId;
-        this.notesId = notesId;
-    }
 
     public Integer getItemId() {
         return itemId;

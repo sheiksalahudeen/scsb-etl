@@ -52,14 +52,6 @@ public class BibliographicEntity implements Serializable{
     public BibliographicEntity() {
     }
 
-    public BibliographicEntity(String content, Integer owningInstitutionId, Date createdDate, Date lastUpdatedDate, String owningInstitutionBibId) {
-        this.content = content;
-        this.owningInstitutionId = owningInstitutionId;
-        this.createdDate = createdDate;
-        this.lastUpdatedDate = lastUpdatedDate;
-        this.owningInstitutionBibId = owningInstitutionBibId;
-    }
-
     public Integer getBibliographicId() {
         return bibliographicId;
     }

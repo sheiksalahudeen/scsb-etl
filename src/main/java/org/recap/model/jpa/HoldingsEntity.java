@@ -41,12 +41,6 @@ public class HoldingsEntity implements Serializable{
     public HoldingsEntity() {
     }
 
-    public HoldingsEntity(String content, Date createdDate, Date lastUpdatedDate, String owningInstitutionHoldingsId) {
-        this.content = content;
-        this.createdDate = createdDate;
-        this.lastUpdatedDate = lastUpdatedDate;
-        this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
-    }
 
     public Integer getHoldingsId() {
         return holdingsId;
