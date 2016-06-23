@@ -5,7 +5,9 @@ import org.apache.camel.Processor;
 import org.recap.model.BibHoldingsGeneratorCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.BibliographicHoldingsEntity;
+import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ public class RecordProcessor implements Processor {
     private Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
     private JAXBHandler jaxbHandler;
     private InstitutionDetailsRepository institutionDetailsRepository;
-    private BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
 
     @Override
@@ -36,7 +38,7 @@ public class RecordProcessor implements Processor {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             List<Future> futures = new ArrayList<>();
 
-            List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = new ArrayList<>();
+            List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
@@ -46,13 +48,13 @@ public class RecordProcessor implements Processor {
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
-                bibliographicHoldingsEntities.addAll((Collection<? extends BibliographicHoldingsEntity>) future.get());
+                bibliographicEntities.addAll((Collection<? extends BibliographicEntity>) future.get());
             }
 
             long startTime = System.currentTimeMillis();
-            bibliographicHoldingsDetailsRepository.save(bibliographicHoldingsEntities);
+            bibliographicDetailsRepository.save(bibliographicEntities);
             long endTime = System.currentTimeMillis();
-            logger.info("Time taken to persist " + bibliographicHoldingsEntities.size() + " bibliographic entities is: " + (endTime - startTime) / 1000 + " seconds");
+            logger.info("Time taken to persist " + bibliographicEntities.size() + " bibliographic entities is: " + (endTime - startTime) / 1000 + " seconds");
         }
     }
 
@@ -63,12 +65,12 @@ public class RecordProcessor implements Processor {
         return jaxbHandler;
     }
 
-    public BibliographicHoldingsDetailsRepository getBibliographicHoldingsDetailsRepository() {
-        return bibliographicHoldingsDetailsRepository;
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
     }
 
-    public void setBibliographicHoldingsDetailsRepository(BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository) {
-        this.bibliographicHoldingsDetailsRepository = bibliographicHoldingsDetailsRepository;
+    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
     public InstitutionDetailsRepository getInstitutionDetailsRepository() {

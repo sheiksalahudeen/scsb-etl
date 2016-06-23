@@ -10,6 +10,7 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.SplitDefinition;
 import org.apache.camel.model.ThreadsDefinition;
 import org.apache.commons.io.FilenameUtils;
+import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 
@@ -20,11 +21,11 @@ public class ETLRouteBuilder extends RouteBuilder {
     private String from = null;
     private FileEndpoint fEPoint = null;
     private int chunkSize = 1;
-    private BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
-    private InstitutionDetailsRepository institutionDetailsRepository;
     private int poolSize = 10;
     private int maxThreads = 10;
     private int numThreads;
+    private InstitutionDetailsRepository institutionDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     public ETLRouteBuilder(CamelContext context) {
         super(context);
@@ -54,12 +55,12 @@ public class ETLRouteBuilder extends RouteBuilder {
         this.institutionDetailsRepository = institutionDetailsRepository;
     }
 
-    public BibliographicHoldingsDetailsRepository getBibliographicHoldingsDetailsRepository() {
-        return bibliographicHoldingsDetailsRepository;
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
     }
 
-    public void setBibliographicHoldingsDetailsRepository(BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository) {
-        this.bibliographicHoldingsDetailsRepository = bibliographicHoldingsDetailsRepository;
+    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
     public String getFrom() {
@@ -102,7 +103,7 @@ public class ETLRouteBuilder extends RouteBuilder {
         aggregator.setParallelProcessing(true);
         aggregator.completionPredicate(new SplitPredicate(chunkSize));
         RecordProcessor processor = new RecordProcessor();
-        processor.setBibliographicHoldingsDetailsRepository(bibliographicHoldingsDetailsRepository);
+        processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         processor.setInstitutionDetailsRepository(institutionDetailsRepository);
         ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
         threads.process(processor);
