@@ -17,25 +17,28 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
- * Created by pvsubrah on 6/21/16.
+ * Created by pvsubrah on 6/22/16.
  */
-public class BibliographicEntityGenerator {
+public class BibHoldingsGeneratorCallable implements Callable {
 
     private InstitutionDetailsRepository institutionDetailsRepository;
     private MarcUtil marcUtil;
+    private BibRecord bibRecord;
 
-    public InstitutionDetailsRepository getInstitutionDetailsRepository() {
-        return institutionDetailsRepository;
+    public BibHoldingsGeneratorCallable(BibRecord bibRecord, InstitutionDetailsRepository institutionDetailsRepository) {
+        this.bibRecord = bibRecord;
+        this.institutionDetailsRepository = institutionDetailsRepository;
     }
 
     public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
         this.institutionDetailsRepository = institutionDetailsRepository;
     }
 
-    public List<BibliographicHoldingsEntity> generateBibliographicEntity(BibRecord bibRecord){
-
+    @Override
+    public Object call() throws Exception {
         List<BibliographicHoldingsEntity> bibliographicHoldingsEntityList = new ArrayList<>();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -71,6 +74,7 @@ public class BibliographicEntityGenerator {
         }
 
         return bibliographicHoldingsEntityList;
+
     }
 
     private String getControlFieldValue001(BibRecord bibRecord) {
@@ -83,9 +87,5 @@ public class BibliographicEntityGenerator {
             marcUtil = new MarcUtil();
         }
         return marcUtil;
-    }
-
-    public void setMarcUtil(MarcUtil marcUtil) {
-        this.marcUtil = marcUtil;
     }
 }

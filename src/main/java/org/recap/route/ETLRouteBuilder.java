@@ -10,8 +10,6 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.SplitDefinition;
 import org.apache.camel.model.ThreadsDefinition;
 import org.apache.commons.io.FilenameUtils;
-import org.recap.model.BibliographicEntityGenerator;
-import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 

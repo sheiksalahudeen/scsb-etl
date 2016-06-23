@@ -2,8 +2,6 @@ package org.recap;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.model.BibliographicEntityGenerator;
-import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.route.ETLRouteBuilder;

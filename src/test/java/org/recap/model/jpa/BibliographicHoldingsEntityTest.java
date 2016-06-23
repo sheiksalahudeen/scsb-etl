@@ -66,10 +66,6 @@ public class BibliographicHoldingsEntityTest extends BaseTestCase {
 
         List<HoldingsEntity> allById = holdingsDetailsRepository.findAllByHoldingsId(holdingsEntity.getHoldingsId());
         assertTrue(allById.size() == 1);
-
-
-
-
     }
 
 }
