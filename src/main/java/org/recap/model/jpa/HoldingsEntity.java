@@ -32,11 +32,21 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
 
-    @OneToMany(mappedBy="holdingsEntity")
-    private List<BibliographicHoldingsEntity> bibliographicHoldingsEntities;
+    @ManyToMany(mappedBy = "holdingsEntities")
+    private List<BibliographicEntity> bibliographicEntities;
 
     @OneToMany(mappedBy = "holdingsEntity", cascade = CascadeType.ALL)
     private List<ItemEntity> itemEntities;
+
+    public HoldingsEntity() {
+    }
+
+    public HoldingsEntity(String content, Date createdDate, Date lastUpdatedDate, String owningInstitutionHoldingsId) {
+        this.content = content;
+        this.createdDate = createdDate;
+        this.lastUpdatedDate = lastUpdatedDate;
+        this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
+    }
 
     public Integer getHoldingsId() {
         return holdingsId;
@@ -78,12 +88,12 @@ public class HoldingsEntity implements Serializable{
         this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
-    public List<BibliographicHoldingsEntity> getBibliographicHoldingsEntities() {
-        return bibliographicHoldingsEntities;
+    public List<BibliographicEntity> getBibliographicEntities() {
+        return bibliographicEntities;
     }
 
-    public void setBibliographicHoldingsEntities(List<BibliographicHoldingsEntity> bibliographicHoldingsEntities) {
-        this.bibliographicHoldingsEntities = bibliographicHoldingsEntities;
+    public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
+        this.bibliographicEntities = bibliographicEntities;
     }
 
     public List<ItemEntity> getItemEntities() {

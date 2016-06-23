@@ -35,12 +35,30 @@ public class BibliographicEntity implements Serializable{
     @Column(name = "OWNING_INST_BIB_ID")
     private String owningInstitutionBibId;
 
-    @OneToMany(mappedBy="bibliographicEntity")
-    private List<BibliographicHoldingsEntity> bibliographicHoldingsEntities;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "bibliographic_holdings_t", joinColumns = @JoinColumn(name = "BIBLIOGRAPHIC_ID", referencedColumnName = "BIBLIOGRAPHIC_ID"),
+            inverseJoinColumns = @JoinColumn(name = "HOLDINGS_ID", referencedColumnName = "HOLDINGS_ID"))
+    private List<HoldingsEntity> holdingsEntities;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "bibliographic_item_t", joinColumns = @JoinColumn(name = "BIBLIOGRAPHIC_ID", referencedColumnName = "BIBLIOGRAPHIC_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ITEM_ID", referencedColumnName = "ITEM_ID"))
+    private List<ItemEntity> itemEntities;
+
+    public BibliographicEntity() {
+    }
+
+    public BibliographicEntity(String content, Integer owningInstitutionId, Date createdDate, Date lastUpdatedDate, String owningInstitutionBibId) {
+        this.content = content;
+        this.owningInstitutionId = owningInstitutionId;
+        this.createdDate = createdDate;
+        this.lastUpdatedDate = lastUpdatedDate;
+        this.owningInstitutionBibId = owningInstitutionBibId;
+    }
 
     public Integer getBibliographicId() {
         return bibliographicId;
@@ -90,19 +108,27 @@ public class BibliographicEntity implements Serializable{
         this.owningInstitutionBibId = owningInstitutionBibId;
     }
 
-    public List<BibliographicHoldingsEntity> getBibliographicHoldingsEntities() {
-        return bibliographicHoldingsEntities;
-    }
-
-    public void setBibliographicHoldingsEntities(List<BibliographicHoldingsEntity> bibliographicHoldingsEntities) {
-        this.bibliographicHoldingsEntities = bibliographicHoldingsEntities;
-    }
-
     public InstitutionEntity getInstitutionEntity() {
         return institutionEntity;
     }
 
     public void setInstitutionEntity(InstitutionEntity institutionEntity) {
         this.institutionEntity = institutionEntity;
+    }
+
+    public List<HoldingsEntity> getHoldingsEntities() {
+        return holdingsEntities;
+    }
+
+    public void setHoldingsEntities(List<HoldingsEntity> holdingsEntities) {
+        this.holdingsEntities = holdingsEntities;
+    }
+
+    public List<ItemEntity> getItemEntities() {
+        return itemEntities;
+    }
+
+    public void setItemEntities(List<ItemEntity> itemEntities) {
+        this.itemEntities = itemEntities;
     }
 }

@@ -29,7 +29,7 @@ public class ProcessETLTest extends BaseTestCase {
     public void process() throws Exception {
         assertNotNull(reCAPCamelContext);
         String endPoint = getEndPoint();
-        reCAPCamelContext.addDynamicRoute(camelContext, endPoint, chunkSize);
+        reCAPCamelContext.addDynamicRoute(camelContext, endPoint, chunkSize, 1);
         while(reCAPCamelContext.isRunning()){
             Thread.sleep(1000);
         }

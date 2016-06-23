@@ -39,9 +39,8 @@ public class BibHoldingsGeneratorCallable implements Callable {
 
     @Override
     public Object call() throws Exception {
-        List<BibliographicHoldingsEntity> bibliographicHoldingsEntityList = new ArrayList<>();
-
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        List<HoldingsEntity> holdingsEntities = new ArrayList<>();
 
         bibliographicEntity.setCreatedDate(new Date());
         Bib bib = bibRecord.getBib();
@@ -59,22 +58,16 @@ public class BibHoldingsGeneratorCallable implements Callable {
             Holdings holdingsList = iterator.next();
             List<Holding> holding = holdingsList.getHolding();
             for (Iterator<Holding> holdingIterator = holding.iterator(); holdingIterator.hasNext(); ) {
-                BibliographicHoldingsEntity bibliographicHoldingsEntity = new BibliographicHoldingsEntity();
                 Holding holdingEnt = holdingIterator.next();
                 HoldingsEntity holdingsEntity = new HoldingsEntity();
                 CollectionType holdingCollection = holdingEnt.getContent().getCollection();
                 holdingsEntity.setContent(holdingCollection.serialize(holdingCollection));
                 holdingsEntity.setCreatedDate(new Date());
-
-                bibliographicHoldingsEntity.setBibliographicEntity(bibliographicEntity);
-                bibliographicHoldingsEntity.setHoldingsEntity(holdingsEntity);
-
-                bibliographicHoldingsEntityList.add(bibliographicHoldingsEntity);
+                holdingsEntities.add(holdingsEntity);
             }
         }
-
-        return bibliographicHoldingsEntityList;
-
+        bibliographicEntity.setHoldingsEntities(holdingsEntities);
+        return bibliographicEntity;
     }
 
     private String getControlFieldValue001(BibRecord bibRecord) {
