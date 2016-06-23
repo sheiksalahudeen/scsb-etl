@@ -2,13 +2,11 @@ package org.recap.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.recap.model.BibHoldingsGeneratorCallable;
+import org.recap.model.BibliographicEntityInformationGeneratorCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.BibliographicHoldingsEntity;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,7 @@ public class RecordProcessor implements Processor {
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
-                Future future = executorService.submit(new BibHoldingsGeneratorCallable(bibRecord, institutionDetailsRepository));
+                Future future = executorService.submit(new BibliographicEntityInformationGeneratorCallable(bibRecord, institutionDetailsRepository));
                 futures.add(future);
             }
 

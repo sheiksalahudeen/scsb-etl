@@ -22,13 +22,13 @@ import java.util.concurrent.Callable;
 /**
  * Created by pvsubrah on 6/22/16.
  */
-public class BibHoldingsGeneratorCallable implements Callable {
+public class BibliographicEntityInformationGeneratorCallable implements Callable {
 
     private InstitutionDetailsRepository institutionDetailsRepository;
     private MarcUtil marcUtil;
     private BibRecord bibRecord;
 
-    public BibHoldingsGeneratorCallable(BibRecord bibRecord, InstitutionDetailsRepository institutionDetailsRepository) {
+    public BibliographicEntityInformationGeneratorCallable(BibRecord bibRecord, InstitutionDetailsRepository institutionDetailsRepository) {
         this.bibRecord = bibRecord;
         this.institutionDetailsRepository = institutionDetailsRepository;
     }
