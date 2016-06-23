@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by pvsubrah on 6/11/16.
@@ -23,9 +24,6 @@ public class ItemEntity implements Serializable{
 
     @Column(name = "CUSTOMER_CODE")
     private String customerCode;
-
-    @Column(name = "HOLDINGS_ID")
-    private Integer holdingsId;
 
     @Column(name = "CALL_NUMBER")
     private String callNumber;
@@ -53,9 +51,6 @@ public class ItemEntity implements Serializable{
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
-    @Column(name = "BIBLIOGRAPHIC_ID")
-    private Integer bibliographicId;
-
     @Column(name = "USE_RESTRICTIONS")
     private String useRestrictions;
 
@@ -69,8 +64,7 @@ public class ItemEntity implements Serializable{
     private Integer notesId;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="HOLDINGS_ID", insertable=false, updatable=false)
-    @JsonIgnore
+    @JoinColumn(name="HOLDINGS_ID")
     private HoldingsEntity holdingsEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -84,6 +78,29 @@ public class ItemEntity implements Serializable{
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
+
+    @ManyToMany(mappedBy = "itemEntities")
+    private List<BibliographicEntity> bibliographicEntities;
+
+    public ItemEntity() {
+    }
+
+    public ItemEntity(String barcode, String customerCode, String callNumber, String callNumberType, Integer itemAvailabilityStatusId, Integer copyNumber, Integer owningInstitutionId, Integer collectionGroupId, Date createdDate, Date lastUpdatedDate, String useRestrictions, String volumePartYear, String owningInstitutionItemId, Integer notesId) {
+        this.barcode = barcode;
+        this.customerCode = customerCode;
+        this.callNumber = callNumber;
+        this.callNumberType = callNumberType;
+        this.itemAvailabilityStatusId = itemAvailabilityStatusId;
+        this.copyNumber = copyNumber;
+        this.owningInstitutionId = owningInstitutionId;
+        this.collectionGroupId = collectionGroupId;
+        this.createdDate = createdDate;
+        this.lastUpdatedDate = lastUpdatedDate;
+        this.useRestrictions = useRestrictions;
+        this.volumePartYear = volumePartYear;
+        this.owningInstitutionItemId = owningInstitutionItemId;
+        this.notesId = notesId;
+    }
 
     public Integer getItemId() {
         return itemId;
@@ -107,14 +124,6 @@ public class ItemEntity implements Serializable{
 
     public void setCustomerCode(String customerCode) {
         this.customerCode = customerCode;
-    }
-
-    public Integer getHoldingsId() {
-        return holdingsId;
-    }
-
-    public void setHoldingsId(Integer holdingsId) {
-        this.holdingsId = holdingsId;
     }
 
     public String getCallNumber() {
@@ -181,14 +190,6 @@ public class ItemEntity implements Serializable{
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    public Integer getBibliographicId() {
-        return bibliographicId;
-    }
-
-    public void setBibliographicId(Integer bibliographicId) {
-        this.bibliographicId = bibliographicId;
-    }
-
     public String getUseRestrictions() {
         return useRestrictions;
     }
@@ -251,5 +252,13 @@ public class ItemEntity implements Serializable{
 
     public void setInstitutionEntity(InstitutionEntity institutionEntity) {
         this.institutionEntity = institutionEntity;
+    }
+
+    public List<BibliographicEntity> getBibliographicEntities() {
+        return bibliographicEntities;
+    }
+
+    public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
+        this.bibliographicEntities = bibliographicEntities;
     }
 }

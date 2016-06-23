@@ -18,16 +18,8 @@ public class BibliographicHoldingsEntity implements Serializable{
     @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private Integer bibliographicId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "BIBLIOGRAPHIC_ID")
-    private BibliographicEntity bibliographicEntity;
-
     @Column(name = "HOLDINGS_ID", insertable = false, updatable = false)
     private Integer holdingsId;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "HOLDINGS_ID")
-    private HoldingsEntity holdingsEntity;
 
     public Integer getBibliographicHoldingsId() {
         return bibliographicHoldingsId;
@@ -51,22 +43,6 @@ public class BibliographicHoldingsEntity implements Serializable{
 
     public void setHoldingsId(Integer holdingsId) {
         this.holdingsId = holdingsId;
-    }
-
-    public BibliographicEntity getBibliographicEntity() {
-        return bibliographicEntity;
-    }
-
-    public void setBibliographicEntity(BibliographicEntity bibliographicEntity) {
-        this.bibliographicEntity = bibliographicEntity;
-    }
-
-    public HoldingsEntity getHoldingsEntity() {
-        return holdingsEntity;
-    }
-
-    public void setHoldingsEntity(HoldingsEntity holdingsEntity) {
-        this.holdingsEntity = holdingsEntity;
     }
 }
 

@@ -10,4 +10,5 @@ import java.util.List;
  */
 public interface BibliographicHoldingsDetailsRepository extends CrudRepository<BibliographicHoldingsEntity, Integer> {
     public List<BibliographicHoldingsEntity> findAllByHoldingsId(Integer holdingsId);
+    List<BibliographicHoldingsEntity> findAllByBibliographicId(Integer bibliographicId);
 }
