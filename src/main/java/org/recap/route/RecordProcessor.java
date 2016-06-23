@@ -46,7 +46,7 @@ public class RecordProcessor implements Processor {
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
-                bibliographicEntities.addAll((Collection<? extends BibliographicEntity>) future.get());
+                bibliographicEntities.add((BibliographicEntity) future.get());
             }
 
             long startTime = System.currentTimeMillis();
