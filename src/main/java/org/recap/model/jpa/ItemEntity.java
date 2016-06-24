@@ -1,6 +1,9 @@
 package org.recap.model.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,10 +16,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "item_t", schema = "recap", catalog = "")
+@IdClass(ItemPK.class)
 public class ItemEntity implements Serializable{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ITEM_ID")
+    @Column(name = "ITEM_ID", insertable = false,updatable = false)
     private Integer itemId;
 
     @Column(name = "BAR_CODE")
@@ -37,6 +39,7 @@ public class ItemEntity implements Serializable{
     @Column(name = "COPY_NUMBER")
     private Integer copyNumber;
 
+    @Id
     @Column(name = "OWNING_INST_ID")
     private Integer owningInstitutionId;
 
@@ -57,6 +60,7 @@ public class ItemEntity implements Serializable{
     @Column(name = "VOLUME_PART_YEAR")
     private String volumePartYear;
 
+    @Id
     @Column(name = "OWNING_INST_ITEM_ID")
     private String owningInstitutionItemId;
 
@@ -244,5 +248,48 @@ public class ItemEntity implements Serializable{
 
     public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
         this.bibliographicEntities = bibliographicEntities;
+    }
+}
+
+
+
+class ItemPK implements Serializable {
+    private Integer owningInstitutionId;
+    private String owningInstitutionItemId;
+
+
+    public ItemPK(){
+
+    }
+
+    public ItemPK(Integer owningInstitutionId, String owningInstitutionItemId) {
+        this.owningInstitutionId = owningInstitutionId;
+        this.owningInstitutionItemId = owningInstitutionItemId;
+    }
+
+    public Integer getOwningInstitutionId() {
+        return owningInstitutionId;
+    }
+
+    public void setOwningInstitutionId(Integer owningInstitutionId) {
+        this.owningInstitutionId = owningInstitutionId;
+    }
+
+    public String getOwningInstitutionItemId() {
+        return owningInstitutionItemId;
+    }
+
+    public void setOwningInstitutionItemId(String owningInstitutionItemId) {
+        this.owningInstitutionItemId = owningInstitutionItemId;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
