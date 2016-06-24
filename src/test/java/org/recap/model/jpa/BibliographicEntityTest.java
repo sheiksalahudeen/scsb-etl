@@ -8,11 +8,14 @@ import org.recap.repository.BibliographicItemDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by chenchulakshmig on 23/6/16.
@@ -241,9 +244,6 @@ public class BibliographicEntityTest extends BaseTestCase {
 
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
 
-        BibliographicEntity savedBibEntity1 = bibliographicDetailsRepository.save(bibliographicEntity1);
-        assertNotNull(savedBibEntity1);
-
 
         BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
         bibliographicEntity2.setContent("mock Content");
@@ -254,9 +254,22 @@ public class BibliographicEntityTest extends BaseTestCase {
 
         bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity1));
-        BibliographicEntity savedBibEntity2 = bibliographicDetailsRepository.save(bibliographicEntity2);
-        assertNotNull(savedBibEntity2);
 
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        List<Future> futureList = new ArrayList<>();
+        futureList.add(executorService.submit(new BibRepositoryCallable(bibliographicEntity1, bibliographicDetailsRepository)));
+        futureList.add(executorService.submit(new BibRepositoryCallable(bibliographicEntity2, bibliographicDetailsRepository)));
+
+        List<BibliographicEntity> savedEntities = new ArrayList<>();
+
+        for (Iterator<Future> iterator = futureList.iterator(); iterator.hasNext(); ) {
+            Future future = iterator.next();
+            savedEntities.add((BibliographicEntity) future.get());
+        }
+
+        assertTrue(savedEntities.size() == 2);
 
     }
 

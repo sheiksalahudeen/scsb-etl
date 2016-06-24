@@ -1,13 +1,9 @@
 package org.recap.model.jpa;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
-import org.hibernate.annotations.GenericGenerator;
-
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
 
 /**
  * Created by pvsubrah on 6/10/16.
@@ -169,11 +165,16 @@ class BibliographicPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionBibId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        BibliographicPK bibliographicPK  = (BibliographicPK) obj;
+        if(bibliographicPK.getOwningInstitutionId().equals(owningInstitutionId) && bibliographicPK.getOwningInstitutionBibId().equals(owningInstitutionBibId)){
+            return true;
+        }
+
+        return false;
     }
 }
