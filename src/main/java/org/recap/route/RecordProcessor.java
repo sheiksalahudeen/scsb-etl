@@ -8,6 +8,7 @@ import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.util.BibSynchronzePersistanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ public class RecordProcessor implements Processor {
     private InstitutionDetailsRepository institutionDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private BibAndRelatedInfoGenerator bibAndRelatedInfoGenerator;
+    private BibSynchronzePersistanceUtil bibSynchronzePersistanceUtil;
 
 
     @Override
@@ -38,15 +40,17 @@ public class RecordProcessor implements Processor {
                 bibliographicEntities.add(bibliographicEntity);
             }
 
-            long startTime = System.currentTimeMillis();
-            try {
-                bibliographicDetailsRepository.save(bibliographicEntities);
-            } catch (Exception e) {
-                logger.info("Exception " + e.getMessage());
-            }
-            long endTime = System.currentTimeMillis();
-            logger.info("Time taken to persist " + bibliographicEntities.size() + " bibliographic entities is: " + (endTime - startTime) / 1000 + " seconds");
+            getBibSynchronzePersistanceUtil().saveBibRecords(bibliographicEntities);
+
         }
+    }
+
+    private BibSynchronzePersistanceUtil getBibSynchronzePersistanceUtil() {
+        if(null == bibSynchronzePersistanceUtil) {
+            bibSynchronzePersistanceUtil = BibSynchronzePersistanceUtil.getInstance();
+            bibSynchronzePersistanceUtil.setBibliographicDetailsRepository(bibliographicDetailsRepository);
+        }
+        return bibSynchronzePersistanceUtil;
     }
 
     public JAXBHandler getJaxbHandler() {
