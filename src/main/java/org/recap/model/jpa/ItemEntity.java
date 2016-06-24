@@ -285,11 +285,16 @@ class ItemPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionItemId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        ItemPK itemPK  = (ItemPK) obj;
+        if(itemPK.getOwningInstitutionId().equals(owningInstitutionId) && itemPK.getOwningInstitutionItemId().equals(owningInstitutionItemId)){
+            return true;
+        }
+
+        return false;
     }
 }
