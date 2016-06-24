@@ -1,13 +1,9 @@
 package org.recap.model.jpa;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
-import org.hibernate.annotations.GenericGenerator;
-
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
 
 /**
  * Created by pvsubrah on 6/10/16.
