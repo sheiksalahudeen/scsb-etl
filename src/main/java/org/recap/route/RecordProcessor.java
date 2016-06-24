@@ -2,7 +2,7 @@ package org.recap.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.recap.model.etl.BibAndRelatedInfoGenerator;
+import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
@@ -13,7 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -23,7 +27,6 @@ public class RecordProcessor implements Processor {
     private JAXBHandler jaxbHandler;
     private InstitutionDetailsRepository institutionDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
-    private BibAndRelatedInfoGenerator bibAndRelatedInfoGenerator;
     private BibSynchronzePersistanceUtil bibSynchronzePersistanceUtil;
 
 
@@ -31,14 +34,26 @@ public class RecordProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         if (exchange.getIn().getBody() instanceof List) {
 
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+            List<Future> futures = new ArrayList<>();
+
             List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
+                futures.add(executorService.submit(new BibPersisterCallable(bibRecord)));
+            }
 
-                BibliographicEntity bibliographicEntity = getBibAndRelatedInfoGenerator().generateBibAndRelatedInfo(bibRecord);
+            long startTime = System.currentTimeMillis();
+            for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+                Future future = iterator.next();
+                BibliographicEntity bibliographicEntity = (BibliographicEntity) future.get();
                 bibliographicEntities.add(bibliographicEntity);
             }
+
+            long endTime = System.currentTimeMillis();
+            System.out.println("Time taken to prepare: " + bibliographicEntities.size() + " Bib and related data by thread : " + Thread.currentThread().getName() + " is : " + (endTime-startTime)/1000 + " seconds");
 
             getBibSynchronzePersistanceUtil().saveBibRecords(bibliographicEntities);
 
@@ -60,6 +75,8 @@ public class RecordProcessor implements Processor {
         return jaxbHandler;
     }
 
+
+
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
         return bibliographicDetailsRepository;
     }
@@ -74,16 +91,5 @@ public class RecordProcessor implements Processor {
 
     public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
         this.institutionDetailsRepository = institutionDetailsRepository;
-    }
-
-    public BibAndRelatedInfoGenerator getBibAndRelatedInfoGenerator() {
-        if (null == bibAndRelatedInfoGenerator) {
-            bibAndRelatedInfoGenerator = new BibAndRelatedInfoGenerator();
-        }
-        return bibAndRelatedInfoGenerator;
-    }
-
-    public void setBibAndRelatedInfoGenerator(BibAndRelatedInfoGenerator bibAndRelatedInfoGenerator) {
-        this.bibAndRelatedInfoGenerator = bibAndRelatedInfoGenerator;
     }
 }

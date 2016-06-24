@@ -9,16 +9,29 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.util.MarcUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
- * Created by pvsubrah on 6/23/16.
+ * Created by pvsubrah on 6/24/16.
  */
-public class BibAndRelatedInfoGenerator {
+public class BibPersisterCallable implements Callable {
 
     private MarcUtil marcUtil;
+    private BibRecord bibRecord;
 
-    public BibliographicEntity generateBibAndRelatedInfo(BibRecord bibRecord) {
+    public BibPersisterCallable(BibRecord bibRecord) {
+        this.bibRecord = bibRecord;
+    }
+
+    @Override
+    public Object call() throws Exception {
+
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
+
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
