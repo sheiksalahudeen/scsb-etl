@@ -214,7 +214,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setLastUpdatedDate(new Date());
         bibliographicEntity1.setOwningInstitutionId(1);
-        bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity1.setOwningInstitutionBibId("10001");
 
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
@@ -250,7 +250,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity2.setCreatedDate(new Date());
         bibliographicEntity2.setLastUpdatedDate(new Date());
         bibliographicEntity2.setOwningInstitutionId(1);
-        bibliographicEntity2.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity2.setOwningInstitutionBibId("10002");
 
         bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity1));

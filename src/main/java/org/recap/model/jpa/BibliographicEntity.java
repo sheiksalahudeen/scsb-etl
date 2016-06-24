@@ -1,5 +1,9 @@
 package org.recap.model.jpa;
 
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -11,16 +15,16 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
+@IdClass(BibliographicPK.class)
 public class BibliographicEntity implements Serializable{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "BIBLIOGRAPHIC_ID")
+    @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private Integer bibliographicId;
 
     @Lob
     @Column(name = "CONTENT")
     private String content;
 
+    @Id
     @Column(name = "OWNING_INST_ID")
     private Integer owningInstitutionId;
 
@@ -32,6 +36,7 @@ public class BibliographicEntity implements Serializable{
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
+    @Id
     @Column(name = "OWNING_INST_BIB_ID")
     private String owningInstitutionBibId;
 
@@ -40,13 +45,19 @@ public class BibliographicEntity implements Serializable{
     private InstitutionEntity institutionEntity;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "bibliographic_holdings_t", joinColumns = @JoinColumn(name = "BIBLIOGRAPHIC_ID", referencedColumnName = "BIBLIOGRAPHIC_ID"),
+    @JoinTable(name = "bibliographic_holdings_t", joinColumns = {
+            @JoinColumn(name="OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
+            @JoinColumn(name="OWNING_INST_ID", referencedColumnName = "OWNING_INST_ID")},
             inverseJoinColumns = @JoinColumn(name = "HOLDINGS_ID", referencedColumnName = "HOLDINGS_ID"))
     private List<HoldingsEntity> holdingsEntities;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "bibliographic_item_t", joinColumns = @JoinColumn(name = "BIBLIOGRAPHIC_ID", referencedColumnName = "BIBLIOGRAPHIC_ID"),
-            inverseJoinColumns = @JoinColumn(name = "ITEM_ID", referencedColumnName = "ITEM_ID"))
+    @JoinTable(name = "bibliographic_item_t", joinColumns = {
+            @JoinColumn(name="OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
+            @JoinColumn(name="BIB_INST_ID", referencedColumnName = "OWNING_INST_ID")},
+            inverseJoinColumns = {
+                    @JoinColumn(name="OWNING_INST_ITEM_ID", referencedColumnName = "OWNING_INST_ITEM_ID"),
+                    @JoinColumn(name="ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID") })
     private List<ItemEntity> itemEntities;
 
     public BibliographicEntity() {
@@ -122,5 +133,47 @@ public class BibliographicEntity implements Serializable{
 
     public void setItemEntities(List<ItemEntity> itemEntities) {
         this.itemEntities = itemEntities;
+    }
+
+
+}
+
+class BibliographicPK implements Serializable {
+    private Integer owningInstitutionId;
+    private String owningInstitutionBibId;
+
+    public BibliographicPK() {
+
+    }
+
+    public BibliographicPK(Integer owningInstitutionId, String owningInstitutionBibId) {
+        this.owningInstitutionId = owningInstitutionId;
+        this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    public Integer getOwningInstitutionId() {
+        return owningInstitutionId;
+    }
+
+    public void setOwningInstitutionId(Integer owningInstitutionId) {
+        this.owningInstitutionId = owningInstitutionId;
+    }
+
+    public String getOwningInstitutionBibId() {
+        return owningInstitutionBibId;
+    }
+
+    public void setOwningInstitutionBibId(String owningInstitutionBibId) {
+        this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
