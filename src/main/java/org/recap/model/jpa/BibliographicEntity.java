@@ -169,11 +169,16 @@ class BibliographicPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionBibId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        BibliographicPK bibliographicPK  = (BibliographicPK) obj;
+        if(bibliographicPK.getOwningInstitutionId().equals(owningInstitutionId) && bibliographicPK.getOwningInstitutionBibId().equals(owningInstitutionBibId)){
+            return true;
+        }
+
+        return false;
     }
 }
