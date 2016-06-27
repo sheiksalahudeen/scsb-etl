@@ -2,6 +2,7 @@ package org.recap.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -28,6 +30,7 @@ public class RecordProcessor implements Processor {
     private InstitutionDetailsRepository institutionDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private BibSynchronzePersistanceUtil bibSynchronzePersistanceUtil;
+    private ProducerTemplate producer;
 
 
     @Override
@@ -55,7 +58,9 @@ public class RecordProcessor implements Processor {
             long endTime = System.currentTimeMillis();
             System.out.println("Time taken to prepare: " + bibliographicEntities.size() + " Bib and related data by thread : " + Thread.currentThread().getName() + " is : " + (endTime-startTime)/1000 + " seconds");
 
-            getBibSynchronzePersistanceUtil().saveBibRecords(bibliographicEntities);
+            //getBibSynchronzePersistanceUtil().saveBibRecords(bibliographicEntities);
+
+            producer.sendBody("activemq:queue:testQ", bibliographicEntities);
 
         }
     }
@@ -91,5 +96,9 @@ public class RecordProcessor implements Processor {
 
     public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
         this.institutionDetailsRepository = institutionDetailsRepository;
+    }
+
+    public void setProducer(ProducerTemplate producer) {
+        this.producer = producer;
     }
 }

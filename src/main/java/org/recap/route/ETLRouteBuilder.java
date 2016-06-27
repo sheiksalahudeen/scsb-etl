@@ -1,6 +1,8 @@
 package org.recap.route;
 
+import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
@@ -26,6 +28,7 @@ public class ETLRouteBuilder extends RouteBuilder {
     private int numThreads;
     private InstitutionDetailsRepository institutionDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private ProducerTemplate producer;
 
     public ETLRouteBuilder(CamelContext context) {
         super(context);
@@ -105,16 +108,15 @@ public class ETLRouteBuilder extends RouteBuilder {
         RecordProcessor processor = new RecordProcessor();
         processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         processor.setInstitutionDetailsRepository(institutionDetailsRepository);
+        processor.setProducer(producer);
         ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
+
         threads.process(processor);
         threads.setThreadName("etlProcessingThread");
+    }
 
-
-//        AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
-//        aggregator.completionPredicate(new SplitPredicate(chunkSize));
-//        RecordProcessor processor = new RecordProcessor();
-//        processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
-//        aggregator.process(processor);
+    public void setProducer(ProducerTemplate producer) {
+        this.producer = producer;
     }
 
     public class FileFilter implements GenericFileFilter {

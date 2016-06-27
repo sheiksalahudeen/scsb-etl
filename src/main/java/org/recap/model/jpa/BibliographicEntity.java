@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
 @IdClass(BibliographicPK.class)
-public class BibliographicEntity implements Serializable{
+public class BibliographicEntity implements Serializable {
     @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private Integer bibliographicId;
 

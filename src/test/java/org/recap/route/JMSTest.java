@@ -15,6 +15,9 @@ import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.Random;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -47,7 +50,7 @@ public class JMSTest extends BaseTestCase {
 
     @Test
     public void produceAndConsumeActiveMQQueue() throws Exception {
-
+        
         camelContext.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
         camelContext.addRoutes(new RouteBuilder() {
             @Override
@@ -57,10 +60,13 @@ public class JMSTest extends BaseTestCase {
             }
         });
 
+        Random random = new Random();
         for(int i = 0; i < 10; i++){
-            BibliographicEntity bibliographicEntity = new BibliographicEntity();
-            bibliographicEntity.setBibliographicId(i);
-            producer.sendBody("activemq:queue:testQ", "Hello World");
+            BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
+            bibliographicEntity1.setBibliographicId(random.nextInt());
+            BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
+            bibliographicEntity2.setBibliographicId(random.nextInt());
+            producer.sendBody("activemq:queue:testQ", Arrays.asList(bibliographicEntity1, bibliographicEntity2));
         }
 
         Thread.sleep(1000);
