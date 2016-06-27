@@ -18,6 +18,9 @@ public class JMSMessageProcessor {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     public void processMessage(List<BibliographicEntity> bibliographicEntityList){
+        long startTime = System.currentTimeMillis();
         bibliographicDetailsRepository.save(bibliographicEntityList);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken to save: " + bibliographicEntityList.size() + " bib and related data is: " + (endTime-startTime)/1000 + " seconds.");
     }
 }

@@ -36,11 +36,11 @@ public class ReCAPCamelContext {
     }
 
     public void addDynamicRoute(CamelContext camelContext, String endPointFrom, int chunkSize, int numThreads) throws Exception {
-        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=true"));
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("activemq:queue:testQ?asyncConsumer=true&concurrentConsumers=10")
+                from("activemq:queue:testQ")
                         .bean(JMSMessageProcessor.class,"processMessage");
             }
         });
