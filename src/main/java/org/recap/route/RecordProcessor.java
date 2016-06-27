@@ -48,17 +48,11 @@ public class RecordProcessor implements Processor {
                 futures.add(executorService.submit(new BibPersisterCallable(bibRecord)));
             }
 
-            long startTime = System.currentTimeMillis();
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
                 BibliographicEntity bibliographicEntity = (BibliographicEntity) future.get();
                 bibliographicEntities.add(bibliographicEntity);
             }
-
-            long endTime = System.currentTimeMillis();
-            System.out.println("Time taken to prepare: " + bibliographicEntities.size() + " Bib and related data by thread : " + Thread.currentThread().getName() + " is : " + (endTime-startTime)/1000 + " seconds");
-
-            //getBibSynchronzePersistanceUtil().saveBibRecords(bibliographicEntities);
 
             producer.sendBody("activemq:queue:testQ", bibliographicEntities);
 
