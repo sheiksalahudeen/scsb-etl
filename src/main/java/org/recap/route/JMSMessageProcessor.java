@@ -2,6 +2,8 @@ package org.recap.route;
 
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,8 @@ import java.util.List;
 @Component
 public class JMSMessageProcessor {
 
+    Logger logger  = LoggerFactory.getLogger(JMSMessageProcessor.class);
+
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
@@ -21,6 +25,6 @@ public class JMSMessageProcessor {
         long startTime = System.currentTimeMillis();
         bibliographicDetailsRepository.save(bibliographicEntityList);
         long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to save: " + bibliographicEntityList.size() + " bib and related data is: " + (endTime-startTime)/1000 + " seconds.");
+        logger.info("Time taken to save: " + bibliographicEntityList.size() + " bib and related data is: " + (endTime-startTime)/1000 + " seconds.");
     }
 }
