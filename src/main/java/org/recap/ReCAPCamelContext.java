@@ -7,6 +7,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.repository.ItemStatusDetailsRespository;
 import org.recap.route.ETLRouteBuilder;
 import org.recap.route.JMSMessageProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class ReCAPCamelContext {
     InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
+    ItemStatusDetailsRespository itemStatusDetailsRespository;
+
+    @Autowired
     ProducerTemplate producer;
 
     public void addRoutes(RouteBuilder routeBuilder) throws Exception {
@@ -36,7 +40,7 @@ public class ReCAPCamelContext {
     }
 
     public void addDynamicRoute(CamelContext camelContext, String endPointFrom, int chunkSize, int numThreads) throws Exception {
-        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=true"));
+        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -50,6 +54,7 @@ public class ReCAPCamelContext {
         etlRouteBuilder.setChunkSize(chunkSize);
         etlRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
+        etlRouteBuilder.setItemStatusDetailsRespository(itemStatusDetailsRespository);
         etlRouteBuilder.setProducer(producer);
         etlRouteBuilder.setMaxThreads(50);
         etlRouteBuilder.setPoolSize(numThreads);

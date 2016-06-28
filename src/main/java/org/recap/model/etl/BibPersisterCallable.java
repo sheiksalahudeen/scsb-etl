@@ -9,11 +9,9 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.util.MarcUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
+
 
 /**
  * Created by pvsubrah on 6/24/16.
@@ -23,15 +21,18 @@ public class BibPersisterCallable implements Callable {
     private MarcUtil marcUtil;
     private BibRecord bibRecord;
 
-    public BibPersisterCallable(BibRecord bibRecord) {
+    private final Map institutionEntitiesMap;
+    private final Map itemStatusMap;
+
+    public BibPersisterCallable(BibRecord bibRecord, Map institutionEntitiesMap, Map itemStatusMap) {
         this.bibRecord = bibRecord;
+        this.institutionEntitiesMap = institutionEntitiesMap;
+        this.itemStatusMap = itemStatusMap;
+
     }
 
     @Override
     public Object call() throws Exception {
-
-        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
-
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
@@ -41,7 +42,8 @@ public class BibPersisterCallable implements Callable {
         Bib bib = bibRecord.getBib();
         String owningInstitutionBibId = getOwningInstitutionBibId(bibRecord, bib);
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
-        bibliographicEntity.setOwningInstitutionId(1);//TODO need to update
+        Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bib.getOwningInstitutionId());
+        bibliographicEntity.setOwningInstitutionId(owningInstitutionId);//TODO need to update
         bibliographicEntity.setCreatedDate(new Date());
         ContentType bibContent = bib.getContent();
 
@@ -78,12 +80,13 @@ public class BibPersisterCallable implements Callable {
                         itemEntity.setCustomerCode(getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "b"));
                         itemEntity.setCallNumber(holdingsCallNumber);
                         itemEntity.setCallNumberType(holdingsCallNumberType);
-                        itemEntity.setItemAvailabilityStatusId(1);//TODO need to update
+                        String itemStatusValue = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "j");
+                        itemEntity.setItemAvailabilityStatusId("-".equals(itemStatusValue) ? 1 : (Integer) itemStatusMap.get(itemStatusValue));//TODO need to update
                         String copyNumber = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "t");
                         if (org.apache.commons.lang3.StringUtils.isNoneBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
                             itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
                         }
-                        itemEntity.setOwningInstitutionId(1);//TODO need to update
+                        itemEntity.setOwningInstitutionId(owningInstitutionId);//TODO need to update
                         String collectionGroupId = getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "a");
                         if (org.apache.commons.lang3.StringUtils.isNoneBlank(collectionGroupId) && org.apache.commons.lang3.math.NumberUtils.isNumber(collectionGroupId)) {
                             itemEntity.setCollectionGroupId(Integer.valueOf(collectionGroupId));

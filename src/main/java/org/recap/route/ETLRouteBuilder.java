@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.repository.ItemStatusDetailsRespository;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -27,6 +28,7 @@ public class ETLRouteBuilder extends RouteBuilder {
     private int maxThreads = 10;
     private int numThreads;
     private InstitutionDetailsRepository institutionDetailsRepository;
+    private ItemStatusDetailsRespository itemStatusDetailsRespository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ProducerTemplate producer;
 
@@ -64,6 +66,14 @@ public class ETLRouteBuilder extends RouteBuilder {
 
     public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+    }
+
+    public ItemStatusDetailsRespository getItemStatusDetailsRespository() {
+        return itemStatusDetailsRespository;
+    }
+
+    public void setItemStatusDetailsRespository(ItemStatusDetailsRespository itemStatusDetailsRespository) {
+        this.itemStatusDetailsRespository = itemStatusDetailsRespository;
     }
 
     public String getFrom() {
@@ -108,6 +118,7 @@ public class ETLRouteBuilder extends RouteBuilder {
         RecordProcessor processor = new RecordProcessor();
         processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         processor.setInstitutionDetailsRepository(institutionDetailsRepository);
+        processor.setItemStatusDetailsRespository(itemStatusDetailsRespository);
         processor.setProducer(producer);
         ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
 

@@ -7,16 +7,15 @@ import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
-import org.recap.util.BibSynchronzePersistanceUtil;
+import org.recap.repository.ItemStatusDetailsRespository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -26,12 +25,16 @@ import java.util.concurrent.Future;
  */
 public class RecordProcessor implements Processor {
     private Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
+
     private JAXBHandler jaxbHandler;
-    private InstitutionDetailsRepository institutionDetailsRepository;
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
-    private BibSynchronzePersistanceUtil bibSynchronzePersistanceUtil;
+
     private ProducerTemplate producer;
 
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private InstitutionDetailsRepository institutionDetailsRepository;
+    private ItemStatusDetailsRespository itemStatusDetailsRespository;
+    private Map institutionEntityMap;
+    private Map itemStatusMap;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -45,7 +48,8 @@ public class RecordProcessor implements Processor {
 
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
-                futures.add(executorService.submit(new BibPersisterCallable(bibRecord)));
+
+                futures.add(executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap())));
             }
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
@@ -59,13 +63,6 @@ public class RecordProcessor implements Processor {
         }
     }
 
-    private BibSynchronzePersistanceUtil getBibSynchronzePersistanceUtil() {
-        if(null == bibSynchronzePersistanceUtil) {
-            bibSynchronzePersistanceUtil = BibSynchronzePersistanceUtil.getInstance();
-            bibSynchronzePersistanceUtil.setBibliographicDetailsRepository(bibliographicDetailsRepository);
-        }
-        return bibSynchronzePersistanceUtil;
-    }
 
     public JAXBHandler getJaxbHandler() {
         if (null == jaxbHandler) {
@@ -75,6 +72,13 @@ public class RecordProcessor implements Processor {
     }
 
 
+    public ItemStatusDetailsRespository getItemStatusDetailsRespository() {
+        return itemStatusDetailsRespository;
+    }
+
+    public void setItemStatusDetailsRespository(ItemStatusDetailsRespository itemStatusDetailsRespository) {
+        this.itemStatusDetailsRespository = itemStatusDetailsRespository;
+    }
 
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
         return bibliographicDetailsRepository;
@@ -94,5 +98,29 @@ public class RecordProcessor implements Processor {
 
     public void setProducer(ProducerTemplate producer) {
         this.producer = producer;
+    }
+
+    public Map getInstitutionEntityMap() {
+        if (null == institutionEntityMap) {
+            institutionEntityMap = new HashMap();
+            Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
+            for (Iterator<InstitutionEntity> iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
+                InstitutionEntity institutionEntity = iterator.next();
+                institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getInstitutionId());
+            }
+        }
+        return institutionEntityMap;
+    }
+
+    public Map getItemStatusMap() {
+        if (null == itemStatusMap) {
+            itemStatusMap = new HashMap();
+            Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRespository.findAll();
+            for (Iterator<ItemStatusEntity> iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
+                ItemStatusEntity itemStatusEntity = iterator.next();
+                itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
+            }
+        }
+        return itemStatusMap;
     }
 }
