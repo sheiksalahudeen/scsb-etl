@@ -4,9 +4,7 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.InstitutionDetailsRepository;
-import org.recap.repository.ItemStatusDetailsRepository;
+import org.recap.repository.*;
 import org.recap.route.ETLRouteBuilder;
 import org.recap.route.JMSMessageProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,9 @@ public class ReCAPCamelContext {
     ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired
+    CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+
+    @Autowired
     ProducerTemplate producer;
 
     public void addRoutes(RouteBuilder routeBuilder) throws Exception {
@@ -54,6 +55,7 @@ public class ReCAPCamelContext {
         etlRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
         etlRouteBuilder.setItemStatusDetailsRepository(itemStatusDetailsRepository);
+        etlRouteBuilder.setCollectionGroupDetailsRepository(collectionGroupDetailsRepository);
         etlRouteBuilder.setProducer(producer);
         etlRouteBuilder.setMaxThreads(50);
         etlRouteBuilder.setPoolSize(numThreads);
