@@ -40,22 +40,28 @@ public class RecordProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         if (exchange.getIn().getBody() instanceof List) {
 
-            ExecutorService executorService = Executors.newFixedThreadPool(5);
+            ExecutorService executorService = Executors.newFixedThreadPool(15);
 
             List<Future> futures = new ArrayList<>();
 
             List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
+            BibRecord bibRecord = null;
             for (String content : (List<String>) exchange.getIn().getBody()) {
-                BibRecord bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
+                bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
 
                 futures.add(executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap())));
             }
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
-                BibliographicEntity bibliographicEntity = (BibliographicEntity) future.get();
-                bibliographicEntities.add(bibliographicEntity);
+                Object o = future.get();
+                if (null != o) {
+                    BibliographicEntity bibliographicEntity = (BibliographicEntity) o;
+                    bibliographicEntities.add(bibliographicEntity);
+                } else {
+                    logger.error("No response from BibPersisterCallable" + bibRecord.getBib().getOwningInstitutionBibId());
+                }
             }
 
             producer.sendBody("activemq:queue:testQ", bibliographicEntities);

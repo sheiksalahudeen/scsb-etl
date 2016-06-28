@@ -32,7 +32,7 @@ public class BibPersisterCallable implements Callable {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object call() {
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
