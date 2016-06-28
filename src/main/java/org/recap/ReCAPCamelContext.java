@@ -5,9 +5,8 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.BibliographicHoldingsDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
-import org.recap.repository.ItemStatusDetailsRespository;
+import org.recap.repository.ItemStatusDetailsRepository;
 import org.recap.route.ETLRouteBuilder;
 import org.recap.route.JMSMessageProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class ReCAPCamelContext {
     InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
-    ItemStatusDetailsRespository itemStatusDetailsRespository;
+    ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired
     ProducerTemplate producer;
@@ -54,7 +53,7 @@ public class ReCAPCamelContext {
         etlRouteBuilder.setChunkSize(chunkSize);
         etlRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
-        etlRouteBuilder.setItemStatusDetailsRespository(itemStatusDetailsRespository);
+        etlRouteBuilder.setItemStatusDetailsRepository(itemStatusDetailsRepository);
         etlRouteBuilder.setProducer(producer);
         etlRouteBuilder.setMaxThreads(50);
         etlRouteBuilder.setPoolSize(numThreads);
