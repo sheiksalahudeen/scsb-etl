@@ -273,4 +273,71 @@ public class BibliographicEntityTest extends BaseTestCase {
 
     }
 
+    @Test
+    public void saveTwoItemsOneItemWithBadData() throws Exception{
+        Random random = new Random();
+        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
+        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setCreatedDate(new Date());
+        bibliographicEntity1.setLastUpdatedDate(new Date());
+        bibliographicEntity1.setOwningInstitutionId(1);
+        bibliographicEntity1.setOwningInstitutionBibId("10001");
+
+
+        HoldingsEntity holdingsEntity1 = new HoldingsEntity();
+        holdingsEntity1.setContent("mock holdings");
+        holdingsEntity1.setCreatedDate(new Date());
+        holdingsEntity1.setLastUpdatedDate(new Date());
+        holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
+
+        ItemEntity itemEntity1 = new ItemEntity();
+        itemEntity1.setLastUpdatedDate(new Date());
+        itemEntity1.setCreatedDate(new Date());
+        itemEntity1.setCustomerCode("1");
+        itemEntity1.setItemAvailabilityStatusId(1);
+        itemEntity1.setOwningInstitutionItemId("101");
+        itemEntity1.setOwningInstitutionId(1);
+        itemEntity1.setBarcode("123");
+        itemEntity1.setCallNumber("x.12321");
+        itemEntity1.setCollectionGroupId(1);
+        itemEntity1.setCallNumberType("1");
+        itemEntity1.setHoldingsEntity(holdingsEntity1);
+
+        bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
+
+        BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
+        bibliographicEntity2.setContent("mock Content");
+        bibliographicEntity2.setCreatedDate(new Date());
+        bibliographicEntity2.setLastUpdatedDate(new Date());
+        bibliographicEntity2.setOwningInstitutionId(1);
+        bibliographicEntity2.setOwningInstitutionBibId("10002");
+
+
+        HoldingsEntity holdingsEntity2 = new HoldingsEntity();
+        holdingsEntity2.setContent("mock holdings");
+        holdingsEntity2.setCreatedDate(new Date());
+        holdingsEntity2.setLastUpdatedDate(new Date());
+        holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
+
+        ItemEntity itemEntity2 = new ItemEntity();
+        itemEntity2.setLastUpdatedDate(new Date());
+        itemEntity2.setCreatedDate(new Date());
+        itemEntity2.setItemAvailabilityStatusId(1);
+        itemEntity2.setOwningInstitutionItemId("102");
+        itemEntity2.setOwningInstitutionId(1);
+        itemEntity2.setBarcode("1234");
+        itemEntity2.setCallNumber("x.123212");
+        itemEntity2.setCollectionGroupId(1);
+        itemEntity2.setCallNumberType("1");
+        itemEntity2.setHoldingsEntity(holdingsEntity2);
+
+        bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity2));
+
+        bibliographicDetailsRepository.save(Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+    }
+
 }
