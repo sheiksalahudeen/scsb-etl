@@ -50,18 +50,16 @@ public class RecordProcessor implements Processor {
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
 
-                futures.add(executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap())));
+                Future submit = executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap()));
+                if (null != submit) {
+                    futures.add(submit);
+                }
             }
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
-                Object o = future.get();
-                if (null != o) {
-                    BibliographicEntity bibliographicEntity = (BibliographicEntity) o;
-                    bibliographicEntities.add(bibliographicEntity);
-                } else {
-                    logger.error("No response from BibPersisterCallable" + bibRecord.getBib().getOwningInstitutionBibId());
-                }
+                BibliographicEntity bibliographicEntity = (BibliographicEntity) future.get();
+                bibliographicEntities.add(bibliographicEntity);
             }
 
             producer.sendBody("activemq:queue:testQ", bibliographicEntities);
