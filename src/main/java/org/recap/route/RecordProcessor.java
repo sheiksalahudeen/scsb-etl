@@ -11,7 +11,7 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
-import org.recap.repository.ItemStatusDetailsRespository;
+import org.recap.repository.ItemStatusDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class RecordProcessor implements Processor {
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private InstitutionDetailsRepository institutionDetailsRepository;
-    private ItemStatusDetailsRespository itemStatusDetailsRespository;
+    private ItemStatusDetailsRepository itemStatusDetailsRepository;
     private Map institutionEntityMap;
     private Map itemStatusMap;
 
@@ -76,12 +76,12 @@ public class RecordProcessor implements Processor {
     }
 
 
-    public ItemStatusDetailsRespository getItemStatusDetailsRespository() {
-        return itemStatusDetailsRespository;
+    public ItemStatusDetailsRepository getItemStatusDetailsRepository() {
+        return itemStatusDetailsRepository;
     }
 
-    public void setItemStatusDetailsRespository(ItemStatusDetailsRespository itemStatusDetailsRespository) {
-        this.itemStatusDetailsRespository = itemStatusDetailsRespository;
+    public void setItemStatusDetailsRepository(ItemStatusDetailsRepository itemStatusDetailsRepository) {
+        this.itemStatusDetailsRepository = itemStatusDetailsRepository;
     }
 
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
@@ -119,7 +119,7 @@ public class RecordProcessor implements Processor {
     public Map getItemStatusMap() {
         if (null == itemStatusMap) {
             itemStatusMap = new HashMap();
-            Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRespository.findAll();
+            Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
             for (Iterator<ItemStatusEntity> iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
                 ItemStatusEntity itemStatusEntity = iterator.next();
                 itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
