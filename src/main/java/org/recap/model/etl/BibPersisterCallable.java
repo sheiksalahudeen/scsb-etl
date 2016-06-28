@@ -1,5 +1,6 @@
 package org.recap.model.etl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
@@ -23,11 +24,13 @@ public class BibPersisterCallable implements Callable {
 
     private final Map institutionEntitiesMap;
     private final Map itemStatusMap;
+    private final Map collectionGroupMap;
 
-    public BibPersisterCallable(BibRecord bibRecord, Map institutionEntitiesMap, Map itemStatusMap) {
+    public BibPersisterCallable(BibRecord bibRecord, Map institutionEntitiesMap, Map itemStatusMap, Map collectionGroupMap) {
         this.bibRecord = bibRecord;
         this.institutionEntitiesMap = institutionEntitiesMap;
         this.itemStatusMap = itemStatusMap;
+        this.collectionGroupMap = collectionGroupMap;
 
     }
 
@@ -43,7 +46,7 @@ public class BibPersisterCallable implements Callable {
         String owningInstitutionBibId = getOwningInstitutionBibId(bibRecord, bib);
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bib.getOwningInstitutionId());
-        bibliographicEntity.setOwningInstitutionId(owningInstitutionId);//TODO need to update
+        bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
         bibliographicEntity.setCreatedDate(new Date());
         ContentType bibContent = bib.getContent();
 
@@ -73,25 +76,29 @@ public class BibPersisterCallable implements Callable {
                     ContentType itemContent = item.getContent();
                     CollectionType itemContentCollection = itemContent.getCollection();
 
-                    List<RecordType> itemRrecordTypes = itemContentCollection.getRecord();
-                    for (RecordType itemRecordType : itemRrecordTypes) {
+                    List<RecordType> itemRecordTypes = itemContentCollection.getRecord();
+                    for (RecordType itemRecordType : itemRecordTypes) {
                         ItemEntity itemEntity = new ItemEntity();
                         itemEntity.setBarcode(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "p"));
                         itemEntity.setCustomerCode(getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "b"));
                         itemEntity.setCallNumber(holdingsCallNumber);
                         itemEntity.setCallNumberType(holdingsCallNumberType);
                         String itemStatusValue = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "j");
-                        itemEntity.setItemAvailabilityStatusId("-".equals(itemStatusValue) ? 1 : (Integer) itemStatusMap.get(itemStatusValue));//TODO need to update
+                        if (StringUtils.isNotBlank(itemStatusValue) && itemStatusMap.containsKey(itemStatusValue)) {
+                            itemEntity.setItemAvailabilityStatusId((Integer) itemStatusMap.get(itemStatusValue));
+                        } else {
+                            itemEntity.setItemAvailabilityStatusId((Integer) itemStatusMap.get("Available"));
+                        }
                         String copyNumber = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "t");
                         if (org.apache.commons.lang3.StringUtils.isNoneBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
                             itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
                         }
-                        itemEntity.setOwningInstitutionId(owningInstitutionId);//TODO need to update
-                        String collectionGroupId = getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "a");
-                        if (org.apache.commons.lang3.StringUtils.isNoneBlank(collectionGroupId) && org.apache.commons.lang3.math.NumberUtils.isNumber(collectionGroupId)) {
-                            itemEntity.setCollectionGroupId(Integer.valueOf(collectionGroupId));
+                        itemEntity.setOwningInstitutionId(owningInstitutionId);
+                        String collectionGroupCode = getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "a");
+                        if (StringUtils.isNotBlank(collectionGroupCode) && collectionGroupMap.containsKey(collectionGroupCode)) {
+                            itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get(collectionGroupCode));
                         } else {
-                            itemEntity.setCollectionGroupId(2);
+                            itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get("Open"));
                         }
                         itemEntity.setCreatedDate(new Date());
                         itemEntity.setUseRestrictions(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h"));

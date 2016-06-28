@@ -7,9 +7,11 @@ import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
 import org.slf4j.Logger;
@@ -33,8 +35,10 @@ public class RecordProcessor implements Processor {
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private InstitutionDetailsRepository institutionDetailsRepository;
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private Map institutionEntityMap;
     private Map itemStatusMap;
+    private Map collectionGroupMap;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -50,7 +54,7 @@ public class RecordProcessor implements Processor {
             for (String content : (List<String>) exchange.getIn().getBody()) {
                 bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
 
-                Future submit = executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap()));
+                Future submit = executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap(), getCollectionGroupMap()));
                 if (null != submit) {
                     futures.add(submit);
                 }
@@ -100,6 +104,14 @@ public class RecordProcessor implements Processor {
         this.institutionDetailsRepository = institutionDetailsRepository;
     }
 
+    public CollectionGroupDetailsRepository getCollectionGroupDetailsRepository() {
+        return collectionGroupDetailsRepository;
+    }
+
+    public void setCollectionGroupDetailsRepository(CollectionGroupDetailsRepository collectionGroupDetailsRepository) {
+        this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
+    }
+
     public void setProducer(ProducerTemplate producer) {
         this.producer = producer;
     }
@@ -126,5 +138,17 @@ public class RecordProcessor implements Processor {
             }
         }
         return itemStatusMap;
+    }
+
+    public Map getCollectionGroupMap() {
+        if(null == collectionGroupMap) {
+            collectionGroupMap = new HashMap();
+            Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
+            for (Iterator<CollectionGroupEntity> iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
+                CollectionGroupEntity collectionGroupEntity = iterator.next();
+                collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
+            }
+        }
+        return collectionGroupMap;
     }
 }

@@ -11,9 +11,7 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.SplitDefinition;
 import org.apache.camel.model.ThreadsDefinition;
 import org.apache.commons.io.FilenameUtils;
-import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.InstitutionDetailsRepository;
-import org.recap.repository.ItemStatusDetailsRepository;
+import org.recap.repository.*;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -24,10 +22,10 @@ public class ETLRouteBuilder extends RouteBuilder {
     private int chunkSize = 1;
     private int poolSize = 10;
     private int maxThreads = 10;
-    private int numThreads;
     private InstitutionDetailsRepository institutionDetailsRepository;
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private ProducerTemplate producer;
 
     public ETLRouteBuilder(CamelContext context) {
@@ -74,6 +72,14 @@ public class ETLRouteBuilder extends RouteBuilder {
         this.itemStatusDetailsRepository = itemStatusDetailsRepository;
     }
 
+    public CollectionGroupDetailsRepository getCollectionGroupDetailsRepository() {
+        return collectionGroupDetailsRepository;
+    }
+
+    public void setCollectionGroupDetailsRepository(CollectionGroupDetailsRepository collectionGroupDetailsRepository) {
+        this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
+    }
+
     public String getFrom() {
         return from;
     }
@@ -117,6 +123,7 @@ public class ETLRouteBuilder extends RouteBuilder {
         processor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         processor.setInstitutionDetailsRepository(institutionDetailsRepository);
         processor.setItemStatusDetailsRepository(itemStatusDetailsRepository);
+        processor.setCollectionGroupDetailsRepository(collectionGroupDetailsRepository);
         processor.setProducer(producer);
         ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
 
