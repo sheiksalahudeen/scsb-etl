@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -337,7 +338,15 @@ public class BibliographicEntityTest extends BaseTestCase {
 
         bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity2));
 
-        bibliographicDetailsRepository.save(Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+        Iterable<BibliographicEntity> savedEntities = bibliographicDetailsRepository.save(Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+
+        assertNotNull(savedEntities);
+
+        assertNotNull(bibliographicEntity1.getBibliographicId());
+
+        assertNull(bibliographicEntity2.getBibliographicId());
+
+
     }
 
 }
