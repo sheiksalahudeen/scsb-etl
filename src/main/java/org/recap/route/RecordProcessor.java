@@ -44,7 +44,7 @@ public class RecordProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         if (exchange.getIn().getBody() instanceof List) {
 
-            ExecutorService executorService = Executors.newFixedThreadPool(15);
+            ExecutorService executorService = Executors.newFixedThreadPool(50);
 
             List<Future> futures = new ArrayList<>();
 
