@@ -16,15 +16,25 @@ import java.util.List;
 @Component
 public class JMSMessageProcessor {
 
-    Logger logger  = LoggerFactory.getLogger(JMSMessageProcessor.class);
+    Logger logger = LoggerFactory.getLogger(JMSMessageProcessor.class);
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
-    public void processMessage(List<BibliographicEntity> bibliographicEntityList){
+    public void processMessage(List<BibliographicEntity> bibliographicEntityList) {
         long startTime = System.currentTimeMillis();
-        bibliographicDetailsRepository.save(bibliographicEntityList);
+        try {
+            bibliographicDetailsRepository.save(bibliographicEntityList);
+        } catch (Exception e) {
+            for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
+                try {
+                    bibliographicDetailsRepository.save(bibliographicEntity);
+                } catch (Exception ex) {
+                    logger.error("Exception " + ex);
+                }
+            }
+        }
         long endTime = System.currentTimeMillis();
-        logger.info("Time taken to save: " + bibliographicEntityList.size() + " bib and related data is: " + (endTime-startTime)/1000 + " seconds.");
+        logger.info("Time taken to save: " + bibliographicEntityList.size() + " bib and related data is: " + (endTime - startTime) / 1000 + " seconds.");
     }
 }
