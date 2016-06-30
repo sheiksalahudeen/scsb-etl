@@ -1,9 +1,10 @@
 package org.recap.controller;
 
 import org.apache.camel.CamelContext;
-import org.recap.ReCAPCamelContext;
 import org.recap.model.etl.EtlLoadRequest;
+import org.recap.repository.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,14 +23,27 @@ import javax.validation.Valid;
 public class EtlDataLoadController {
 
     @Autowired
-    ReCAPCamelContext reCAPCamelContext;
+    CamelContext camelContext;
 
     @Autowired
-    CamelContext camelContext;
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Value("${etl.number.of.threads}")
+    private Integer numberOfThreads;
+
+    @Value("${etl.load.batchSize}")
+    private Integer batchSize;
+
+    @Value("${etl.load.directory}")
+    private String inputDirectoryPath;
 
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
-        model.addAttribute("etlLoadRequest", new EtlLoadRequest());
+        EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
+        etlLoadRequest.setNumberOfThreads(numberOfThreads);
+        etlLoadRequest.setBatchSize(batchSize);
+        etlLoadRequest.setInputDirectoryPath(inputDirectoryPath);
+        model.addAttribute("etlLoadRequest", etlLoadRequest);
         return "etlDataLoader";
     }
 
@@ -38,16 +52,7 @@ public class EtlDataLoadController {
     public String bulkIngest(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                             BindingResult result,
                             Model model) {
-        String inputDirectoryPath = etlLoadRequest.getInputDirectoryPath();
-        Integer numberOfThreads = etlLoadRequest.getNumberOfThreads();
-        Integer batchSize = etlLoadRequest.getBatchSize();
-
-        try {
-            reCAPCamelContext.addDynamicRoute(camelContext, inputDirectoryPath, batchSize, numberOfThreads);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        report();
         return etlDataLoader(model);
     }
 
@@ -55,6 +60,13 @@ public class EtlDataLoadController {
     @RequestMapping(value = "/etlDataLoader/report", method = RequestMethod.GET)
     public String report() {
         String status = "Process Started";
-        return status;
+        if (camelContext.getStatus().isStarted()) {
+            status = "Running";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Status  : " + status).append("\n");
+        stringBuilder.append("Number of Bibs loaded : " + bibliographicDetailsRepository.count()).append("\n");
+        return stringBuilder.toString();
     }
 }
