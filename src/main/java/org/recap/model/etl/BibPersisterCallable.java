@@ -66,6 +66,7 @@ public class BibPersisterCallable implements Callable {
                 RecordType holdingsRecordType = holdingRecordTypes.get(0);
                 holdingsEntity.setContent(holdingContentCollection.serialize(holdingContentCollection));
                 holdingsEntity.setCreatedDate(new Date());
+                holdingsEntity.setOwningInstitutionHoldingsId(holdingEnt.getOwningInstitutionHoldingsId());
                 holdingsEntities.add(holdingsEntity);
 
                 String holdingsCallNumber = getMarcUtil().getDataFieldValue(holdingsRecordType, "852", null, null, "h");
