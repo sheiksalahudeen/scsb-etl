@@ -7,6 +7,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.recap.repository.*;
 import org.recap.route.ETLRouteBuilder;
 import org.recap.route.JMSMessageRouteBuilder;
+import org.recap.route.JMSReportRouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,7 @@ public class ReCAPCamelContext {
     public void addDynamicRoute() throws Exception {
         context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
         addRoutes(new JMSMessageRouteBuilder());
+        addRoutes(new JMSReportRouteBuilder());
         addRoutes(getEtlRouteBuilder());
     }
 
