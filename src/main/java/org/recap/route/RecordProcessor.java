@@ -4,6 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.recap.model.etl.BibPersisterCallable;
+import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
@@ -16,6 +17,7 @@ import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +51,7 @@ public class RecordProcessor implements Processor {
             List<Future> futures = new ArrayList<>();
 
             List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+            List<LoadReportEntity> loadReportEntities = new ArrayList<>();
 
             BibRecord bibRecord = null;
             for (String content : (List<String>) exchange.getIn().getBody()) {
@@ -62,11 +65,29 @@ public class RecordProcessor implements Processor {
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
-                BibliographicEntity bibliographicEntity = (BibliographicEntity) future.get();
-                bibliographicEntities.add(bibliographicEntity);
+                Object object = future.get();
+                Map<String, Object> map = (Map<String, Object>) object;
+                if (object != null) {
+                    Object bibliographicEntity = map.get("bibliographicEntity");
+                    Object loadReportEntity = map.get("loadReportEntity");
+                    if (bibliographicEntity != null) {
+                        bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
+                    } else if (loadReportEntity != null) {
+                        loadReportEntities.add((LoadReportEntity) loadReportEntity);
+                    }
+                }
             }
 
-            producer.sendBody("activemq:queue:testQ", bibliographicEntities);
+            if (!CollectionUtils.isEmpty(bibliographicEntities)) {
+                ETLExchange etlExchange = new ETLExchange();
+                etlExchange.setBibliographicEntities(bibliographicEntities);
+                etlExchange.setInstitutionEntityMap(getInstitutionEntityMap());
+                etlExchange.setCollectionGroupMap(getCollectionGroupMap());
+                producer.sendBody("activemq:queue:etlLoadQ", etlExchange);
+            }
+            if (!CollectionUtils.isEmpty(loadReportEntities)) {
+                producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
+            }
 
         }
     }
@@ -141,7 +162,7 @@ public class RecordProcessor implements Processor {
     }
 
     public Map getCollectionGroupMap() {
-        if(null == collectionGroupMap) {
+        if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
             Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
             for (Iterator<CollectionGroupEntity> iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {

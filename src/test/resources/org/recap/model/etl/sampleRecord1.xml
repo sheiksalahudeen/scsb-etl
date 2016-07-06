@@ -1,0 +1,126 @@
+<?xml version="1.0" ?>
+  <bibRecord>
+    <bib>
+      <owningInstitutionId>NYPL</owningInstitutionId>
+      <content>
+        <collection xmlns="http://www.loc.gov/MARC21/slim">
+          <record>
+            <controlfield tag="001">NYPG001000011-B</controlfield>
+            <controlfield tag="005">20001116192418.8</controlfield>
+            <controlfield tag="008">841106s1976    le       b    000 0 arax </controlfield>
+            <datafield ind1=" " ind2=" " tag="010">
+              <subfield code="a">79971032</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="035">
+              <subfield code="a">NNSZ00100011</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="035">
+              <subfield code="a">(WaOLN)nyp0200023</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="040">
+              <subfield code="c">NN</subfield>
+              <subfield code="d">NN</subfield>
+              <subfield code="d">WaOLN</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="043">
+              <subfield code="a">a-ba---</subfield>
+            </datafield>
+            <datafield ind1="0" ind2="0" tag="050">
+              <subfield code="a">DS247.B28</subfield>
+              <subfield code="b">R85</subfield>
+            </datafield>
+            <datafield ind1="1" ind2=" " tag="100">
+              <subfield code="a">Rumayḥī, Muḥammad Ghānim.</subfield>
+            </datafield>
+            <datafield ind1="1" ind2="3" tag="245">
+              <subfield code="a">al-Baḥrayn :</subfield>
+              <subfield code="b">mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /</subfield>
+              <subfield code="c">Muḥammad al-Rumayḥī.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="250">
+              <subfield code="a">al-Ṭabʻah 1.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="260">
+              <subfield code="a">[Bayrūt] :</subfield>
+              <subfield code="b">Dār Ibn Khaldūn,</subfield>
+              <subfield code="c">1976.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="300">
+              <subfield code="a">264 p. ;</subfield>
+              <subfield code="c">24 cm.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="504">
+              <subfield code="a">Includes bibliographies.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="546">
+              <subfield code="a">In Arabic.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2="0" tag="651">
+              <subfield code="a">Bahrain</subfield>
+              <subfield code="x">History</subfield>
+              <subfield code="y">20th century.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2="0" tag="651">
+              <subfield code="a">Bahrain</subfield>
+              <subfield code="x">Economic conditions.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2="0" tag="651">
+              <subfield code="a">Bahrain</subfield>
+              <subfield code="x">Social conditions.</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="907">
+              <subfield code="a">.b100000241</subfield>
+              <subfield code="c">m</subfield>
+              <subfield code="d">a</subfield>
+              <subfield code="e">-</subfield>
+              <subfield code="f">ara</subfield>
+              <subfield code="g">le </subfield>
+              <subfield code="h">3</subfield>
+              <subfield code="i">1</subfield>
+            </datafield>
+            <datafield ind1=" " ind2=" " tag="952">
+              <subfield code="h">*OFK 84-1944</subfield>
+            </datafield>
+          </record>
+        </collection>
+      </content>
+    </bib>
+    <holdings>
+      <holding>
+        <owningInstitutionHoldingsId>1000</owningInstitutionHoldingsId>
+        <content>
+          <collection xmlns="http://www.loc.gov/MARC21/slim">
+            <record>
+              <datafield ind1="0" ind2="0" tag="852">
+                <subfield code="b">rc2ma</subfield>
+                <subfield code="h">*OFK 84-1944</subfield>
+              </datafield>
+              <datafield ind1="0" ind2="0" tag="866">
+                <subfield code="a"/>
+              </datafield>
+            </record>
+          </collection>
+        </content>
+        <items>
+          <content>
+            <collection xmlns="http://www.loc.gov/MARC21/slim">
+              <record>
+                <datafield ind1="0" ind2="0" tag="876">
+                  <subfield code="h">Use on site</subfield>
+                  <subfield code="a">.i100000058</subfield>
+                  <subfield code="j">-</subfield>
+                  <subfield code="p">33433005548676</subfield>
+                  <subfield code="t">1</subfield>
+                  <subfield code="3"/>
+                </datafield>
+                <datafield ind1="0" ind2="0" tag="900">
+                  <subfield code="a">Shared</subfield>
+                  <subfield code="b">NA</subfield>
+                </datafield>
+              </record>
+            </collection>
+          </content>
+        </items>
+      </holding>
+    </holdings>
+  </bibRecord>

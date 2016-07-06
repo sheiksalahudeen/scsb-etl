@@ -5,11 +5,6 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.impl.PropertyPlaceholderDelegateRegistry;
-import org.apache.camel.impl.SimpleRegistry;
-import org.apache.camel.spi.Registry;
-import org.apache.camel.spring.spi.ApplicationContextRegistry;
-import org.apache.camel.util.jndi.JndiContext;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
@@ -19,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
@@ -95,7 +91,12 @@ public class JMSTest extends BaseTestCase {
             bibliographicEntity2.setOwningInstitutionId(1);
             bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
-            producer.sendBody("activemq:queue:testQ", Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+            ETLExchange etlExchange = new ETLExchange();
+            etlExchange.setBibliographicEntities( Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+            etlExchange.setInstitutionEntityMap(new HashMap());
+            etlExchange.setCollectionGroupMap(new HashMap());
+
+            producer.sendBody("activemq:queue:etlLoadQ", Arrays.asList(bibliographicEntity1, bibliographicEntity2));
         }
 
         Thread.sleep(1000);

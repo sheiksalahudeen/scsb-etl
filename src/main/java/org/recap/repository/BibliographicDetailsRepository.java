@@ -14,4 +14,5 @@ import java.util.List;
 public interface BibliographicDetailsRepository extends PagingAndSortingRepository<BibliographicEntity, Integer> {
     public Long countByOwningInstitutionId(Integer institutionId);
     public List<BibliographicEntity> findByOwningInstitutionId(Pageable pageable, Integer institutionId);
+    BibliographicEntity findByOwningInstitutionIdAndOwningInstitutionBibId(Integer owningInstitutionId, String owningInstitutionBibId);
 }

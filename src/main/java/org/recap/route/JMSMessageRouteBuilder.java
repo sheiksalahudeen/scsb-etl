@@ -8,8 +8,8 @@ import org.apache.camel.builder.RouteBuilder;
 public class JMSMessageRouteBuilder extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("activemq:queue:testQ")
+        from("activemq:queue:etlLoadQ")
                 .autoStartup(true)
-                .bean(JMSMessageProcessor.class,"processMessage");
+                .bean(JMSMessageProcessor.class, "processMessage");
     }
 }
