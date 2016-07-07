@@ -33,7 +33,6 @@ public class BibPersisterCallable implements Callable {
         this.institutionEntitiesMap = institutionEntitiesMap;
         this.itemStatusMap = itemStatusMap;
         this.collectionGroupMap = collectionGroupMap;
-
     }
 
     @Override
