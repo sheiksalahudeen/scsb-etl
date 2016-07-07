@@ -50,6 +50,7 @@ public class BibPersisterCallable implements Callable {
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bib.getOwningInstitutionId());
         bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
         bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
         ContentType bibContent = bib.getContent();
 
         CollectionType bibContentCollection = bibContent.getCollection();
@@ -69,6 +70,7 @@ public class BibPersisterCallable implements Callable {
                     RecordType holdingsRecordType = holdingRecordTypes.get(0);
                     holdingsEntity.setContent(holdingContentCollection.serialize(holdingContentCollection));
                     holdingsEntity.setCreatedDate(new Date());
+                    holdingsEntity.setLastUpdatedDate(new Date());
                     holdingsEntity.setOwningInstitutionHoldingsId(holdingEnt.getOwningInstitutionHoldingsId());
                     holdingsEntities.add(holdingsEntity);
 
@@ -105,6 +107,7 @@ public class BibPersisterCallable implements Callable {
                                 itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get("Open"));
                             }
                             itemEntity.setCreatedDate(new Date());
+                            itemEntity.setLastUpdatedDate(new Date());
                             itemEntity.setUseRestrictions(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h"));
                             itemEntity.setVolumePartYear(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "3"));
                             itemEntity.setOwningInstitutionItemId(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "a"));
