@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
 @IdClass(BibliographicPK.class)
 public class BibliographicEntity implements Serializable {
-    @Column(name = "BIBLIOGRAPHIC_ID")
+    @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private Integer bibliographicId;
 
     @Lob
