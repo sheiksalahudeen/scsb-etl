@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
 @IdClass(BibliographicPK.class)
 public class BibliographicEntity implements Serializable {
-    @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
+    @Column(name = "BIBLIOGRAPHIC_ID")
     private Integer bibliographicId;
 
     @Lob
@@ -28,9 +28,15 @@ public class BibliographicEntity implements Serializable {
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
+    @Column(name = "CREATED_BY")
+    private String createdBy;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
+
+    @Column(name = "LAST_UPDATED_BY")
+    private String lastUpdatedBy;
 
     @Id
     @Column(name = "OWNING_INST_BIB_ID")
@@ -131,50 +137,20 @@ public class BibliographicEntity implements Serializable {
         this.itemEntities = itemEntities;
     }
 
-
-}
-
-class BibliographicPK implements Serializable {
-    private Integer owningInstitutionId;
-    private String owningInstitutionBibId;
-
-    public BibliographicPK() {
-
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public BibliographicPK(Integer owningInstitutionId, String owningInstitutionBibId) {
-        this.owningInstitutionId = owningInstitutionId;
-        this.owningInstitutionBibId = owningInstitutionBibId;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public Integer getOwningInstitutionId() {
-        return owningInstitutionId;
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
     }
 
-    public void setOwningInstitutionId(Integer owningInstitutionId) {
-        this.owningInstitutionId = owningInstitutionId;
-    }
-
-    public String getOwningInstitutionBibId() {
-        return owningInstitutionBibId;
-    }
-
-    public void setOwningInstitutionBibId(String owningInstitutionBibId) {
-        this.owningInstitutionBibId = owningInstitutionBibId;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionBibId);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        BibliographicPK bibliographicPK  = (BibliographicPK) obj;
-        if(bibliographicPK.getOwningInstitutionId().equals(owningInstitutionId) && bibliographicPK.getOwningInstitutionBibId().equals(owningInstitutionBibId)){
-            return true;
-        }
-
-        return false;
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 }
+

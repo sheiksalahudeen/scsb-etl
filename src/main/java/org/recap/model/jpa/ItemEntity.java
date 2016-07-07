@@ -45,9 +45,15 @@ public class ItemEntity implements Serializable{
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
+    @Column(name = "CREATED_BY")
+    private String createdBy;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
+
+    @Column(name = "LAST_UPDATED_BY")
+    private String lastUpdatedBy;
 
     @Column(name = "USE_RESTRICTIONS")
     private String useRestrictions;
@@ -243,6 +249,22 @@ public class ItemEntity implements Serializable{
 
     public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
         this.bibliographicEntities = bibliographicEntities;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 }
 

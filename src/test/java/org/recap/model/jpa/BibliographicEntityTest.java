@@ -41,23 +41,54 @@ public class BibliographicEntityTest extends BaseTestCase {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content");
         bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setOwningInstitutionId(1);
-        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
 
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings");
         holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
-        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("1231");
+        itemEntity.setOwningInstitutionItemId(".i1231");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setHoldingsEntity(holdingsEntity);
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getBibliographicId());
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        bibliographicDetailsRepository.save(bibliographicEntity);
+
+        BibliographicPK bibliographicPK = new BibliographicPK();
+        bibliographicPK.setOwningInstitutionId(1);
+        bibliographicPK.setOwningInstitutionBibId(owningInstitutionBibId);
+        BibliographicEntity byBibliographicPK = bibliographicDetailsRepository.findOne(bibliographicPK);
+
+        assertNotNull(byBibliographicPK);
+        assertNotNull(byBibliographicPK.getBibliographicId());
+        assertNotNull(byBibliographicPK.getLastUpdatedBy());
+        assertNotNull(byBibliographicPK.getCreatedBy());
+        assertNotNull(byBibliographicPK.getHoldingsEntities().get(0).getHoldingsId());
     }
 
     @Test

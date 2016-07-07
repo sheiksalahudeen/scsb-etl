@@ -49,7 +49,9 @@ public class BibPersisterCallable implements Callable {
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bib.getOwningInstitutionId());
         bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
         bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedBy("etl");
         ContentType bibContent = bib.getContent();
 
         CollectionType bibContentCollection = bibContent.getCollection();
@@ -69,7 +71,9 @@ public class BibPersisterCallable implements Callable {
                     RecordType holdingsRecordType = holdingRecordTypes.get(0);
                     holdingsEntity.setContent(holdingContentCollection.serialize(holdingContentCollection));
                     holdingsEntity.setCreatedDate(new Date());
+                    holdingsEntity.setCreatedBy("etl");
                     holdingsEntity.setLastUpdatedDate(new Date());
+                    holdingsEntity.setLastUpdatedBy("etl");
                     holdingsEntity.setOwningInstitutionHoldingsId(holdingEnt.getOwningInstitutionHoldingsId());
                     holdingsEntities.add(holdingsEntity);
 
@@ -106,11 +110,12 @@ public class BibPersisterCallable implements Callable {
                                 itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get("Open"));
                             }
                             itemEntity.setCreatedDate(new Date());
+                            itemEntity.setCreatedBy("etl");
                             itemEntity.setLastUpdatedDate(new Date());
+                            itemEntity.setLastUpdatedBy("etl");
                             itemEntity.setUseRestrictions(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h"));
                             itemEntity.setVolumePartYear(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "3"));
                             itemEntity.setOwningInstitutionItemId(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "a"));
-
                             itemEntity.setHoldingsEntity(holdingsEntity);
                             if (holdingsEntity.getItemEntities() == null) {
                                 holdingsEntity.setItemEntities(new ArrayList<>());
