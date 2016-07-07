@@ -8,6 +8,8 @@ import org.recap.repository.BibliographicItemDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -28,6 +30,10 @@ public class BibliographicEntityTest extends BaseTestCase {
 
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
+
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
@@ -376,6 +382,29 @@ public class BibliographicEntityTest extends BaseTestCase {
         assertNotNull(bibliographicEntity1.getBibliographicId());
 
         assertNull(bibliographicEntity2.getBibliographicId());
+
+
+    }
+
+    @Test
+    public void refreshEntityAfterSave() throws Exception{
+
+        String owningInstitutionBibId = "10001";
+        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
+        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setCreatedDate(new Date());
+        bibliographicEntity1.setLastUpdatedDate(new Date());
+        bibliographicEntity1.setOwningInstitutionId(1);
+        bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId);
+        bibliographicEntity1.setCreatedBy("etl");
+        bibliographicEntity1.setLastUpdatedBy("etl");
+        BibliographicEntity savedEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
+        assertNotNull(savedEntity);
+        entityManager.refresh(savedEntity);
+        Integer bibliographicId = savedEntity.getBibliographicId();
+        assertNotNull(bibliographicId);
+        System.out.println("Saved Bib Id : " + bibliographicId);
+
 
 
     }
