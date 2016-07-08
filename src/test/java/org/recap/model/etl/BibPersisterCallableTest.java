@@ -86,10 +86,12 @@ public class BibPersisterCallableTest extends BaseTestCase {
         assertNotNull(bibRecord);
 
         BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
-        Object object = bibPersisterCallable.call();
-        assertNotNull(object);
-        if (object instanceof LoadReportEntity) {
-            loadReportEntities.add((LoadReportEntity) object);
+        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
+        if (map != null) {
+            Object object = map.get("loadReportEntity");
+            if (object != null) {
+                loadReportEntities.add((LoadReportEntity) object);
+            }
         }
 
         assertEquals(loadReportEntities.size(), 1);
@@ -99,7 +101,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
     }
 
     @Test
-    public void checkUniqueConstraints() throws Exception {
+    public void loadBibHoldingsMultipleItems() throws Exception {
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
@@ -121,9 +123,16 @@ public class BibPersisterCallableTest extends BaseTestCase {
         bibRecord1 = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
         assertNotNull(bibRecord1);
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibPersisterCallable.call();
+        BibliographicEntity bibliographicEntity = null;
 
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
+        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
+        if (map != null) {
+            Object object = map.get("bibliographicEntity");
+            if (object != null) {
+                bibliographicEntity = (BibliographicEntity) object;
+            }
+        }
         assertNotNull(bibliographicEntity);
         assertEquals(bibliographicEntity.getHoldingsEntities().size(), 1);
         assertEquals(bibliographicEntity.getItemEntities().size(), 5);
@@ -145,7 +154,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
         assertNotNull(savedBibliographicEntity.getHoldingsEntities());
         assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 1);
         assertNotNull(savedBibliographicEntity.getItemEntities());
-        assertEquals(savedBibliographicEntity.getItemEntities().size(), 4);
+        assertEquals(savedBibliographicEntity.getItemEntities().size(), 5);
     }
 
     @Test
@@ -167,12 +176,20 @@ public class BibPersisterCallableTest extends BaseTestCase {
         File file = new File(resource.toURI());
         assertNotNull(file);
         assertTrue(file.exists());
-        BibRecord bibRecord1 = null;
-        bibRecord1 = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
-        assertNotNull(bibRecord1);
+        BibRecord bibRecord = null;
+        bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        assertNotNull(bibRecord);
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibPersisterCallable.call();
+        BibliographicEntity bibliographicEntity = null;
+
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
+        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
+        if (map != null) {
+            Object object = map.get("bibliographicEntity");
+            if (object != null) {
+                bibliographicEntity = (BibliographicEntity) object;
+            }
+        }
 
         assertNotNull(bibliographicEntity);
         assertEquals(bibliographicEntity.getHoldingsEntities().size(), 2);
@@ -193,10 +210,9 @@ public class BibPersisterCallableTest extends BaseTestCase {
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 1);
+        assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 2);
         assertNotNull(savedBibliographicEntity.getItemEntities());
-        assertEquals(savedBibliographicEntity.getItemEntities().size(), 2);
-        assertEquals(bibliographicEntity.getHoldingsEntities().get(0).getItemEntities().size(), 2);
+        assertEquals(savedBibliographicEntity.getItemEntities().size(), 3);
     }
 
     //TODO : need to fix constraint in bibliographic_item_t
@@ -220,12 +236,21 @@ public class BibPersisterCallableTest extends BaseTestCase {
         File file = new File(resource.toURI());
         assertNotNull(file);
         assertTrue(file.exists());
-        BibRecord bibRecord1 = null;
-        bibRecord1 = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
-        assertNotNull(bibRecord1);
+        BibRecord bibRecord = null;
+        bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        assertNotNull(bibRecord);
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibPersisterCallable.call();
+        BibliographicEntity bibliographicEntity = null;
+
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
+        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
+        if (map != null) {
+            Object object = map.get("bibliographicEntity");
+            if (object != null) {
+                bibliographicEntity = (BibliographicEntity) object;
+            }
+        }
+
         assertNotNull(bibliographicEntity);
         assertEquals(bibliographicEntity.getHoldingsEntities().size(), 2);
         assertEquals(bibliographicEntity.getItemEntities().size(), 4);
