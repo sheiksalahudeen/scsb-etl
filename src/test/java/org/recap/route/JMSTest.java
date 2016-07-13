@@ -1,17 +1,20 @@
 package org.recap.route;
 
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +22,7 @@ import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by pvsubrah on 6/24/16.
@@ -34,6 +38,9 @@ public class JMSTest extends BaseTestCase {
     @Autowired
     CamelContext camelContext;
 
+    @Value("${etl.report.directory}")
+    private String reportDirectoryPath;
+
     @Test
     public void produceAndConsumeSEDA() throws Exception {
         assertNotNull(producer);
@@ -48,21 +55,9 @@ public class JMSTest extends BaseTestCase {
     }
 
     @Test
-    public void produceAndConsumeActiveMQQueue() throws Exception {
-        
-        camelContext.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("activemq:queue:testQ?asyncConsumer=true&concurrentConsumers=10")
-                        .bean(JMSMessageProcessor.class,"processMessage");
-            }
-        });
-
-
-
+    public void produceAndConsumeEtlLoadQ() throws Exception {
         Random random = new Random();
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
             bibliographicEntity1.setBibliographicId(random.nextInt());
             bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
@@ -92,7 +87,7 @@ public class JMSTest extends BaseTestCase {
             bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
             ETLExchange etlExchange = new ETLExchange();
-            etlExchange.setBibliographicEntities( Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+            etlExchange.setBibliographicEntities(Arrays.asList(bibliographicEntity1, bibliographicEntity2));
             etlExchange.setInstitutionEntityMap(new HashMap());
             etlExchange.setCollectionGroupMap(new HashMap());
 
@@ -100,5 +95,34 @@ public class JMSTest extends BaseTestCase {
         }
 
         Thread.sleep(1000);
+    }
+
+    @Test
+    public void produceAndConsumeEtlReportQ() throws Exception {
+        Random random = new Random();
+
+        LoadReportEntity loadReportEntity = new LoadReportEntity();
+        String owningInstitution = String.valueOf(random.nextInt());
+        loadReportEntity.setOwningInstitution(owningInstitution);
+        loadReportEntity.setOwningInstitutionBibId("1111");
+        loadReportEntity.setOwningInstitutionHoldingsId("2222");
+        loadReportEntity.setLocalItemId("333333333");
+        loadReportEntity.setItemBarcode("4444");
+        loadReportEntity.setCustomerCode("PA");
+        loadReportEntity.setTitle("title");
+        loadReportEntity.setCollectionGroupDesignation("open");
+        loadReportEntity.setCreateDateItem(new Date());
+        loadReportEntity.setLastUpdatedDateItem(new Date());
+        loadReportEntity.setExceptionMessage("exception");
+        loadReportEntity.setErrorDescription("error");
+
+        producer.sendBody("activemq:queue:etlReportQ", Arrays.asList(loadReportEntity));
+
+        Thread.sleep(1000);
+
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        String fileName = reportDirectoryPath + File.separator + owningInstitution + "_" + df.format(new Date()) + ".csv";
+        File file = new File(fileName);
+        assertTrue(file.exists());
     }
 }
