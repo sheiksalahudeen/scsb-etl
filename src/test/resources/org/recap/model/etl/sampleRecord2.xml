@@ -35,8 +35,7 @@
                         <subfield code="b">D59 2000</subfield>
                     </datafield>
                     <datafield ind1="0" ind2="0" tag="245">
-                        <subfield code="a">Dizionario biografico enciclopedico di un secolo del calcio italiano /
-                        </subfield>
+                        <subfield code="a">Dizionario biografico enciclopedico di un secolo del calcio italiano /</subfield>
                         <subfield code="c">a cura di Marco Sappino.</subfield>
                     </datafield>
                     <datafield ind1="1" ind2="4" tag="246">
@@ -114,7 +113,7 @@
                             <subfield code="h">JFD 02-22709</subfield>
                         </datafield>
                         <datafield ind1=" " ind2=" " tag="866">
-                            <subfield code="a">v. 1</subfield>
+                            <subfield code="a">v. 2</subfield>
                         </datafield>
                     </record>
                 </collection>
@@ -124,12 +123,12 @@
                     <collection xmlns="http://www.loc.gov/MARC21/slim">
                         <record>
                             <datafield ind1=" " ind2=" " tag="876">
-                                <subfield code="p">33433031684909</subfield>
+                                <subfield code="p">33433031684917</subfield>
                                 <subfield code="h">In Library Use</subfield>
-                                <subfield code="a">.i116690355</subfield>
+                                <subfield code="a">.i116690367</subfield>
                                 <subfield code="j">Available</subfield>
                                 <subfield code="t">1</subfield>
-                                <subfield code="3">v. 1</subfield>
+                                <subfield code="3">v. 2</subfield>
                             </datafield>
                             <datafield ind1=" " ind2=" " tag="900">
                                 <subfield code="a">Shared</subfield>

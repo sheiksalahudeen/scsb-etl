@@ -18,6 +18,8 @@ import org.recap.util.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
@@ -34,6 +36,9 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
     @Autowired
     private ProducerTemplate producer;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     CsvUtil csvUtil;
@@ -216,8 +221,8 @@ public class BibPersisterCallableTest extends BaseTestCase {
     }
 
     //TODO : need to fix constraint in bibliographic_item_t
-    @Ignore
     @Test
+    @Ignore
     public void duplicateItemsForSingleBib() throws Exception {
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
@@ -255,12 +260,87 @@ public class BibPersisterCallableTest extends BaseTestCase {
         assertEquals(bibliographicEntity.getHoldingsEntities().size(), 2);
         assertEquals(bibliographicEntity.getItemEntities().size(), 4);
 
-        bibliographicDetailsRepository.save(bibliographicEntity);
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
         assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 2);
         assertEquals(savedBibliographicEntity.getItemEntities().size(), 2);
 
+    }
+
+    @Test
+    @Ignore
+    public void duplicateBibsWithDifferentItems() throws Exception {
+        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
+        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
+        Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
+
+        Map<String, Integer> institution = new HashMap<>();
+        institution.put("NYPL", 3);
+        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
+
+        Map<String, Integer> collection = new HashMap<>();
+        collection.put("Open", 2);
+        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
+
+        URL resource = getClass().getResource("sampleRecord1.xml");
+        assertNotNull(resource);
+        File file = new File(resource.toURI());
+        assertNotNull(file);
+        assertTrue(file.exists());
+        BibRecord bibRecord1 = null;
+        bibRecord1 = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        assertNotNull(bibRecord1);
+
+        BibliographicEntity bibliographicEntity1 = null;
+
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
+        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
+        if (map != null) {
+            Object object = map.get("bibliographicEntity");
+            if (object != null) {
+                bibliographicEntity1 = (BibliographicEntity) object;
+            }
+        }
+
+        resource = getClass().getResource("sampleRecord2.xml");
+        assertNotNull(resource);
+        file = new File(resource.toURI());
+        assertNotNull(file);
+        assertTrue(file.exists());
+        BibRecord bibRecord2 = null;
+        bibRecord2 = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        assertNotNull(bibRecord2);
+
+        BibliographicEntity bibliographicEntity2 = null;
+
+        bibPersisterCallable = new BibPersisterCallable(bibRecord2, institutionMap, itemStatusMap, collectionGroupMap);
+        map = (Map<String, Object>) bibPersisterCallable.call();
+        if (map != null) {
+            Object object = map.get("bibliographicEntity");
+            if (object != null) {
+                bibliographicEntity2 = (BibliographicEntity) object;
+            }
+        }
+
+        assertNotNull(bibliographicEntity1);
+        assertNotNull(bibliographicEntity2);
+
+        BibliographicEntity savedBibliographicEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
+        entityManager.refresh(savedBibliographicEntity1);
+        assertNotNull(savedBibliographicEntity1);
+        assertNotNull(savedBibliographicEntity1.getBibliographicId());
+
+        BibliographicEntity savedBibliographicEntity2 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
+        entityManager.refresh(savedBibliographicEntity1);
+        assertNotNull(savedBibliographicEntity2);
+        assertNotNull(savedBibliographicEntity2.getBibliographicId());
+
+        BibliographicEntity byOwningInstitutionBibId = bibliographicDetailsRepository.findByOwningInstitutionBibId(".b153286131");
+        assertNotNull(byOwningInstitutionBibId);
+        assertEquals(byOwningInstitutionBibId.getHoldingsEntities().size(), 2);
+        assertEquals(byOwningInstitutionBibId.getItemEntities().size(), 2);
     }
 
 

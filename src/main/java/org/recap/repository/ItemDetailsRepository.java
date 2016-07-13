@@ -9,6 +9,13 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * Created by chenchulakshmig on 21/6/16.
  */
 public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, Integer> {
-    Long countByOwningInstitutionId(Integer institutionId);
-    Page<ItemEntity> findByOwningInstitutionId(Pageable pageable, Integer institutionId);
+
+    Long countByOwningInstitutionId(Integer owningInstitutionId);
+
+    Page<ItemEntity> findByOwningInstitutionId(Pageable pageable, Integer owningInstitutionId);
+
+    ItemEntity findByOwningInstitutionId(Integer owningInstitutionId);
+
+    ItemEntity findByOwningInstitutionItemId(String owningInstitutionItemId);
+
 }
