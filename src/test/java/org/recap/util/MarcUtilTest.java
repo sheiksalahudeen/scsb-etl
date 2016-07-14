@@ -5,6 +5,8 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.RecordType;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -29,10 +31,32 @@ public class MarcUtilTest {
     public void dataField245() throws Exception {
         MarcUtil marcUtil = new MarcUtil();
         String dataFieldValue = marcUtil.getDataFieldValue(getBibRecord().getBib().getContent().getCollection().getRecord().get(0), "245", null, null, "a");
-        System.out.println(dataFieldValue);
-
+        assertEquals(dataFieldValue, "al-Baḥrayn :");
     }
 
+    @Test
+    public void dataField035() throws Exception {
+        MarcUtil marcUtil = new MarcUtil();
+        List<String> dataFieldValues = marcUtil.getMultiDataFieldValues(getBibRecord().getBib().getContent().getCollection().getRecord().get(0), "035", null, null, "a");
+        assertNotNull(dataFieldValues);
+        assertEquals(dataFieldValues.size(), 2);
+    }
+
+    @Test
+    public void getInd1() throws Exception {
+        MarcUtil marcUtil = new MarcUtil();
+        RecordType recordType = getBibRecord().getHoldings().get(0).getHolding().get(0).getContent().getCollection().getRecord().get(0);
+        String ind1 = marcUtil.getInd1(recordType, "852", "h");
+        assertEquals(ind1, "0");
+    }
+
+    @Test
+    public void getControlFieldValue() throws Exception {
+        MarcUtil marcUtil = new MarcUtil();
+        RecordType recordType = getBibRecord().getBib().getContent().getCollection().getRecord().get(0);
+        String controlFieldValue = marcUtil.getControlFieldValue(recordType, "001");
+        assertEquals(controlFieldValue, "NYPG001000011-B");
+    }
 
     private BibRecord getBibRecord() {
         JAXBHandler jaxbHandler = JAXBHandler.getInstance();

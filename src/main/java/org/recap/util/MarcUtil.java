@@ -1,10 +1,6 @@
 package org.recap.util;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.marc4j.MarcReader;
-import org.marc4j.MarcXmlReader;
-import org.marc4j.marc.Record;
 import org.recap.model.jaxb.marc.ControlFieldType;
 import org.recap.model.jaxb.marc.DataFieldType;
 import org.recap.model.jaxb.marc.RecordType;
@@ -20,19 +16,9 @@ import java.util.List;
  */
 public class MarcUtil {
 
-    public List<Record> convertMarcXmlToRecord(String marcXml) {
-        List<Record> records = new ArrayList<>();
-        MarcReader reader = new MarcXmlReader(IOUtils.toInputStream(marcXml));
-        while (reader.hasNext()) {
-            Record record = reader.next();
-            records.add(record);
-        }
-        return records;
-    }
-
     public String getDataFieldValue(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
         List<String> strings = resolveValue(marcRecord, field, ind1, ind2, subField);
-        return CollectionUtils.isEmpty(strings)? "" : strings.get(0);
+        return CollectionUtils.isEmpty(strings) ? "" : strings.get(0);
     }
 
     public List<String> getMultiDataFieldValues(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
@@ -47,12 +33,12 @@ public class MarcUtil {
 
         for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
             DataFieldType dataField = dataFieldIterator.next();
-            if(dataField!=null && dataField.getTag().equals(field)){
+            if (dataField != null && dataField.getTag().equals(field)) {
                 if (doIndicatorsMatch(indicator1, indicator2, dataField)) {
                     List<SubfieldatafieldType> subFields = dataField.getSubfield();
                     for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
                         SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
-                        if (subField!=null && subfieldatafieldType.getCode().equals(subField)){
+                        if (subField != null && subfieldatafieldType.getCode().equals(subField)) {
                             String data = subfieldatafieldType.getCode();
                             if (StringUtils.isNotBlank(data)) {
                                 values.add(subfieldatafieldType.getValue());
@@ -98,7 +84,7 @@ public class MarcUtil {
         List<ControlFieldType> controlFields = marcRecord.getControlfield();
         for (Iterator<ControlFieldType> variableFieldIterator = controlFields.iterator(); variableFieldIterator.hasNext(); ) {
             ControlFieldType controlField = variableFieldIterator.next();
-            if (controlField!=null && controlField.getTag().equals(field)) {
+            if (controlField != null && controlField.getTag().equals(field)) {
                 return controlField.getValue();
             }
         }

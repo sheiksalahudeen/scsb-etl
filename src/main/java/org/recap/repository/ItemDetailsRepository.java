@@ -10,6 +10,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, Integer> {
 
+    ItemEntity findByItemId(Integer itemId);
+
     Long countByOwningInstitutionId(Integer owningInstitutionId);
 
     Page<ItemEntity> findByOwningInstitutionId(Pageable pageable, Integer owningInstitutionId);

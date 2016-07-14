@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,28 +46,29 @@ public class ItemDetailsRepositoryTest extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content");
-        bibliographicEntity.setCreatedDate(new Date());
+        Date date = new Date();
+        bibliographicEntity.setCreatedDate(date);
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
-        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(date);
         bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
         String owningInstitutionBibId = String.valueOf(random.nextInt());
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings");
-        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedDate(date);
         holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(date);
         holdingsEntity.setLastUpdatedBy("etl");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setCallNumberType("0");
         itemEntity.setCallNumber("callNum");
-        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedDate(date);
         itemEntity.setCreatedBy("etl");
-        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedDate(date);
         itemEntity.setLastUpdatedBy("etl");
         itemEntity.setBarcode("1231");
         String owningInstitutionItemId = String.valueOf(random.nextInt());
@@ -88,7 +90,9 @@ public class ItemDetailsRepositoryTest extends BaseTestCase {
         assertNotNull(savedEntity);
         assertNotNull(savedEntity.getBibliographicId());
         assertNotNull(savedEntity.getHoldingsEntities().get(0).getHoldingsId());
-        assertNotNull(savedEntity.getItemEntities().get(0).getItemId());
+        ItemEntity savedItemEntity = savedEntity.getItemEntities().get(0);
+        assertNotNull(savedItemEntity);
+        assertNotNull(savedItemEntity.getItemId());
 
         Long countAfterAdd = itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
         assertTrue(countAfterAdd > count);
@@ -102,6 +106,17 @@ public class ItemDetailsRepositoryTest extends BaseTestCase {
         Page<ItemEntity> pageByOwningInstitutionId = itemDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 10), owningInstitutionId);
         assertNotNull(pageByOwningInstitutionId);
         assertTrue(countAfterAdd == pageByOwningInstitutionId.getTotalElements());
+
+        assertEquals(savedItemEntity.getCallNumberType(), "0");
+        assertEquals(savedItemEntity.getCallNumber(), "callNum");
+        assertEquals(savedItemEntity.getCreatedBy(), "etl");
+        assertEquals(savedItemEntity.getLastUpdatedBy(), "etl");
+        assertEquals(savedItemEntity.getBarcode(), "1231");
+        assertEquals(savedItemEntity.getOwningInstitutionItemId(), owningInstitutionItemId);
+        assertEquals(savedItemEntity.getCustomerCode(), "PA");
+        assertNotNull(savedItemEntity.getHoldingsEntity());
+        assertTrue(savedItemEntity.getOwningInstitutionId() == owningInstitutionId);
+        assertTrue(savedItemEntity.getCollectionGroupId() == 1);
     }
 
 }
