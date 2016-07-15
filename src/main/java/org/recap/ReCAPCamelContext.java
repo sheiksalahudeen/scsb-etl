@@ -29,11 +29,17 @@ public class ReCAPCamelContext {
     private Integer numberOfThreads;
     private Integer batchSize;
     private String inputDirectoryPath;
+    private String jmsComponentName;
+    private String jmsComponentUrl;
+    private String xmlTagName;
 
     @Autowired
     public ReCAPCamelContext(@Value("${etl.number.of.threads}") Integer numberOfThreads,
                              @Value("${etl.load.batchSize}") Integer batchSize,
                              @Value("${etl.load.directory}") String inputDirectoryPath,
+                             @Value("${etl.jms.component.name}") String jmsComponentName,
+                             @Value("${etl.jms.component.url}") String jmsComponentUrl,
+                             @Value("${etl.split.xml.tag.name}") String xmlTagName,
                              CamelContext context,
                              BibliographicDetailsRepository bibliographicDetailsRepository,
                              InstitutionDetailsRepository institutionDetailsRepository,
@@ -43,6 +49,9 @@ public class ReCAPCamelContext {
         this.numberOfThreads = numberOfThreads;
         this.batchSize = batchSize;
         this.inputDirectoryPath = inputDirectoryPath;
+        this.jmsComponentName = jmsComponentName;
+        this.jmsComponentUrl = jmsComponentUrl;
+        this.xmlTagName = xmlTagName;
         this.context = context;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.institutionDetailsRepository = institutionDetailsRepository;
@@ -65,7 +74,7 @@ public class ReCAPCamelContext {
     }
 
     public void addDynamicRoute() throws Exception {
-        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+        context.addComponent(jmsComponentName, ActiveMQComponent.activeMQComponent(jmsComponentUrl));
         addRoutes(new JMSMessageRouteBuilder());
         addRoutes(new JMSReportRouteBuilder());
         addRoutes(getEtlRouteBuilder());
@@ -75,6 +84,7 @@ public class ReCAPCamelContext {
         ETLRouteBuilder etlRouteBuilder = new ETLRouteBuilder(context);
         etlRouteBuilder.setFrom(inputDirectoryPath);
         etlRouteBuilder.setChunkSize(batchSize);
+        etlRouteBuilder.setXmlTagName(xmlTagName);
         etlRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
         etlRouteBuilder.setItemStatusDetailsRepository(itemStatusDetailsRepository);
