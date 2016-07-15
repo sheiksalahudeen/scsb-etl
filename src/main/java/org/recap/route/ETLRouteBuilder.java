@@ -22,6 +22,7 @@ public class ETLRouteBuilder extends RouteBuilder {
     private int chunkSize = 1;
     private int poolSize = 10;
     private int maxThreads = 10;
+    private String xmlTagName;
     private InstitutionDetailsRepository institutionDetailsRepository;
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -46,6 +47,14 @@ public class ETLRouteBuilder extends RouteBuilder {
 
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
+    }
+
+    public String getXmlTagName() {
+        return xmlTagName;
+    }
+
+    public void setXmlTagName(String xmlTagName) {
+        this.xmlTagName = xmlTagName;
     }
 
     public InstitutionDetailsRepository getInstitutionDetailsRepository() {
@@ -114,7 +123,7 @@ public class ETLRouteBuilder extends RouteBuilder {
         fEPoint.setFilter(new FileFilter());
         RouteDefinition route = from(fEPoint).streamCaching();
         route.setId(from);
-        SplitDefinition split = route.split().tokenizeXML("bibRecord");
+        SplitDefinition split = route.split().tokenizeXML(xmlTagName);
         split.streaming();
         AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
         aggregator.setParallelProcessing(true);
