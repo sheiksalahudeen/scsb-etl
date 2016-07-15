@@ -4,8 +4,11 @@ import org.junit.Test;
 import org.recap.model.jaxb.marc.*;
 
 import java.util.Arrays;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -18,6 +21,7 @@ public class JAXBHandlerTest {
         BibRecord bibRecord = new BibRecord();
         Bib bib = new Bib();
         bib.setOwningInstitutionId("101");
+        bib.setOwningInstitutionBibId("111");
         ContentType content = new ContentType();
         CollectionType collection = new CollectionType();
         RecordType recordType = new RecordType();
@@ -34,7 +38,9 @@ public class JAXBHandlerTest {
         bibRecord.setBib(bib);
         Holding holding1 = new Holding();
         holding1.setOwningInstitutionHoldingsId("h-101");
+        holding1.setContent(new ContentType());
         Items items = new Items();
+        items.setContent(new ContentType());
         holding1.setItems(Arrays.asList(items));
         Holding holding2 = new Holding();
         holding2.setOwningInstitutionHoldingsId("h-102");
@@ -52,6 +58,7 @@ public class JAXBHandlerTest {
         String content = "<bibRecord>\n" +
                 "    <bib>\n" +
                 "      <owningInstitutionId>NYPL</owningInstitutionId>\n" +
+                "      <owningInstitutionBibId>.b153286131</owningInstitutionBibId>\n" +
                 "      <content>\n" +
                 "        <collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
                 "          <record>\n" +
@@ -137,7 +144,7 @@ public class JAXBHandlerTest {
                 "    </bib>\n" +
                 "    <holdings>\n" +
                 "      <holding>\n" +
-                "        <owningInstitutionHoldingsId/>\n" +
+                "        <owningInstitutionHoldingsId>123456</owningInstitutionHoldingsId>\n" +
                 "        <content>\n" +
                 "          <collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
                 "            <record>\n" +
@@ -179,7 +186,25 @@ public class JAXBHandlerTest {
         BibRecord bibRecord = (BibRecord) jaxbHandler.unmarshal(content, BibRecord.class);
 
         assertNotNull(bibRecord);
+        Bib bib = bibRecord.getBib();
+        assertNotNull(bib);
+        assertEquals(bib.getOwningInstitutionId(), "NYPL");
+        assertEquals(bib.getOwningInstitutionBibId(), ".b153286131");
+        assertNotNull(bib.getContent());
 
+        assertNotNull(bibRecord.getHoldings());
+        assertTrue(bibRecord.getHoldings().size() > 0);
+        List<Holding> holdings = bibRecord.getHoldings().get(0).getHolding();
+        assertNotNull(holdings);
+        Holding holding = holdings.get(0);
+        assertNotNull(holding);
+        assertEquals(holding.getOwningInstitutionHoldingsId(), "123456");
+        assertNotNull(holding.getContent());
+
+        assertNotNull(holding.getItems());
+        Items items = holding.getItems().get(0);
+        assertNotNull(items);
+        assertNotNull(items.getContent());
 
     }
 

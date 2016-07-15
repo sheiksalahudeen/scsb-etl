@@ -332,12 +332,12 @@ public class BibPersisterCallableTest extends BaseTestCase {
         assertNotNull(savedBibliographicEntity1);
         assertNotNull(savedBibliographicEntity1.getBibliographicId());
 
-        BibliographicEntity savedBibliographicEntity2 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
-        entityManager.refresh(savedBibliographicEntity1);
+        BibliographicEntity savedBibliographicEntity2 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity2);
+        entityManager.refresh(savedBibliographicEntity2);
         assertNotNull(savedBibliographicEntity2);
         assertNotNull(savedBibliographicEntity2.getBibliographicId());
 
-        BibliographicEntity byOwningInstitutionBibId = bibliographicDetailsRepository.findByOwningInstitutionBibId(".b153286131");
+        BibliographicEntity byOwningInstitutionBibId = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(3, ".b153286131");
         assertNotNull(byOwningInstitutionBibId);
         assertEquals(byOwningInstitutionBibId.getHoldingsEntities().size(), 2);
         assertEquals(byOwningInstitutionBibId.getItemEntities().size(), 2);
