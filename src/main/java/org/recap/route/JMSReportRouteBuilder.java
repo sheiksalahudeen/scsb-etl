@@ -10,6 +10,7 @@ public class JMSReportRouteBuilder extends RouteBuilder {
     public void configure() throws Exception {
         from("activemq:queue:etlReportQ")
                 .autoStartup(true)
+                .routeId("jmsReportQRoute")
                 .bean(JMSReportProcessor.class, "processReport");
     }
 }

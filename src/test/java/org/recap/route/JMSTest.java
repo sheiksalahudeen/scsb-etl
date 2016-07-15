@@ -57,44 +57,52 @@ public class JMSTest extends BaseTestCase {
     @Test
     public void produceAndConsumeEtlLoadQ() throws Exception {
         Random random = new Random();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
             bibliographicEntity1.setBibliographicId(random.nextInt());
             bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
             bibliographicEntity1.setOwningInstitutionId(1);
             bibliographicEntity1.setContent("mock content");
             bibliographicEntity1.setCreatedDate(new Date());
+            bibliographicEntity1.setCreatedBy("etl-test");
+            bibliographicEntity1.setLastUpdatedBy("etl-test");
+            bibliographicEntity1.setLastUpdatedDate(new Date());
+
 
             HoldingsEntity holdingsEntity = new HoldingsEntity();
             holdingsEntity.setContent("mock holding content");
             holdingsEntity.setCreatedDate(new Date());
+            holdingsEntity.setCreatedBy("etl-test");
+            holdingsEntity.setLastUpdatedDate(new Date());
+            holdingsEntity.setLastUpdatedBy("etl-test");
+
             ItemEntity itemEntity = new ItemEntity();
             itemEntity.setBarcode("b.123");
             itemEntity.setCollectionGroupId(1);
             itemEntity.setCreatedDate(new Date());
+            itemEntity.setCreatedBy("etl-test");
+            itemEntity.setLastUpdatedBy("etl-test");
+            itemEntity.setLastUpdatedDate(new Date());
             itemEntity.setOwningInstitutionId(1);
             itemEntity.setCustomerCode("PA");
             itemEntity.setOwningInstitutionItemId("123");
-            holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
-            bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
+            itemEntity.setItemAvailabilityStatusId(1);
+            itemEntity.setHoldingsEntity(holdingsEntity);
 
-            BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-            bibliographicEntity2.setBibliographicId(random.nextInt());
-            bibliographicEntity2.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
-            bibliographicEntity2.setContent("mock conent");
-            bibliographicEntity2.setCreatedDate(new Date());
-            bibliographicEntity2.setOwningInstitutionId(1);
+            holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+
             bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
+            bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity));
 
             ETLExchange etlExchange = new ETLExchange();
-            etlExchange.setBibliographicEntities(Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+            etlExchange.setBibliographicEntities(Arrays.asList(bibliographicEntity1));
             etlExchange.setInstitutionEntityMap(new HashMap());
             etlExchange.setCollectionGroupMap(new HashMap());
 
-            producer.sendBody("activemq:queue:etlLoadQ", Arrays.asList(bibliographicEntity1, bibliographicEntity2));
+            producer.sendBody("activemq:queue:etlLoadQ", etlExchange);
         }
 
-        Thread.sleep(1000);
+        Thread.sleep(5000);
     }
 
     @Test

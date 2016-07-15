@@ -5,7 +5,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.repository.*;
-import org.recap.route.ETLRouteBuilder;
+import org.recap.route.FileRouteBuilder;
 import org.recap.route.JMSMessageRouteBuilder;
 import org.recap.route.JMSReportRouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +25,14 @@ public class ReCAPCamelContext {
     ItemStatusDetailsRepository itemStatusDetailsRepository;
     CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     ProducerTemplate producer;
-
     private Integer numberOfThreads;
+
     private Integer batchSize;
     private String inputDirectoryPath;
     private String jmsComponentName;
     private String jmsComponentUrl;
     private String xmlTagName;
+    private String levelDbFilePath;
 
     @Autowired
     public ReCAPCamelContext(@Value("${etl.number.of.threads}") Integer numberOfThreads,
@@ -40,6 +41,7 @@ public class ReCAPCamelContext {
                              @Value("${etl.jms.component.name}") String jmsComponentName,
                              @Value("${etl.jms.component.url}") String jmsComponentUrl,
                              @Value("${etl.split.xml.tag.name}") String xmlTagName,
+                             @Value("${levelDb.filePath}") String levelDbFilePath,
                              CamelContext context,
                              BibliographicDetailsRepository bibliographicDetailsRepository,
                              InstitutionDetailsRepository institutionDetailsRepository,
@@ -52,6 +54,7 @@ public class ReCAPCamelContext {
         this.jmsComponentName = jmsComponentName;
         this.jmsComponentUrl = jmsComponentUrl;
         this.xmlTagName = xmlTagName;
+        this.levelDbFilePath = levelDbFilePath;
         this.context = context;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.institutionDetailsRepository = institutionDetailsRepository;
@@ -77,22 +80,23 @@ public class ReCAPCamelContext {
         context.addComponent(jmsComponentName, ActiveMQComponent.activeMQComponent(jmsComponentUrl));
         addRoutes(new JMSMessageRouteBuilder());
         addRoutes(new JMSReportRouteBuilder());
-        addRoutes(getEtlRouteBuilder());
+        addRoutes(getFileRouteBuilder());
     }
 
-    private ETLRouteBuilder getEtlRouteBuilder() {
-        ETLRouteBuilder etlRouteBuilder = new ETLRouteBuilder(context);
-        etlRouteBuilder.setFrom(inputDirectoryPath);
-        etlRouteBuilder.setChunkSize(batchSize);
-        etlRouteBuilder.setXmlTagName(xmlTagName);
-        etlRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
-        etlRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
-        etlRouteBuilder.setItemStatusDetailsRepository(itemStatusDetailsRepository);
-        etlRouteBuilder.setCollectionGroupDetailsRepository(collectionGroupDetailsRepository);
-        etlRouteBuilder.setProducer(producer);
-        etlRouteBuilder.setMaxThreads(50);
-        etlRouteBuilder.setPoolSize(numberOfThreads);
-        return etlRouteBuilder;
+    private FileRouteBuilder getFileRouteBuilder() {
+        FileRouteBuilder fileRouteBuilder = new FileRouteBuilder(context);
+        fileRouteBuilder.setLevlDbFilePath(levelDbFilePath);
+        fileRouteBuilder.setFrom(inputDirectoryPath);
+        fileRouteBuilder.setChunkSize(batchSize);
+        fileRouteBuilder.setXmlTagName(xmlTagName);
+        fileRouteBuilder.setBibliographicDetailsRepository(bibliographicDetailsRepository);
+        fileRouteBuilder.setInstitutionDetailsRepository(institutionDetailsRepository);
+        fileRouteBuilder.setItemStatusDetailsRepository(itemStatusDetailsRepository);
+        fileRouteBuilder.setCollectionGroupDetailsRepository(collectionGroupDetailsRepository);
+        fileRouteBuilder.setProducer(producer);
+        fileRouteBuilder.setMaxThreads(50);
+        fileRouteBuilder.setPoolSize(numberOfThreads);
+        return fileRouteBuilder;
     }
 
     public boolean isRunning() {

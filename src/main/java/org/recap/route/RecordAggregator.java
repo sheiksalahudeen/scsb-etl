@@ -15,13 +15,15 @@ public class RecordAggregator implements AggregationStrategy {
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
         if (oldExchange == null) {
-            oldExchange = new DefaultExchange(newExchange);
-            oldExchange.getIn().setHeaders(newExchange.getIn().getHeaders());
             List<Object> body = new ArrayList<>();
-            oldExchange.getIn().setBody(body);
-            oldExchange.getExchangeId();
+            body.add(newExchange.getIn().getBody());
+            newExchange.getIn().setBody(body);
+            return newExchange;
         }
-        oldExchange.getIn().getBody(List.class).add(newExchange.getIn().getBody());
+
+        List body = oldExchange.getIn().getBody(List.class);
+        Object newBody = newExchange.getIn().getBody();
+        body.add(newBody);
 
         for (String key : newExchange.getProperties().keySet()) {
             oldExchange.setProperty(key, newExchange.getProperty(key));

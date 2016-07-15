@@ -16,7 +16,7 @@ import org.recap.repository.*;
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class ETLRouteBuilder extends RouteBuilder {
+public class FileRouteBuilder extends RouteBuilder {
     private String from = null;
     private FileEndpoint fEPoint = null;
     private int chunkSize = 1;
@@ -28,8 +28,17 @@ public class ETLRouteBuilder extends RouteBuilder {
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private ProducerTemplate producer;
+    private String levlDbFilePath;
 
-    public ETLRouteBuilder(CamelContext context) {
+    public String getLevlDbFilePath() {
+        return levlDbFilePath;
+    }
+
+    public void setLevlDbFilePath(String levlDbFilePath) {
+        this.levlDbFilePath = levlDbFilePath;
+    }
+
+    public FileRouteBuilder(CamelContext context) {
         super(context);
     }
 
@@ -116,16 +125,18 @@ public class ETLRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        System.out.println("Loading Bulk Ingest Process: @" + from);
         fEPoint = endpoint(
                 "file:" + from + "?move=.done",
                 FileEndpoint.class);
         fEPoint.setFilter(new FileFilter());
-        RouteDefinition route = from(fEPoint).streamCaching();
-        route.setId(from);
+
+        RouteDefinition route = from(fEPoint);
+        route.setId("fileRoute");
+
         SplitDefinition split = route.split().tokenizeXML(xmlTagName);
         split.streaming();
-        AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator());
+
+        AggregateDefinition aggregator = split.aggregate(constant(true), new RecordAggregator()).aggregationRepository(new ReCAPJDBCAggregationRepository("etl-repo", levlDbFilePath));
         aggregator.setParallelProcessing(true);
         aggregator.completionPredicate(new SplitPredicate(chunkSize));
         RecordProcessor processor = new RecordProcessor();
@@ -134,6 +145,7 @@ public class ETLRouteBuilder extends RouteBuilder {
         processor.setItemStatusDetailsRepository(itemStatusDetailsRepository);
         processor.setCollectionGroupDetailsRepository(collectionGroupDetailsRepository);
         processor.setProducer(producer);
+
         ThreadsDefinition threads = aggregator.threads(poolSize, maxThreads);
 
         threads.process(processor);

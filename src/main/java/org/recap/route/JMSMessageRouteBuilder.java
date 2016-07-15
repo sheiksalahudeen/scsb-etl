@@ -10,6 +10,7 @@ public class JMSMessageRouteBuilder extends RouteBuilder {
     public void configure() throws Exception {
         from("activemq:queue:etlLoadQ")
                 .autoStartup(true)
+                .routeId("jmsLoadRoute")
                 .bean(JMSMessageProcessor.class, "processMessage");
     }
 }

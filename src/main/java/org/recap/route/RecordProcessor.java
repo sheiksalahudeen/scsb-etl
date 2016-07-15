@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -43,10 +44,11 @@ public class RecordProcessor implements Processor {
     private Map collectionGroupMap;
 
     @Override
-    public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) {
+        ExecutorService executorService = null;
         if (exchange.getIn().getBody() instanceof List) {
 
-            ExecutorService executorService = Executors.newFixedThreadPool(50);
+            executorService = Executors.newFixedThreadPool(50);
 
             List<Future> futures = new ArrayList<>();
 
@@ -65,7 +67,14 @@ public class RecordProcessor implements Processor {
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                 Future future = iterator.next();
-                Object object = future.get();
+                Object object = null;
+                try {
+                    object = future.get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 Map<String, Object> map = (Map<String, Object>) object;
                 if (object != null) {
                     Object bibliographicEntity = map.get("bibliographicEntity");
@@ -89,6 +98,10 @@ public class RecordProcessor implements Processor {
                 producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
             }
 
+        }
+
+        if (null != executorService) {
+            executorService.shutdown();
         }
     }
 
