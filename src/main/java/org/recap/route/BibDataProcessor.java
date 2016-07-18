@@ -12,7 +12,6 @@ import org.recap.util.LoadReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -23,9 +22,9 @@ import java.util.*;
  */
 
 @Component
-public class JMSMessageProcessor {
+public class BibDataProcessor {
 
-    Logger logger = LoggerFactory.getLogger(JMSMessageProcessor.class);
+    Logger logger = LoggerFactory.getLogger(BibDataProcessor.class);
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -43,7 +42,7 @@ public class JMSMessageProcessor {
         if (etlExchange != null) {
             List<LoadReportEntity> loadReportEntities = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntityList = etlExchange.getBibliographicEntities();
-            long startTime = System.currentTimeMillis();
+
             try {
                 bibliographicDetailsRepository.save(bibliographicEntityList);
             } catch (Exception e) {
@@ -60,8 +59,7 @@ public class JMSMessageProcessor {
             if (!CollectionUtils.isEmpty(loadReportEntities)) {
                 csvUtil.writeToCsv(loadReportEntities);
             }
-            long endTime = System.currentTimeMillis();
-            logger.info("Time taken to save: " + bibliographicEntityList.size() + " bib and related data is: " + (endTime - startTime) / 1000 + " seconds.");
+
         }
     }
 

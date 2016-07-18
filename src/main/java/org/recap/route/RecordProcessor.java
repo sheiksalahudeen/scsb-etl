@@ -7,16 +7,16 @@ import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -28,76 +28,87 @@ import java.util.concurrent.Future;
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class RecordProcessor implements Processor {
+
+@Component
+public class RecordProcessor {
     private Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
 
-    private JAXBHandler jaxbHandler;
-
-    private ProducerTemplate producer;
-
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
-    private InstitutionDetailsRepository institutionDetailsRepository;
-    private ItemStatusDetailsRepository itemStatusDetailsRepository;
-    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private Map institutionEntityMap;
     private Map itemStatusMap;
     private Map collectionGroupMap;
+    private JAXBHandler jaxbHandler;
 
-    @Override
-    public void process(Exchange exchange) {
+    @Autowired
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    private InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Autowired
+    private ItemStatusDetailsRepository itemStatusDetailsRepository;
+
+    @Autowired
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+
+    @Autowired
+    BibDataProcessor bibDataProcessor;
+
+
+    public void process(Page<XmlRecordEntity> xmlRecordEntities) {
+        logger.info("Processor: " + Thread.currentThread().getName());
         ExecutorService executorService = null;
-        if (exchange.getIn().getBody() instanceof List) {
+        executorService = Executors.newFixedThreadPool(50);
 
-            executorService = Executors.newFixedThreadPool(50);
+        List<Future> futures = new ArrayList<>();
 
-            List<Future> futures = new ArrayList<>();
+        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+        List<LoadReportEntity> loadReportEntities = new ArrayList<>();
 
-            List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-            List<LoadReportEntity> loadReportEntities = new ArrayList<>();
+        BibRecord bibRecord = null;
+        for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
+            XmlRecordEntity xmlRecordEntity = iterator.next();
+            String xml = xmlRecordEntity.getXml();
 
-            BibRecord bibRecord = null;
-            for (String content : (List<String>) exchange.getIn().getBody()) {
-                bibRecord = (BibRecord) getJaxbHandler().unmarshal(content, BibRecord.class);
+            bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
 
-                Future submit = executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap(), getCollectionGroupMap()));
-                if (null != submit) {
-                    futures.add(submit);
+            Future submit = executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap(), getCollectionGroupMap()));
+            if (null != submit) {
+                futures.add(submit);
+            }
+        }
+
+        for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+            Future future = iterator.next();
+            Object object = null;
+            try {
+                object = future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            Map<String, Object> map = (Map<String, Object>) object;
+            if (object != null) {
+                Object bibliographicEntity = map.get("bibliographicEntity");
+                Object loadReportEntity = map.get("loadReportEntity");
+                if (bibliographicEntity != null) {
+                    bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
+                } else if (loadReportEntity != null) {
+                    loadReportEntities.add((LoadReportEntity) loadReportEntity);
                 }
             }
+        }
 
-            for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
-                Future future = iterator.next();
-                Object object = null;
-                try {
-                    object = future.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                Map<String, Object> map = (Map<String, Object>) object;
-                if (object != null) {
-                    Object bibliographicEntity = map.get("bibliographicEntity");
-                    Object loadReportEntity = map.get("loadReportEntity");
-                    if (bibliographicEntity != null) {
-                        bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
-                    } else if (loadReportEntity != null) {
-                        loadReportEntities.add((LoadReportEntity) loadReportEntity);
-                    }
-                }
-            }
+        if (!CollectionUtils.isEmpty(bibliographicEntities)) {
+            ETLExchange etlExchange = new ETLExchange();
+            etlExchange.setBibliographicEntities(bibliographicEntities);
+            etlExchange.setInstitutionEntityMap(getInstitutionEntityMap());
+            etlExchange.setCollectionGroupMap(getCollectionGroupMap());
+            bibDataProcessor.processMessage(etlExchange);
+        }
 
-            if (!CollectionUtils.isEmpty(bibliographicEntities)) {
-                ETLExchange etlExchange = new ETLExchange();
-                etlExchange.setBibliographicEntities(bibliographicEntities);
-                etlExchange.setInstitutionEntityMap(getInstitutionEntityMap());
-                etlExchange.setCollectionGroupMap(getCollectionGroupMap());
-                producer.sendBody("activemq:queue:etlLoadQ", etlExchange);
-            }
-            if (!CollectionUtils.isEmpty(loadReportEntities)) {
-                producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
-            }
-
+        if (!CollectionUtils.isEmpty(loadReportEntities)) {
+            //TODO: Write report.
         }
 
         if (null != executorService) {
@@ -111,43 +122,6 @@ public class RecordProcessor implements Processor {
             jaxbHandler = JAXBHandler.getInstance();
         }
         return jaxbHandler;
-    }
-
-
-    public ItemStatusDetailsRepository getItemStatusDetailsRepository() {
-        return itemStatusDetailsRepository;
-    }
-
-    public void setItemStatusDetailsRepository(ItemStatusDetailsRepository itemStatusDetailsRepository) {
-        this.itemStatusDetailsRepository = itemStatusDetailsRepository;
-    }
-
-    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
-        return bibliographicDetailsRepository;
-    }
-
-    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
-        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
-    }
-
-    public InstitutionDetailsRepository getInstitutionDetailsRepository() {
-        return institutionDetailsRepository;
-    }
-
-    public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
-        this.institutionDetailsRepository = institutionDetailsRepository;
-    }
-
-    public CollectionGroupDetailsRepository getCollectionGroupDetailsRepository() {
-        return collectionGroupDetailsRepository;
-    }
-
-    public void setCollectionGroupDetailsRepository(CollectionGroupDetailsRepository collectionGroupDetailsRepository) {
-        this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
-    }
-
-    public void setProducer(ProducerTemplate producer) {
-        this.producer = producer;
     }
 
     public Map getInstitutionEntityMap() {

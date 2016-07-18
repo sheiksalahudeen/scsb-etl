@@ -33,7 +33,7 @@
                                     <div class="col-xs-6">
                                         <div th:fragment="bulkingest-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
                                             <form id="bulkingest-form" name="bulkingest-form" class="form-horizontal" action="#"
-                                                  th:action="@{/etlDataLoader/bulkIngest}"
+                                                  th:action="@{/etlDataLoader/etlStep1}"
                                                   th:object="${etlLoadRequest}" method="post">
 
                                                 <fieldset>
@@ -75,7 +75,7 @@
                                                                    value="autoRefresh" onclick="refresh();"/>
                                                         </div>
                                                         <div class="col-sm-4">
-                                                            <button id="submit" type="submit" name="bulkIngest"
+                                                            <button id="submit" type="submit" name="loadXMLRecords"
                                                                     class="btn btn-info active  pull-right">ETL
                                                             </button>
                                                         </div>
