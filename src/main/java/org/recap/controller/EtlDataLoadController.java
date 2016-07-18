@@ -59,7 +59,6 @@ public class EtlDataLoadController {
     public String etlDataLoader(Model model) {
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
         etlLoadRequest.setNumberOfThreads(numberOfThreads);
-        etlLoadRequest.setBatchSize(batchSize);
         model.addAttribute("etlLoadRequest", etlLoadRequest);
         return "etlDataLoader";
     }
@@ -70,7 +69,7 @@ public class EtlDataLoadController {
                             BindingResult result,
                             Model model) {
         EtlDataLoadProcessor etlDataLoadProcessor = new EtlDataLoadProcessor();
-        etlDataLoadProcessor.setBatchSize(batchSize);
+        etlDataLoadProcessor.setBatchSize(etlLoadRequest.getBatchSize());
         etlDataLoadProcessor.setFileName(etlLoadRequest.getFileName());
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
         etlDataLoadProcessor.setRecordProcessor(recordProcessor);
