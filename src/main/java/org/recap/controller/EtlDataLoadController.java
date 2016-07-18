@@ -4,17 +4,14 @@ import org.apache.camel.CamelContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.etl.EtlLoadRequest;
-import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
-import org.recap.route.BibDataProcessor;
+import org.recap.route.EtlDataLoadProcessor;
 import org.recap.route.RecordProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,8 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by rajeshbabuk on 22/6/16.
@@ -65,7 +60,6 @@ public class EtlDataLoadController {
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
         etlLoadRequest.setNumberOfThreads(numberOfThreads);
         etlLoadRequest.setBatchSize(batchSize);
-        etlLoadRequest.setInputDirectoryPath(inputDirectoryPath);
         model.addAttribute("etlLoadRequest", etlLoadRequest);
         return "etlDataLoader";
     }
@@ -75,39 +69,13 @@ public class EtlDataLoadController {
     public String bulkIngest(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                             BindingResult result,
                             Model model) {
-        report();
+        EtlDataLoadProcessor etlDataLoadProcessor = new EtlDataLoadProcessor();
+        etlDataLoadProcessor.setBatchSize(batchSize);
+        etlDataLoadProcessor.setFileName(etlLoadRequest.getFileName());
+        etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
+        etlDataLoadProcessor.setRecordProcessor(recordProcessor);
+        etlDataLoadProcessor.startLoadProcess();
         return etlDataLoader(model);
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/etlDataLoader/etlStep1", method = RequestMethod.POST)
-    public String loadXMLRecords() {
-        String status = "Process Started";
-        if (camelContext.getStatus().isStarted()) {
-            status = "Running";
-        }
-
-        long totalDocCount = xmlRecordRepository.count();
-
-        int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (1000);
-        int remainder = Integer.valueOf(Long.toString(totalDocCount)) % (1000);
-
-        int loopCount = remainder == 0 ? quotient : quotient + 1;
-
-        Page<XmlRecordEntity> xmlRecordEntities = null;
-        long totalStartTime = System.currentTimeMillis();
-        for(int i =0; i < loopCount; i++){
-            long startTime = System.currentTimeMillis();
-            xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, 1000));
-            recordProcessor.process(xmlRecordEntities);
-            long endTime = System.currentTimeMillis();
-            logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bib and related data is: " + (endTime - startTime) / 1000 + " seconds.");
-        }
-
-        long totalEndTime = System.currentTimeMillis();
-        logger.info("Time taken to save: " + xmlRecordEntities.getTotalElements() + " bib and related data is: " + (totalEndTime - totalStartTime) / 1000 + " seconds.");
-
-        return status;
     }
 
     @ResponseBody

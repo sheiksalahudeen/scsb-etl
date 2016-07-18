@@ -1,6 +1,8 @@
 package org.recap.repository;
 
 import org.recap.model.jpa.XmlRecordEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
@@ -8,4 +10,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 
 public interface XmlRecordRepository extends PagingAndSortingRepository<XmlRecordEntity, Integer> {
+
+    Page<XmlRecordEntity> findByXmlFileName(Pageable pageable, String xmlFileName);
 }

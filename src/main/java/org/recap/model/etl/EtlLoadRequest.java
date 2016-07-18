@@ -7,18 +7,18 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class EtlLoadRequest {
 
-    private String inputDirectoryPath;
+    private String fileName;
     private Integer numberOfThreads;
     private Integer batchSize;
     private MultipartFile file;
     private String userName;
 
-    public String getInputDirectoryPath() {
-        return inputDirectoryPath;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setInputDirectoryPath(String inputDirectoryPath) {
-        this.inputDirectoryPath = inputDirectoryPath;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public Integer getNumberOfThreads() {
