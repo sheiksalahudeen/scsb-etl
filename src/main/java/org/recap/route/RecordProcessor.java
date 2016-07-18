@@ -12,6 +12,7 @@ import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
+import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ public class RecordProcessor {
 
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+
+    @Autowired
+    CsvUtil csvUtil;
 
     @Autowired
     BibDataProcessor bibDataProcessor;
@@ -107,7 +111,7 @@ public class RecordProcessor {
         }
 
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
-            //TODO: Write report.
+            csvUtil.writeToCsv(loadReportEntities);
         }
     }
 
