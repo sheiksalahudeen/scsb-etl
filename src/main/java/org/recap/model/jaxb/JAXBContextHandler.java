@@ -12,14 +12,14 @@ public class JAXBContextHandler {
     private Map<String, JAXBContext> contextMap;
 
     public JAXBContext getJAXBContextForClass(Class cl) throws JAXBException {
-        if(getContextMap().containsKey(cl)){
-            return contextMap.get(cl.getName());
+        if(getContextMap().containsKey(cl.getName())){
+            return getContextMap().get(cl.getName());
         } else {
             JAXBContext newInstance = JAXBContext.newInstance(cl);
             getContextMap().put(cl.getName(), newInstance);
         }
 
-        return contextMap.get(cl.getName());
+        return getContextMap().get(cl.getName());
     }
 
     public Map<String, JAXBContext> getContextMap() {
