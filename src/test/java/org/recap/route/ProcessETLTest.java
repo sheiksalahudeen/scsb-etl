@@ -3,12 +3,14 @@ package org.recap.route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.camel.CamelContext;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
@@ -57,5 +59,19 @@ public class ProcessETLTest extends BaseTestCase {
         URL resource = getClass().getResource("5Records.xml");
         File file = new File(resource.toURI());
         return file;
+    }
+
+    @Test
+    public void parseXPath() throws Exception {
+        File file = getInputFileEndPoint();
+
+        String fileToString = FileUtils.readFileToString(file);
+
+        String owningInstitutionId = StringUtils.substringBetween(fileToString, "<owningInstitutionId>", "</owningInstitutionId>");
+        System.out.println(owningInstitutionId);
+        String owningInstitutionBibId = StringUtils.substringBetween(fileToString, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
+        System.out.println(owningInstitutionBibId);
+
+
     }
 }

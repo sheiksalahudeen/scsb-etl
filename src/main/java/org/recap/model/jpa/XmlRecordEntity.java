@@ -2,6 +2,7 @@ package org.recap.model.jpa;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by peris on 7/17/16.
@@ -22,6 +23,39 @@ public class XmlRecordEntity implements Serializable {
     @Column(name = "xml_file")
     private String xmlFileName;
 
+    @Column(name="owning_inst")
+    private String owningInst;
+
+    @Column(name="owning_inst_bib_id")
+    private String owningInstBibId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "date_loaded")
+    private Date dataLoaded;
+
+    public Date getDataLoaded() {
+        return dataLoaded;
+    }
+
+    public void setDataLoaded(Date dataLoaded) {
+        this.dataLoaded = dataLoaded;
+    }
+
+    public String getOwningInstBibId() {
+        return owningInstBibId;
+    }
+
+    public void setOwningInstBibId(String owningInstBibId) {
+        this.owningInstBibId = owningInstBibId;
+    }
+
+    public String getOwningInst() {
+        return owningInst;
+    }
+
+    public void setOwningInst(String owningInst) {
+        this.owningInst = owningInst;
+    }
 
     public Integer getId() {
         return id;
