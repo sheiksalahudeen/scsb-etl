@@ -12,7 +12,6 @@ import java.io.StringReader;
 public class JAXBHandler {
 
     private static JAXBHandler jaxbHandler;
-    private static JAXBContextHandler jaxbContextHandler;
 
     private JAXBHandler() {
 
@@ -27,7 +26,7 @@ public class JAXBHandler {
 
     public static void marshal(BibRecord bibRecord) {
         try {
-            JAXBContext jaxbContext = getJaxbContextHandler().getJAXBContextForClass(BibRecord.class);
+            JAXBContext jaxbContext = JAXBContextHandler.getInstance().getJAXBContextForClass(BibRecord.class);
 
             Marshaller marshaller = jaxbContext.createMarshaller();
 
@@ -40,17 +39,11 @@ public class JAXBHandler {
         }
     }
 
-    private static JAXBContextHandler getJaxbContextHandler() {
-        if (null == jaxbContextHandler) {
-            jaxbContextHandler = new JAXBContextHandler();
-        }
-        return jaxbContextHandler;
-    }
 
     public Object unmarshal(String content, Class cl) {
         BibRecord bibRecord = null;
         try {
-            JAXBContext jaxbContextForClass = getJaxbContextHandler().getJAXBContextForClass(cl);
+            JAXBContext jaxbContextForClass = JAXBContextHandler.getInstance().getJAXBContextForClass(cl);
 
             Unmarshaller unmarshaller = jaxbContextForClass.createUnmarshaller();
 

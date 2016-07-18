@@ -2,6 +2,7 @@
 package org.recap.model.jaxb.marc;
 
 import org.apache.log4j.Logger;
+import org.recap.model.jaxb.JAXBContextHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -105,7 +106,7 @@ public class CollectionType {
         CollectionType collectionType = (CollectionType) object;
         try {
             StringWriter stringWriter = new StringWriter();
-            Marshaller jaxbMarshaller = JAXBContext.newInstance(CollectionType.class).createMarshaller();
+            Marshaller jaxbMarshaller = JAXBContextHandler.getInstance().getJAXBContextForClass(CollectionType.class).createMarshaller();
             synchronized (jaxbMarshaller) {
                 jaxbMarshaller.marshal(collectionType, stringWriter);
             }
@@ -119,7 +120,7 @@ public class CollectionType {
     public Object deserialize(String collectionTypeXml) {
         CollectionType collectionType = new CollectionType();
         try {
-            Unmarshaller unmarshaller = JAXBContext.newInstance(CollectionType.class).createUnmarshaller();
+            Unmarshaller unmarshaller = JAXBContextHandler.getInstance().getJAXBContextForClass(CollectionType.class).createUnmarshaller();
 
             collectionType = (CollectionType) unmarshaller.unmarshal(new StringReader(collectionTypeXml));
         } catch (Exception e) {

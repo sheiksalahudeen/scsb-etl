@@ -9,6 +9,20 @@ import java.util.Map;
  * Created by pvsubrah on 6/21/16.
  */
 public class JAXBContextHandler {
+
+    private static JAXBContextHandler jaxbContextHandler;
+
+    private JAXBContextHandler() {
+    }
+
+    public static JAXBContextHandler getInstance() {
+        if(null == jaxbContextHandler){
+            jaxbContextHandler = new JAXBContextHandler();
+        }
+
+        return jaxbContextHandler;
+    }
+
     private Map<String, JAXBContext> contextMap;
 
     public JAXBContext getJAXBContextForClass(Class cl) throws JAXBException {
