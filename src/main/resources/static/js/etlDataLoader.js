@@ -16,7 +16,7 @@ function refresh() {
     if(autoRefresh) {
         intervalID= setInterval(function () {
             updateStatus();
-        }, 5000);
+        }, 60000);
     } else {
         clearInterval(intervalID);
     }
