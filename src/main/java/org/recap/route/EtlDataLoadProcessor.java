@@ -25,7 +25,7 @@ public class EtlDataLoadProcessor {
     public void startLoadProcess() {
         long totalDocCount;
         if(StringUtils.isNotBlank(fileName)) {
-            totalDocCount = xmlRecordRepository.countByXmlFileName(fileName);
+            totalDocCount = xmlRecordRepository.countByXmlFileNameContaining(fileName);
         } else {
             totalDocCount = xmlRecordRepository.count();
         }
@@ -41,7 +41,7 @@ public class EtlDataLoadProcessor {
             for (int i = 0; i < loopCount; i++) {
                 long startTime = System.currentTimeMillis();
                 if (StringUtils.isNotBlank(fileName)) {
-                    xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), fileName);
+                    xmlRecordEntities = xmlRecordRepository.findByXmlFileNameContaining(new PageRequest(i, batchSize), fileName);
                 } else {
                     xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, batchSize));
                 }

@@ -13,5 +13,9 @@ public interface XmlRecordRepository extends PagingAndSortingRepository<XmlRecor
 
     Page<XmlRecordEntity> findByXmlFileName(Pageable pageable, String xmlFileName);
 
+    Page<XmlRecordEntity> findByXmlFileNameContaining(Pageable pageable, String xmlFileName);
+
     Long countByXmlFileName(String xmlFileName);
+
+    Long countByXmlFileNameContaining(String xmlFileName);
 }
