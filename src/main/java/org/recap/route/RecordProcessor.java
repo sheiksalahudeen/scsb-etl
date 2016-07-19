@@ -53,7 +53,6 @@ public class RecordProcessor {
 
     @Autowired
     BibDataProcessor bibDataProcessor;
-    private ExecutorService executorService;
 
 
     public void process(Page<XmlRecordEntity> xmlRecordEntities) {
@@ -65,13 +64,16 @@ public class RecordProcessor {
         List<LoadReportEntity> loadReportEntities = new ArrayList<>();
 
         BibRecord bibRecord = null;
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+
         for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
             XmlRecordEntity xmlRecordEntity = iterator.next();
             String xml = xmlRecordEntity.getXml();
 
             bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
 
-            Future submit = getExecutorService().submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap(), getCollectionGroupMap()));
+
+            Future submit = executorService.submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap(), getCollectionGroupMap()));
             if (null != submit) {
                 futures.add(submit);
             }
@@ -110,6 +112,8 @@ public class RecordProcessor {
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
             csvUtil.writeLoadReportToCsv(loadReportEntities);
         }
+
+        executorService.shutdown();
     }
 
 
@@ -156,18 +160,4 @@ public class RecordProcessor {
         return collectionGroupMap;
     }
 
-    public ExecutorService getExecutorService() {
-        if (null == executorService) {
-            executorService = Executors.newFixedThreadPool(50);
-        }
-        return executorService;
-    }
-
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
-    }
-
-    public void cleanUp() {
-        getExecutorService().shutdown();
-    }
 }
