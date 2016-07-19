@@ -12,4 +12,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface XmlRecordRepository extends PagingAndSortingRepository<XmlRecordEntity, Integer> {
 
     Page<XmlRecordEntity> findByXmlFileName(Pageable pageable, String xmlFileName);
+
+    Long countByXmlFileName(String xmlFileName);
 }

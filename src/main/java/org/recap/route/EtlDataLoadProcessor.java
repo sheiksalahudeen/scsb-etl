@@ -23,30 +23,39 @@ public class EtlDataLoadProcessor {
     private RecordProcessor recordProcessor;
 
     public void startLoadProcess() {
-        long totalDocCount = xmlRecordRepository.count();
-
-        int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
-        int remainder = Integer.valueOf(Long.toString(totalDocCount)) % (batchSize);
-
-        int loopCount = remainder == 0 ? quotient : quotient + 1;
-
-        Page<XmlRecordEntity> xmlRecordEntities = null;
-        long totalStartTime = System.currentTimeMillis();
-        for (int i = 0; i < loopCount; i++) {
-            long startTime = System.currentTimeMillis();
-            if (StringUtils.isNotBlank(fileName)) {
-                xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), fileName);
-            } else {
-                xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, batchSize));
-            }
-            recordProcessor.process(xmlRecordEntities);
-            long endTime = System.currentTimeMillis();
-            logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bib and related data is: " + (endTime - startTime) / 1000 + " seconds.");
+        long totalDocCount;
+        if(StringUtils.isNotBlank(fileName)) {
+            totalDocCount = xmlRecordRepository.countByXmlFileName(fileName);
+        } else {
+            totalDocCount = xmlRecordRepository.count();
         }
 
-        recordProcessor.cleanUp();
-        long totalEndTime = System.currentTimeMillis();
-        logger.info("Time taken to save: " + xmlRecordEntities.getTotalElements() + " bib and related data is: " + (totalEndTime - totalStartTime) / 1000 + " seconds.");
+        if(totalDocCount > 0) {
+            int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
+            int remainder = Integer.valueOf(Long.toString(totalDocCount)) % (batchSize);
+
+            int loopCount = remainder == 0 ? quotient : quotient + 1;
+
+            Page<XmlRecordEntity> xmlRecordEntities = null;
+            long totalStartTime = System.currentTimeMillis();
+            for (int i = 0; i < loopCount; i++) {
+                long startTime = System.currentTimeMillis();
+                if (StringUtils.isNotBlank(fileName)) {
+                    xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), fileName);
+                } else {
+                    xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, batchSize));
+                }
+                recordProcessor.process(xmlRecordEntities);
+                long endTime = System.currentTimeMillis();
+                logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bib and related data is: " + (endTime - startTime) / 1000 + " seconds.");
+            }
+
+            recordProcessor.cleanUp();
+            long totalEndTime = System.currentTimeMillis();
+            logger.info("Time taken to save: " + xmlRecordEntities.getTotalElements() + " bib and related data is: " + (totalEndTime - totalStartTime) / 1000 + " seconds.");
+        } else {
+            logger.info("No records found to load into DB");
+        }
     }
 
     public Integer getBatchSize() {
