@@ -65,9 +65,6 @@ public class ItemEntity implements Serializable{
     @Column(name = "OWNING_INST_ITEM_ID")
     private String owningInstitutionItemId;
 
-    @Column(name = "NOTES_ID")
-    private Integer notesId;
-
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="OWNING_INST_HOLDINGS_ID")
     private HoldingsEntity holdingsEntity;
@@ -201,14 +198,6 @@ public class ItemEntity implements Serializable{
 
     public void setOwningInstitutionItemId(String owningInstitutionItemId) {
         this.owningInstitutionItemId = owningInstitutionItemId;
-    }
-
-    public Integer getNotesId() {
-        return notesId;
-    }
-
-    public void setNotesId(Integer notesId) {
-        this.notesId = notesId;
     }
 
     public HoldingsEntity getHoldingsEntity() {
