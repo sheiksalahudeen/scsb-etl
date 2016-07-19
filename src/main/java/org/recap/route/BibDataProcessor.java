@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Persistent;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
@@ -42,6 +43,10 @@ public class BibDataProcessor {
     @Autowired
     CsvUtil csvUtil;
 
+    @PersistenceContext
+    EntityManager entityManager;
+
+    @Transactional
     public void processMessage(ETLExchange etlExchange) {
         if (etlExchange != null) {
             List<LoadReportEntity> loadReportEntities = new ArrayList<>();
@@ -49,11 +54,13 @@ public class BibDataProcessor {
 
             try {
                 bibliographicDetailsRepository.save(bibliographicEntityList);
+                flushAndClearSession();
             } catch (Exception e) {
                 LoadReportUtil loadReportUtil = new LoadReportUtil(etlExchange.getInstitutionEntityMap(), etlExchange.getCollectionGroupMap());
                 for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
                     try {
                         bibliographicDetailsRepository.save(bibliographicEntity);
+                        flushAndClearSession();
                     } catch (Exception ex) {
                         List<LoadReportEntity> reportEntities = processBibHoldingsItems(loadReportUtil, bibliographicEntity);
                         loadReportEntities.addAll(reportEntities);
@@ -63,7 +70,7 @@ public class BibDataProcessor {
             if (!CollectionUtils.isEmpty(loadReportEntities)) {
                 csvUtil.writeToCsv(loadReportEntities);
             }
-
+            etlExchange = null;
         }
     }
 
@@ -108,6 +115,13 @@ public class BibDataProcessor {
             loadReportEntity.setExceptionMessage(bibEx.getCause().getCause().getMessage());
             loadReportEntities.add(loadReportEntity);
         }
+
+        flushAndClearSession();
         return loadReportEntities;
+    }
+
+    private void flushAndClearSession() {
+        entityManager.flush();
+        entityManager.clear();
     }
 }
