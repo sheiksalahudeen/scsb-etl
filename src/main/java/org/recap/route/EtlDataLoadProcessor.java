@@ -49,6 +49,9 @@ public class EtlDataLoadProcessor {
                 long endTime = System.currentTimeMillis();
                 logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bib and related data is: " + (endTime - startTime) / 1000 + " seconds.");
             }
+
+            recordProcessor.shutdownExecutorService();
+
             long totalEndTime = System.currentTimeMillis();
             logger.info("Time taken to save: " + xmlRecordEntities.getTotalElements() + " bib and related data is: " + (totalEndTime - totalStartTime) / 1000 + " seconds.");
         } else {
