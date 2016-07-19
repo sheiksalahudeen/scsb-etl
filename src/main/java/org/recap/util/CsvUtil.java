@@ -2,6 +2,7 @@ package org.recap.util;
 
 import com.csvreader.CsvWriter;
 import org.recap.model.etl.LoadReportEntity;
+import org.recap.model.etl.SuccessReportEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,7 @@ public class CsvUtil {
 
     Logger logger = LoggerFactory.getLogger(CsvUtil.class);
 
-    public void writeToCsv(List<LoadReportEntity> loadReportEntities) {
+    public void writeLoadReportToCsv(List<LoadReportEntity> loadReportEntities) {
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
             LoadReportEntity loadReport = loadReportEntities.get(0);
             String fileName = loadReport.getOwningInstitution() != null ? loadReport.getOwningInstitution() : "Failure_Report";
@@ -83,6 +84,48 @@ public class CsvUtil {
                 logger.error(e.getMessage());
             }
 
+        }
+    }
+
+    public void writeSuccessReportToCsv(SuccessReportEntity successReportEntity) {
+        if(null != successReportEntity) {
+            String fileName = "Success_Report";
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            File file = new File(reportDirectoryPath + File.separator + fileName + "_" + df.format(new Date()) + ".csv");
+            try {
+                boolean fileExists = file.exists();
+                if (!fileExists) {
+                    if (!file.getParentFile().exists()) {
+                        file.getParentFile().mkdir();
+                    }
+                    file.createNewFile();
+                }
+                // Use FileWriter constructor that specifies open for appending
+                CsvWriter csvOutput = new CsvWriter(new FileWriter(file, true), ',');
+
+                //Create Header for CSV
+                if(!fileExists) {
+                    csvOutput.write("XML File Name");
+                    csvOutput.write("Total Records Received");
+                    csvOutput.write("Total Bibs Loaded");
+                    csvOutput.write("Total Holdings Loaded");
+                    csvOutput.write("Total Items Loaded");
+                    csvOutput.endRecord();
+                }
+
+                csvOutput.write(successReportEntity.getFileName());
+                csvOutput.write(successReportEntity.getTotalRecordsInFile().toString());
+                csvOutput.write(successReportEntity.getTotalBibsLoaded().toString());
+                csvOutput.write(successReportEntity.getTotalHoldingsLoaded().toString());
+                csvOutput.write(successReportEntity.getTotalItemsLoaded().toString());
+                csvOutput.endRecord();
+
+                csvOutput.flush();
+                csvOutput.close();
+
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
     }
 }

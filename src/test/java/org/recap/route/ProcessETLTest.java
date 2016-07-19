@@ -1,18 +1,23 @@
 package org.recap.route;
 
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.commons.io.FileUtils;
 import org.apache.camel.CamelContext;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.XmlRecordEntity;
+import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.io.File;
-import java.io.StringReader;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,6 +34,12 @@ public class ProcessETLTest extends BaseTestCase {
 
     @Value("${etl.load.directory}")
     private String etlLoadDir;
+
+    @Autowired
+    RecordProcessor recordProcessor;
+
+    @Autowired
+    XmlRecordRepository xmlRecordRepository;
 
     @Test
     public void process() throws Exception {
@@ -73,5 +84,27 @@ public class ProcessETLTest extends BaseTestCase {
         System.out.println(owningInstitutionBibId);
 
 
+    }
+
+    @Test
+    public void loadSampleData() throws Exception {
+        String fileName = "sampleRecordForEtlLoadTest.xml";
+        saveXmlRecordEntity(fileName, ".b100006279");
+        Page<XmlRecordEntity> xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(0,10), fileName);
+        recordProcessor.process(xmlRecordEntities);
+    }
+
+    private XmlRecordEntity saveXmlRecordEntity(String fileName, String owningInstBibId) throws URISyntaxException, IOException {
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        URL resource = getClass().getResource(fileName);
+        File file = new File(resource.toURI());
+        String content = FileUtils.readFileToString(file, "UTF-8");
+        xmlRecordEntity.setXml(content);
+        xmlRecordEntity.setOwningInst("NYPL");
+        xmlRecordEntity.setOwningInstBibId(owningInstBibId);
+        xmlRecordEntity.setDataLoaded(new Date());
+        xmlRecordEntity.setXmlFileName(fileName);
+        xmlRecordRepository.save(xmlRecordEntity);
+        return xmlRecordEntity;
     }
 }

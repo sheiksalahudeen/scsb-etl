@@ -4,10 +4,14 @@ import org.apache.camel.CamelContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.etl.EtlLoadRequest;
+import org.recap.model.etl.SuccessReportEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.HoldingsDetailsRepository;
+import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.recap.route.EtlDataLoadProcessor;
 import org.recap.route.RecordProcessor;
+import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,12 @@ public class EtlDataLoadController {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
+    ItemDetailsRepository itemDetailsRepository;
+
+    @Autowired
     XmlRecordRepository xmlRecordRepository;
 
     @Value("${etl.number.of.threads}")
@@ -54,6 +64,9 @@ public class EtlDataLoadController {
 
     @Autowired
     RecordProcessor recordProcessor;
+
+    @Autowired
+    CsvUtil csvUtil;
 
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
@@ -69,12 +82,36 @@ public class EtlDataLoadController {
                             BindingResult result,
                             Model model) {
         EtlDataLoadProcessor etlDataLoadProcessor = new EtlDataLoadProcessor();
+        long oldBibsCount = bibliographicDetailsRepository.count();
+        long oldHoldingsCount = holdingsDetailsRepository.count();
+        long oldItemsCount = itemDetailsRepository.count();
+        String fileName = etlLoadRequest.getFileName();
         etlDataLoadProcessor.setBatchSize(etlLoadRequest.getBatchSize());
-        etlDataLoadProcessor.setFileName(etlLoadRequest.getFileName());
+        etlDataLoadProcessor.setFileName(fileName);
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
         etlDataLoadProcessor.setRecordProcessor(recordProcessor);
         etlDataLoadProcessor.startLoadProcess();
+        if(StringUtils.isNotBlank(fileName)) {
+            generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, fileName);
+        }
         return etlDataLoader(model);
+    }
+
+    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName) {
+        SuccessReportEntity successReportEntity = new SuccessReportEntity();
+        long newBibsCount = bibliographicDetailsRepository.count();
+        long newHoldingsCount = holdingsDetailsRepository.count();
+        long newItemsCount = itemDetailsRepository.count();
+        Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
+        Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
+        Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
+        Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
+        successReportEntity.setFileName(fileName);
+        successReportEntity.setTotalRecordsInFile(totalRecordsInfile);
+        successReportEntity.setTotalBibsLoaded(processedBibsCount);
+        successReportEntity.setTotalHoldingsLoaded(processedHoldingsCount);
+        successReportEntity.setTotalItemsLoaded(processedItemsCount);
+        csvUtil.writeSuccessReportToCsv(successReportEntity);
     }
 
     @ResponseBody

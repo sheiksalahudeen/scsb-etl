@@ -42,7 +42,7 @@ public class CsvUtilTest extends BaseTestCase {
 
         loadReportEntity.setErrorDescription("error");
 
-        csvUtil.writeToCsv(Arrays.asList(loadReportEntity));
+        csvUtil.writeLoadReportToCsv(Arrays.asList(loadReportEntity));
 
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         String fileName = reportDirectoryPath + File.separator + loadReportEntity.getOwningInstitution() + "_" + df.format(new Date()) + ".csv";
