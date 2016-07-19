@@ -74,7 +74,18 @@ public class BibPersisterCallable implements Callable {
                     holdingsEntity.setCreatedBy("etl");
                     holdingsEntity.setLastUpdatedDate(new Date());
                     holdingsEntity.setLastUpdatedBy("etl");
-                    holdingsEntity.setOwningInstitutionHoldingsId(holdingEnt.getOwningInstitutionHoldingsId());
+                    String owningInstituionHoldingsId = null;
+                    if (StringUtils.isNotBlank(holdingEnt.getOwningInstitutionHoldingsId())) {
+                        if (holdingEnt.getOwningInstitutionHoldingsId().length() > 45) {
+                            owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId();
+                        } else {
+                            owningInstituionHoldingsId= bibRecord.getBib().getOwningInstitutionId() + bibRecord.getBib().getOwningInstitutionBibId() + "-" + holdingEnt.getOwningInstitutionHoldingsId();
+                        }
+                    } else {
+                        owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId();
+                    }
+
+                    holdingsEntity.setOwningInstitutionHoldingsId(owningInstituionHoldingsId);
                     holdingsEntities.add(holdingsEntity);
 
                     String holdingsCallNumber = getMarcUtil().getDataFieldValue(holdingsRecordType, "852", null, null, "h");

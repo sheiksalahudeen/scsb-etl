@@ -3,8 +3,6 @@ package org.recap.model.jpa;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.BibliographicHoldingsDetailsRepository;
-import org.recap.repository.BibliographicItemDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,12 +27,6 @@ public class BibliographicEntityTest extends BaseTestCase {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Autowired
-    BibliographicHoldingsDetailsRepository bibliographicHoldingsDetailsRepository;
-
-    @Autowired
-    BibliographicItemDetailsRepository bibliographicItemDetailsRepository;
 
     @Test
     public void saveBibSingleHoldings() throws Exception {

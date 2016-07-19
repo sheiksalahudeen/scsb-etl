@@ -1,6 +1,7 @@
 package org.recap.route;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.PollingConsumer;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
@@ -37,7 +38,6 @@ public class XmlRouteContext {
                         .split()
                         .tokenizeXML(xmlTagName)
                         .streaming()
-                        .threads(poolSize, maxPoolSize, "xmlProcessingThread")
                         .process(new XmlProcessor(xmlRecordRepository));
             }
         });

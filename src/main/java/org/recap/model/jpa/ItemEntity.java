@@ -69,7 +69,7 @@ public class ItemEntity implements Serializable{
     private Integer notesId;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="HOLDINGS_ID")
+    @JoinColumn(name="OWNING_INST_HOLDINGS_ID")
     private HoldingsEntity holdingsEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)

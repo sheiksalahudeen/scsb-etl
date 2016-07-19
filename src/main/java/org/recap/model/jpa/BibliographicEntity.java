@@ -50,7 +50,7 @@ public class BibliographicEntity implements Serializable {
     @JoinTable(name = "bibliographic_holdings_t", joinColumns = {
             @JoinColumn(name="OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
             @JoinColumn(name="OWNING_INST_ID", referencedColumnName = "OWNING_INST_ID")},
-            inverseJoinColumns = @JoinColumn(name = "HOLDINGS_ID", referencedColumnName = "HOLDINGS_ID"))
+            inverseJoinColumns = @JoinColumn(name = "OWNING_INST_HOLDINGS_ID", referencedColumnName = "OWNING_INST_HOLDINGS_ID"))
     private List<HoldingsEntity> holdingsEntities;
 
     @ManyToMany(cascade = CascadeType.ALL)
