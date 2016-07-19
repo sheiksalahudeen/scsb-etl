@@ -1,8 +1,5 @@
 package org.recap.route;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jaxb.BibRecord;
@@ -111,7 +108,7 @@ public class RecordProcessor {
         }
 
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
-            csvUtil.writeToCsv(loadReportEntities);
+            csvUtil.writeLoadReportToCsv(loadReportEntities);
         }
     }
 

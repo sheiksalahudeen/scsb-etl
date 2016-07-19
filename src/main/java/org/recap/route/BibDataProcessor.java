@@ -1,6 +1,5 @@
 package org.recap.route;
 
-import org.hibernate.annotations.Persister;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -11,9 +10,6 @@ import org.recap.util.LoadReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.annotation.Persistent;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -68,7 +64,7 @@ public class BibDataProcessor {
                 }
             }
             if (!CollectionUtils.isEmpty(loadReportEntities)) {
-                csvUtil.writeToCsv(loadReportEntities);
+                csvUtil.writeLoadReportToCsv(loadReportEntities);
             }
             etlExchange = null;
         }
