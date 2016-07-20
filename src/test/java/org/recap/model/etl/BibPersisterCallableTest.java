@@ -13,6 +13,7 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.route.BibDataProcessor;
 import org.recap.route.ETLExchange;
 import org.recap.util.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    BibDataProcessor bibDataProcessor;
 
     @Autowired
     CsvUtil csvUtil;
@@ -150,9 +154,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
         etlExchange.setInstitutionEntityMap(new HashMap());
         etlExchange.setCollectionGroupMap(new HashMap());
 
-        producer.sendBody("activemq:queue:etlLoadQ", etlExchange);
-
-        Thread.sleep(1000);
+        bibDataProcessor.processMessage(etlExchange);
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         assertNotNull(savedBibliographicEntity);

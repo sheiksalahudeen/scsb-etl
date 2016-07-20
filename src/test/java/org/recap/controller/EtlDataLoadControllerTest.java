@@ -8,7 +8,9 @@ import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.etl.EtlLoadRequest;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.ui.Model;
@@ -19,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -31,6 +34,9 @@ public class EtlDataLoadControllerTest extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    XmlRecordRepository xmlRecordRepository;
 
     @Mock
     Model model;
@@ -64,10 +70,8 @@ public class EtlDataLoadControllerTest extends BaseTestCase {
 
         Thread.sleep(1000);
 
-        assertNotNull(bibliographicDetailsRepository);
-        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(3, ".b153286131");
-        assertNotNull(bibliographicEntity);
-
+        Long recordCount =  xmlRecordRepository.countByXmlFileName("SampleRecord.xml");
+        assertNotEquals(recordCount,new Long(0));
     }
 
 }
