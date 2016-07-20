@@ -80,16 +80,19 @@ public class BibDataProcessor {
             bibliographicEntity.setItemEntities(null);
 
             bibliographicDetailsRepository.save(bibliographicEntity);
+            flushAndClearSession();
             for (HoldingsEntity holdingsEntity : holdingsEntities) {
                 List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
                 holdingsEntity.setItemEntities(null);
                 try {
                     HoldingsEntity savedHoldingsEntity = holdingsDetailsRepository.save(holdingsEntity);
+                    flushAndClearSession();
                     savedHoldingsEntities.add(savedHoldingsEntity);
                     for (ItemEntity itemEntity : itemEntities) {
                         try {
                             itemEntity.setHoldingsEntity(savedHoldingsEntity);
                             ItemEntity savedItemEntity = itemDetailsRepository.save(itemEntity);
+                            flushAndClearSession();
                             savedItemEntities.add(savedItemEntity);
                         } catch (Exception itemEx) {
                             LoadReportEntity loadReportEntity = loadReportUtil.populateBibHoldingsItemInfo(bibliographicEntity, holdingsEntity, itemEntity);
@@ -106,13 +109,12 @@ public class BibDataProcessor {
             bibliographicEntity.setHoldingsEntities(savedHoldingsEntities);
             bibliographicEntity.setItemEntities(savedItemEntities);
             bibliographicDetailsRepository.save(bibliographicEntity);
+            flushAndClearSession();
         } catch (Exception bibEx) {
             LoadReportEntity loadReportEntity = loadReportUtil.populateBibInfo(bibliographicEntity);
             loadReportEntity.setExceptionMessage(bibEx.getCause().getCause().getMessage());
             loadReportEntities.add(loadReportEntity);
         }
-
-        flushAndClearSession();
         return loadReportEntities;
     }
 
