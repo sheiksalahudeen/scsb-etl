@@ -62,7 +62,7 @@ public class JMSTest extends BaseTestCase {
             bibliographicEntity1.setBibliographicId(random.nextInt());
             bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
             bibliographicEntity1.setOwningInstitutionId(1);
-            bibliographicEntity1.setContent("mock content");
+            bibliographicEntity1.setContent("mock Content".getBytes());
             bibliographicEntity1.setCreatedDate(new Date());
             bibliographicEntity1.setCreatedBy("etl-test");
             bibliographicEntity1.setLastUpdatedBy("etl-test");
@@ -70,7 +70,7 @@ public class JMSTest extends BaseTestCase {
 
 
             HoldingsEntity holdingsEntity = new HoldingsEntity();
-            holdingsEntity.setContent("mock holding content");
+            holdingsEntity.setContent("mock holding content".getBytes());
             holdingsEntity.setCreatedDate(new Date());
             holdingsEntity.setCreatedBy("etl-test");
             holdingsEntity.setLastUpdatedDate(new Date());

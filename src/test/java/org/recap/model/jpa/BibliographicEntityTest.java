@@ -34,7 +34,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void saveBibSingleHoldings() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content");
+        bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
@@ -45,7 +45,7 @@ public class BibliographicEntityTest extends BaseTestCase {
 
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -91,7 +91,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void saveBibMultipleHoldings() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content");
+        bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
@@ -100,7 +100,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity1 = new HoldingsEntity();
-        holdingsEntity1.setContent("mock holdings");
+        holdingsEntity1.setContent("mock holdings".getBytes());
         holdingsEntity1.setCreatedDate(new Date());
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
@@ -108,7 +108,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
-        holdingsEntity2.setContent("mock holdings");
+        holdingsEntity2.setContent("mock holdings".getBytes());
         holdingsEntity2.setCreatedDate(new Date());
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());
@@ -130,7 +130,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void saveMultipleBibSingleHoldings() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setCreatedBy("etl");
         bibliographicEntity1.setLastUpdatedBy("etl");
@@ -139,7 +139,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
         BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content");
+        bibliographicEntity2.setContent("mock Content".getBytes());
         bibliographicEntity2.setCreatedDate(new Date());
         bibliographicEntity2.setCreatedBy("etl");
         bibliographicEntity2.setLastUpdatedBy("etl");
@@ -148,7 +148,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity2.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -174,7 +174,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void saveBibSingleHoldingsSingleItem() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content");
+        bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
@@ -183,7 +183,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -222,7 +222,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void saveBibSingleHoldingsMultipleItem() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content");
+        bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
@@ -231,7 +231,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -288,7 +288,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void boundWith() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setCreatedBy("etl");
         bibliographicEntity1.setLastUpdatedBy("etl");
@@ -297,7 +297,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setOwningInstitutionBibId("10001");
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -324,7 +324,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
 
         BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content");
+        bibliographicEntity2.setContent("mock Content".getBytes());
         bibliographicEntity2.setCreatedDate(new Date());
         bibliographicEntity2.setCreatedBy("etl");
         bibliographicEntity2.setLastUpdatedBy("etl");
@@ -351,7 +351,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void saveTwoItemsOneItemWithBadData() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setCreatedBy("etl");
         bibliographicEntity1.setLastUpdatedBy("etl");
@@ -360,7 +360,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setOwningInstitutionBibId("10001");
 
         HoldingsEntity holdingsEntity1 = new HoldingsEntity();
-        holdingsEntity1.setContent("mock holdings");
+        holdingsEntity1.setContent("mock holdings".getBytes());
         holdingsEntity1.setCreatedDate(new Date());
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
@@ -388,7 +388,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
 
         BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content");
+        bibliographicEntity2.setContent("mock Content".getBytes());
         bibliographicEntity2.setCreatedDate(new Date());
         bibliographicEntity2.setCreatedBy("etl");
         bibliographicEntity2.setLastUpdatedBy("etl");
@@ -397,7 +397,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity2.setOwningInstitutionBibId("10002");
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
-        holdingsEntity2.setContent("mock holdings");
+        holdingsEntity2.setContent("mock holdings".getBytes());
         holdingsEntity2.setCreatedDate(new Date());
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());
@@ -440,7 +440,7 @@ public class BibliographicEntityTest extends BaseTestCase {
 
         String owningInstitutionBibId = "10001";
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setLastUpdatedDate(new Date());
         bibliographicEntity1.setOwningInstitutionId(1);
@@ -461,7 +461,7 @@ public class BibliographicEntityTest extends BaseTestCase {
     public void duplicateBibsWithDifferentItems() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content");
+        bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setCreatedBy("etl");
         bibliographicEntity1.setLastUpdatedBy("etl");
@@ -471,7 +471,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId);
 
         HoldingsEntity holdingsEntity1 = new HoldingsEntity();
-        holdingsEntity1.setContent("mock holdings");
+        holdingsEntity1.setContent("mock holdings".getBytes());
         holdingsEntity1.setCreatedDate(new Date());
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
@@ -501,7 +501,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity1);
 
         BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content");
+        bibliographicEntity2.setContent("mock Content".getBytes());
         bibliographicEntity2.setCreatedDate(new Date());
         bibliographicEntity2.setCreatedBy("etl");
         bibliographicEntity2.setLastUpdatedBy("etl");
@@ -510,7 +510,7 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity2.setOwningInstitutionBibId(owningInstitutionBibId);
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
-        holdingsEntity2.setContent("mock holdings");
+        holdingsEntity2.setContent("mock holdings".getBytes());
         holdingsEntity2.setCreatedDate(new Date());
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());

@@ -52,7 +52,7 @@ public class BibliographicDetailsRepositoryTest extends BaseTestCase {
         Page<BibliographicEntity> byOwningInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 10), owningInstitutionId);
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("Mock Bib Content");
+        bibliographicEntity.setContent("Mock Bib Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
@@ -61,7 +61,7 @@ public class BibliographicDetailsRepositoryTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());

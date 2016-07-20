@@ -18,7 +18,7 @@ public class XmlRecordEntity implements Serializable {
 
     @Lob
     @Column(name = "xml_record")
-    private String xml;
+    private byte[] xml;
 
     @Column(name = "xml_file")
     private String xmlFileName;
@@ -65,11 +65,11 @@ public class XmlRecordEntity implements Serializable {
         this.id = id;
     }
 
-    public String getXml() {
+    public byte[] getXml() {
         return xml;
     }
 
-    public void setXml(String xml) {
+    public void setXml(byte[] xml) {
         this.xml = xml;
     }
 
