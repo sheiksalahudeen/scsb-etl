@@ -53,9 +53,6 @@ public class EtlDataLoadController {
     @Autowired
     XmlRecordRepository xmlRecordRepository;
 
-    @Value("${etl.number.of.threads}")
-    private Integer numberOfThreads;
-
     @Value("${etl.load.batchSize}")
     private Integer batchSize;
 
@@ -71,7 +68,6 @@ public class EtlDataLoadController {
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
-        etlLoadRequest.setNumberOfThreads(numberOfThreads);
         model.addAttribute("etlLoadRequest", etlLoadRequest);
         return "etlDataLoader";
     }

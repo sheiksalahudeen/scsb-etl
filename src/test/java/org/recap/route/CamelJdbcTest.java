@@ -30,9 +30,13 @@ public class CamelJdbcTest extends BaseTestCase {
     String xmlTagName;
 
     @Value("${etl.load.directory}")
-    String inputDirectoryPath;
+    Integer etlPoolSize;
 
-    @Value("${etl.number.of.threads}") Integer numberOfThreads;
+    @Value("${etl.pool.size}")
+    Integer etlMaxPoolSize;
+
+    @Value("${etl.max.pool.size}")
+    String inputDirectoryPath;
 
     @Value("${etl.load.batchSize}") Integer batchSize;
 
@@ -53,7 +57,7 @@ public class CamelJdbcTest extends BaseTestCase {
                         .split()
                         .tokenizeXML(xmlTagName)
                         .streaming()
-                        .threads(numberOfThreads, 100, "xmlProcessingThread")
+                        .threads(etlPoolSize, etlMaxPoolSize, "xmlProcessingThread")
                         .process(new XmlProcessor(xmlRecordRepository))
                         .to("jdbc:dataSource");
             }

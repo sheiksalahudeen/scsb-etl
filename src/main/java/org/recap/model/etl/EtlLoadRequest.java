@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class EtlLoadRequest {
 
     private String fileName;
-    private Integer numberOfThreads;
     private Integer batchSize;
     private MultipartFile file;
     private String userName;
@@ -19,14 +18,6 @@ public class EtlLoadRequest {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
-    }
-
-    public Integer getNumberOfThreads() {
-        return numberOfThreads;
-    }
-
-    public void setNumberOfThreads(Integer numberOfThreads) {
-        this.numberOfThreads = numberOfThreads;
     }
 
     public Integer getBatchSize() {
