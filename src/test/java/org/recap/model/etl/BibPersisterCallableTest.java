@@ -343,44 +343,4 @@ public class BibPersisterCallableTest extends BaseTestCase {
         assertEquals(byOwningInstitutionBibId.getItemEntities().size(), 2);
     }
 
-    @Test
-    public void loadBibRecord() throws Exception {
-        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
-        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
-        Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
-
-        Map<String, Integer> institution = new HashMap<>();
-        institution.put("NYPL", 3);
-        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
-
-        Map<String, Integer> collection = new HashMap<>();
-        collection.put("Open", 2);
-        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
-
-        URL resource = getClass().getResource("sampleRecordForEtlLoadTest1.xml");
-        assertNotNull(resource);
-        File file = new File(resource.toURI());
-        assertNotNull(file);
-        assertTrue(file.exists());
-        BibRecord bibRecord = null;
-        bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
-        assertNotNull(bibRecord);
-
-        BibliographicEntity bibliographicEntity = null;
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
-        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
-        if (map != null) {
-            Object object = map.get("bibliographicEntity");
-            if (object != null) {
-                bibliographicEntity = (BibliographicEntity) object;
-            }
-        }
-        assertNotNull(bibliographicEntity);
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getBibliographicId());
-
-    }
-
 }
