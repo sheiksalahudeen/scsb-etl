@@ -32,6 +32,9 @@ public class XmlProcessor implements Processor {
         if(StringUtils.isBlank(owningInstitutionBibId)){
             owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag=\"001\">","</controlfield>");
         }
+        if (StringUtils.isBlank(owningInstitutionBibId)){
+            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag='001'>","</controlfield>");
+        }
         xmlRecordEntity.setOwningInstBibId(owningInstitutionBibId);
         Date date = new Date();
         xmlRecordEntity.setDataLoaded(date);
