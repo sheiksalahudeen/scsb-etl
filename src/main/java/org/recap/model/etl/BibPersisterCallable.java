@@ -56,7 +56,7 @@ public class BibPersisterCallable implements Callable {
 
         CollectionType bibContentCollection = bibContent.getCollection();
         String bibXmlContent = bibContentCollection.serialize(bibContentCollection);
-        bibliographicEntity.setContent(bibXmlContent);
+        bibliographicEntity.setContent(bibXmlContent.getBytes());
 
         List<Holdings> holdings = bibRecord.getHoldings();
         for (Iterator<Holdings> iterator = holdings.iterator(); iterator.hasNext(); ) {
@@ -69,7 +69,10 @@ public class BibPersisterCallable implements Callable {
                     CollectionType holdingContentCollection = holdingEnt.getContent().getCollection();
                     List<RecordType> holdingRecordTypes = holdingContentCollection.getRecord();
                     RecordType holdingsRecordType = holdingRecordTypes.get(0);
-                    holdingsEntity.setContent(holdingContentCollection.serialize(holdingContentCollection));
+                    String holdingsContent = holdingContentCollection.serialize(holdingContentCollection);
+                    if (StringUtils.isNotBlank(holdingsContent)) {
+                        holdingsEntity.setContent(holdingsContent.getBytes());
+                    }
                     holdingsEntity.setCreatedDate(new Date());
                     holdingsEntity.setCreatedBy("etl");
                     holdingsEntity.setLastUpdatedDate(new Date());

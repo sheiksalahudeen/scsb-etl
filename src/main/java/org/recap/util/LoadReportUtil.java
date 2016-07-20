@@ -27,7 +27,8 @@ public class LoadReportUtil {
 
     public LoadReportEntity validateBibliographicEntity(BibliographicEntity bibliographicEntity) {
         StringBuffer errorMessage = new StringBuffer();
-        if (StringUtils.isBlank(bibliographicEntity.getContent())) {
+        String content = new String(bibliographicEntity.getContent());
+        if (StringUtils.isBlank(content)) {
             errorMessage.append("Bib Content cannot be empty");
         }
         if (bibliographicEntity.getOwningInstitutionId() == null) {
@@ -58,7 +59,8 @@ public class LoadReportUtil {
                 if (holdingsEntity.getCreatedDate() == null) {
                     errorMessage.append("Holdings Created Date cannot be null");
                 }
-                if (StringUtils.isBlank(holdingsEntity.getContent())) {
+                String content = new String(holdingsEntity.getContent());
+                if (StringUtils.isBlank(content)) {
                     errorMessage.append("\n");
                     errorMessage.append("Holdings Content cannot be empty");
                 }
@@ -126,9 +128,10 @@ public class LoadReportUtil {
             }
         }
         loadReportEntity.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
-        if (StringUtils.isNotBlank(bibliographicEntity.getContent())) {
+        String content = new String(bibliographicEntity.getContent());
+        if (StringUtils.isNotBlank(content)) {
             CollectionType collectionType = new CollectionType();
-            collectionType = (CollectionType) collectionType.deserialize(bibliographicEntity.getContent());
+            collectionType = (CollectionType) collectionType.deserialize(content);
             if (collectionType != null && !CollectionUtils.isEmpty(collectionType.getRecord())) {
                 RecordType recordType = collectionType.getRecord().get(0);
                 if (recordType != null) {

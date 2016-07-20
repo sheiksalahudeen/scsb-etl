@@ -99,7 +99,7 @@ public class ProcessETLTest extends BaseTestCase {
         URL resource = getClass().getResource(fileName);
         File file = new File(resource.toURI());
         String content = FileUtils.readFileToString(file, "UTF-8");
-        xmlRecordEntity.setXml(content);
+        xmlRecordEntity.setXml(content.getBytes());
         xmlRecordEntity.setOwningInst("NYPL");
         xmlRecordEntity.setOwningInstBibId(owningInstBibId);
         xmlRecordEntity.setDataLoaded(new Date());

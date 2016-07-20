@@ -45,7 +45,7 @@ public class ItemDetailsRepositoryTest extends BaseTestCase {
         Long count = itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content");
+        bibliographicEntity.setContent("mock Content".getBytes());
         Date date = new Date();
         bibliographicEntity.setCreatedDate(date);
         bibliographicEntity.setCreatedBy("etl");
@@ -56,7 +56,7 @@ public class ItemDetailsRepositoryTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings");
+        holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(date);
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(date);

@@ -23,7 +23,7 @@ public class XmlProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         String xmlRecord = (String) exchange.getIn().getBody();
         XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
-        xmlRecordEntity.setXml(xmlRecord);
+        xmlRecordEntity.setXml(xmlRecord.getBytes());
         String camelFileName = (String) exchange.getIn().getHeader("CamelFileName");
         xmlRecordEntity.setXmlFileName(camelFileName);
         String owningInstitutionId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionId>", "</owningInstitutionId>");

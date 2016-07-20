@@ -69,7 +69,7 @@ public class RecordProcessor {
 
         for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
             XmlRecordEntity xmlRecordEntity = iterator.next();
-            String xml = xmlRecordEntity.getXml();
+            String xml = new String(xmlRecordEntity.getXml());
 
             bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
 
