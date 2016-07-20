@@ -41,7 +41,7 @@ public class XmlRouteContext {
                         .split()
                         .tokenizeXML(xmlTagName)
                         .streaming()
-                        .parallelProcessing().threads(100, 100)
+                        .parallelProcessing().threads(poolSize, maxPoolSize)
                         .process(new XmlProcessor(xmlRecordRepository));
             }
         });
