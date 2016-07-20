@@ -1,11 +1,13 @@
 package org.recap.route;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.PollingConsumer;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
+import org.apache.camel.spi.ThreadPoolProfile;
 import org.apache.commons.io.FilenameUtils;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ public class XmlRouteContext {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
+
                 FileEndpoint fileEndpoint = endpoint("file:" + inputDirectoryPath, FileEndpoint.class);
                 fileEndpoint.setFilter(new XmlFileFilter());
 
@@ -38,6 +41,7 @@ public class XmlRouteContext {
                         .split()
                         .tokenizeXML(xmlTagName)
                         .streaming()
+                        .parallelProcessing().threads(100, 100)
                         .process(new XmlProcessor(xmlRecordRepository));
             }
         });
