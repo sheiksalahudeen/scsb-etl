@@ -30,7 +30,7 @@ public class XmlProcessor implements Processor {
         xmlRecordEntity.setOwningInst(owningInstitutionId);
         String owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
         if(StringUtils.isBlank(owningInstitutionBibId)){
-            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag='001'>","</controlfield>");
+            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag=\"001\">","</controlfield>");
         }
         xmlRecordEntity.setOwningInstBibId(owningInstitutionBibId);
         Date date = new Date();
