@@ -18,4 +18,6 @@ public interface XmlRecordRepository extends PagingAndSortingRepository<XmlRecor
     Long countByXmlFileName(String xmlFileName);
 
     Long countByXmlFileNameContaining(String xmlFileName);
+
+    XmlRecordEntity findById(Integer id);
 }

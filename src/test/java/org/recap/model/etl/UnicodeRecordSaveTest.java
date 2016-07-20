@@ -4,7 +4,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -26,13 +28,16 @@ public class UnicodeRecordSaveTest extends BaseTestCase {
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
+    @Autowired
+    XmlRecordRepository xmlRecordRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Test
-    public void saveUnicodeRecord() throws Exception {
+    public void saveUnicodeRecordBibTable() throws Exception {
         Random random = new Random();
-        File bibContentFile = getUnicodeContentFile();
+        File bibContentFile = getUnicodeContentFile("UnicodeRecord.xml");
         String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -57,8 +62,33 @@ public class UnicodeRecordSaveTest extends BaseTestCase {
         assertEquals(sourceBibContent, fetchedBibContent);
     }
 
-    public File getUnicodeContentFile() throws URISyntaxException {
-        URL resource = getClass().getResource("UnicodeRecord.xml");
+    @Test
+    public void saveUnicodeRecordXmlTable() throws Exception {
+        String fileName = "NYPL-UnicodeRecord.xml";
+        File bibContentFile = getUnicodeContentFile(fileName);
+        String sourceBibXml = FileUtils.readFileToString(bibContentFile, "UTF-8");
+
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXml(sourceBibXml.getBytes());
+        xmlRecordEntity.setXmlFileName(fileName);
+        xmlRecordEntity.setOwningInst("NYPL");
+        xmlRecordEntity.setOwningInstBibId(".b160150577123");
+        xmlRecordEntity.setDataLoaded(new Date());
+
+        XmlRecordEntity savedXmlRecordEntity = xmlRecordRepository.save(xmlRecordEntity);
+        entityManager.refresh(savedXmlRecordEntity);
+        assertNotNull(savedXmlRecordEntity);
+
+        XmlRecordEntity fetchedXmlRecordEntity = xmlRecordRepository.findById(savedXmlRecordEntity.getId());
+        assertNotNull(fetchedXmlRecordEntity);
+        assertNotNull(fetchedXmlRecordEntity.getXml());
+
+        String fetchedBibXml = new String(fetchedXmlRecordEntity.getXml());
+        assertEquals(sourceBibXml, fetchedBibXml);
+    }
+
+    public File getUnicodeContentFile(String fileName) throws URISyntaxException {
+        URL resource = getClass().getResource(fileName);
         return new File(resource.toURI());
     }
 
