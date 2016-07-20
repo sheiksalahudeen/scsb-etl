@@ -80,12 +80,12 @@ public class BibPersisterCallable implements Callable {
                     String owningInstituionHoldingsId = null;
                     if (StringUtils.isNotBlank(holdingEnt.getOwningInstitutionHoldingsId())) {
                         if (holdingEnt.getOwningInstitutionHoldingsId().length() > 45) {
-                            owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId();
+                            owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId() + "-" + UUID.randomUUID().toString();
                         } else {
                             owningInstituionHoldingsId= bibRecord.getBib().getOwningInstitutionId() + bibRecord.getBib().getOwningInstitutionBibId() + "-" + holdingEnt.getOwningInstitutionHoldingsId();
                         }
                     } else {
-                        owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId();
+                        owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId() + "-" + UUID.randomUUID().toString();
                     }
 
                     holdingsEntity.setOwningInstitutionHoldingsId(owningInstituionHoldingsId);
