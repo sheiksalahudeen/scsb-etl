@@ -130,7 +130,6 @@ public class JMSTest extends BaseTestCase {
 
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         String fileName = reportDirectoryPath + File.separator + owningInstitution + "_" + df.format(new Date()) + ".csv";
-        File file = new File(fileName);
-        assertTrue(file.exists());
+        assertTrue(new File(fileName).exists());
     }
 }
