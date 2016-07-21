@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 21/7/16.
@@ -37,10 +39,12 @@ public class EtlGfaEntityTest extends BaseTestCase {
         entityManager.refresh(savedEtlGfa);
 
         List<EtlGfaEntity> etlGfaEntityList = etlGfaRepository.findBystatus("Out on Ret WO: 387966 09/29/15 To PA");
+        List<EtlGfaEntity> etlGfaEntityListByBarcode = etlGfaRepository.findByItemBarcode("3210457796");
         assertNotNull(savedEtlGfa);
         assertNotNull(etlGfaEntityList);
         assertEquals(etlGfaEntityList.get(0).getStatus(),"Out on Ret WO: 387966 09/29/15 To PA");
-
+        assertNotNull(etlGfaEntityListByBarcode);
+        assertEquals(etlGfaEntityListByBarcode.get(0).getItemBarcode(),"3210457796");
 
     }
 
