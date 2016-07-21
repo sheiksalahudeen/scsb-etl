@@ -100,7 +100,7 @@ public class RecordProcessor {
                 if (bibliographicEntity != null) {
                     bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
                 } else if (loadReportEntity != null) {
-                    loadReportEntities.add((LoadReportEntity) loadReportEntity);
+                    loadReportEntities.addAll((List<LoadReportEntity>) loadReportEntity);
                 }
             }
         }

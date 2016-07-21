@@ -99,7 +99,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
         if (map != null) {
             Object object = map.get("loadReportEntity");
             if (object != null) {
-                loadReportEntities.add((LoadReportEntity) object);
+                loadReportEntities.addAll((List<LoadReportEntity>) object);
             }
         }
 
@@ -154,7 +154,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
         etlExchange.setInstitutionEntityMap(new HashMap());
         etlExchange.setCollectionGroupMap(new HashMap());
 
-        bibDataProcessor.processMessage(etlExchange);
+        bibDataProcessor.processETLExchagneAndPersistToDB(etlExchange);
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         assertNotNull(savedBibliographicEntity);
