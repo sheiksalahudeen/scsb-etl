@@ -1,5 +1,6 @@
 package org.recap.route;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jaxb.BibRecord;
@@ -35,6 +36,9 @@ public class RecordProcessor {
     private Map itemStatusMap;
     private Map collectionGroupMap;
     private JAXBHandler jaxbHandler;
+
+    @Autowired
+    private ProducerTemplate producer;
 
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -110,7 +114,7 @@ public class RecordProcessor {
         }
 
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
-            csvUtil.writeLoadReportToCsv(loadReportEntities);
+            producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
         }
 
     }
