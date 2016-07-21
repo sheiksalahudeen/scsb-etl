@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
+import org.recap.model.jaxb.marc.LeaderFieldType;
 import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -142,6 +143,13 @@ public class BibPersisterCallable implements Callable {
             errorMessage.append("\n");
             errorMessage.append("Bib Content cannot be empty");
         }
+
+        LeaderFieldType leader = bibContentCollection.getRecord().get(0).getLeader();
+        if (!(leader != null && StringUtils.isNotBlank(leader.getValue()) && leader.getValue().length() == 24)) {
+            errorMessage.append("\n");
+            errorMessage.append("Leader Field value should be 24 characters");
+        }
+
         if (errorMessage.toString().length() > 1) {
             loadReportEntity = getLoadReportUtil().populateBibInfo(bibliographicEntity);
             loadReportEntity.setErrorDescription(errorMessage.toString());
