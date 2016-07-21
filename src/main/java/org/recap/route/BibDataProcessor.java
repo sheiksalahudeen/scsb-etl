@@ -1,5 +1,6 @@
 package org.recap.route;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -26,6 +27,9 @@ import java.util.*;
 public class BibDataProcessor {
 
     Logger logger = LoggerFactory.getLogger(BibDataProcessor.class);
+
+    @Autowired
+    private ProducerTemplate producer;
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -64,7 +68,7 @@ public class BibDataProcessor {
                 }
             }
             if (!CollectionUtils.isEmpty(loadReportEntities)) {
-                csvUtil.writeLoadReportToCsv(loadReportEntities);
+                producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
             }
             etlExchange = null;
         }
