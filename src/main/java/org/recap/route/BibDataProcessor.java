@@ -47,7 +47,7 @@ public class BibDataProcessor {
     EntityManager entityManager;
 
     @Transactional
-    public void processMessage(ETLExchange etlExchange) {
+    public void processETLExchagneAndPersistToDB(ETLExchange etlExchange) {
         if (etlExchange != null) {
             List<LoadReportEntity> loadReportEntities = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntityList = etlExchange.getBibliographicEntities();
@@ -70,7 +70,6 @@ public class BibDataProcessor {
             if (!CollectionUtils.isEmpty(loadReportEntities)) {
                 producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
             }
-            etlExchange = null;
         }
     }
 

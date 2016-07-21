@@ -110,7 +110,7 @@ public class RecordProcessor {
             etlExchange.setBibliographicEntities(bibliographicEntities);
             etlExchange.setInstitutionEntityMap(getInstitutionEntityMap());
             etlExchange.setCollectionGroupMap(getCollectionGroupMap());
-            bibDataProcessor.processMessage(etlExchange);
+            bibDataProcessor.processETLExchagneAndPersistToDB(etlExchange);
         }
 
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
