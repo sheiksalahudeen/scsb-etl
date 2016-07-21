@@ -28,6 +28,9 @@ public class ReCAPCamelContext {
     private Integer poolSize;
     private Integer maxPoolSize;
 
+    private JMSReportRouteBuilder jmsReportRouteBuilder;
+    private XmlRouteBuilder xmlRouteBuilder;
+
 
     @Autowired
     public ReCAPCamelContext(CamelContext context, XmlRecordRepository xmlRecordRepository,
@@ -45,7 +48,8 @@ public class ReCAPCamelContext {
 
     private void init() {
         try {
-            addDynamicRoute();
+            addComponents();
+            addDefaultRoutes();
         } catch (Exception e) {
             logger.error("Exception : " + e.getMessage());
         }
@@ -55,19 +59,31 @@ public class ReCAPCamelContext {
         context.addRoutes(routeBuilder);
     }
 
-    public void addDynamicRoute() throws Exception {
-        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+    public void addDefaultRoutes() throws Exception {
         addRoutes(getXmlRouteBuilder());
-        addRoutes(new JMSReportRouteBuilder());
+        addRoutes(getJMSReportBuilder());
+    }
+
+    private JMSReportRouteBuilder getJMSReportBuilder() {
+        if (null == jmsReportRouteBuilder) {
+            jmsReportRouteBuilder = new JMSReportRouteBuilder();
+        }
+        return jmsReportRouteBuilder;
+    }
+
+    private void addComponents() {
+        context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
     }
 
     public RouteBuilder getXmlRouteBuilder() {
-        XmlRouteBuilder xmlRouteBuilder = new XmlRouteBuilder();
-        xmlRouteBuilder.setXmlTagName(xmlTagName);
-        xmlRouteBuilder.setInputDirectoryPath(inputDirectoryPath);
-        xmlRouteBuilder.setPoolSize(poolSize);
-        xmlRouteBuilder.setMaxPoolSize(maxPoolSize);
-        xmlRouteBuilder.setXmlRecordRepository(xmlRecordRepository);
+        if (null == xmlRouteBuilder) {
+            xmlRouteBuilder = new XmlRouteBuilder();
+            xmlRouteBuilder.setXmlTagName(xmlTagName);
+            xmlRouteBuilder.setInputDirectoryPath(inputDirectoryPath);
+            xmlRouteBuilder.setPoolSize(poolSize);
+            xmlRouteBuilder.setMaxPoolSize(maxPoolSize);
+            xmlRouteBuilder.setXmlRecordRepository(xmlRecordRepository);
+        }
         return xmlRouteBuilder;
     }
 }
