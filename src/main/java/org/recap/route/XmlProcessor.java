@@ -5,14 +5,18 @@ import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.XmlRecordRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by peris on 7/17/16.
  */
 public class XmlProcessor implements Processor {
+
+    Logger logger = LoggerFactory.getLogger(XmlProcessor.class);
+
     private final XmlRecordRepository xmlRecordRepository;
 
     public XmlProcessor(XmlRecordRepository xmlRecordRepository) {
@@ -29,15 +33,21 @@ public class XmlProcessor implements Processor {
         String owningInstitutionId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionId>", "</owningInstitutionId>");
         xmlRecordEntity.setOwningInst(owningInstitutionId);
         String owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
-        if(StringUtils.isBlank(owningInstitutionBibId)){
-            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag=\"001\">","</controlfield>");
+        if (StringUtils.isBlank(owningInstitutionBibId)) {
+            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag=\"001\">", "</controlfield>");
         }
-        if (StringUtils.isBlank(owningInstitutionBibId)){
-            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag='001'>","</controlfield>");
+        if (StringUtils.isBlank(owningInstitutionBibId)) {
+            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag='001'>", "</controlfield>");
         }
         xmlRecordEntity.setOwningInstBibId(owningInstitutionBibId);
         Date date = new Date();
         xmlRecordEntity.setDataLoaded(date);
-        xmlRecordRepository.save(xmlRecordEntity);
+        if (StringUtils.isNotBlank(owningInstitutionId) && StringUtils.isNotBlank(owningInstitutionBibId)) {
+            try {
+                xmlRecordRepository.save(xmlRecordEntity);
+            } catch (Exception e) {
+                logger.error("Exception " + e);
+            }
+        }
     }
 }

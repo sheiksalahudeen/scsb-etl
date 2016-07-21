@@ -166,7 +166,7 @@ public class BibPersisterCallable implements Callable {
     }
 
     private String getOwningInstitutionBibId(BibRecord bibRecord, Bib bib) {
-        return null == bib.getOwningInstitutionBibId() ? getControlFieldValue001(bibRecord) : bib.getOwningInstitutionBibId();
+        return StringUtils.isBlank(bib.getOwningInstitutionBibId()) ? getControlFieldValue001(bibRecord) : bib.getOwningInstitutionBibId();
     }
 
     private String getControlFieldValue001(BibRecord bibRecord) {
