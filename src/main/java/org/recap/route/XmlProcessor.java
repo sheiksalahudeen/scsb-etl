@@ -42,12 +42,10 @@ public class XmlProcessor implements Processor {
         xmlRecordEntity.setOwningInstBibId(owningInstitutionBibId);
         Date date = new Date();
         xmlRecordEntity.setDataLoaded(date);
-        if (StringUtils.isNotBlank(owningInstitutionId) && StringUtils.isNotBlank(owningInstitutionBibId)) {
-            try {
-                xmlRecordRepository.save(xmlRecordEntity);
-            } catch (Exception e) {
-                logger.error("Exception " + e);
-            }
+        try {
+            xmlRecordRepository.save(xmlRecordEntity);
+        } catch (Exception e) {
+            logger.error("Exception " + e);
         }
     }
 }
