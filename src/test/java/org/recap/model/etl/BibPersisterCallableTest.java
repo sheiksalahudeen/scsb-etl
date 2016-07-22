@@ -15,7 +15,6 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.route.BibDataProcessor;
 import org.recap.route.ETLExchange;
-import org.recap.util.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
@@ -44,9 +43,6 @@ public class BibPersisterCallableTest extends BaseTestCase {
     @Autowired
     BibDataProcessor bibDataProcessor;
 
-    @Autowired
-    CsvUtil csvUtil;
-
     @Mock
     private Map<String, Integer> institutionMap;
 
@@ -65,7 +61,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
     @Test
     public void newInstance() {
         BibRecord bibRecord = new BibRecord();
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord);
         assertNotNull(bibPersisterCallable);
     }
 
@@ -94,7 +94,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
         bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
         assertNotNull(bibRecord);
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("loadReportEntity");
@@ -105,7 +109,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
         assertEquals(loadReportEntities.size(), 1);
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
-            csvUtil.writeLoadReportToCsv(loadReportEntities);
+//            csvUtil.writeLoadReportToCsv(loadReportEntities);
         }
     }
 
@@ -134,7 +138,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity = null;
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord1);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");
@@ -189,7 +197,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity = null;
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");
@@ -249,7 +261,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity = null;
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord, institutionMap, itemStatusMap, collectionGroupMap);
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");
@@ -297,7 +313,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity1 = null;
 
-        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable(bibRecord1, institutionMap, itemStatusMap, collectionGroupMap);
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord1);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");
@@ -317,7 +337,11 @@ public class BibPersisterCallableTest extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity2 = null;
 
-        bibPersisterCallable = new BibPersisterCallable(bibRecord2, institutionMap, itemStatusMap, collectionGroupMap);
+        bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setBibRecord(bibRecord2);
         map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");

@@ -10,7 +10,6 @@ import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
-import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +52,6 @@ public class RecordProcessor {
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    CsvUtil csvUtil;
-
-    @Autowired
     BibDataProcessor bibDataProcessor;
 
     private ExecutorService executorService;
@@ -64,24 +60,7 @@ public class RecordProcessor {
     public void process(Page<XmlRecordEntity> xmlRecordEntities) {
         logger.info("Processor: " + Thread.currentThread().getName());
 
-        List<Future> futures = new ArrayList<>();
-
-        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-        List<LoadReportEntity> loadReportEntities = new ArrayList<>();
-
-        BibRecord bibRecord = null;
-
-        for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
-            XmlRecordEntity xmlRecordEntity = iterator.next();
-            String xml = new String(xmlRecordEntity.getXml());
-
-            bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
-
-            Future submit = getExecutorService().submit(new BibPersisterCallable(bibRecord, getInstitutionEntityMap(), getItemStatusMap(), getCollectionGroupMap()));
-            if (null != submit) {
-                futures.add(submit);
-            }
-        }
+        List<Future> futures = prepareFutureTasks(xmlRecordEntities);
 
         for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
             Future future = iterator.next();
@@ -89,19 +68,28 @@ public class RecordProcessor {
             try {
                 object = future.get();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             } catch (ExecutionException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
-            Map<String, Object> map = (Map<String, Object>) object;
-            if (object != null) {
-                Object bibliographicEntity = map.get("bibliographicEntity");
-                Object loadReportEntity = map.get("loadReportEntity");
-                if (bibliographicEntity != null) {
-                    bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
-                } else if (loadReportEntity != null) {
-                    loadReportEntities.addAll((List<LoadReportEntity>) loadReportEntity);
-                }
+
+            processFutureResults(object);
+        }
+
+    }
+
+    private void processFutureResults(Object object) {
+        Map<String, Object> resultMap = (Map<String, Object>) object;
+        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+        List<LoadReportEntity> loadReportEntities = new ArrayList<>();
+
+        if (object != null) {
+            Object bibliographicEntity = resultMap.get("bibliographicEntity");
+            Object loadReportEntity = resultMap.get("loadReportEntity");
+            if (bibliographicEntity != null) {
+                bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
+            } else if (loadReportEntity != null) {
+                loadReportEntities.addAll((List<LoadReportEntity>) loadReportEntity);
             }
         }
 
@@ -113,10 +101,33 @@ public class RecordProcessor {
             bibDataProcessor.processETLExchagneAndPersistToDB(etlExchange);
         }
 
+
         if (!CollectionUtils.isEmpty(loadReportEntities)) {
             producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
         }
+    }
 
+    private List<Future> prepareFutureTasks(Page<XmlRecordEntity> xmlRecordEntities) {
+        List<Future> futures = new ArrayList<>();
+        BibRecord bibRecord;
+
+        for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
+            XmlRecordEntity xmlRecordEntity = iterator.next();
+            String xml = new String(xmlRecordEntity.getXml());
+
+            bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
+
+            BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+            bibPersisterCallable.setBibRecord(bibRecord);
+            bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
+            bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
+            bibPersisterCallable.setItemStatusMap(getItemStatusMap());
+            bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
+            Future submit = getExecutorService().submit(bibPersisterCallable);
+            futures.add(submit);
+        }
+
+        return futures;
     }
 
 

@@ -38,8 +38,6 @@ public class CamelJdbcTest extends BaseTestCase {
     @Value("${etl.max.pool.size}")
     String inputDirectoryPath;
 
-    @Value("${etl.load.batchSize}") Integer batchSize;
-
     @Autowired
     XmlRecordRepository xmlRecordRepository;
 

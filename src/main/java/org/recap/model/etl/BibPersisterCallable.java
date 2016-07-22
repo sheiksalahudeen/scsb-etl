@@ -9,6 +9,7 @@ import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.util.LoadReportUtil;
 import org.recap.util.MarcUtil;
 import org.springframework.util.CollectionUtils;
@@ -25,17 +26,11 @@ public class BibPersisterCallable implements Callable {
     private MarcUtil marcUtil;
     private LoadReportUtil loadReportUtil;
     private BibRecord bibRecord;
+    private XmlRecordEntity xmlRecordEntity;
 
-    private final Map institutionEntitiesMap;
-    private final Map itemStatusMap;
-    private final Map collectionGroupMap;
-
-    public BibPersisterCallable(BibRecord bibRecord, Map institutionEntitiesMap, Map itemStatusMap, Map collectionGroupMap) {
-        this.bibRecord = bibRecord;
-        this.institutionEntitiesMap = institutionEntitiesMap;
-        this.itemStatusMap = itemStatusMap;
-        this.collectionGroupMap = collectionGroupMap;
-    }
+    private Map institutionEntitiesMap;
+    private Map itemStatusMap;
+    private Map collectionGroupMap;
 
     @Override
     public Object call() {
@@ -50,6 +45,7 @@ public class BibPersisterCallable implements Callable {
         BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
         LoadReportEntity bibLoadReportEntity = (LoadReportEntity) bibMap.get("loadReportEntity");
         if (bibLoadReportEntity != null) {
+            bibLoadReportEntity.setFileName(xmlRecordEntity.getXmlFileName());
             loadReportEntities.add(bibLoadReportEntity);
         }
 
@@ -270,6 +266,46 @@ public class BibPersisterCallable implements Callable {
     private String getControlFieldValue001(BibRecord bibRecord) {
         RecordType marcRecord = bibRecord.getBib().getContent().getCollection().getRecord().get(0);
         return getMarcUtil().getControlFieldValue(marcRecord, "001");
+    }
+
+    public BibRecord getBibRecord() {
+        return bibRecord;
+    }
+
+    public void setBibRecord(BibRecord bibRecord) {
+        this.bibRecord = bibRecord;
+    }
+
+    public Map getInstitutionEntitiesMap() {
+        return institutionEntitiesMap;
+    }
+
+    public void setInstitutionEntitiesMap(Map institutionEntitiesMap) {
+        this.institutionEntitiesMap = institutionEntitiesMap;
+    }
+
+    public Map getItemStatusMap() {
+        return itemStatusMap;
+    }
+
+    public void setItemStatusMap(Map itemStatusMap) {
+        this.itemStatusMap = itemStatusMap;
+    }
+
+    public Map getCollectionGroupMap() {
+        return collectionGroupMap;
+    }
+
+    public void setCollectionGroupMap(Map collectionGroupMap) {
+        this.collectionGroupMap = collectionGroupMap;
+    }
+
+    public XmlRecordEntity getXmlRecordEntity() {
+        return xmlRecordEntity;
+    }
+
+    public void setXmlRecordEntity(XmlRecordEntity xmlRecordEntity) {
+        this.xmlRecordEntity = xmlRecordEntity;
     }
 
     public MarcUtil getMarcUtil() {

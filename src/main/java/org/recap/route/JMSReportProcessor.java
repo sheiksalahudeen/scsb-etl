@@ -1,7 +1,6 @@
 package org.recap.route;
 
 import org.recap.model.etl.LoadReportEntity;
-import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,11 @@ public class JMSReportProcessor {
 
     Logger logger = LoggerFactory.getLogger(JMSReportProcessor.class);
 
-    @Autowired
-    CsvUtil csvUtil;
 
     public void processReport(List<LoadReportEntity> loadReportEntities) {
         long startTime = System.currentTimeMillis();
         try {
-            csvUtil.writeLoadReportToCsv(loadReportEntities);
+//            csvUtil.writeLoadReportToCsv(loadReportEntities);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

@@ -11,7 +11,6 @@ import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.recap.route.EtlDataLoadProcessor;
 import org.recap.route.RecordProcessor;
-import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +61,6 @@ public class EtlDataLoadController {
     @Autowired
     RecordProcessor recordProcessor;
 
-    @Autowired
-    CsvUtil csvUtil;
-
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
@@ -107,7 +103,7 @@ public class EtlDataLoadController {
         successReportEntity.setTotalBibsLoaded(processedBibsCount);
         successReportEntity.setTotalHoldingsLoaded(processedHoldingsCount);
         successReportEntity.setTotalItemsLoaded(processedItemsCount);
-        csvUtil.writeSuccessReportToCsv(successReportEntity);
+//        csvUtil.writeSuccessReportToCsv(successReportEntity);
     }
 
     @ResponseBody

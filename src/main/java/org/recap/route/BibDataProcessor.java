@@ -6,7 +6,6 @@ import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
 import org.recap.repository.ItemDetailsRepository;
-import org.recap.util.CsvUtil;
 import org.recap.util.LoadReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +38,6 @@ public class BibDataProcessor {
 
     @Autowired
     ItemDetailsRepository itemDetailsRepository;
-
-    @Autowired
-    CsvUtil csvUtil;
 
     @PersistenceContext
     EntityManager entityManager;

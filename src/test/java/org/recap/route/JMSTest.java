@@ -1,10 +1,14 @@
 package org.recap.route;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.ConsumerTemplate;
-import org.apache.camel.ProducerTemplate;
+import org.apache.camel.*;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.dataformat.csv.CsvDataFormat;
+import org.apache.camel.model.dataformat.BindyType;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -15,10 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -51,6 +52,44 @@ public class JMSTest extends BaseTestCase {
         String body = consumer.receiveBody("seda:start", String.class);
 
         assertEquals("Hello World", body);
+
+    }
+
+    @Test
+    public void uploadToFTP() throws Exception {
+        assertNotNull(producer);
+        assertNotNull(consumer);
+
+        producer.sendBody("activemq:queue:ftpQ", "Hello World");
+
+        String body = consumer.receiveBody("seda:start", String.class);
+
+        assertEquals("Hello World", body);
+
+    }
+
+    @Test
+    public void csv() throws Exception {
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("seda:start").process(new DateProcessor()).marshal().bindy(BindyType.Csv, FailureReportReCAPCSVRecord.class).process(new CSVHeaderProcessor()).to("file:"+reportDirectoryPath+"?fileName=${in.header.reportFileName}-${date:now:ddMMMyyyy}&fileExist=append");
+            }
+        });
+
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
+        failureReportReCAPCSVRecord.setTitle("History of Science");
+        failureReportReCAPCSVRecord.setOwningInstitutionHoldingsId("1231");
+        failureReportReCAPCSVRecord.setOwningInstitution("PUL");
+        failureReportReCAPCSVRecord.setOwningInstitutionBibId("123");
+        failureReportReCAPCSVRecord.setCollectionGroupDesignation("Open");
+        failureReportReCAPCSVRecord.setCreateDateItem(new Date());
+        failureReportReCAPCSVRecord.setExceptionMessage("Holdings Id is null");
+        failureReportReCAPCSVRecord.setFileName("recap_records2.xml");
+
+        producer.sendBody("seda:start", failureReportReCAPCSVRecord);
+
+        Thread.sleep(3000);
 
     }
 
@@ -131,5 +170,21 @@ public class JMSTest extends BaseTestCase {
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         String fileName = reportDirectoryPath + File.separator + owningInstitution + "_" + df.format(new Date()) + ".csv";
         assertTrue(new File(fileName).exists());
+    }
+
+   public class DateProcessor implements Processor {
+       @Override
+       public void process(Exchange exchange) throws Exception {
+           FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) exchange.getIn().getBody();
+           String fileName = FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName());
+           exchange.getIn().setHeader("reportFileName", fileName);
+       }
+   }
+
+    public class CSVHeaderProcessor implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            System.out.println();
+        }
     }
 }
