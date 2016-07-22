@@ -1,6 +1,7 @@
 package org.recap.model.etl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
@@ -36,17 +37,17 @@ public class BibPersisterCallable implements Callable {
     public Object call() {
         Map<String, Object> map = new HashMap<>();
 
-        List<LoadReportEntity> loadReportEntities = new ArrayList<>();
+        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();
 
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
         Map<String, Object> bibMap = processAndValidateBibliographicEntity(owningInstitutionId);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
-        LoadReportEntity bibLoadReportEntity = (LoadReportEntity) bibMap.get("loadReportEntity");
-        if (bibLoadReportEntity != null) {
-            bibLoadReportEntity.setFileName(xmlRecordEntity.getXmlFileName());
-            loadReportEntities.add(bibLoadReportEntity);
+        FailureReportReCAPCSVRecord bibFailureReportReCAPCSVRecord= (FailureReportReCAPCSVRecord) bibMap.get("failureReportReCAPCSVRecord");
+        if (bibFailureReportReCAPCSVRecord != null) {
+            bibFailureReportReCAPCSVRecord.setFileName(xmlRecordEntity.getXmlFileName());
+            failureReportReCAPCSVRecords.add(bibFailureReportReCAPCSVRecord);
         }
 
         List<Holdings> holdings = bibRecord.getHoldings();
@@ -62,9 +63,9 @@ public class BibPersisterCallable implements Callable {
 
                     Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, holdingEnt, holdingContentCollection);
                     HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
-                    LoadReportEntity holdingsLoadReportEntity = (LoadReportEntity) holdingsMap.get("loadReportEntity");
-                    if (holdingsLoadReportEntity != null) {
-                        loadReportEntities.add(holdingsLoadReportEntity);
+                    FailureReportReCAPCSVRecord holdingsFailureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) holdingsMap.get("failureReportReCAPCSVRecord");
+                    if (holdingsFailureReportReCAPCSVRecord != null) {
+                        failureReportReCAPCSVRecords.add(holdingsFailureReportReCAPCSVRecord);
                     }
 
                     holdingsEntities.add(holdingsEntity);
@@ -80,9 +81,9 @@ public class BibPersisterCallable implements Callable {
                         for (RecordType itemRecordType : itemRecordTypes) {
                             Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecordType);
                             ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
-                            LoadReportEntity itemLoadReportEntity = (LoadReportEntity) itemMap.get("loadReportEntity");
-                            if (itemLoadReportEntity != null) {
-                                loadReportEntities.add(itemLoadReportEntity);
+                            FailureReportReCAPCSVRecord itemFailureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) itemMap.get("failureReportReCAPCSVRecord");
+                            if (itemFailureReportReCAPCSVRecord != null) {
+                                failureReportReCAPCSVRecords.add(itemFailureReportReCAPCSVRecord);
                             }
 
                             if (holdingsEntity.getItemEntities() == null) {
@@ -98,10 +99,10 @@ public class BibPersisterCallable implements Callable {
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
         bibliographicEntity.setItemEntities(itemEntities);
 
-        if (CollectionUtils.isEmpty(loadReportEntities)) {
+        if (CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
             map.put("bibliographicEntity", bibliographicEntity);
         } else {
-            map.put("loadReportEntity", loadReportEntities);
+            map.put("failureReportReCAPCSVRecord", failureReportReCAPCSVRecords);
         }
         return map;
     }
@@ -109,7 +110,7 @@ public class BibPersisterCallable implements Callable {
     private Map<String, Object> processAndValidateBibliographicEntity(Integer owningInstitutionId) {
         Map<String, Object> map = new HashMap<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        LoadReportEntity loadReportEntity = null;
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = null;
         StringBuffer errorMessage = new StringBuffer();
 
         Bib bib = bibRecord.getBib();
@@ -147,17 +148,17 @@ public class BibPersisterCallable implements Callable {
         }
 
         if (errorMessage.toString().length() > 1) {
-            loadReportEntity = getLoadReportUtil().populateBibInfo(bibliographicEntity);
-            loadReportEntity.setErrorDescription(errorMessage.toString());
+            failureReportReCAPCSVRecord = getLoadReportUtil().populateBibInfo(bibliographicEntity);
+            failureReportReCAPCSVRecord.setErrorDescription(errorMessage.toString());
         }
         map.put("bibliographicEntity", bibliographicEntity);
-        map.put("loadReportEntity", loadReportEntity);
+        map.put("failureReportReCAPCSVRecord", failureReportReCAPCSVRecord);
         return map;
     }
 
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Holding holdingEnt, CollectionType holdingContentCollection) {
         StringBuffer errorMessage = new StringBuffer();
-        LoadReportEntity loadReportEntity = null;
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = null;
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
 
@@ -184,17 +185,17 @@ public class BibPersisterCallable implements Callable {
 
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstituionHoldingsId);
         if (errorMessage.toString().length() > 1) {
-            loadReportEntity = getLoadReportUtil().populateBibHoldingsInfo(bibliographicEntity, holdingsEntity);
-            loadReportEntity.setErrorDescription(errorMessage.toString());
+            failureReportReCAPCSVRecord = getLoadReportUtil().populateBibHoldingsInfo(bibliographicEntity, holdingsEntity);
+            failureReportReCAPCSVRecord.setErrorDescription(errorMessage.toString());
         }
         map.put("holdingsEntity", holdingsEntity);
-        map.put("loadReportEntity", loadReportEntity);
+        map.put("failureReportReCAPCSVRecord", failureReportReCAPCSVRecord);
         return map;
     }
 
     private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, String holdingsCallNumberType, RecordType itemRecordType) {
         StringBuffer errorMessage = new StringBuffer();
-        LoadReportEntity loadReportEntity = null;
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = null;
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
 
@@ -251,11 +252,11 @@ public class BibPersisterCallable implements Callable {
         itemEntity.setHoldingsEntity(holdingsEntity);
 
         if (errorMessage.toString().length() > 1) {
-            loadReportEntity = getLoadReportUtil().populateBibHoldingsItemInfo(bibliographicEntity, itemEntity.getHoldingsEntity(), itemEntity);
-            loadReportEntity.setErrorDescription(errorMessage.toString());
+            failureReportReCAPCSVRecord = getLoadReportUtil().populateBibHoldingsItemInfo(bibliographicEntity, itemEntity.getHoldingsEntity(), itemEntity);
+            failureReportReCAPCSVRecord.setErrorDescription(errorMessage.toString());
         }
         map.put("itemEntity", itemEntity);
-        map.put("loadReportEntity", loadReportEntity);
+        map.put("failureReportReCAPCSVRecord", failureReportReCAPCSVRecord);
         return map;
     }
 

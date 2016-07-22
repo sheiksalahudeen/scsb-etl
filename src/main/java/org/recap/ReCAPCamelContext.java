@@ -2,15 +2,18 @@ package org.recap;
 
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.seda.SedaComponent;
 import org.recap.repository.XmlRecordRepository;
 import org.recap.route.FTPRouteBuilder;
-import org.recap.route.JMSReportRouteBuilder;
+import org.recap.route.CSVRouteBuilder;
 import org.recap.route.XmlRouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.cdi.Eager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +37,7 @@ public class ReCAPCamelContext {
     private String ftpKnownHost;
     private String ftpPrivateKey;
 
-    private JMSReportRouteBuilder jmsReportRouteBuilder;
+    private CSVRouteBuilder csvRouteBuilder;
     private XmlRouteBuilder xmlRouteBuilder;
     private FTPRouteBuilder ftpRouteBuilder;
 
@@ -76,15 +79,16 @@ public class ReCAPCamelContext {
 
     public void addDefaultRoutes() throws Exception {
         addRoutes(getXmlRouteBuilder());
-        addRoutes(getJMSReportBuilder());
+        addRoutes(getCSVRouteBuilder());
         addRoutes(getFtpRouteBuilder());
     }
 
-    private JMSReportRouteBuilder getJMSReportBuilder() {
-        if (null == jmsReportRouteBuilder) {
-            jmsReportRouteBuilder = new JMSReportRouteBuilder();
+    private CSVRouteBuilder getCSVRouteBuilder() {
+        if (null == csvRouteBuilder) {
+            csvRouteBuilder = new CSVRouteBuilder();
+            csvRouteBuilder.setReportDirectoryPath(reportsDirectory);
         }
-        return jmsReportRouteBuilder;
+        return csvRouteBuilder;
     }
 
     private void addComponents() {

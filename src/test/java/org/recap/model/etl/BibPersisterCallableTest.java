@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
+import org.recap.model.csv.FailureReportReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
@@ -75,7 +77,7 @@ public class BibPersisterCallableTest extends BaseTestCase {
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
 
-        List<LoadReportEntity> loadReportEntities = new ArrayList<>();
+        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
 
         Map<String, Integer> institution = new HashMap<>();
         institution.put("NYPL", 3);
@@ -101,15 +103,17 @@ public class BibPersisterCallableTest extends BaseTestCase {
         bibPersisterCallable.setBibRecord(bibRecord);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
-            Object object = map.get("loadReportEntity");
+            Object object = map.get("failureReportReCAPCSVRecord");
             if (object != null) {
-                loadReportEntities.addAll((List<LoadReportEntity>) object);
+                failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) object);
             }
         }
 
-        assertEquals(loadReportEntities.size(), 1);
-        if (!CollectionUtils.isEmpty(loadReportEntities)) {
-//            csvUtil.writeLoadReportToCsv(loadReportEntities);
+        assertEquals(failureReportReCAPCSVRecords.size(), 1);
+        if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
+            ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
+            producer.sendBody("seda:etlReportQ", reCAPCSVRecord);
         }
     }
 
