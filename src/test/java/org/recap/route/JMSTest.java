@@ -9,6 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -73,7 +74,7 @@ public class JMSTest extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("seda:start").process(new DateProcessor()).marshal().bindy(BindyType.Csv, FailureReportReCAPCSVRecord.class).process(new CSVHeaderProcessor()).to("file:"+reportDirectoryPath+"?fileName=${in.header.reportFileName}-${date:now:ddMMMyyyy}&fileExist=append");
+                from("seda:start").process(new FileNameProcessor()).marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class).to("file:"+reportDirectoryPath+"?fileName=${in.header.reportFileName}-${date:now:ddMMMyyyy}&fileExist=append");
             }
         });
 
@@ -87,7 +88,22 @@ public class JMSTest extends BaseTestCase {
         failureReportReCAPCSVRecord.setExceptionMessage("Holdings Id is null");
         failureReportReCAPCSVRecord.setFileName("recap_records2.xml");
 
-        producer.sendBody("seda:start", failureReportReCAPCSVRecord);
+
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord1 = new FailureReportReCAPCSVRecord();
+        failureReportReCAPCSVRecord1.setTitle("History of Science");
+        failureReportReCAPCSVRecord1.setOwningInstitutionHoldingsId("1231");
+        failureReportReCAPCSVRecord1.setOwningInstitution("PUL");
+        failureReportReCAPCSVRecord1.setOwningInstitutionBibId("123");
+        failureReportReCAPCSVRecord1.setCollectionGroupDesignation("Open");
+        failureReportReCAPCSVRecord1.setCreateDateItem(new Date());
+        failureReportReCAPCSVRecord1.setExceptionMessage("Item Id is null");
+        failureReportReCAPCSVRecord1.setFileName("recap_records2.xml");
+
+
+        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord, failureReportReCAPCSVRecord1));
+
+        producer.sendBody("seda:start", reCAPCSVRecord);
 
         Thread.sleep(3000);
 
@@ -172,19 +188,12 @@ public class JMSTest extends BaseTestCase {
         assertTrue(new File(fileName).exists());
     }
 
-   public class DateProcessor implements Processor {
+   public class FileNameProcessor implements Processor {
        @Override
        public void process(Exchange exchange) throws Exception {
-           FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) exchange.getIn().getBody();
-           String fileName = FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName());
+           ReCAPCSVRecord reCAPCSVRecord = (ReCAPCSVRecord) exchange.getIn().getBody();
+           String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFailureReportReCAPCSVRecordList().get(0).getFileName());
            exchange.getIn().setHeader("reportFileName", fileName);
        }
    }
-
-    public class CSVHeaderProcessor implements Processor {
-        @Override
-        public void process(Exchange exchange) throws Exception {
-            System.out.println();
-        }
-    }
 }

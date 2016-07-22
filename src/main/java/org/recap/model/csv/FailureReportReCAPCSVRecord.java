@@ -2,6 +2,7 @@ package org.recap.model.csv;
 
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
+import org.apache.camel.dataformat.bindy.annotation.Link;
 
 import java.util.Date;
 
@@ -9,6 +10,7 @@ import java.util.Date;
  * Created by peris on 7/21/16.
  */
 
+@Link
 @CsvRecord(generateHeaderColumns = true, separator = ",", crlf = "UNIX")
 public class FailureReportReCAPCSVRecord  {
     @DataField(pos = 1)
