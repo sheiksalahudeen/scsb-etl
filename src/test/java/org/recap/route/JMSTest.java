@@ -2,15 +2,12 @@ package org.recap.route;
 
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.dataformat.csv.CsvDataFormat;
 import org.apache.camel.model.dataformat.BindyType;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVRecord;
-import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -20,7 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -164,27 +164,31 @@ public class JMSTest extends BaseTestCase {
     public void produceAndConsumeEtlReportQ() throws Exception {
         Random random = new Random();
 
-        LoadReportEntity loadReportEntity = new LoadReportEntity();
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
         String owningInstitution = String.valueOf(random.nextInt());
-        loadReportEntity.setOwningInstitution(owningInstitution);
-        loadReportEntity.setOwningInstitutionBibId("1111");
-        loadReportEntity.setOwningInstitutionHoldingsId("2222");
-        loadReportEntity.setLocalItemId("333333333");
-        loadReportEntity.setItemBarcode("4444");
-        loadReportEntity.setCustomerCode("PA");
-        loadReportEntity.setTitle("title");
-        loadReportEntity.setCollectionGroupDesignation("open");
-        loadReportEntity.setCreateDateItem(new Date());
-        loadReportEntity.setLastUpdatedDateItem(new Date());
-        loadReportEntity.setExceptionMessage("exception");
-        loadReportEntity.setErrorDescription("error");
+        failureReportReCAPCSVRecord.setOwningInstitution(owningInstitution);
+        failureReportReCAPCSVRecord.setOwningInstitutionBibId("1111");
+        failureReportReCAPCSVRecord.setOwningInstitutionHoldingsId("2222");
+        failureReportReCAPCSVRecord.setLocalItemId("333333333");
+        failureReportReCAPCSVRecord.setItemBarcode("4444");
+        failureReportReCAPCSVRecord.setCustomerCode("PA");
+        failureReportReCAPCSVRecord.setTitle("title");
+        failureReportReCAPCSVRecord.setCollectionGroupDesignation("open");
+        failureReportReCAPCSVRecord.setCreateDateItem(new Date());
+        failureReportReCAPCSVRecord.setLastUpdatedDateItem(new Date());
+        failureReportReCAPCSVRecord.setExceptionMessage("exception");
+        failureReportReCAPCSVRecord.setErrorDescription("error");
+        failureReportReCAPCSVRecord.setFileName("recap_records1.xml");
 
-        producer.sendBody("activemq:queue:etlReportQ", Arrays.asList(loadReportEntity));
+        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
+
+        producer.sendBody("activemq:queue:etlReportQ", reCAPCSVRecord);
 
         Thread.sleep(1000);
 
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        String fileName = reportDirectoryPath + File.separator + owningInstitution + "_" + df.format(new Date()) + ".csv";
+        DateFormat df = new SimpleDateFormat("ddMMMyyyy");
+        String fileName = FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-" + df.format(new Date());
         assertTrue(new File(fileName).exists());
     }
 

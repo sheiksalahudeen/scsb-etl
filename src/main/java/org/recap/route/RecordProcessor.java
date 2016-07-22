@@ -1,8 +1,9 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
+import org.recap.model.csv.FailureReportReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.etl.BibPersisterCallable;
-import org.recap.model.etl.LoadReportEntity;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.*;
@@ -81,15 +82,15 @@ public class RecordProcessor {
     private void processFutureResults(Object object) {
         Map<String, Object> resultMap = (Map<String, Object>) object;
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-        List<LoadReportEntity> loadReportEntities = new ArrayList<>();
+        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
 
         if (object != null) {
             Object bibliographicEntity = resultMap.get("bibliographicEntity");
-            Object loadReportEntity = resultMap.get("loadReportEntity");
+            Object failureReportReCAPCSVRecord = resultMap.get("failureReportReCAPCSVRecord");
             if (bibliographicEntity != null) {
                 bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
-            } else if (loadReportEntity != null) {
-                loadReportEntities.addAll((List<LoadReportEntity>) loadReportEntity);
+            } else if (failureReportReCAPCSVRecord != null) {
+                failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) failureReportReCAPCSVRecord);
             }
         }
 
@@ -102,8 +103,10 @@ public class RecordProcessor {
         }
 
 
-        if (!CollectionUtils.isEmpty(loadReportEntities)) {
-            producer.sendBody("activemq:queue:etlReportQ", loadReportEntities);
+        if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
+            ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
+            producer.sendBody("seda:etlReportQ", reCAPCSVRecord);
         }
     }
 
