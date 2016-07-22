@@ -44,6 +44,18 @@ public class JMSTest extends BaseTestCase {
     @Value("${etl.report.directory}")
     private String reportDirectoryPath;
 
+    @Value("${ftp.userName}")
+    String ftpUserName;
+
+    @Value("${ftp.remote.server}")
+    String ftpRemoteServer;
+
+    @Value("${ftp.knownHost}")
+    String ftpKnownHost;
+
+    @Value("${ftp.privateKey}")
+    String ftpPrivateKey;
+
     @Test
     public void produceAndConsumeSEDA() throws Exception {
         assertNotNull(producer);
@@ -59,106 +71,14 @@ public class JMSTest extends BaseTestCase {
 
     @Test
     public void uploadToFTP() throws Exception {
-        assertNotNull(producer);
-        assertNotNull(consumer);
-
-        producer.sendBody("activemq:queue:ftpQ", "Hello World");
-
-        String body = consumer.receiveBody("seda:start", String.class);
-
-        assertEquals("Hello World", body);
-
-    }
-
-    @Test
-    public void csv() throws Exception {
-        camelContext.addRoutes(new RouteBuilder() {
+        camelContext.addRoutes((new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("seda:start").process(new FileNameProcessor()).marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class).to("file:"+reportDirectoryPath+"?fileName=${in.header.reportFileName}-${date:now:ddMMMyyyy}&fileExist=append");
+                from("file:"+reportDirectoryPath)
+                        .choice().when(simple("${in.header.CamelFileName} contains '*.xlsx'"))
+                        .to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost);
             }
-        });
-
-        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
-        failureReportReCAPCSVRecord.setTitle("History of Science");
-        failureReportReCAPCSVRecord.setOwningInstitutionHoldingsId("1231");
-        failureReportReCAPCSVRecord.setOwningInstitution("PUL");
-        failureReportReCAPCSVRecord.setOwningInstitutionBibId("123");
-        failureReportReCAPCSVRecord.setCollectionGroupDesignation("Open");
-        failureReportReCAPCSVRecord.setCreateDateItem(new Date());
-        failureReportReCAPCSVRecord.setExceptionMessage("Holdings Id is null");
-        failureReportReCAPCSVRecord.setFileName("recap_records2.xml");
-
-
-        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord1 = new FailureReportReCAPCSVRecord();
-        failureReportReCAPCSVRecord1.setTitle("History of Science");
-        failureReportReCAPCSVRecord1.setOwningInstitutionHoldingsId("1231");
-        failureReportReCAPCSVRecord1.setOwningInstitution("PUL");
-        failureReportReCAPCSVRecord1.setOwningInstitutionBibId("123");
-        failureReportReCAPCSVRecord1.setCollectionGroupDesignation("Open");
-        failureReportReCAPCSVRecord1.setCreateDateItem(new Date());
-        failureReportReCAPCSVRecord1.setExceptionMessage("Item Id is null");
-        failureReportReCAPCSVRecord1.setFileName("recap_records2.xml");
-
-
-        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord, failureReportReCAPCSVRecord1));
-
-        producer.sendBody("seda:start", reCAPCSVRecord);
-
-        Thread.sleep(3000);
-
-    }
-
-    @Test
-    public void produceAndConsumeEtlLoadQ() throws Exception {
-        Random random = new Random();
-        for (int i = 0; i < 100; i++) {
-            BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-            bibliographicEntity1.setBibliographicId(random.nextInt());
-            bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
-            bibliographicEntity1.setOwningInstitutionId(1);
-            bibliographicEntity1.setContent("mock Content".getBytes());
-            bibliographicEntity1.setCreatedDate(new Date());
-            bibliographicEntity1.setCreatedBy("etl-test");
-            bibliographicEntity1.setLastUpdatedBy("etl-test");
-            bibliographicEntity1.setLastUpdatedDate(new Date());
-
-
-            HoldingsEntity holdingsEntity = new HoldingsEntity();
-            holdingsEntity.setContent("mock holding content".getBytes());
-            holdingsEntity.setCreatedDate(new Date());
-            holdingsEntity.setCreatedBy("etl-test");
-            holdingsEntity.setLastUpdatedDate(new Date());
-            holdingsEntity.setLastUpdatedBy("etl-test");
-
-            ItemEntity itemEntity = new ItemEntity();
-            itemEntity.setBarcode("b.123");
-            itemEntity.setCollectionGroupId(1);
-            itemEntity.setCreatedDate(new Date());
-            itemEntity.setCreatedBy("etl-test");
-            itemEntity.setLastUpdatedBy("etl-test");
-            itemEntity.setLastUpdatedDate(new Date());
-            itemEntity.setOwningInstitutionId(1);
-            itemEntity.setCustomerCode("PA");
-            itemEntity.setOwningInstitutionItemId("123");
-            itemEntity.setItemAvailabilityStatusId(1);
-            itemEntity.setHoldingsEntity(holdingsEntity);
-
-            holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
-
-            bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
-            bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity));
-
-            ETLExchange etlExchange = new ETLExchange();
-            etlExchange.setBibliographicEntities(Arrays.asList(bibliographicEntity1));
-            etlExchange.setInstitutionEntityMap(new HashMap());
-            etlExchange.setCollectionGroupMap(new HashMap());
-
-            producer.sendBody("activemq:queue:etlLoadQ", etlExchange);
-        }
-
-        Thread.sleep(5000);
+        }));
     }
 
     @Test
@@ -184,13 +104,13 @@ public class JMSTest extends BaseTestCase {
         ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
         reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("activemq:queue:etlReportQ", reCAPCSVRecord);
+        producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
 
         Thread.sleep(1000);
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
-        String fileName = FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-" + df.format(new Date());
-        assertTrue(new File(fileName).exists());
+        String fileName = "FailureReport-"+FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-" + df.format(new Date());
+        assertTrue(new File(reportDirectoryPath+fileName).exists());
     }
 
    public class FileNameProcessor implements Processor {
