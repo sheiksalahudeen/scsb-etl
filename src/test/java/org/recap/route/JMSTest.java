@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVRecord;
+import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -200,4 +201,16 @@ public class JMSTest extends BaseTestCase {
            exchange.getIn().setHeader("reportFileName", fileName);
        }
    }
+
+    @Test
+    public void generateSuccessReport() throws Exception {
+        SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
+        successReportReCAPCSVRecord.setFileName("scsb-records1.xml");
+        successReportReCAPCSVRecord.setTotalRecordsInFile(1000);
+        successReportReCAPCSVRecord.setTotalBibsLoaded(900);;
+        successReportReCAPCSVRecord.setTotalHoldingsLoaded(800);
+        successReportReCAPCSVRecord.setTotalItemsLoaded(1000);
+        producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
+        Thread.sleep(1000);
+    }
 }

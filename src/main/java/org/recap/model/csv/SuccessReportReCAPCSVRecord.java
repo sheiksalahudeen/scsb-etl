@@ -1,16 +1,23 @@
-package org.recap.model.etl;
+package org.recap.model.csv;
 
-import java.io.Serializable;
+import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
+import org.apache.camel.dataformat.bindy.annotation.DataField;
 
 /**
- * Created by angelind on 19/7/16.
+ * Created by angelind on 22/7/16.
  */
-public class SuccessReportEntity implements Serializable {
+@CsvRecord(generateHeaderColumns = true, separator = ",", crlf = "UNIX")
+public class SuccessReportReCAPCSVRecord {
 
+    @DataField(pos = 1)
     private String fileName;
+    @DataField(pos = 2)
     private Integer totalRecordsInFile;
+    @DataField(pos = 3)
     private Integer totalBibsLoaded;
+    @DataField(pos = 4)
     private Integer totalHoldingsLoaded;
+    @DataField(pos = 5)
     private Integer totalItemsLoaded;
 
     public String getFileName() {
