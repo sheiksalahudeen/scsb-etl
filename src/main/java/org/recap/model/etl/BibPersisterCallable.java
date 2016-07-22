@@ -209,7 +209,7 @@ public class BibPersisterCallable implements Callable {
             errorMessage.append("Item Barcode cannot be null");
         }
         String customerCode = getMarcUtil().getDataFieldValue(itemRecordType, "900", null, null, "b");
-        if (StringUtils.isNotBlank(itemEntity.getCustomerCode())) {
+        if (StringUtils.isNotBlank(customerCode)) {
             itemEntity.setCustomerCode(customerCode);
         } else {
             errorMessage.append("\n");
