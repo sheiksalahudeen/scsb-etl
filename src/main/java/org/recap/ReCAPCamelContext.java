@@ -2,18 +2,14 @@ package org.recap;
 
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.seda.SedaComponent;
 import org.recap.repository.XmlRecordRepository;
-import org.recap.route.FTPRouteBuilder;
 import org.recap.route.CSVRouteBuilder;
 import org.recap.route.XmlRouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.cdi.Eager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,14 +28,9 @@ public class ReCAPCamelContext {
     private Integer poolSize;
     private Integer maxPoolSize;
     private String reportsDirectory;
-    private String ftpRemoteServer;
-    private String ftpUserName;
-    private String ftpKnownHost;
-    private String ftpPrivateKey;
 
     private CSVRouteBuilder csvRouteBuilder;
     private XmlRouteBuilder xmlRouteBuilder;
-    private FTPRouteBuilder ftpRouteBuilder;
 
 
     @Autowired
@@ -47,9 +38,7 @@ public class ReCAPCamelContext {
                              @Value("${etl.split.xml.tag.name}") String xmlTagName,
                              @Value("${etl.load.directory}") String inputDirectoryPath,
                              @Value("${etl.pool.size}") Integer poolSize, @Value("${etl.max.pool.size}") Integer maxPoolSize,
-                             @Value("${etl.report.directory}") String reportsDirectory, @Value("${ftp.userName}") String ftpUserName,
-                             @Value("${ftp.remote.server}") String ftpRemoteServer, @Value("${ftp.knownHost}") String ftpKnownHost,
-                             @Value("${ftp.privateKey}") String ftpPrivateKey) {
+                             @Value("${etl.report.directory}") String reportsDirectory) {
         this.context = context;
         this.xmlRecordRepository = xmlRecordRepository;
         this.xmlTagName = xmlTagName;
@@ -57,10 +46,6 @@ public class ReCAPCamelContext {
         this.poolSize = poolSize;
         this.maxPoolSize = maxPoolSize;
         this.reportsDirectory = reportsDirectory;
-        this.ftpRemoteServer = ftpRemoteServer;
-        this.ftpUserName = ftpUserName;
-        this.ftpKnownHost = ftpKnownHost;
-        this.ftpPrivateKey = ftpPrivateKey;
         init();
     }
 
@@ -80,7 +65,6 @@ public class ReCAPCamelContext {
     public void addDefaultRoutes() throws Exception {
         addRoutes(getXmlRouteBuilder());
         addRoutes(getCSVRouteBuilder());
-        addRoutes(getFtpRouteBuilder());
     }
 
     private CSVRouteBuilder getCSVRouteBuilder() {
@@ -105,17 +89,5 @@ public class ReCAPCamelContext {
             xmlRouteBuilder.setXmlRecordRepository(xmlRecordRepository);
         }
         return xmlRouteBuilder;
-    }
-
-    public RouteBuilder getFtpRouteBuilder() {
-        if(null == ftpRouteBuilder) {
-            ftpRouteBuilder = new FTPRouteBuilder();
-            ftpRouteBuilder.setFtpKnownHost(ftpKnownHost);
-            ftpRouteBuilder.setFtpPrivateKey(ftpPrivateKey);
-            ftpRouteBuilder.setFtpRemoteServer(ftpRemoteServer);
-            ftpRouteBuilder.setFtpUserName(ftpUserName);
-            ftpRouteBuilder.setReportsDirectory(reportsDirectory);
-        }
-        return ftpRouteBuilder;
     }
 }

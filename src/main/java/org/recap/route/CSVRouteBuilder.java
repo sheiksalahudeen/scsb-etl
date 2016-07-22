@@ -25,7 +25,7 @@ public class CSVRouteBuilder extends RouteBuilder {
         from("seda:etlFailureReportQ")
                 .routeId("failureReportQRoute")
                 .process(new CSVFileNameProcessor()).marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
-                .to("file:"+reportDirectoryPath+"?fileName=${in.header.reportFileName}-${date:now:ddMMMyyyy}&fileExist=append");
+                .to("file:"+reportDirectoryPath+"?fileName=FailureReport-${in.header.reportFileName}-${date:now:ddMMMyyyy}&fileExist=append");
 
         from("seda:etlSuccessReportQ")
                 .routeId("successReportQRoute")
