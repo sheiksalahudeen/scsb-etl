@@ -106,7 +106,7 @@ public class RecordProcessor {
         if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
             ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
             reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-            producer.sendBody("seda:etlReportQ", reCAPCSVRecord);
+            producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
         }
     }
 

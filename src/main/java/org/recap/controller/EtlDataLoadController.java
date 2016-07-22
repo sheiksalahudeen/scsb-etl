@@ -1,10 +1,11 @@
 package org.recap.controller;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.etl.EtlLoadRequest;
-import org.recap.model.etl.SuccessReportEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
 import org.recap.repository.ItemDetailsRepository;
@@ -61,6 +62,9 @@ public class EtlDataLoadController {
     @Autowired
     RecordProcessor recordProcessor;
 
+    @Autowired
+    ProducerTemplate producer;
+
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
@@ -90,7 +94,7 @@ public class EtlDataLoadController {
     }
 
     private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName) {
-        SuccessReportEntity successReportEntity = new SuccessReportEntity();
+        SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
         long newBibsCount = bibliographicDetailsRepository.count();
         long newHoldingsCount = holdingsDetailsRepository.count();
         long newItemsCount = itemDetailsRepository.count();
@@ -98,12 +102,12 @@ public class EtlDataLoadController {
         Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
         Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
         Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
-        successReportEntity.setFileName(fileName);
-        successReportEntity.setTotalRecordsInFile(totalRecordsInfile);
-        successReportEntity.setTotalBibsLoaded(processedBibsCount);
-        successReportEntity.setTotalHoldingsLoaded(processedHoldingsCount);
-        successReportEntity.setTotalItemsLoaded(processedItemsCount);
-//        csvUtil.writeSuccessReportToCsv(successReportEntity);
+        successReportReCAPCSVRecord.setFileName(fileName);
+        successReportReCAPCSVRecord.setTotalRecordsInFile(totalRecordsInfile);
+        successReportReCAPCSVRecord.setTotalBibsLoaded(processedBibsCount);
+        successReportReCAPCSVRecord.setTotalHoldingsLoaded(processedHoldingsCount);
+        successReportReCAPCSVRecord.setTotalItemsLoaded(processedItemsCount);
+        producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
     }
 
     @ResponseBody
