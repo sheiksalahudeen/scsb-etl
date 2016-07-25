@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by rajeshbabuk on 20/7/16.
  */
-public class UnicodeRecordSaveTest extends BaseTestCase {
+public class UnicodeRecordSaveUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;

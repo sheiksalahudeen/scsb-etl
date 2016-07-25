@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class ProcessETLTest extends BaseTestCase {
+public class ProcessETLUT extends BaseTestCase {
 
     @Autowired
     CamelContext camelContext;

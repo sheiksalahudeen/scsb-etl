@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by chenchulakshmig on 14/7/16.
  */
-public class CollectionGroupDetailsRepositoryTest extends BaseTestCase {
+public class CollectionGroupDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired
     CollectionGroupDetailsRepository collectionGroupDetailsRepository;

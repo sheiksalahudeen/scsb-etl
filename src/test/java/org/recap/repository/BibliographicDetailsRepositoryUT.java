@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class BibliographicDetailsRepositoryTest extends BaseTestCase {
+public class BibliographicDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;

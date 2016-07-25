@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 /**
  * Created by peris on 7/17/16.
  */
-public class XmlRecordRepositoryTest extends BaseTestCase {
+public class XmlRecordRepositoryUT extends BaseTestCase {
     @Autowired
     XmlRecordRepository xmlRecordRepository;
 

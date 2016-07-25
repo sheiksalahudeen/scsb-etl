@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by chenchulakshmig on 14/7/16.
  */
-public class EtlDataLoadControllerTest extends BaseTestCase {
+public class EtlDataLoadControllerUT extends BaseTestCase {
 
     @Autowired
     EtlDataLoadController etlDataLoadController;

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 21/7/16.
  */
-public class EtlGfaEntityTest extends BaseTestCase {
+public class EtlGfaEntityUT extends BaseTestCase {
 
     @Autowired
     EtlGfaRepository etlGfaRepository;
