@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class JAXBHandlerTest {
+public class JAXBHandlerUT {
 
     @Test
     public void marshal() throws Exception {

@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
  */
 
 @Ignore
-public class CamelJdbcTest extends BaseTestCase {
+public class CamelJdbcUT extends BaseTestCase {
 
     @Value("${etl.split.xml.tag.name}")
     String xmlTagName;

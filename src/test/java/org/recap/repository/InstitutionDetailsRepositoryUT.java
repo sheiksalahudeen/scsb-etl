@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by pvsubrah on 6/22/16.
  */
-public class InstitutionDetailsRepositoryTest extends BaseTestCase {
+public class InstitutionDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;

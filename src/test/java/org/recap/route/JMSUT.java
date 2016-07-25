@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by pvsubrah on 6/24/16.
  */
-public class JMSTest extends BaseTestCase {
+public class JMSUT extends BaseTestCase {
 
     @Autowired
     private ProducerTemplate producer;

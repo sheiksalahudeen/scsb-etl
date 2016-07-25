@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 /**
  * Created by angelind on 21/7/16.
  */
-public class FTPRouteBuilderTest extends BaseTestCase{
+public class FTPRouteBuilderUT extends BaseTestCase{
 
     @Test
     public void uploadFileToFTP() throws Exception {

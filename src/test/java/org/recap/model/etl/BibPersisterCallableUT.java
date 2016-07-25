@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * Created by chenchulakshmig on 1/7/16.
  */
-public class BibPersisterCallableTest extends BaseTestCase {
+public class BibPersisterCallableUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
