@@ -38,6 +38,7 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         XmlRecordEntity savedEntity = xmlRecordRepository.save(xmlRecordEntity);
 
         XmlRecordEntity byId = xmlRecordRepository.findById(savedEntity.getId());
+        assertEquals(new String(byId.getXml()),"mock xml content");
         System.out.println(new String(byId.getXml()));
     }
 
