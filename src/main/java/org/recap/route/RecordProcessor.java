@@ -61,6 +61,9 @@ public class RecordProcessor {
     public void process(Page<XmlRecordEntity> xmlRecordEntities) {
         logger.info("Processor: " + Thread.currentThread().getName());
 
+        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
+
         List<Future> futures = prepareFutureTasks(xmlRecordEntities);
 
         for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
@@ -74,24 +77,7 @@ public class RecordProcessor {
                 logger.error(e.getMessage());
             }
 
-            processFutureResults(object);
-        }
-
-    }
-
-    private void processFutureResults(Object object) {
-        Map<String, Object> resultMap = (Map<String, Object>) object;
-        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
-
-        if (object != null) {
-            Object bibliographicEntity = resultMap.get("bibliographicEntity");
-            Object failureReportReCAPCSVRecord = resultMap.get("failureReportReCAPCSVRecord");
-            if (bibliographicEntity != null) {
-                bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
-            } else if (failureReportReCAPCSVRecord != null) {
-                failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) failureReportReCAPCSVRecord);
-            }
+            processFutureResults(object, bibliographicEntities, failureReportReCAPCSVRecords);
         }
 
         if (!CollectionUtils.isEmpty(bibliographicEntities)) {
@@ -107,6 +93,21 @@ public class RecordProcessor {
             ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
             reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
             producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
+        }
+
+    }
+
+    private void processFutureResults(Object object, List<BibliographicEntity> bibliographicEntities, List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords) {
+        Map<String, Object> resultMap = (Map<String, Object>) object;
+
+        if (object != null) {
+            Object bibliographicEntity = resultMap.get("bibliographicEntity");
+            Object failureReportReCAPCSVRecord = resultMap.get("failureReportReCAPCSVRecord");
+            if (bibliographicEntity != null) {
+                bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
+            } else if (failureReportReCAPCSVRecord != null) {
+                failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) failureReportReCAPCSVRecord);
+            }
         }
     }
 
