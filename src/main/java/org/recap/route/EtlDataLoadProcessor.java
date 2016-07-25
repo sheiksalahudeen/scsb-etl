@@ -41,7 +41,7 @@ public class EtlDataLoadProcessor {
             for (int i = 0; i < loopCount; i++) {
                 long startTime = System.currentTimeMillis();
                 if (StringUtils.isNotBlank(fileName)) {
-                    xmlRecordEntities = xmlRecordRepository.findByXmlFileNameContaining(new PageRequest(i, batchSize), fileName);
+                    xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), fileName);
                 } else {
                     xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, batchSize));
                 }
