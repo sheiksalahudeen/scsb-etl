@@ -26,6 +26,11 @@ apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 apply plugin: 'net.saliman.cobertura'
 
+//added to accept systemproperties while executing gradlew test cmd
+test {
+	systemProperties = System.properties
+}
+
 jar {
 	baseName = 'scsb-etl'
 	version = '0.0.1-SNAPSHOT'
