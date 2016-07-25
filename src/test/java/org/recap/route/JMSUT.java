@@ -44,18 +44,6 @@ public class JMSUT extends BaseTestCase {
     @Value("${etl.report.directory}")
     private String reportDirectoryPath;
 
-    @Value("${ftp.userName}")
-    String ftpUserName;
-
-    @Value("${ftp.remote.server}")
-    String ftpRemoteServer;
-
-    @Value("${ftp.knownHost}")
-    String ftpKnownHost;
-
-    @Value("${ftp.privateKey}")
-    String ftpPrivateKey;
-
     @Test
     public void produceAndConsumeSEDA() throws Exception {
         assertNotNull(producer);
@@ -67,18 +55,6 @@ public class JMSUT extends BaseTestCase {
 
         assertEquals("Hello World", body);
 
-    }
-
-    @Test
-    public void uploadToFTP() throws Exception {
-        camelContext.addRoutes((new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("file:"+reportDirectoryPath)
-                        .choice().when(simple("${in.header.CamelFileName} contains '*.xlsx'"))
-                        .to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost);
-            }
-        }));
     }
 
     @Test
@@ -110,7 +86,7 @@ public class JMSUT extends BaseTestCase {
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
         String fileName = "FailureReport-"+FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-" + df.format(new Date());
-        assertTrue(new File(reportDirectoryPath+fileName).exists());
+        assertTrue(new File(reportDirectoryPath + File.separator + fileName).exists());
     }
 
    public class FileNameProcessor implements Processor {

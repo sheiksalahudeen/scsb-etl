@@ -14,6 +14,7 @@ import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.route.BibDataProcessor;
 import org.recap.route.ETLExchange;
@@ -87,6 +88,9 @@ public class BibPersisterCallableUT extends BaseTestCase {
         collection.put("Open", 2);
         Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
 
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXmlFileName("BibWithoutItemBarcode.xml");
+
         URL resource = getClass().getResource("BibWithoutItemBarcode.xml");
         assertNotNull(resource);
         File file = new File(resource.toURI());
@@ -100,6 +104,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setItemStatusMap(itemStatusMap);
         bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
@@ -109,7 +114,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
             }
         }
 
-        assertEquals(failureReportReCAPCSVRecords.size(), 1);
+        assertNotEquals(failureReportReCAPCSVRecords.size(), 0);
         if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
             ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
             reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
@@ -131,6 +136,9 @@ public class BibPersisterCallableUT extends BaseTestCase {
         collection.put("Open", 2);
         Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
 
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXmlFileName("BibHoldingsMultipleItems.xml");
+
         URL resource = getClass().getResource("BibHoldingsMultipleItems.xml");
         assertNotNull(resource);
         File file = new File(resource.toURI());
@@ -146,6 +154,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setItemStatusMap(itemStatusMap);
         bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord1);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
@@ -190,6 +199,9 @@ public class BibPersisterCallableUT extends BaseTestCase {
         collection.put("Open", 2);
         Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
 
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXmlFileName("BibMultipleHoldingsItems.xml");
+
         URL resource = getClass().getResource("BibMultipleHoldingsItems.xml");
         assertNotNull(resource);
         File file = new File(resource.toURI());
@@ -205,6 +217,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setItemStatusMap(itemStatusMap);
         bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
@@ -226,9 +239,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         etlExchange.setInstitutionEntityMap(new HashMap());
         etlExchange.setCollectionGroupMap(new HashMap());
 
-        producer.sendBody("activemq:queue:etlLoadQ", etlExchange);
-
-        Thread.sleep(1000);
+        bibDataProcessor.processETLExchagneAndPersistToDB(etlExchange);
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         assertNotNull(savedBibliographicEntity);
