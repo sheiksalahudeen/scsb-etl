@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -97,8 +98,9 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         Long countAfterAdd = itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
         assertTrue(countAfterAdd > count);
 
-        ItemEntity byOwningInstitutionId = itemDetailsRepository.findByOwningInstitutionId(owningInstitutionId);
+        List<ItemEntity> byOwningInstitutionId = itemDetailsRepository.findByOwningInstitutionId(owningInstitutionId);
         assertNotNull(byOwningInstitutionId);
+        assertTrue(byOwningInstitutionId.size() > 0);
 
         ItemEntity byOwningInstitutionItemId = itemDetailsRepository.findByOwningInstitutionItemId(owningInstitutionItemId);
         assertNotNull(byOwningInstitutionItemId);
