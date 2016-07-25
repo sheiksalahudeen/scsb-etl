@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 /**
  * Created by chenchulakshmig on 21/6/16.
  */
@@ -16,7 +18,7 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
 
     Page<ItemEntity> findByOwningInstitutionId(Pageable pageable, Integer owningInstitutionId);
 
-    ItemEntity findByOwningInstitutionId(Integer owningInstitutionId);
+    List<ItemEntity> findByOwningInstitutionId(Integer owningInstitutionId);
 
     ItemEntity findByOwningInstitutionItemId(String owningInstitutionItemId);
 
