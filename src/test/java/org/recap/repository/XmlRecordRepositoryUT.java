@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.nio.charset.Charset;
+import java.util.Date;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +29,16 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
 
     @Test
     public void findById() throws Exception {
-        XmlRecordEntity byId = xmlRecordRepository.findById(161355);
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXml("mock xml content".getBytes());
+        xmlRecordEntity.setOwningInst("1");
+        xmlRecordEntity.setOwningInstBibId("PUL");
+        xmlRecordEntity.setXmlFileName("mockfile.xml");
+        xmlRecordEntity.setDataLoaded(new Date());
+        XmlRecordEntity savedEntity = xmlRecordRepository.save(xmlRecordEntity);
+
+        XmlRecordEntity byId = xmlRecordRepository.findById(savedEntity.getId());
+        assertEquals(new String(byId.getXml()),"mock xml content");
         System.out.println(new String(byId.getXml()));
     }
 
