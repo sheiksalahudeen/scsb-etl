@@ -14,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Random;
 
@@ -58,7 +59,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getContent());
 
-        String fetchedBibContent = new String(fetchedBibliographicEntity.getContent());
+        String fetchedBibContent = new String(fetchedBibliographicEntity.getContent(), Charset.forName("UTF-8"));
         assertEquals(sourceBibContent, fetchedBibContent);
     }
 
