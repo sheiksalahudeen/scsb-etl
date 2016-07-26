@@ -41,7 +41,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setContent(sourceBibContent.getBytes("UTF-8"));
         bibliographicEntity.setOwningInstitutionId(3);
         String owningInstitutionBibId = String.valueOf(random.nextInt());
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
@@ -69,7 +69,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         String sourceBibXml = FileUtils.readFileToString(bibContentFile, "UTF-8");
 
         XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
-        xmlRecordEntity.setXml(sourceBibXml.getBytes());
+        xmlRecordEntity.setXml(sourceBibXml.getBytes("UTF-8"));
         xmlRecordEntity.setXmlFileName(fileName);
         xmlRecordEntity.setOwningInst("NYPL");
         xmlRecordEntity.setOwningInstBibId(".b160150577123");
