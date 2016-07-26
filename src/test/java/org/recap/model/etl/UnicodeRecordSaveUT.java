@@ -84,7 +84,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         assertNotNull(fetchedXmlRecordEntity);
         assertNotNull(fetchedXmlRecordEntity.getXml());
 
-        String fetchedBibXml = new String(fetchedXmlRecordEntity.getXml());
+        String fetchedBibXml = new String(fetchedXmlRecordEntity.getXml(), Charset.forName("UTF-8"));
         assertEquals(sourceBibXml, fetchedBibXml);
     }
 
