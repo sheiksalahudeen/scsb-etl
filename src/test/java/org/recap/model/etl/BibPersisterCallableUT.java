@@ -186,6 +186,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
     }
 
     @Test
+    @Ignore
     public void checkDataTruncateIssue() throws Exception {
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
