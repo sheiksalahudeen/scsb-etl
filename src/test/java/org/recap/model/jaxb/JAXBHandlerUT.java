@@ -48,7 +48,9 @@ public class JAXBHandlerUT {
         holdings.setHolding(Arrays.asList(holding1, holding2));
         holding2.setItems(Arrays.asList(items));
         bibRecord.setHoldings(Arrays.asList(holdings));
-        jaxbHandler.marshal(bibRecord);
+        String marshalledObject = jaxbHandler.marshal(bibRecord);
+        assertNotNull(marshalledObject);
+        System.out.println(marshalledObject);
     }
 
     @Test

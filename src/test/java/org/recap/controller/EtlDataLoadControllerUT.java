@@ -70,6 +70,7 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
 
         Thread.sleep(1000);
 
+        //TODO: Fix this to assert on the exact count.
         Long recordCount =  xmlRecordRepository.countByXmlFileName("SampleRecord.xml");
         assertNotEquals(recordCount,new Long(0));
     }

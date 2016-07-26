@@ -72,6 +72,8 @@ public class BibPersisterCallableUT extends BaseTestCase {
         assertNotNull(bibPersisterCallable);
     }
 
+    //TODO: Fix the test to remove the reporting check and put it in a new report test. Also, assert for the
+    //right count of failure records.
     @Test
     public void checkNullConstraints() throws Exception {
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
@@ -122,6 +124,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         }
     }
 
+    //TODO: Remove the test as it does not test the function of the BibPersisterCallable class and move it as appropriate.
     @Test
     public void loadBibHoldingsMultipleItems() throws Exception {
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
@@ -185,6 +188,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         assertEquals(savedBibliographicEntity.getItemEntities().size(), 5);
     }
 
+    //TODO: Remove the test as it does not test the function of the BibPersisterCallable class and move it as appropriate.
     @Test
     @Ignore
     public void checkDataTruncateIssue() throws Exception {
@@ -250,6 +254,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         assertEquals(savedBibliographicEntity.getItemEntities().size(), 3);
     }
 
+    //TODO: Remove the test as it does not test the function of the BibPersisterCallable class and move it as appropriate.
     //TODO : need to fix constraint in bibliographic_item_t
     @Test
     @Ignore
@@ -303,6 +308,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
 
     }
 
+    //TODO: Remove the test as it does not test the function of the BibPersisterCallable class and move it as appropriate.
     @Test
     @Ignore
     public void duplicateBibsWithDifferentItems() throws Exception {
