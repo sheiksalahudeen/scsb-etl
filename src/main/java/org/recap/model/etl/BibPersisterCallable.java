@@ -214,12 +214,7 @@ public class BibPersisterCallable implements Callable {
         }
         itemEntity.setCallNumber(holdingsCallNumber);
         itemEntity.setCallNumberType(holdingsCallNumberType);
-        String itemStatusValue = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "j");
-        if (StringUtils.isNotBlank(itemStatusValue) && itemStatusMap.containsKey(itemStatusValue)) {
-            itemEntity.setItemAvailabilityStatusId((Integer) itemStatusMap.get(itemStatusValue));
-        } else {
-            itemEntity.setItemAvailabilityStatusId((Integer) itemStatusMap.get("Available"));
-        }
+        itemEntity.setItemAvailabilityStatusId((Integer) itemStatusMap.get("Available"));
         String copyNumber = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "t");
         if (StringUtils.isNoneBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
             itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
