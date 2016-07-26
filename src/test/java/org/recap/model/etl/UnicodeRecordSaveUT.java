@@ -14,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Random;
 
@@ -41,7 +42,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setContent(sourceBibContent.getBytes("UTF-8"));
         bibliographicEntity.setOwningInstitutionId(3);
         String owningInstitutionBibId = String.valueOf(random.nextInt());
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
@@ -58,7 +59,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getContent());
 
-        String fetchedBibContent = new String(fetchedBibliographicEntity.getContent());
+        String fetchedBibContent = new String(fetchedBibliographicEntity.getContent(), Charset.forName("UTF-8"));
         assertEquals(sourceBibContent, fetchedBibContent);
     }
 
@@ -69,7 +70,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         String sourceBibXml = FileUtils.readFileToString(bibContentFile, "UTF-8");
 
         XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
-        xmlRecordEntity.setXml(sourceBibXml.getBytes());
+        xmlRecordEntity.setXml(sourceBibXml.getBytes("UTF-8"));
         xmlRecordEntity.setXmlFileName(fileName);
         xmlRecordEntity.setOwningInst("NYPL");
         xmlRecordEntity.setOwningInstBibId(".b160150577123");
@@ -83,7 +84,7 @@ public class UnicodeRecordSaveUT extends BaseTestCase {
         assertNotNull(fetchedXmlRecordEntity);
         assertNotNull(fetchedXmlRecordEntity.getXml());
 
-        String fetchedBibXml = new String(fetchedXmlRecordEntity.getXml());
+        String fetchedBibXml = new String(fetchedXmlRecordEntity.getXml(), Charset.forName("UTF-8"));
         assertEquals(sourceBibXml, fetchedBibXml);
     }
 
