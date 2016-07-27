@@ -7,8 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.etl.EtlLoadRequest;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by chenchulakshmig on 14/7/16.
@@ -70,9 +68,8 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
 
         Thread.sleep(1000);
 
-        //TODO: Fix this to assert on the exact count.
         Long recordCount =  xmlRecordRepository.countByXmlFileName("SampleRecord.xml");
-        assertNotEquals(recordCount,new Long(0));
+        assertTrue(recordCount == 1);
     }
 
 }
