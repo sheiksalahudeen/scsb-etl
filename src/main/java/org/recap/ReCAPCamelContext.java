@@ -28,6 +28,10 @@ public class ReCAPCamelContext {
     private Integer poolSize;
     private Integer maxPoolSize;
     private String reportsDirectory;
+    private String ftpPrivateKey;
+    private String ftpKnownHost;
+    private String ftpUserName;
+    private String ftpRemoteServer;
 
     private CSVRouteBuilder csvRouteBuilder;
     private XmlRouteBuilder xmlRouteBuilder;
@@ -38,7 +42,9 @@ public class ReCAPCamelContext {
                              @Value("${etl.split.xml.tag.name}") String xmlTagName,
                              @Value("${etl.load.directory}") String inputDirectoryPath,
                              @Value("${etl.pool.size}") Integer poolSize, @Value("${etl.max.pool.size}") Integer maxPoolSize,
-                             @Value("${etl.report.directory}") String reportsDirectory) {
+                             @Value("${etl.report.directory}") String reportsDirectory,
+                             @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.remote.server}") String ftpRemoteServer,
+                             @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
         this.context = context;
         this.xmlRecordRepository = xmlRecordRepository;
         this.xmlTagName = xmlTagName;
@@ -46,6 +52,10 @@ public class ReCAPCamelContext {
         this.poolSize = poolSize;
         this.maxPoolSize = maxPoolSize;
         this.reportsDirectory = reportsDirectory;
+        this.ftpUserName = ftpUserName;
+        this.ftpKnownHost = ftpKnownHost;
+        this.ftpPrivateKey = ftpPrivateKey;
+        this.ftpRemoteServer = ftpRemoteServer;
         init();
     }
 
@@ -71,6 +81,10 @@ public class ReCAPCamelContext {
         if (null == csvRouteBuilder) {
             csvRouteBuilder = new CSVRouteBuilder();
             csvRouteBuilder.setReportDirectoryPath(reportsDirectory);
+            csvRouteBuilder.setFtpUserName(ftpUserName);
+            csvRouteBuilder.setFtpRemoteServer(ftpRemoteServer);
+            csvRouteBuilder.setFtpPrivateKey(ftpPrivateKey);
+            csvRouteBuilder.setFtpKnownHost(ftpKnownHost);
         }
         return csvRouteBuilder;
     }

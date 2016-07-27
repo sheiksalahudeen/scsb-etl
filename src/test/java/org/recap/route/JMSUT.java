@@ -86,7 +86,7 @@ public class JMSUT extends BaseTestCase {
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
         String fileName = "FailureReport-"+FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-" + df.format(new Date());
-        assertTrue(new File(reportDirectoryPath + File.separator + fileName).exists());
+        assertTrue(new File(reportDirectoryPath + File.separator + fileName + ".csv").exists());
     }
 
    public class FileNameProcessor implements Processor {
@@ -108,5 +108,9 @@ public class JMSUT extends BaseTestCase {
         successReportReCAPCSVRecord.setTotalItemsLoaded(1000);
         producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
         Thread.sleep(1000);
+
+        DateFormat df = new SimpleDateFormat("ddMMMyyyy");
+        String fileName = "SuccessReport-" + df.format(new Date());
+        assertTrue(new File(reportDirectoryPath + File.separator + fileName + ".csv").exists());
     }
 }

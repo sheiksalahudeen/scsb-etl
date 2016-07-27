@@ -47,24 +47,24 @@ public class FTPRouteBuilderUT extends BaseTestCase{
         camelContext.addRoutes((new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:uploadFile")
+                from("seda:uploadFile")
                         .process(new FTPUploadFileProcessor())
                         .to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileNameToUpload}");
             }
         }));
-        producer.sendBody("direct:uploadFile", fileName);
+        producer.sendBody("seda:uploadFile", fileName);
 
         Thread.sleep(1000);
 
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:getFileContent")
+                from("seda:getFileContent")
                         .pollEnrich("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=uploadTestFileToFTP.csv");
             }
         });
 
-        String response = producer.requestBody("direct:getFileContent", "", String.class);
+        String response = producer.requestBody("seda:getFileContent", "", String.class);
 
         Thread.sleep(1000);
 
