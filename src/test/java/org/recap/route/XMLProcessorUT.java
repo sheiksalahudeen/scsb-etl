@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.XmlRecordEntity;
-import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,13 +20,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by pvsubrah on 6/21/16.
  */
-public class ProcessETLUT extends BaseTestCase {
+public class XMLProcessorUT extends BaseTestCase {
 
     @Autowired
     CamelContext camelContext;
@@ -62,8 +60,6 @@ public class ProcessETLUT extends BaseTestCase {
         Thread.sleep(10000);
 
         FileUtils.deleteDirectory(loadDir);
-
-
     }
 
     private File getInputFileEndPoint() throws URISyntaxException {
@@ -82,8 +78,8 @@ public class ProcessETLUT extends BaseTestCase {
         System.out.println(owningInstitutionId);
         String owningInstitutionBibId = StringUtils.substringBetween(fileToString, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
         System.out.println(owningInstitutionBibId);
-
-
+        assertEquals(owningInstitutionId, "NYPL");
+        assertEquals(owningInstitutionBibId, ".b153286131");
     }
 
     @Test
