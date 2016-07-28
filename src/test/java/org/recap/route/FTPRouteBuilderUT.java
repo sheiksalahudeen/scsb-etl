@@ -1,5 +1,7 @@
 package org.recap.route;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.junit.Test;
@@ -71,5 +73,16 @@ public class FTPRouteBuilderUT extends BaseTestCase{
         assertNotNull(response);
         System.out.println(response);
         assertTrue(response.equals(content));
+    }
+
+    public class FTPUploadFileProcessor implements Processor {
+
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            String filename = (String) exchange.getIn().getBody();
+            File file = new File(filename);
+            exchange.getIn().setBody(file);
+            exchange.getIn().setHeader("fileNameToUpload", file.getName());
+        }
     }
 }
