@@ -45,6 +45,7 @@ public class EtlDataLoadProcessor {
                 } else {
                     xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, batchSize));
                 }
+                recordProcessor.setXmlFileName(fileName);
                 recordProcessor.process(xmlRecordEntities);
                 long endTime = System.currentTimeMillis();
                 logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bibs and related data is: " + (endTime - startTime) / 1000 + " seconds.");
