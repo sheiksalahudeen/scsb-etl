@@ -65,6 +65,7 @@ public class BibPersisterCallable implements Callable {
                     HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
                     FailureReportReCAPCSVRecord holdingsFailureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) holdingsMap.get("failureReportReCAPCSVRecord");
                     if (holdingsFailureReportReCAPCSVRecord != null) {
+                        holdingsFailureReportReCAPCSVRecord.setFileName(xmlRecordEntity.getXmlFileName());
                         failureReportReCAPCSVRecords.add(holdingsFailureReportReCAPCSVRecord);
                     }
 
@@ -83,6 +84,7 @@ public class BibPersisterCallable implements Callable {
                             ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
                             FailureReportReCAPCSVRecord itemFailureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) itemMap.get("failureReportReCAPCSVRecord");
                             if (itemFailureReportReCAPCSVRecord != null) {
+                                itemFailureReportReCAPCSVRecord.setFileName(xmlRecordEntity.getXmlFileName());
                                 failureReportReCAPCSVRecords.add(itemFailureReportReCAPCSVRecord);
                             }
 

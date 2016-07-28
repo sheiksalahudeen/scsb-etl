@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
  * Created by angelind on 22/7/16.
  */
 @Component
-public class CSVFileNameProcessor implements Processor{
+public class CSVFailureFileNameProcessor implements Processor{
 
-    Logger logger = LoggerFactory.getLogger(CSVFileNameProcessor.class);
+    Logger logger = LoggerFactory.getLogger(CSVFailureFileNameProcessor.class);
 
     @Override
     public void process(Exchange exchange) throws Exception {

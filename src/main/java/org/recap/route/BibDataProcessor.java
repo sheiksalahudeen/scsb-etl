@@ -31,6 +31,8 @@ public class BibDataProcessor {
 
     Logger logger = LoggerFactory.getLogger(BibDataProcessor.class);
 
+    private String xmlFileName;
+
     @Autowired
     private ProducerTemplate producer;
 
@@ -102,12 +104,14 @@ public class BibDataProcessor {
                         } catch (Exception itemEx) {
                             FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibHoldingsItemInfo(bibliographicEntity, holdingsEntity, itemEntity);
                             failureReportReCAPCSVRecord.setExceptionMessage(itemEx.getCause().getCause().getMessage());
+                            failureReportReCAPCSVRecord.setFileName(xmlFileName);
                             failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
                         }
                     }
                 } catch (Exception holdingsEx) {
                     FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibHoldingsInfo(bibliographicEntity, holdingsEntity);
                     failureReportReCAPCSVRecord.setExceptionMessage(holdingsEx.getCause().getCause().getMessage());
+                    failureReportReCAPCSVRecord.setFileName(xmlFileName);
                     failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
                 }
             }
@@ -118,6 +122,7 @@ public class BibDataProcessor {
         } catch (Exception bibEx) {
             FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibInfo(bibliographicEntity);
             failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getCause().getCause().getMessage());
+            failureReportReCAPCSVRecord.setFileName(xmlFileName);
             failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
         }
         return failureReportReCAPCSVRecords;
@@ -126,5 +131,13 @@ public class BibDataProcessor {
     private void flushAndClearSession() {
         entityManager.flush();
         entityManager.clear();
+    }
+
+    public String getXmlFileName() {
+        return xmlFileName;
+    }
+
+    public void setXmlFileName(String xmlFileName) {
+        this.xmlFileName = xmlFileName;
     }
 }
