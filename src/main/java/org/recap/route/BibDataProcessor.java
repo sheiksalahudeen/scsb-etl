@@ -77,7 +77,7 @@ public class BibDataProcessor {
         }
     }
 
-    private List<FailureReportReCAPCSVRecord> processBibHoldingsItems(LoadReportUtil loadReportUtil, BibliographicEntity bibliographicEntity) {
+    public List<FailureReportReCAPCSVRecord> processBibHoldingsItems(LoadReportUtil loadReportUtil, BibliographicEntity bibliographicEntity) {
         List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
         List<HoldingsEntity> savedHoldingsEntities = new ArrayList<>();
         List<ItemEntity> savedItemEntities = new ArrayList<>();

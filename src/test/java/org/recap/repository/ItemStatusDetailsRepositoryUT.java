@@ -34,4 +34,19 @@ public class ItemStatusDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(byStatusCode);
     }
 
+    @Test
+    public void update() throws Exception {
+        assertNotNull(itemStatusDetailsRepository);
+
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setItemStatusId(1);
+        itemStatusEntity.setStatusCode("Available");
+        itemStatusEntity.setStatusDescription("Test Available");
+
+        itemStatusDetailsRepository.save(itemStatusEntity);
+
+        ItemStatusEntity savedItemStatusEntity = itemStatusDetailsRepository.findOne(1);
+        assertEquals(savedItemStatusEntity.getStatusDescription(), itemStatusEntity.getStatusDescription());
+    }
+
 }

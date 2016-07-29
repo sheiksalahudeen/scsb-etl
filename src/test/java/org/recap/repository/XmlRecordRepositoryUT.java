@@ -1,16 +1,12 @@
 package org.recap.repository;
 
-import org.apache.activemq.transport.tcp.ExceededMaximumConnectionsException;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +27,7 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void findById() throws Exception {
+    public void saveAndFindAndUpdate() throws Exception {
         XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
         xmlRecordEntity.setXml("mock xml content".getBytes());
         xmlRecordEntity.setOwningInst("1");
@@ -41,8 +37,25 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         XmlRecordEntity savedEntity = xmlRecordRepository.save(xmlRecordEntity);
 
         XmlRecordEntity byId = xmlRecordRepository.findById(savedEntity.getId());
+        assertNotNull(byId.getDataLoaded());
+        assertEquals(byId.getOwningInst(), xmlRecordEntity.getOwningInst());
+        assertEquals(byId.getOwningInstBibId(), xmlRecordEntity.getOwningInstBibId());
+        assertEquals(byId.getXmlFileName(), xmlRecordEntity.getXmlFileName());
         assertEquals(new String(byId.getXml()),"mock xml content");
         System.out.println(new String(byId.getXml()));
+
+        XmlRecordEntity xmlRecordEntityToUpdate = new XmlRecordEntity();
+        xmlRecordEntityToUpdate.setId(byId.getId());
+        xmlRecordEntityToUpdate.setXml("new mock xml content".getBytes());
+        xmlRecordEntityToUpdate.setOwningInst("1");
+        xmlRecordEntityToUpdate.setOwningInstBibId("PUL");
+        xmlRecordEntityToUpdate.setXmlFileName("mockfile.xml");
+        xmlRecordEntityToUpdate.setDataLoaded(byId.getDataLoaded());
+        xmlRecordRepository.save(xmlRecordEntityToUpdate);
+        XmlRecordEntity byIdAfterUpdate = xmlRecordRepository.findById(savedEntity.getId());
+        assertEquals(byIdAfterUpdate.getId(), byId.getId());
+        assertEquals(new String(byIdAfterUpdate.getXml()),"new mock xml content");
+        System.out.println(new String(byIdAfterUpdate.getXml()));
     }
 
     @Test

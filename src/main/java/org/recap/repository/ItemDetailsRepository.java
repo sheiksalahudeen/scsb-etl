@@ -1,6 +1,7 @@
 package org.recap.repository;
 
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * Created by chenchulakshmig on 21/6/16.
  */
-public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, Integer> {
+public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, ItemPK> {
 
     ItemEntity findByItemId(Integer itemId);
 
