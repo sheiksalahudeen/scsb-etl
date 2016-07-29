@@ -9,6 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Created by rajeshbabuk on 18/7/16.
  */
@@ -23,39 +26,37 @@ public class EtlDataLoadProcessor {
     private RecordProcessor recordProcessor;
 
     public void startLoadProcess() {
-        long totalDocCount;
-        if(StringUtils.isNotBlank(fileName)) {
-            totalDocCount = xmlRecordRepository.countByXmlFileNameContaining(fileName);
-        } else {
-            totalDocCount = xmlRecordRepository.count();
-        }
+        List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
+        for (Iterator iterator = distinctFileNames.iterator(); iterator.hasNext(); ) {
+            String distinctFileName = (String) iterator.next();
+            if (distinctFileName.contains(fileName)) {
+                long totalDocCount;
+                totalDocCount = xmlRecordRepository.countByXmlFileNameContaining(distinctFileName);
 
-        if(totalDocCount > 0) {
-            int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
-            int remainder = Integer.valueOf(Long.toString(totalDocCount)) % (batchSize);
+                if (totalDocCount > 0) {
+                    int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
+                    int remainder = Integer.valueOf(Long.toString(totalDocCount)) % (batchSize);
 
-            int loopCount = remainder == 0 ? quotient : quotient + 1;
+                    int loopCount = remainder == 0 ? quotient : quotient + 1;
 
-            Page<XmlRecordEntity> xmlRecordEntities = null;
-            long totalStartTime = System.currentTimeMillis();
-            for (int i = 0; i < loopCount; i++) {
-                long startTime = System.currentTimeMillis();
-                if (StringUtils.isNotBlank(fileName)) {
-                    xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), fileName);
+                    Page<XmlRecordEntity> xmlRecordEntities = null;
+                    long totalStartTime = System.currentTimeMillis();
+                    for (int i = 0; i < loopCount; i++) {
+                        long startTime = System.currentTimeMillis();
+                        xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), distinctFileName);
+                        recordProcessor.setXmlFileName(distinctFileName);
+                        recordProcessor.process(xmlRecordEntities);
+                        long endTime = System.currentTimeMillis();
+                        logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bibs and related data is: " + (endTime - startTime) / 1000 + " seconds.");
+                    }
+
+
+                    long totalEndTime = System.currentTimeMillis();
+                    logger.info("Total time taken to save: " + xmlRecordEntities.getTotalElements() + " bibs and related data is: " + (totalEndTime - totalStartTime) / 1000 + " seconds.");
                 } else {
-                    xmlRecordEntities = xmlRecordRepository.findAll(new PageRequest(i, batchSize));
+                    logger.info("No records found to load into DB");
                 }
-                recordProcessor.setXmlFileName(fileName);
-                recordProcessor.process(xmlRecordEntities);
-                long endTime = System.currentTimeMillis();
-                logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bibs and related data is: " + (endTime - startTime) / 1000 + " seconds.");
             }
-
-
-            long totalEndTime = System.currentTimeMillis();
-            logger.info("Total time taken to save: " + xmlRecordEntities.getTotalElements() + " bibs and related data is: " + (totalEndTime - totalStartTime) / 1000 + " seconds.");
-        } else {
-            logger.info("No records found to load into DB");
         }
         recordProcessor.shutdownExecutorService();
     }

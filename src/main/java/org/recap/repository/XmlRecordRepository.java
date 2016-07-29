@@ -24,6 +24,6 @@ public interface XmlRecordRepository extends PagingAndSortingRepository<XmlRecor
 
     XmlRecordEntity findById(Integer id);
 
-    @Query("select distinct (xml_file) from xml_records_t")
+    @Query(value = "select distinct (xml_file) from xml_records_t",  nativeQuery = true)
     List findDistinctFileNames();
 }
