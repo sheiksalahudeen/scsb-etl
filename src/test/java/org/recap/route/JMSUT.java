@@ -58,8 +58,7 @@ public class JMSUT extends BaseTestCase {
         Random random = new Random();
 
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
-        String owningInstitution = String.valueOf(random.nextInt());
-        failureReportReCAPCSVRecord.setOwningInstitution(owningInstitution);
+        failureReportReCAPCSVRecord.setOwningInstitution("PUL");
         failureReportReCAPCSVRecord.setOwningInstitutionBibId("1111");
         failureReportReCAPCSVRecord.setOwningInstitutionHoldingsId("2222");
         failureReportReCAPCSVRecord.setLocalItemId("333333333");
@@ -71,7 +70,7 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setLastUpdatedDateItem(new Date());
         failureReportReCAPCSVRecord.setExceptionMessage("exception");
         failureReportReCAPCSVRecord.setErrorDescription("error");
-        failureReportReCAPCSVRecord.setFileName("testReport.xml");
+        failureReportReCAPCSVRecord.setFileName("testReport1.xml");
 
         ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
@@ -112,11 +111,14 @@ public class JMSUT extends BaseTestCase {
     @Test
     public void generateSuccessReport() throws Exception {
         SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
-        successReportReCAPCSVRecord.setFileName("testReport.xml");
+        successReportReCAPCSVRecord.setFileName("test,Report.xml");
         successReportReCAPCSVRecord.setTotalRecordsInFile(1000);
         successReportReCAPCSVRecord.setTotalBibsLoaded(900);;
         successReportReCAPCSVRecord.setTotalHoldingsLoaded(800);
         successReportReCAPCSVRecord.setTotalItemsLoaded(1000);
+        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(900);
+        successReportReCAPCSVRecord.setTotalBibItemsLoaded(1100);
+        successReportReCAPCSVRecord.setOwningInstitution("PUL");
         producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
         Thread.sleep(1000);
 
@@ -130,5 +132,7 @@ public class JMSUT extends BaseTestCase {
         assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalHoldingsLoaded().toString()));
         assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalRecordsInFile().toString()));
         assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalItemsLoaded().toString()));
+        assertTrue(fileContents.contains(String.valueOf(successReportReCAPCSVRecord.getTotalBibItemsLoaded())));
+        assertTrue(fileContents.contains(String.valueOf(successReportReCAPCSVRecord.getTotalBibHoldingsLoaded())));
     }
 }

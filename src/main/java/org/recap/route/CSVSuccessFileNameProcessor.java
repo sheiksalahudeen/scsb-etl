@@ -16,6 +16,8 @@ public class CSVSuccessFileNameProcessor implements Processor{
     public void process(Exchange exchange) throws Exception {
         SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = (SuccessReportReCAPCSVRecord) exchange.getIn().getBody();
         String fileName = FilenameUtils.removeExtension(successReportReCAPCSVRecord.getFileName());
+        String institution = successReportReCAPCSVRecord.getOwningInstitution();
+        exchange.getIn().setHeader("institutionName", institution);
         exchange.getIn().setHeader("reportFileName", fileName);
     }
 }

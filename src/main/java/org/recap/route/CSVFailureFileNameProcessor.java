@@ -20,6 +20,8 @@ public class CSVFailureFileNameProcessor implements Processor{
     public void process(Exchange exchange) throws Exception {
         ReCAPCSVRecord reCAPCSVRecord = (ReCAPCSVRecord) exchange.getIn().getBody();
         String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFailureReportReCAPCSVRecordList().get(0).getFileName());
+        String institution = reCAPCSVRecord.getFailureReportReCAPCSVRecordList().get(0).getOwningInstitution();
+        exchange.getIn().setHeader("institutionName", institution);
         exchange.getIn().setHeader("reportFileName", fileName);
     }
 }

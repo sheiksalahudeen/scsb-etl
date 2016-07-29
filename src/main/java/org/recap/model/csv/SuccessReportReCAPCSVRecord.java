@@ -1,5 +1,6 @@
 package org.recap.model.csv;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
@@ -23,6 +24,8 @@ public class SuccessReportReCAPCSVRecord {
     private Integer totalItemsLoaded;
     @DataField(pos = 7)
     private long totalBibItemsLoaded;
+    @Ignore
+    private String owningInstitution;
 
     public String getFileName() {
         return fileName;
@@ -78,5 +81,13 @@ public class SuccessReportReCAPCSVRecord {
 
     public long getTotalBibItemsLoaded() {
         return totalBibItemsLoaded;
+    }
+
+    public String getOwningInstitution() {
+        return owningInstitution;
+    }
+
+    public void setOwningInstitution(String owningInstitution) {
+        this.owningInstitution = owningInstitution;
     }
 }
