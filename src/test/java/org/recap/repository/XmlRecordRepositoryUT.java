@@ -1,5 +1,6 @@
 package org.recap.repository;
 
+import org.apache.activemq.transport.tcp.ExceededMaximumConnectionsException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -40,6 +43,17 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         XmlRecordEntity byId = xmlRecordRepository.findById(savedEntity.getId());
         assertEquals(new String(byId.getXml()),"mock xml content");
         System.out.println(new String(byId.getXml()));
+    }
+
+    @Test
+    public void findDistinctFileNames() throws Exception {
+        List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
+        assertNotNull(distinctFileNames);
+        assertTrue(!distinctFileNames.isEmpty());
+        for (Iterator iterator = distinctFileNames.iterator(); iterator.hasNext(); ) {
+            String fileName = (String) iterator.next();
+            System.out.println(fileName);
+        }
     }
 
 }
