@@ -12,7 +12,7 @@ import java.util.List;
  * Created by peris on 7/21/16.
  */
 
-@CsvRecord(generateHeaderColumns = true, separator = ",", crlf = "UNIX")
+@CsvRecord(generateHeaderColumns = true, separator = ",", quote = "\"", crlf = "UNIX")
 public class FailureReportReCAPCSVRecord  {
     @DataField(pos = 1)
     private String owningInstitution;
