@@ -1,6 +1,7 @@
 package org.recap.controller;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -86,8 +87,13 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
         etlLoadRequest.setFileName("SampleRecord.xml");
         etlLoadRequest.setBatchSize(1000);
+        etlLoadRequest.setUserName(StringUtils.isBlank(etlLoadRequest.getUserName()) ? "etl" : etlLoadRequest.getUserName());
         etlDataLoadController.bulkIngest(etlLoadRequest, bindingResult, model);
         Thread.sleep(1000);
+
+        String report = etlDataLoadController.report();
+        assertNotNull(report);
+        System.out.println(report);
 
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(3, ".b153286131");
         assertNotNull(bibliographicEntity);

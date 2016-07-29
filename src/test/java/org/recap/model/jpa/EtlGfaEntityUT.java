@@ -10,7 +10,6 @@ import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -42,7 +41,11 @@ public class EtlGfaEntityUT extends BaseTestCase {
         List<EtlGfaEntity> etlGfaEntityListByBarcode = etlGfaRepository.findByItemBarcode("3210457796");
         assertNotNull(savedEtlGfa);
         assertNotNull(etlGfaEntityList);
-        assertEquals(etlGfaEntityList.get(0).getStatus(),"Out on Ret WO: 387966 09/29/15 To PA");
+        EtlGfaEntity savedEtlGfaEntity = etlGfaEntityList.get(0);
+        assertEquals(savedEtlGfaEntity.getStatus(),"Out on Ret WO: 387966 09/29/15 To PA");
+        assertEquals(savedEtlGfaEntity.getCustomer(), etlGfaEntity.getCustomer());
+        assertNotNull(savedEtlGfaEntity.getAccessionDate());
+        assertNotNull(savedEtlGfaEntity.getDeleteDate());
         assertNotNull(etlGfaEntityListByBarcode);
         assertEquals(etlGfaEntityListByBarcode.get(0).getItemBarcode(),"3210457796");
 

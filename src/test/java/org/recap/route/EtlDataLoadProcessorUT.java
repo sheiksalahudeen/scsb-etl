@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Date;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -33,7 +34,7 @@ public class EtlDataLoadProcessorUT extends BaseTestCase{
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Test
-    public void testStartLoadProcess() throws Exception {
+    public void testStartLoadProcessWithXmlFileName() throws Exception {
 
         assertNotNull(etlDataLoadProcessor);
         assertNotNull(recordProcessor);
@@ -57,7 +58,12 @@ public class EtlDataLoadProcessorUT extends BaseTestCase{
         etlDataLoadProcessor.setBatchSize(10);
         etlDataLoadProcessor.setRecordProcessor(recordProcessor);
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
+        assertNotNull(etlDataLoadProcessor.getXmlRecordRepository());
+        assertEquals(etlDataLoadProcessor.getBatchSize(), new Integer(10));
+        assertEquals(etlDataLoadProcessor.getRecordProcessor(), recordProcessor);
+        assertEquals(etlDataLoadProcessor.getFileName(), xmlFileName);
         etlDataLoadProcessor.startLoadProcess();
+        assertEquals(recordProcessor.getXmlFileName(),xmlFileName);
 
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(3,xmlRecordEntity.getOwningInstBibId());
         assertNotNull(bibliographicEntity);

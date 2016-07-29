@@ -5,6 +5,7 @@ import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemPK;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by chenchulakshmig on 13/7/16.
@@ -79,6 +78,9 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setUseRestrictions("In Library Use");
+        itemEntity.setVolumePartYear("X");
+        itemEntity.setCopyNumber(1);
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -109,14 +111,33 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(pageByOwningInstitutionId);
         assertTrue(countAfterAdd == pageByOwningInstitutionId.getTotalElements());
 
-        assertEquals(savedItemEntity.getCallNumberType(), "0");
-        assertEquals(savedItemEntity.getCallNumber(), "callNum");
-        assertEquals(savedItemEntity.getCreatedBy(), "etl");
-        assertEquals(savedItemEntity.getLastUpdatedBy(), "etl");
-        assertEquals(savedItemEntity.getBarcode(), "1231");
-        assertEquals(savedItemEntity.getOwningInstitutionItemId(), owningInstitutionItemId);
-        assertEquals(savedItemEntity.getCustomerCode(), "PA");
-        assertNotNull(savedItemEntity.getHoldingsEntity());
+        ItemPK itemPK1 = new ItemPK(owningInstitutionId, owningInstitutionItemId);
+        ItemEntity byItemEntityPK = itemDetailsRepository.findOne(itemPK1);
+        assertNotNull(byItemEntityPK);
+        assertEquals(byItemEntityPK.getOwningInstitutionId(), itemPK1.getOwningInstitutionId());
+        assertEquals(byItemEntityPK.getOwningInstitutionItemId(), itemPK1.getOwningInstitutionItemId());
+
+        ItemPK itemPK2 = new ItemPK();
+        itemPK2.setOwningInstitutionId(owningInstitutionId);
+        itemPK2.setOwningInstitutionItemId(owningInstitutionItemId);
+        ItemEntity itemEntityPK = itemDetailsRepository.findOne(itemPK2);
+        assertNotNull(itemEntityPK);
+
+        assertEquals(itemEntityPK.getCallNumberType(), "0");
+        assertEquals(itemEntityPK.getCallNumber(), "callNum");
+        assertEquals(itemEntityPK.getCreatedBy(), "etl");
+        assertEquals(itemEntityPK.getLastUpdatedBy(), "etl");
+        assertEquals(itemEntityPK.getBarcode(), "1231");
+        assertEquals(itemEntityPK.getOwningInstitutionItemId(), owningInstitutionItemId);
+        assertEquals(itemEntityPK.getItemAvailabilityStatusId(), itemEntity.getItemAvailabilityStatusId());
+        assertEquals(itemEntityPK.getCopyNumber(), itemEntity.getCopyNumber());
+        assertEquals(itemEntityPK.getVolumePartYear(), itemEntity.getVolumePartYear());
+        assertEquals(itemEntityPK.getUseRestrictions(), itemEntity.getUseRestrictions());
+        assertEquals(itemEntityPK.getCustomerCode(), "PA");
+        assertNotNull(itemEntityPK.getHoldingsEntity());
+        assertNotNull(itemEntityPK.getInstitutionEntity());
+        assertNotNull(itemEntityPK.getCollectionGroupEntity());
+        assertNotNull(itemEntityPK.getItemStatusEntity());
         assertTrue(savedItemEntity.getOwningInstitutionId() == owningInstitutionId);
         assertTrue(savedItemEntity.getCollectionGroupId() == 1);
     }

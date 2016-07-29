@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -76,16 +73,24 @@ public class BibliographicEntityUT extends BaseTestCase {
         BibliographicEntity savedEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
         entityManager.refresh(savedEntity);
 
-        BibliographicPK bibliographicPK = new BibliographicPK();
-        bibliographicPK.setOwningInstitutionId(1);
-        bibliographicPK.setOwningInstitutionBibId(owningInstitutionBibId);
+        BibliographicPK bibliographicPK = new BibliographicPK(1, owningInstitutionBibId);
         BibliographicEntity byBibliographicPK = bibliographicDetailsRepository.findOne(bibliographicPK);
+        assertEquals(bibliographicPK.getOwningInstitutionId(), byBibliographicPK.getOwningInstitutionId());
+        assertEquals(bibliographicPK.getOwningInstitutionBibId(), byBibliographicPK.getOwningInstitutionBibId());
 
         assertNotNull(byBibliographicPK);
         assertNotNull(byBibliographicPK.getBibliographicId());
         assertNotNull(byBibliographicPK.getLastUpdatedBy());
         assertNotNull(byBibliographicPK.getCreatedBy());
+        assertEquals(byBibliographicPK.getContent(), savedEntity.getContent());
+        assertEquals(byBibliographicPK.getCreatedDate(), savedEntity.getCreatedDate());
+        assertEquals(byBibliographicPK.getLastUpdatedDate(), savedEntity.getLastUpdatedDate());
+        assertNotNull(byBibliographicPK.getInstitutionEntity());
         assertNotNull(byBibliographicPK.getHoldingsEntities().get(0).getHoldingsId());
+        List<ItemEntity> itemEntities = byBibliographicPK.getItemEntities();
+        assertNotNull(itemEntities);
+        assertNotNull(itemEntities.get(0).getItemId());
+        assertNotNull(itemEntities.get(0).getBibliographicEntities());
     }
 
     @Test
