@@ -96,6 +96,11 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
+        assertNotNull(bibPersisterCallable.getItemStatusMap());
+        assertNotNull(bibPersisterCallable.getInstitutionEntitiesMap());
+        assertNotNull(bibPersisterCallable.getCollectionGroupMap());
+        assertNotNull(bibPersisterCallable.getXmlRecordEntity());
+        assertNotNull(bibPersisterCallable.getBibRecord());
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("failureReportReCAPCSVRecord");

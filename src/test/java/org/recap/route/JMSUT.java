@@ -1,17 +1,14 @@
 package org.recap.route;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.apache.camel.*;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.dataformat.BindyType;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.csv.SuccessReportReCAPCSVRecord;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -20,7 +17,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
@@ -75,9 +71,11 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setLastUpdatedDateItem(new Date());
         failureReportReCAPCSVRecord.setExceptionMessage("exception");
         failureReportReCAPCSVRecord.setErrorDescription("error");
-        failureReportReCAPCSVRecord.setFileName("recap_records1.xml");
+        failureReportReCAPCSVRecord.setFileName("testReport.xml");
 
         ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+        assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
+        assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
         producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
@@ -85,8 +83,21 @@ public class JMSUT extends BaseTestCase {
         Thread.sleep(1000);
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
-        String fileName = "FailureReport-"+FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-" + df.format(new Date());
-        assertTrue(new File(reportDirectoryPath + File.separator + fileName + ".csv").exists());
+        String fileName = FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-Failure-" + df.format(new Date());
+        File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
+        assertTrue(file.exists());
+        String fileContents = Files.toString(file, Charsets.UTF_8);
+        assertNotNull(fileContents);
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getOwningInstitution()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getOwningInstitutionBibId()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getOwningInstitutionHoldingsId()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getLocalItemId()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getItemBarcode()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getCustomerCode()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getTitle()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getCollectionGroupDesignation()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getExceptionMessage()));
+        assertTrue(fileContents.contains(failureReportReCAPCSVRecord.getErrorDescription()));
     }
 
    public class FileNameProcessor implements Processor {
@@ -101,7 +112,7 @@ public class JMSUT extends BaseTestCase {
     @Test
     public void generateSuccessReport() throws Exception {
         SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
-        successReportReCAPCSVRecord.setFileName("scsb-records1.xml");
+        successReportReCAPCSVRecord.setFileName("testReport.xml");
         successReportReCAPCSVRecord.setTotalRecordsInFile(1000);
         successReportReCAPCSVRecord.setTotalBibsLoaded(900);;
         successReportReCAPCSVRecord.setTotalHoldingsLoaded(800);
@@ -110,7 +121,14 @@ public class JMSUT extends BaseTestCase {
         Thread.sleep(1000);
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
-        String fileName = "SuccessReport-" + df.format(new Date());
-        assertTrue(new File(reportDirectoryPath + File.separator + fileName + ".csv").exists());
+        String fileName = FilenameUtils.removeExtension(successReportReCAPCSVRecord.getFileName()) + "-Success-" + df.format(new Date());
+        File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
+        assertTrue(file.exists());
+        String fileContents = Files.toString(file, Charsets.UTF_8);
+        assertNotNull(fileContents);
+        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalBibsLoaded().toString()));
+        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalHoldingsLoaded().toString()));
+        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalRecordsInFile().toString()));
+        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalItemsLoaded().toString()));
     }
 }

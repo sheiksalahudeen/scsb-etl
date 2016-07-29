@@ -3,16 +3,17 @@ package org.recap.util;
 import org.junit.Test;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
-import org.recap.model.jaxb.marc.RecordType;
+import org.recap.model.jaxb.marc.*;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by pvsubrah on 6/22/16.
  */
-public class MarcUtilTest {
+public class MarcUtilUT {
 
     @Test
     public void controlField001() throws Exception {
@@ -189,6 +190,50 @@ public class MarcUtilTest {
 
 
         return (BibRecord) jaxbHandler.unmarshal(content, BibRecord.class);
+    }
+
+    @Test
+    public void marcRecordsSettersAndGettersTest() throws Exception {
+        CollectionType collectionType = new CollectionType();
+        collectionType.setId("1");
+        assertEquals(collectionType.getId(), "1");
+        ControlFieldType controlFieldType = new ControlFieldType();
+        controlFieldType.setId("1");
+        controlFieldType.setTag("Test Tag");
+        controlFieldType.setValue("Test Value");
+        assertEquals(controlFieldType.getId(), "1");
+        assertEquals(controlFieldType.getTag(), "Test Tag");
+        assertEquals(controlFieldType.getValue(), "Test Value");
+        DataFieldType dataFieldType = new DataFieldType();
+        dataFieldType.setId("1");
+        dataFieldType.setTag("Test Tag");
+        dataFieldType.setInd1("001");
+        dataFieldType.setInd2("002");
+        assertEquals(dataFieldType.getId(), "1");
+        assertEquals(dataFieldType.getTag(), "Test Tag");
+        assertEquals(dataFieldType.getInd1(), "001");
+        assertEquals(dataFieldType.getInd2(), "002");
+        LeaderFieldType leaderFieldType = new LeaderFieldType();
+        leaderFieldType.setId("1");
+        leaderFieldType.setValue("Test Leader Field");
+        assertEquals(leaderFieldType.getId(), "1");
+        assertEquals(leaderFieldType.getValue(), "Test Leader Field");
+        RecordType recordType = new RecordType();
+        recordType.setId("1");
+        recordType.setLeader(leaderFieldType);
+        recordType.setType(RecordTypeType.fromValue("Bibliographic"));
+        assertEquals(recordType.getId(), "1");
+        assertEquals(recordType.getLeader(), leaderFieldType);
+        assertEquals(recordType.getType().value(), RecordTypeType.BIBLIOGRAPHIC.value());
+        assertNotNull(recordType.getControlfield());
+        assertNotNull(recordType.getDatafield());
+        SubfieldatafieldType subfieldatafieldType = new SubfieldatafieldType();
+        subfieldatafieldType.setId("1");
+        subfieldatafieldType.setValue("Test Value");
+        subfieldatafieldType.setCode("Test code");
+        assertEquals(subfieldatafieldType.getId(), "1");
+        assertEquals(subfieldatafieldType.getValue(), "Test Value");
+        assertEquals(subfieldatafieldType.getCode(), "Test code");
     }
 
 }

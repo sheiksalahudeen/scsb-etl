@@ -37,4 +37,19 @@ public class InstitutionDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(byInstitutionName);
     }
 
+    @Test
+    public void updateEntity() throws Exception {
+        assertNotNull(institutionDetailsRepository);
+
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionId(1);
+        institutionEntity.setInstitutionCode("PUL");
+        institutionEntity.setInstitutionName("Princetonn");
+
+        institutionDetailsRepository.save(institutionEntity);
+
+        InstitutionEntity savedInstitutionEntity = institutionDetailsRepository.findOne(1);
+        assertEquals(savedInstitutionEntity.getInstitutionName(), institutionEntity.getInstitutionName());
+    }
+
 }

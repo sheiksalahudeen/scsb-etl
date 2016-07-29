@@ -4,11 +4,10 @@ import org.junit.Test;
 import org.recap.model.jaxb.marc.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -18,6 +17,7 @@ public class JAXBHandlerUT {
     @Test
     public void marshal() throws Exception {
         JAXBHandler jaxbHandler = JAXBHandler.getInstance();
+        jaxbHandler.setMarshallerMap(new HashMap<>());
         BibRecord bibRecord = new BibRecord();
         Bib bib = new Bib();
         bib.setOwningInstitutionId("101");
@@ -56,6 +56,7 @@ public class JAXBHandlerUT {
     @Test
     public void unmarshal() throws Exception {
         JAXBHandler jaxbHandler = JAXBHandler.getInstance();
+        jaxbHandler.setUnmarshallerMap(new HashMap<>());
 
         String content = "<bibRecord>\n" +
                 "    <bib>\n" +

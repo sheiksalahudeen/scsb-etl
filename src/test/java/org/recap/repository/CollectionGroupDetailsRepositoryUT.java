@@ -41,4 +41,22 @@ public class CollectionGroupDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(byCollectionGroupCode);
     }
 
+    @Test
+    public void update() throws Exception {
+        assertNotNull(collectionGroupDetailsRepository);
+
+        CollectionGroupEntity collectionGroupEntity = new CollectionGroupEntity();
+        collectionGroupEntity.setCollectionGroupId(1);
+        collectionGroupEntity.setCollectionGroupCode("Shared");
+        collectionGroupEntity.setCollectionGroupDescription("Shared");
+        collectionGroupEntity.setCreatedDate(new Date());
+        collectionGroupEntity.setLastUpdatedDate(new Date());
+
+        collectionGroupDetailsRepository.save(collectionGroupEntity);
+
+        CollectionGroupEntity savedCollectionGroupEntity = collectionGroupDetailsRepository.findOne(1);
+        assertEquals(savedCollectionGroupEntity.getCreatedDate(), collectionGroupEntity.getCreatedDate());
+        assertEquals(savedCollectionGroupEntity.getLastUpdatedDate(), collectionGroupEntity.getLastUpdatedDate());
+    }
+
 }
