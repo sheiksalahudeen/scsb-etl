@@ -98,6 +98,9 @@ public class EtlDataLoadController {
         long newBibsCount = bibliographicDetailsRepository.count();
         long newHoldingsCount = holdingsDetailsRepository.count();
         long newItemsCount = itemDetailsRepository.count();
+        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliogrpahicHoldings();
+        long newBibItemsCount = itemDetailsRepository.findCountOfBibliogrpahicItems();
+
         Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
         Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
         Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
@@ -107,6 +110,8 @@ public class EtlDataLoadController {
         successReportReCAPCSVRecord.setTotalBibsLoaded(processedBibsCount);
         successReportReCAPCSVRecord.setTotalHoldingsLoaded(processedHoldingsCount);
         successReportReCAPCSVRecord.setTotalItemsLoaded(processedItemsCount);
+        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(newHoldingsCount);
+        successReportReCAPCSVRecord.setTotalBibItemsLoaded(newBibItemsCount);
         producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
     }
 

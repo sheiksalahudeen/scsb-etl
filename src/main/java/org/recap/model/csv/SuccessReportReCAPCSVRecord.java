@@ -18,7 +18,11 @@ public class SuccessReportReCAPCSVRecord {
     @DataField(pos = 4)
     private Integer totalHoldingsLoaded;
     @DataField(pos = 5)
+    private long totalBibHoldingsLoaded;
+    @DataField(pos = 6)
     private Integer totalItemsLoaded;
+    @DataField(pos = 7)
+    private long totalBibItemsLoaded;
 
     public String getFileName() {
         return fileName;
@@ -58,5 +62,21 @@ public class SuccessReportReCAPCSVRecord {
 
     public void setTotalItemsLoaded(Integer totalItemsLoaded) {
         this.totalItemsLoaded = totalItemsLoaded;
+    }
+
+    public void setTotalBibHoldingsLoaded(long totalBibHoldingsLoaded) {
+        this.totalBibHoldingsLoaded = totalBibHoldingsLoaded;
+    }
+
+    public void setTotalBibItemsLoaded(long totalBibItemsLoaded) {
+        this.totalBibItemsLoaded = totalBibItemsLoaded;
+    }
+
+    public long getTotalBibHoldingsLoaded() {
+        return totalBibHoldingsLoaded;
+    }
+
+    public long getTotalBibItemsLoaded() {
+        return totalBibItemsLoaded;
     }
 }

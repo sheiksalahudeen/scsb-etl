@@ -4,6 +4,7 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
@@ -22,5 +23,8 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
     List<ItemEntity> findByOwningInstitutionId(Integer owningInstitutionId);
 
     ItemEntity findByOwningInstitutionItemId(String owningInstitutionItemId);
+
+    @Query(value = "select count (*) from bibliographic_item_t",  nativeQuery = true)
+    Long findCountOfBibliogrpahicItems();
 
 }
