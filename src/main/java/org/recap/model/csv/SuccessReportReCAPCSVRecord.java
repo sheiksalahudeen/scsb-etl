@@ -6,7 +6,7 @@ import org.apache.camel.dataformat.bindy.annotation.DataField;
 /**
  * Created by angelind on 22/7/16.
  */
-@CsvRecord(generateHeaderColumns = true, separator = ",", crlf = "UNIX")
+@CsvRecord(generateHeaderColumns = true, separator = ",", quote = "\"", crlf = "UNIX")
 public class SuccessReportReCAPCSVRecord {
 
     @DataField(pos = 1)
