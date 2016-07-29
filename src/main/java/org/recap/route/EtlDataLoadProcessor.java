@@ -1,10 +1,16 @@
 package org.recap.route;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
+import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.jpa.XmlRecordEntity;
+import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.HoldingsDetailsRepository;
+import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -22,15 +28,26 @@ public class EtlDataLoadProcessor {
 
     private Integer batchSize;
     private String fileName;
-    private XmlRecordRepository xmlRecordRepository;
+
     private RecordProcessor recordProcessor;
+
+    ProducerTemplate producer;
+
+    private XmlRecordRepository xmlRecordRepository;
+    private ItemDetailsRepository itemDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     public void startLoadProcess() {
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
         for (Iterator iterator = distinctFileNames.iterator(); iterator.hasNext(); ) {
             String distinctFileName = (String) iterator.next();
             if (distinctFileName.contains(fileName)) {
+                long oldBibsCount = bibliographicDetailsRepository.count();
+                long oldHoldingsCount = holdingsDetailsRepository.count();
+                long oldItemsCount = itemDetailsRepository.count();
                 long totalDocCount;
+
                 totalDocCount = xmlRecordRepository.countByXmlFileNameContaining(distinctFileName);
 
                 if (totalDocCount > 0) {
@@ -56,9 +73,73 @@ public class EtlDataLoadProcessor {
                 } else {
                     logger.info("No records found to load into DB");
                 }
+
+                generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, fileName);
             }
         }
         recordProcessor.shutdownExecutorService();
+    }
+
+    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName) {
+        SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
+        long newBibsCount = bibliographicDetailsRepository.count();
+        long newHoldingsCount = holdingsDetailsRepository.count();
+        long newItemsCount = itemDetailsRepository.count();
+        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliogrpahicHoldings();
+        long newBibItemsCount = itemDetailsRepository.findCountOfBibliogrpahicItems();
+
+        Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
+        Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
+        Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
+        Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
+        successReportReCAPCSVRecord.setFileName(fileName);
+        successReportReCAPCSVRecord.setTotalRecordsInFile(totalRecordsInfile);
+        successReportReCAPCSVRecord.setTotalBibsLoaded(processedBibsCount);
+        successReportReCAPCSVRecord.setTotalHoldingsLoaded(processedHoldingsCount);
+        successReportReCAPCSVRecord.setTotalItemsLoaded(processedItemsCount);
+        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(newBibHoldingsCount);
+        successReportReCAPCSVRecord.setTotalBibItemsLoaded(newBibItemsCount);
+        producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    public ProducerTemplate getProducer() {
+        return producer;
+    }
+
+    public void setProducer(ProducerTemplate producer) {
+        this.producer = producer;
+    }
+
+    public ItemDetailsRepository getItemDetailsRepository() {
+        return itemDetailsRepository;
+    }
+
+    public void setItemDetailsRepository(ItemDetailsRepository itemDetailsRepository) {
+        this.itemDetailsRepository = itemDetailsRepository;
+    }
+
+    public HoldingsDetailsRepository getHoldingsDetailsRepository() {
+        return holdingsDetailsRepository;
+    }
+
+    public void setHoldingsDetailsRepository(HoldingsDetailsRepository holdingsDetailsRepository) {
+        this.holdingsDetailsRepository = holdingsDetailsRepository;
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
     public Integer getBatchSize() {

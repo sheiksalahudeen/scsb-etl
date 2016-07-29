@@ -78,41 +78,18 @@ public class EtlDataLoadController {
                             BindingResult result,
                             Model model) {
         EtlDataLoadProcessor etlDataLoadProcessor = new EtlDataLoadProcessor();
-        long oldBibsCount = bibliographicDetailsRepository.count();
-        long oldHoldingsCount = holdingsDetailsRepository.count();
-        long oldItemsCount = itemDetailsRepository.count();
+
         String fileName = etlLoadRequest.getFileName();
         etlDataLoadProcessor.setBatchSize(etlLoadRequest.getBatchSize());
         etlDataLoadProcessor.setFileName(fileName);
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
+        etlDataLoadProcessor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
+        etlDataLoadProcessor.setHoldingsDetailsRepository(holdingsDetailsRepository);
+        etlDataLoadProcessor.setItemDetailsRepository(itemDetailsRepository);
+        etlDataLoadProcessor.setProducer(producer);
         etlDataLoadProcessor.setRecordProcessor(recordProcessor);
         etlDataLoadProcessor.startLoadProcess();
-        if(StringUtils.isNotBlank(fileName)) {
-            generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, fileName);
-        }
         return etlDataLoader(model);
-    }
-
-    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName) {
-        SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
-        long newBibsCount = bibliographicDetailsRepository.count();
-        long newHoldingsCount = holdingsDetailsRepository.count();
-        long newItemsCount = itemDetailsRepository.count();
-        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliogrpahicHoldings();
-        long newBibItemsCount = itemDetailsRepository.findCountOfBibliogrpahicItems();
-
-        Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
-        Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
-        Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
-        Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
-        successReportReCAPCSVRecord.setFileName(fileName);
-        successReportReCAPCSVRecord.setTotalRecordsInFile(totalRecordsInfile);
-        successReportReCAPCSVRecord.setTotalBibsLoaded(processedBibsCount);
-        successReportReCAPCSVRecord.setTotalHoldingsLoaded(processedHoldingsCount);
-        successReportReCAPCSVRecord.setTotalItemsLoaded(processedItemsCount);
-        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(newHoldingsCount);
-        successReportReCAPCSVRecord.setTotalBibItemsLoaded(newBibItemsCount);
-        producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
     }
 
     @ResponseBody
