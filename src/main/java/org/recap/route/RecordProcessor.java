@@ -104,7 +104,8 @@ public class RecordProcessor {
             Object failureReportReCAPCSVRecord = resultMap.get("failureReportReCAPCSVRecord");
             if (bibliographicEntity != null) {
                 bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
-            } else if (failureReportReCAPCSVRecord != null) {
+            }
+            if (failureReportReCAPCSVRecord != null) {
                 failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) failureReportReCAPCSVRecord);
             }
         }

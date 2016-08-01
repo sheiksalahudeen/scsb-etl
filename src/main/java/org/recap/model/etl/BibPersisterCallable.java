@@ -36,6 +36,7 @@ public class BibPersisterCallable implements Callable {
     @Override
     public Object call() {
         Map<String, Object> map = new HashMap<>();
+        boolean processBib = false;
 
         List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
@@ -44,10 +45,12 @@ public class BibPersisterCallable implements Callable {
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
         Map<String, Object> bibMap = processAndValidateBibliographicEntity(owningInstitutionId);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
-        FailureReportReCAPCSVRecord bibFailureReportReCAPCSVRecord= (FailureReportReCAPCSVRecord) bibMap.get("failureReportReCAPCSVRecord");
+        FailureReportReCAPCSVRecord bibFailureReportReCAPCSVRecord = (FailureReportReCAPCSVRecord) bibMap.get("failureReportReCAPCSVRecord");
         if (bibFailureReportReCAPCSVRecord != null) {
             bibFailureReportReCAPCSVRecord.setFileName(xmlRecordEntity.getXmlFileName());
             failureReportReCAPCSVRecords.add(bibFailureReportReCAPCSVRecord);
+        } else {
+            processBib = true;
         }
 
         List<Holdings> holdings = bibRecord.getHoldings();
@@ -55,6 +58,7 @@ public class BibPersisterCallable implements Callable {
             Holdings holdingsList = iterator.next();
             List<Holding> holding = holdingsList.getHolding();
             for (Iterator<Holding> holdingIterator = holding.iterator(); holdingIterator.hasNext(); ) {
+                boolean processHoldings = false;
                 Holding holdingEnt = holdingIterator.next();
                 if (holdingEnt.getContent() != null) {
                     CollectionType holdingContentCollection = holdingEnt.getContent().getCollection();
@@ -67,9 +71,11 @@ public class BibPersisterCallable implements Callable {
                     if (holdingsFailureReportReCAPCSVRecord != null) {
                         holdingsFailureReportReCAPCSVRecord.setFileName(xmlRecordEntity.getXmlFileName());
                         failureReportReCAPCSVRecords.add(holdingsFailureReportReCAPCSVRecord);
+                    } else {
+                        processHoldings = true;
+                        holdingsEntities.add(holdingsEntity);
                     }
 
-                    holdingsEntities.add(holdingsEntity);
                     String holdingsCallNumber = getMarcUtil().getDataFieldValue(holdingsRecordType, "852", null, null, "h");
                     String holdingsCallNumberType = getMarcUtil().getInd1(holdingsRecordType, "852", "h");
 
@@ -86,13 +92,13 @@ public class BibPersisterCallable implements Callable {
                             if (itemFailureReportReCAPCSVRecord != null) {
                                 itemFailureReportReCAPCSVRecord.setFileName(xmlRecordEntity.getXmlFileName());
                                 failureReportReCAPCSVRecords.add(itemFailureReportReCAPCSVRecord);
+                            } else if (processHoldings){
+                                if (holdingsEntity.getItemEntities() == null) {
+                                    holdingsEntity.setItemEntities(new ArrayList<>());
+                                }
+                                holdingsEntity.getItemEntities().add(itemEntity);
+                                itemEntities.add(itemEntity);
                             }
-
-                            if (holdingsEntity.getItemEntities() == null) {
-                                holdingsEntity.setItemEntities(new ArrayList<>());
-                            }
-                            holdingsEntity.getItemEntities().add(itemEntity);
-                            itemEntities.add(itemEntity);
                         }
                     }
                 }
@@ -101,10 +107,11 @@ public class BibPersisterCallable implements Callable {
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
         bibliographicEntity.setItemEntities(itemEntities);
 
-        if (CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
-            map.put("bibliographicEntity", bibliographicEntity);
-        } else {
+        if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
             map.put("failureReportReCAPCSVRecord", failureReportReCAPCSVRecords);
+        }
+        if (processBib){
+            map.put("bibliographicEntity", bibliographicEntity);
         }
         return map;
     }
@@ -144,7 +151,7 @@ public class BibPersisterCallable implements Callable {
         }
 
         boolean subFieldExistsFor245 = getMarcUtil().isSubFieldExists(bibContentCollection.getRecord().get(0), "245");
-        if (!subFieldExistsFor245){
+        if (!subFieldExistsFor245) {
             errorMessage.append("\n");
             errorMessage.append("Atleast one subfield should be there for 245 tag");
         }
@@ -185,7 +192,7 @@ public class BibPersisterCallable implements Callable {
         String owningInstitutionBibId = bibliographicEntity.getOwningInstitutionBibId();
         if (StringUtils.isNotBlank(holdingEnt.getOwningInstitutionHoldingsId())) {
             if (holdingEnt.getOwningInstitutionHoldingsId().length() > 45) {
-                owningInstituionHoldingsId =  owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + UUID.randomUUID().toString();
+                owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + UUID.randomUUID().toString();
             } else {
                 owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + holdingEnt.getOwningInstitutionHoldingsId();
             }
