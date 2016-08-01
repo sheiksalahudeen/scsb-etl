@@ -2,7 +2,6 @@ package org.recap.model.csv;
 
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
-import org.apache.camel.dataformat.bindy.annotation.Link;
 import org.apache.camel.dataformat.bindy.annotation.OneToMany;
 
 import java.util.Date;
@@ -30,9 +29,9 @@ public class ReCAPCSVRecord {
     private String title;
     @DataField(pos = 8)
     private String collectionGroupDesignation;
-    @DataField(pos = 9)
+    @DataField(pos = 9, pattern="MM/dd/yyyy hh:mm:ss a")
     private Date createDateItem;
-    @DataField(pos = 10)
+    @DataField(pos = 10, pattern="MM/dd/yyyy hh:mm:ss a")
     private Date lastUpdatedDateItem;
     @DataField(pos = 11)
     private String exceptionMessage;
