@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by peris on 7/21/16.
  */
 
-@CsvRecord(generateHeaderColumns = true, separator = ",", quote = "\"", crlf = "UNIX")
+@CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
 public class FailureReportReCAPCSVRecord  {
     @DataField(pos = 1)
     private String owningInstitution;

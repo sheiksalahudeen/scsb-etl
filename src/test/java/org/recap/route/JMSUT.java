@@ -54,9 +54,7 @@ public class JMSUT extends BaseTestCase {
     }
 
     @Test
-    public void produceAndConsumeEtlReportQ() throws Exception {
-        Random random = new Random();
-
+    public void generateFailureReport() throws Exception {
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
         failureReportReCAPCSVRecord.setOwningInstitution("PUL");
         failureReportReCAPCSVRecord.setOwningInstitutionBibId("1111");

@@ -11,7 +11,7 @@ import java.util.List;
  * Created by peris on 7/21/16.
  */
 
-@CsvRecord(generateHeaderColumns = true, separator = ",", quote = "\"", crlf = "UNIX", skipFirstLine = true)
+@CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
 public class ReCAPCSVRecord {
     @DataField(pos = 1)
     private String owningInstitution;
