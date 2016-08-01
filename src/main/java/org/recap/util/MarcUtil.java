@@ -91,4 +91,26 @@ public class MarcUtil {
         return null;
     }
 
+    public boolean isSubFieldExists(RecordType marcRecord, String field) {
+        List<DataFieldType> dataFields = marcRecord.getDatafield();
+        for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
+            DataFieldType dataField = dataFieldIterator.next();
+            if (dataField != null && dataField.getTag().equals(field)) {
+                List<SubfieldatafieldType> subFields = dataField.getSubfield();
+                for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
+                    SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
+                    String data = subfieldatafieldType.getCode();
+                    if (StringUtils.isNotBlank(data)) {
+                        String value = subfieldatafieldType.getValue();
+                        if (StringUtils.isNotBlank(value)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
 }

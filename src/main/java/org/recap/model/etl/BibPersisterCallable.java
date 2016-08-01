@@ -143,6 +143,12 @@ public class BibPersisterCallable implements Callable {
             errorMessage.append("Bib Content cannot be empty");
         }
 
+        boolean subFieldExistsFor245 = getMarcUtil().isSubFieldExists(bibContentCollection.getRecord().get(0), "245");
+        if (!subFieldExistsFor245){
+            errorMessage.append("\n");
+            errorMessage.append("Atleast one subfield should be there for 245 tag");
+        }
+
         LeaderFieldType leader = bibContentCollection.getRecord().get(0).getLeader();
         if (!(leader != null && StringUtils.isNotBlank(leader.getValue()) && leader.getValue().length() == 24)) {
             errorMessage.append("\n");
