@@ -181,14 +181,16 @@ public class BibPersisterCallable implements Callable {
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
         String owningInstituionHoldingsId = null;
+        Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
+        String owningInstitutionBibId = bibliographicEntity.getOwningInstitutionBibId();
         if (StringUtils.isNotBlank(holdingEnt.getOwningInstitutionHoldingsId())) {
             if (holdingEnt.getOwningInstitutionHoldingsId().length() > 45) {
-                owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId() + "-" + UUID.randomUUID().toString();
+                owningInstituionHoldingsId =  owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + UUID.randomUUID().toString();
             } else {
-                owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + bibRecord.getBib().getOwningInstitutionBibId() + "-" + holdingEnt.getOwningInstitutionHoldingsId();
+                owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + holdingEnt.getOwningInstitutionHoldingsId();
             }
         } else {
-            owningInstituionHoldingsId = bibRecord.getBib().getOwningInstitutionId() + "-" + bibRecord.getBib().getOwningInstitutionBibId() + "-" + UUID.randomUUID().toString();
+            owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + UUID.randomUUID().toString();
         }
 
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstituionHoldingsId);

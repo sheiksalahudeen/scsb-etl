@@ -58,6 +58,7 @@ public class EtlDataLoadProcessorUT extends BaseTestCase{
         etlDataLoadProcessor.setBatchSize(10);
         etlDataLoadProcessor.setRecordProcessor(recordProcessor);
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
+        etlDataLoadProcessor.setInstitutionName("NYPL");
         assertNotNull(etlDataLoadProcessor.getXmlRecordRepository());
         assertEquals(etlDataLoadProcessor.getBatchSize(), new Integer(10));
         assertEquals(etlDataLoadProcessor.getRecordProcessor(), recordProcessor);

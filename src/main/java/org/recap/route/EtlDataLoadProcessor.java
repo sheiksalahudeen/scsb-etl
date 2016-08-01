@@ -1,7 +1,6 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.StringUtils;
 import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -10,7 +9,6 @@ import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -28,6 +26,7 @@ public class EtlDataLoadProcessor {
 
     private Integer batchSize;
     private String fileName;
+    private String institutionName;
 
     private RecordProcessor recordProcessor;
 
@@ -46,6 +45,8 @@ public class EtlDataLoadProcessor {
                 long oldBibsCount = bibliographicDetailsRepository.count();
                 long oldHoldingsCount = holdingsDetailsRepository.count();
                 long oldItemsCount = itemDetailsRepository.count();
+                long oldBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldings();
+                long oldBibItemsCount = itemDetailsRepository.findCountOfBibliographicItems();
                 long totalDocCount;
 
                 totalDocCount = xmlRecordRepository.countByXmlFileNameContaining(distinctFileName);
@@ -74,31 +75,34 @@ public class EtlDataLoadProcessor {
                     logger.info("No records found to load into DB");
                 }
 
-                generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, fileName);
+                generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, distinctFileName, oldBibHoldingsCount, oldBibItemsCount);
             }
         }
         recordProcessor.shutdownExecutorService();
     }
 
-    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName) {
+    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName, long oldBibHoldingsCount, long oldBibItemsCount) {
         SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
         long newBibsCount = bibliographicDetailsRepository.count();
         long newHoldingsCount = holdingsDetailsRepository.count();
         long newItemsCount = itemDetailsRepository.count();
-        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliogrpahicHoldings();
-        long newBibItemsCount = itemDetailsRepository.findCountOfBibliogrpahicItems();
+        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldings();
+        long newBibItemsCount = itemDetailsRepository.findCountOfBibliographicItems();
 
         Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
         Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
         Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
+        Integer processedBibHoldingsCount = Integer.valueOf(new Long(newBibHoldingsCount).toString()) - Integer.valueOf(new Long(oldBibHoldingsCount).toString());
+        Integer processedBibItemsCount = Integer.valueOf(new Long(newBibItemsCount).toString()) - Integer.valueOf(new Long(oldBibItemsCount).toString());
         Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
         successReportReCAPCSVRecord.setFileName(fileName);
         successReportReCAPCSVRecord.setTotalRecordsInFile(totalRecordsInfile);
         successReportReCAPCSVRecord.setTotalBibsLoaded(processedBibsCount);
         successReportReCAPCSVRecord.setTotalHoldingsLoaded(processedHoldingsCount);
         successReportReCAPCSVRecord.setTotalItemsLoaded(processedItemsCount);
-        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(newBibHoldingsCount);
-        successReportReCAPCSVRecord.setTotalBibItemsLoaded(newBibItemsCount);
+        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(processedBibHoldingsCount);
+        successReportReCAPCSVRecord.setTotalBibItemsLoaded(processedBibItemsCount);
+        successReportReCAPCSVRecord.setOwningInstitution(institutionName);
         producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
     }
 
@@ -156,6 +160,14 @@ public class EtlDataLoadProcessor {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 
     public XmlRecordRepository getXmlRecordRepository() {

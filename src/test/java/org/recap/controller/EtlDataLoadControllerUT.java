@@ -88,6 +88,7 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
         etlLoadRequest.setFileName("SampleRecord.xml");
         etlLoadRequest.setBatchSize(1000);
         etlLoadRequest.setUserName(StringUtils.isBlank(etlLoadRequest.getUserName()) ? "etl" : etlLoadRequest.getUserName());
+        etlLoadRequest.setOwningInstitutionName("NYPL");
         etlDataLoadController.bulkIngest(etlLoadRequest, bindingResult, model);
         Thread.sleep(1000);
 

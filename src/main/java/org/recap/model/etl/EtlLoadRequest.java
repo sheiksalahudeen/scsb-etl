@@ -11,6 +11,7 @@ public class EtlLoadRequest {
     private Integer batchSize;
     private MultipartFile file;
     private String userName;
+    private String owningInstitutionName;
 
     public String getFileName() {
         return fileName;
@@ -42,5 +43,13 @@ public class EtlLoadRequest {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getOwningInstitutionName() {
+        return owningInstitutionName;
+    }
+
+    public void setOwningInstitutionName(String owningInstitutionName) {
+        this.owningInstitutionName = owningInstitutionName;
     }
 }

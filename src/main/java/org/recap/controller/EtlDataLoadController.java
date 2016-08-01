@@ -82,6 +82,7 @@ public class EtlDataLoadController {
         String fileName = etlLoadRequest.getFileName();
         etlDataLoadProcessor.setBatchSize(etlLoadRequest.getBatchSize());
         etlDataLoadProcessor.setFileName(fileName);
+        etlDataLoadProcessor.setInstitutionName(etlLoadRequest.getOwningInstitutionName());
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
         etlDataLoadProcessor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
         etlDataLoadProcessor.setHoldingsDetailsRepository(holdingsDetailsRepository);

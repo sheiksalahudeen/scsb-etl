@@ -59,6 +59,21 @@
                                                     </div>
 
                                                     <div class="form-group">
+                                                        <label for="institutionName" class="col-sm-4">Institution</label>
+
+                                                        <div class="col-sm-4">
+                                                            <select id="institutionName"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{owningInstitutionName}">
+                                                                <option value="PUL">PUL</option>
+                                                                <option value="CUL">CUL</option>
+                                                                <option value="NYPL">NYPL</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
                                                         <div class="col-sm-4">
                                                             <label for="autoRefresh">Auto Refresh</label> &nbsp;&nbsp;
                                                             <input type="checkbox" id="autoRefresh" name="autoRefresh"
