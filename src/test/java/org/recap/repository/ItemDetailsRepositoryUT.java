@@ -143,9 +143,9 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void findCountOfBibliogrpahicItems() throws Exception {
+    public void findCountOfBibliographicItems() throws Exception {
         Random random = new Random();
-        Long beforeSaveCount = itemDetailsRepository.findCountOfBibliogrpahicItems();
+        Long beforeSaveCount = itemDetailsRepository.findCountOfBibliographicItems();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("Mock Bib Content".getBytes());
@@ -188,7 +188,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getBibliographicId());
 
-        Long afterSaveCount = itemDetailsRepository.findCountOfBibliogrpahicItems();
+        Long afterSaveCount = itemDetailsRepository.findCountOfBibliographicItems();
         assertTrue(afterSaveCount > beforeSaveCount);
     }
 

@@ -25,6 +25,6 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
     ItemEntity findByOwningInstitutionItemId(String owningInstitutionItemId);
 
     @Query(value = "select count(*) from bibliographic_item_t",  nativeQuery = true)
-    Long findCountOfBibliogrpahicItems();
+    Long findCountOfBibliographicItems();
 
 }

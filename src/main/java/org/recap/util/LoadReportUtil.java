@@ -44,7 +44,7 @@ public class LoadReportUtil {
                 RecordType recordType = collectionType.getRecord().get(0);
                 if (recordType != null) {
                     String title = new MarcUtil().getDataFieldValue(recordType, "245", null, null, "a");
-                    failureReportReCAPCSVRecord.setTitle(title);
+                    failureReportReCAPCSVRecord.setTitle(title.trim());
                 }
             }
 
