@@ -62,7 +62,7 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setLocalItemId("333333333");
         failureReportReCAPCSVRecord.setItemBarcode("4444");
         failureReportReCAPCSVRecord.setCustomerCode("PA");
-        failureReportReCAPCSVRecord.setTitle("title");
+        failureReportReCAPCSVRecord.setTitle("History, of Science");
         failureReportReCAPCSVRecord.setCollectionGroupDesignation("open");
         failureReportReCAPCSVRecord.setCreateDateItem(new Date());
         failureReportReCAPCSVRecord.setLastUpdatedDateItem(new Date());
