@@ -245,7 +245,12 @@ public class BibPersisterCallable implements Callable {
         itemEntity.setCreatedBy("etl");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("etl");
-        itemEntity.setUseRestrictions(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h"));
+
+        String useRestrictions = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h");
+        if (StringUtils.isNotBlank(useRestrictions) && (useRestrictions.equalsIgnoreCase("In Library Use") || useRestrictions.equalsIgnoreCase("Supervised Use"))) {
+            itemEntity.setUseRestrictions(useRestrictions);
+        }
+
         itemEntity.setVolumePartYear(getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "3"));
         String owningInstitutionItemId = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "a");
         if (StringUtils.isNotBlank(owningInstitutionItemId)) {
