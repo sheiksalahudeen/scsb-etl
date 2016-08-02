@@ -58,12 +58,14 @@ public class BibDataProcessor {
                 bibliographicDetailsRepository.save(bibliographicEntityList);
                 flushAndClearSession();
             } catch (Exception e) {
+                clearSession();
                 LoadReportUtil loadReportUtil = new LoadReportUtil(etlExchange.getInstitutionEntityMap(), etlExchange.getCollectionGroupMap());
                 for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
                     try {
                         bibliographicDetailsRepository.save(bibliographicEntity);
                         flushAndClearSession();
                     } catch (Exception ex) {
+                        clearSession();
                         List<FailureReportReCAPCSVRecord> failureReportEntities = processBibHoldingsItems(loadReportUtil, bibliographicEntity);
                         failureReportReCAPCSVRecords.addAll(failureReportEntities);
                     }
@@ -102,6 +104,7 @@ public class BibDataProcessor {
                             flushAndClearSession();
                             savedItemEntities.add(savedItemEntity);
                         } catch (Exception itemEx) {
+                            clearSession();
                             FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibHoldingsItemInfo(bibliographicEntity, holdingsEntity, itemEntity);
                             failureReportReCAPCSVRecord.setExceptionMessage(itemEx.getCause().getCause().getMessage());
                             failureReportReCAPCSVRecord.setFileName(xmlFileName);
@@ -109,6 +112,7 @@ public class BibDataProcessor {
                         }
                     }
                 } catch (Exception holdingsEx) {
+                    clearSession();
                     FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibHoldingsInfo(bibliographicEntity, holdingsEntity);
                     failureReportReCAPCSVRecord.setExceptionMessage(holdingsEx.getCause().getCause().getMessage());
                     failureReportReCAPCSVRecord.setFileName(xmlFileName);
@@ -120,6 +124,7 @@ public class BibDataProcessor {
             bibliographicDetailsRepository.save(bibliographicEntity);
             flushAndClearSession();
         } catch (Exception bibEx) {
+            clearSession();
             FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibInfo(bibliographicEntity);
             failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getCause().getCause().getMessage());
             failureReportReCAPCSVRecord.setFileName(xmlFileName);
@@ -130,6 +135,10 @@ public class BibDataProcessor {
 
     private void flushAndClearSession() {
         entityManager.flush();
+        entityManager.clear();
+    }
+
+    private void clearSession() {
         entityManager.clear();
     }
 
