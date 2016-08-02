@@ -1,11 +1,14 @@
 package org.recap.route;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.HoldingsDetailsRepository;
+import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +36,15 @@ public class EtlDataLoadProcessorUT extends BaseTestCase{
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
+    ItemDetailsRepository itemDetailsRepository;
+
+    @Autowired
+    ProducerTemplate producer;
+
     @Test
     public void testStartLoadProcessWithXmlFileName() throws Exception {
 
@@ -40,6 +52,9 @@ public class EtlDataLoadProcessorUT extends BaseTestCase{
         assertNotNull(recordProcessor);
         assertNotNull(xmlRecordRepository);
         assertNotNull(bibliographicDetailsRepository);
+        assertNotNull(holdingsDetailsRepository);
+        assertNotNull(itemDetailsRepository);
+        assertNotNull(producer);
 
         XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
         String xmlFileName = "sampleRecordForEtlLoadTest.xml";
@@ -58,6 +73,10 @@ public class EtlDataLoadProcessorUT extends BaseTestCase{
         etlDataLoadProcessor.setBatchSize(10);
         etlDataLoadProcessor.setRecordProcessor(recordProcessor);
         etlDataLoadProcessor.setXmlRecordRepository(xmlRecordRepository);
+        etlDataLoadProcessor.setBibliographicDetailsRepository(bibliographicDetailsRepository);
+        etlDataLoadProcessor.setHoldingsDetailsRepository(holdingsDetailsRepository);
+        etlDataLoadProcessor.setItemDetailsRepository(itemDetailsRepository);
+        etlDataLoadProcessor.setProducer(producer);
         etlDataLoadProcessor.setInstitutionName("NYPL");
         assertNotNull(etlDataLoadProcessor.getXmlRecordRepository());
         assertEquals(etlDataLoadProcessor.getBatchSize(), new Integer(10));
