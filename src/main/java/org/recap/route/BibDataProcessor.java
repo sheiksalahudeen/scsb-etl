@@ -126,7 +126,11 @@ public class BibDataProcessor {
         } catch (Exception bibEx) {
             clearSession();
             FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibInfo(bibliographicEntity);
-            failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getCause().getCause().getMessage());
+            if(bibEx.getCause() != null && bibEx.getCause().getCause() != null) {
+                failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getCause().getCause().getMessage());
+            } else {
+                failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getMessage());
+            }
             failureReportReCAPCSVRecord.setFileName(xmlFileName);
             failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
         }

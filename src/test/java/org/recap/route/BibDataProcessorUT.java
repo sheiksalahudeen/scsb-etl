@@ -117,12 +117,35 @@ public class BibDataProcessorUT extends BaseTestCase {
     @Test
     public void processFailuresForHoldingsAndItems() throws Exception {
 
+        String content = "<collection>\n" +
+                "        <record>\n" +
+                "        <controlfield tag=\"001\">47764496</controlfield>\n" +
+                "        <controlfield tag=\"003\">OCoLC</controlfield>\n" +
+                "        <controlfield tag=\"005\">20021018083242.7</controlfield>\n" +
+                "        <controlfield tag=\"008\">010604s2000 it a bde 000 0cita</controlfield>\n" +
+                "        <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">Dizionario biografico enciclopedico di un secolo del calcio italiano /\n" +
+                "        </subfield>\n" +
+                "        <subfield code=\"c\">a cura di Marco Sappino.</subfield>\n" +
+                "        </datafield>\n" +
+                "        <datafield ind1=\"1\" ind2=\"4\" tag=\"246\">\n" +
+                "        <subfield code=\"a\">Dizionario del calcio italiano</subfield>\n" +
+                "        </datafield>\n" +
+                "        <datafield ind1=\" \" ind2=\" \" tag=\"260\">\n" +
+                "        <subfield code=\"a\">Milano :</subfield>\n" +
+                "        <subfield code=\"b\">Baldini &amp; Castoldi,</subfield>\n" +
+                "        <subfield code=\"c\">c2000.</subfield>\n" +
+                "        </datafield>\n" +
+                "        <leader>01184nam a22003494a 4500</leader>\n" +
+                "        </record>\n" +
+                "        </collection>";
+
         Mockito.when(institutionMap.get("PUL")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Shared")).thenReturn(1);
 
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content".getBytes());
+        bibliographicEntity.setContent(content.getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedBy("etl");
