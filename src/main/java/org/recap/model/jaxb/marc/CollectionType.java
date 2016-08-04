@@ -81,6 +81,10 @@ public class CollectionType {
         return this.record;
     }
 
+    public void setRecord(List<RecordType> record) {
+        this.record = record;
+    }
+
     /**
      * Gets the value of the id property.
      *

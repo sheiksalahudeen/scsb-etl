@@ -121,6 +121,10 @@ public class RecordType {
         return this.datafield;
     }
 
+    public void setDatafield(List<DataFieldType> datafield) {
+        this.datafield = datafield;
+    }
+
     /**
      * Gets the value of the type property.
      *

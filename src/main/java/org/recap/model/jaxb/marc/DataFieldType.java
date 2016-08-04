@@ -77,6 +77,10 @@ public class DataFieldType {
         return this.subfield;
     }
 
+    public void setSubfield(List<SubfieldatafieldType> subfield) {
+        this.subfield = subfield;
+    }
+
     /**
      * Gets the value of the id property.
      *
