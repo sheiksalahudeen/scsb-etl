@@ -561,7 +561,6 @@ public class BibliographicEntityUT extends BaseTestCase {
 
     @Test
     public void duplicateBibWithDifferentHoldingsItemsAndKeepOld() {
-        Random random = new Random();
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
         bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
@@ -569,7 +568,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity1.setLastUpdatedBy("etl");
         bibliographicEntity1.setLastUpdatedDate(new Date());
         bibliographicEntity1.setOwningInstitutionId(1);
-        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        String owningInstitutionBibId = "1";
         bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId);
 
         HoldingsEntity holdingsEntity1 = new HoldingsEntity();
@@ -578,11 +577,11 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
         holdingsEntity1.setLastUpdatedBy("etl");
-        holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        holdingsEntity1.setOwningInstitutionHoldingsId("2");
 
         ItemEntity itemEntity1 = new ItemEntity();
         itemEntity1.setLastUpdatedDate(new Date());
-        itemEntity1.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity1.setOwningInstitutionItemId("3");
         itemEntity1.setOwningInstitutionId(1);
         itemEntity1.setCreatedDate(new Date());
         itemEntity1.setCreatedBy("etl");
@@ -612,11 +611,11 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());
         holdingsEntity2.setLastUpdatedBy("etl");
-        holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        holdingsEntity2.setOwningInstitutionHoldingsId("4");
 
         ItemEntity itemEntity2 = new ItemEntity();
         itemEntity2.setLastUpdatedDate(new Date());
-        itemEntity2.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity2.setOwningInstitutionItemId("5");
         itemEntity2.setOwningInstitutionId(1);
         itemEntity2.setCreatedDate(new Date());
         itemEntity2.setCreatedBy("etl");
