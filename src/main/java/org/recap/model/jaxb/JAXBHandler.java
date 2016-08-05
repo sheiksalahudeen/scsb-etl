@@ -54,14 +54,14 @@ public class JAXBHandler {
     }
 
     public Object unmarshal(String content, Class cl) {
-        BibRecord bibRecord = null;
+        Object object = null;
         try {
             Unmarshaller unmarshaller = getUnmarshaller(cl);
-            bibRecord = (BibRecord) unmarshaller.unmarshal(new StringReader(content));
+            object = unmarshaller.unmarshal(new StringReader(content));
         } catch (JAXBException e) {
             e.printStackTrace();
         }
-        return bibRecord;
+        return object;
     }
 
     private Unmarshaller getUnmarshaller(Class cl) throws JAXBException {
