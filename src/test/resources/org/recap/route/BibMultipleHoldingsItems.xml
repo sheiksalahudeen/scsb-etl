@@ -1,7 +1,7 @@
 <bibRecord>
     <bib>
         <owningInstitutionId>NYPL</owningInstitutionId>
-        <owningInstitutionBibId>.b103167134</owningInstitutionBibId>
+        <owningInstitutionBibId>0002</owningInstitutionBibId>
         <content>
             <collection xmlns="http://www.loc.gov/MARC21/slim">
                 <record>
@@ -60,7 +60,7 @@
                         </subfield>
                     </datafield>
                     <datafield ind1=" " ind2=" " tag="907">
-                        <subfield code="a">.b103167134</subfield>
+                        <subfield code="a">b103167134</subfield>
                         <subfield code="c">s</subfield>
                         <subfield code="d">a</subfield>
                         <subfield code="e">-</subfield>
@@ -85,7 +85,7 @@
     </bib>
     <holdings>
         <holding>
-            <owningInstitutionHoldingsId>.c11316020.c11333133.c11349165</owningInstitutionHoldingsId>
+            <owningInstitutionHoldingsId>0003</owningInstitutionHoldingsId>
             <content>
                 <collection xmlns="http://www.loc.gov/MARC21/slim">
                     <record>
@@ -129,7 +129,7 @@
                             <datafield ind1=" " ind2=" " tag="876">
                                 <subfield code="p">33433002853285</subfield>
                                 <subfield code="h">In Library Use</subfield>
-                                <subfield code="a">.i100748843</subfield>
+                                <subfield code="a">0004</subfield>
                                 <subfield code="j">Available</subfield>
                                 <subfield code="t">1</subfield>
                                 <subfield code="3">v. 17 (Apr-June 1990)</subfield>
@@ -143,7 +143,7 @@
                             <datafield ind1=" " ind2=" " tag="876">
                                 <subfield code="p">33433002853319334330028533193343300285331955555</subfield>
                                 <subfield code="h">In Library Use</subfield>
-                                <subfield code="a">.i100748879</subfield>
+                                <subfield code="a">0005</subfield>
                                 <subfield code="j">Available</subfield>
                                 <subfield code="t">1</subfield>
                                 <subfield code="3">v. 18 (Jan-Mar 1991) index</subfield>
@@ -160,7 +160,7 @@
     </holdings>
     <holdings>
         <holding>
-            <owningInstitutionHoldingsId/>
+            <owningInstitutionHoldingsId>0006</owningInstitutionHoldingsId>
             <content>
                 <collection xmlns="http://www.loc.gov/MARC21/slim">
                     <record>
@@ -181,7 +181,7 @@
                             <datafield ind1=" " ind2=" " tag="876">
                                 <subfield code="p">33433017226774</subfield>
                                 <subfield code="h">In Library Use</subfield>
-                                <subfield code="a">.i119424642</subfield>
+                                <subfield code="a">0007</subfield>
                                 <subfield code="j">Available</subfield>
                                 <subfield code="t">1</subfield>
                                 <subfield code="3">v. 26 (Jan-Mar 1999)</subfield>
@@ -195,7 +195,7 @@
                             <datafield ind1=" " ind2=" " tag="876">
                                 <subfield code="p">33433023831724</subfield>
                                 <subfield code="h">In Library Use</subfield>
-                                <subfield code="a">.i119424654</subfield>
+                                <subfield code="a">0008</subfield>
                                 <subfield code="j">Available</subfield>
                                 <subfield code="t">1</subfield>
                                 <subfield code="3">v. 26 (Oct-Dec 1999)</subfield>
