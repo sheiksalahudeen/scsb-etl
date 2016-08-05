@@ -143,7 +143,6 @@ public class BibDataProcessorUT extends BaseTestCase {
         Mockito.when(institutionMap.get("PUL")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Shared")).thenReturn(1);
 
-        Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent(content.getBytes());
         bibliographicEntity.setCreatedDate(new Date());
@@ -151,7 +150,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedBy("etl");
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setOwningInstitutionId(1);
-        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        String owningInstitutionBibId = String.valueOf("001");
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
 
 
@@ -161,7 +160,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf("002"));
 
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setCallNumberType("0");
@@ -186,7 +185,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         LoadReportUtil loadReportUtil = new LoadReportUtil(institutionMap, collectionGroupMap);
         bibDataProcessor.setXmlFileName("testFailureForItemsAndHoldings.xml");
         List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = bibDataProcessor.processBibHoldingsItems(loadReportUtil, bibliographicEntity);
-        assertTrue(failureReportReCAPCSVRecords.size() == 1);
+        assertEquals(failureReportReCAPCSVRecords.size() , 1);
         assertEquals(bibDataProcessor.getXmlFileName(), failureReportReCAPCSVRecords.get(0).getFileName());
     }
 
