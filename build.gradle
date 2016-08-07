@@ -33,7 +33,7 @@ apply plugin: 'net.saliman.cobertura'
 
 sonarqube {
     properties {
-        property "systemProp.sonar.host.url", "http://http://174.129.129.28:9000"
+        property "systemProp.sonar.host.url", "http://174.129.129.28:9000"
         property "systemProp.sonar.jdbc.url", "jdbc:mysql://scsb-mysql:3306/sonar"
         property "systemProp.sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
         property "systemProp.sonar.jdbc.username", "sonar"
