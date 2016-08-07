@@ -1,77 +1,92 @@
 buildscript {
-	ext {
-		springBootVersion = '1.3.5.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
-	}
+    ext {
+        springBootVersion = '1.3.5.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 buildscript {
-	repositories {
-		maven {
-			url "https://plugins.gradle.org/m2/"
-		}
-	}
-	dependencies {
-		classpath "net.saliman:gradle-cobertura-plugin:2.3.2"
-	}
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:2.3.2"
+    }
 }
+
+plugins {
+    id "org.sonarqube" version "2.0.1"
+}
+
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 apply plugin: 'net.saliman.cobertura'
 
+sonarqube {
+    properties {
+        property "systemProp.sonar.host.url", "http://localhost:9000"
+        property "systemProp.sonar.jdbc.url", "jdbc:mysql://scsb-mysql:3306/sonar"
+        property "systemProp.sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
+        property "systemProp.sonar.jdbc.username", "sonar"
+        property "systemProp.sonar.jdbc.password", "sonar"
+    }
+}
+
 //added to accept systemproperties while executing gradlew test cmd
 test {
-	systemProperties = System.properties
+    systemProperties = System.properties
 }
 
 jar {
-	baseName = 'scsb-etl'
-	version = '0.0.1-SNAPSHOT'
+    baseName = 'scsb-etl'
+    version = '0.0.1-SNAPSHOT'
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 
 dependencies {
-	compile('org.apache.camel:camel-spring-boot-starter:2.17.1')
-	compile('org.apache.camel:camel-metrics:2.17.1')
-	compile('org.apache.camel:camel-ftp:2.17.1')
-	compile('org.apache.camel:camel-csv:2.17.1')
-	compile('org.apache.camel:camel-bindy:2.17.1')
-	compile('org.apache.commons:commons-csv:1.4')
-	compile('org.apache.activemq:activemq-camel:5.13.3')
-	compile('org.apache.activemq:activemq-pool:5.13.3')
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-ws')
-	compile('info.freelibrary:freelib-marc4j:2.6.11')
-	compile('org.apache.commons:commons-lang3:3.4')
-	compile('commons-io:commons-io:2.5')
-	runtime('mysql:mysql-connector-java')
-	testCompile('org.springframework.boot:spring-boot-starter-test') 
-	testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
+    compile('org.apache.camel:camel-spring-boot-starter:2.17.1')
+    compile('org.apache.camel:camel-metrics:2.17.1')
+    compile('org.apache.camel:camel-ftp:2.17.1')
+    compile('org.apache.camel:camel-csv:2.17.1')
+    compile('org.apache.camel:camel-bindy:2.17.1')
+    compile('org.apache.commons:commons-csv:1.4')
+    compile('org.apache.activemq:activemq-camel:5.13.3')
+    compile('org.apache.activemq:activemq-pool:5.13.3')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-ws')
+    compile('info.freelibrary:freelib-marc4j:2.6.11')
+    compile('org.apache.commons:commons-lang3:3.4')
+    compile('commons-io:commons-io:2.5')
+    runtime('mysql:mysql-connector-java')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
 }
 
 
 eclipse {
-	classpath {
-		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
-	}
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
 }
 
 cobertura {
-	coverageFormats = [ 'xml', 'html' ]
+    coverageFormats = ['xml', 'html']
 }
