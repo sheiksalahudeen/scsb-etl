@@ -1,5 +1,6 @@
 package org.recap.repository;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.ReportEntity;
@@ -18,6 +19,7 @@ public class ReportDetailRepositoryTest extends BaseTestCase {
     @Autowired
     private ReportDetailRepository reportDetailRepository;
 
+    @Ignore
     @Test
     public void testSaveReportEntity() {
 
@@ -51,12 +53,11 @@ public class ReportDetailRepositoryTest extends BaseTestCase {
         reportEntity4.setRecordNumber(2);
         reportEntities.add(reportEntity4);
 
-        reportDetailRepository.save(reportEntities);
+        Iterable<ReportEntity> savedEntities = reportDetailRepository.save(reportEntities);
 
-        System.out.println("test");
-
-
-
+        for (ReportEntity savedReportEntity : savedEntities) {
+            assertNotNull(savedReportEntity.getReportId());
+        }
     }
 
 }
