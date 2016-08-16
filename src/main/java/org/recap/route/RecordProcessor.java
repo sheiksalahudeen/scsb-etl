@@ -1,16 +1,14 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.model.csv.FailureReportReCAPCSVRecord;
-import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.*;
-import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
+import org.recap.util.DBReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +51,9 @@ public class RecordProcessor {
     @Autowired
     BibDataProcessor bibDataProcessor;
 
+    @Autowired
+    DBReportUtil DBReportUtil;
+
     private ExecutorService executorService;
 
 
@@ -60,7 +61,7 @@ public class RecordProcessor {
         logger.info("Processor: " + Thread.currentThread().getName());
 
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
+        List<ReportEntity> reportEntities = new ArrayList<>();
 
         List<Future> futures = prepareFutureTasks(xmlRecordEntities);
 
@@ -75,7 +76,7 @@ public class RecordProcessor {
                 logger.error(e.getMessage());
             }
 
-            processFutureResults(object, bibliographicEntities, failureReportReCAPCSVRecords);
+            processFutureResults(object, bibliographicEntities, reportEntities);
         }
 
         if (!CollectionUtils.isEmpty(bibliographicEntities)) {
@@ -88,25 +89,23 @@ public class RecordProcessor {
         }
 
 
-        if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
-            ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-            producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
+        if (!CollectionUtils.isEmpty(reportEntities)) {
+            producer.sendBody("seda:reportQ", reportEntities);
         }
 
     }
 
-    private void processFutureResults(Object object, List<BibliographicEntity> bibliographicEntities, List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords) {
+    private void processFutureResults(Object object, List<BibliographicEntity> bibliographicEntities, List<ReportEntity> reportEntities) {
         Map<String, Object> resultMap = (Map<String, Object>) object;
 
         if (object != null) {
             Object bibliographicEntity = resultMap.get("bibliographicEntity");
-            Object failureReportReCAPCSVRecord = resultMap.get("failureReportReCAPCSVRecord");
+            ReportEntity reportEntity = (ReportEntity) resultMap.get("reportEntity");
             if (bibliographicEntity != null) {
                 bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
             }
-            if (failureReportReCAPCSVRecord != null) {
-                failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) failureReportReCAPCSVRecord);
+            if (reportEntity != null) {
+                reportEntities.add(reportEntity);
             }
         }
     }
@@ -122,6 +121,7 @@ public class RecordProcessor {
             bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
 
             BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+            bibPersisterCallable.setDBReportUtil(DBReportUtil);
             bibPersisterCallable.setBibRecord(bibRecord);
             bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
             bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());

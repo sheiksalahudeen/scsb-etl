@@ -8,16 +8,16 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVRecord;
-import org.recap.model.csv.SuccessReportReCAPCSVRecord;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
+import org.recap.repository.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,6 +39,9 @@ public class JMSUT extends BaseTestCase {
 
     @Value("${etl.report.directory}")
     private String reportDirectoryPath;
+
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
 
     @Test
     public void produceAndConsumeSEDA() throws Exception {
@@ -64,8 +67,8 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setCustomerCode("PA");
         failureReportReCAPCSVRecord.setTitle("History, of Science");
         failureReportReCAPCSVRecord.setCollectionGroupDesignation("open");
-        failureReportReCAPCSVRecord.setCreateDateItem(new Date());
-        failureReportReCAPCSVRecord.setLastUpdatedDateItem(new Date());
+        failureReportReCAPCSVRecord.setCreateDateItem(new SimpleDateFormat("mm-dd-yyyy").format(new Date()));
+        failureReportReCAPCSVRecord.setLastUpdatedDateItem(new SimpleDateFormat("mm-dd-yyyy").format(new Date()));
         failureReportReCAPCSVRecord.setExceptionMessage("exception");
         failureReportReCAPCSVRecord.setErrorDescription("error");
         failureReportReCAPCSVRecord.setFileName("testReport1.xml");
@@ -75,7 +78,7 @@ public class JMSUT extends BaseTestCase {
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
+        producer.sendBody("seda:reportQ", reCAPCSVRecord);
 
         Thread.sleep(1000);
 
@@ -108,29 +111,49 @@ public class JMSUT extends BaseTestCase {
 
     @Test
     public void generateSuccessReport() throws Exception {
-        SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
-        successReportReCAPCSVRecord.setFileName("test,Report.xml");
-        successReportReCAPCSVRecord.setTotalRecordsInFile(1000);
-        successReportReCAPCSVRecord.setTotalBibsLoaded(900);;
-        successReportReCAPCSVRecord.setTotalHoldingsLoaded(800);
-        successReportReCAPCSVRecord.setTotalItemsLoaded(1000);
-        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(900);
-        successReportReCAPCSVRecord.setTotalBibItemsLoaded(1100);
-        successReportReCAPCSVRecord.setOwningInstitution("PUL");
-        producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
+
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+
+        ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
+        totalRecordsInFileEntity.setHeaderName("Total Records In File");
+        totalRecordsInFileEntity.setHeaderValue(String.valueOf(10000));
+        reportDataEntities.add(totalRecordsInFileEntity);
+
+        ReportDataEntity totalBibsLoadedEntity = new ReportDataEntity();
+        totalBibsLoadedEntity.setHeaderName("Total Bibs Loaded");
+        totalBibsLoadedEntity.setHeaderValue(String.valueOf(10000));
+        reportDataEntities.add(totalBibsLoadedEntity);
+
+        ReportDataEntity totalHoldingsLoadedEntity = new ReportDataEntity();
+        totalHoldingsLoadedEntity.setHeaderName("Total Holdings Loaded");
+        totalHoldingsLoadedEntity.setHeaderValue(String.valueOf(8000));
+        reportDataEntities.add(totalHoldingsLoadedEntity);
+
+        ReportDataEntity totalItemsLoadedEntity = new ReportDataEntity();
+        totalItemsLoadedEntity.setHeaderName("Total Items Loaded");
+        totalItemsLoadedEntity.setHeaderValue(String.valueOf(12000));
+        reportDataEntities.add(totalItemsLoadedEntity);
+
+        ReportDataEntity totalBibHoldingsLoadedEntity = new ReportDataEntity();
+        totalBibHoldingsLoadedEntity.setHeaderName("Total Bib-Holdings Loaded");
+        totalBibHoldingsLoadedEntity.setHeaderValue(String.valueOf(18000));
+        reportDataEntities.add(totalBibHoldingsLoadedEntity);
+
+        ReportDataEntity totalBiBItemsLoadedEntity = new ReportDataEntity();
+        totalBiBItemsLoadedEntity.setHeaderName("Total Bib-Items Loaded");
+        totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(22000));
+        reportDataEntities.add(totalBiBItemsLoadedEntity);
+
+        reportEntity.setFileName("SampleRecord.xml");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("Success");
+        reportEntity.setReportDataEntities(reportDataEntities);
+        producer.sendBody("seda:reportQ", reportEntity);
         Thread.sleep(1000);
 
-        DateFormat df = new SimpleDateFormat("ddMMMyyyy");
-        String fileName = FilenameUtils.removeExtension(successReportReCAPCSVRecord.getFileName()) + "-Success-" + df.format(new Date());
-        File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
-        assertTrue(file.exists());
-        String fileContents = Files.toString(file, Charsets.UTF_8);
-        assertNotNull(fileContents);
-        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalBibsLoaded().toString()));
-        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalHoldingsLoaded().toString()));
-        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalRecordsInFile().toString()));
-        assertTrue(fileContents.contains(successReportReCAPCSVRecord.getTotalItemsLoaded().toString()));
-        assertTrue(fileContents.contains(String.valueOf(successReportReCAPCSVRecord.getTotalBibItemsLoaded())));
-        assertTrue(fileContents.contains(String.valueOf(successReportReCAPCSVRecord.getTotalBibHoldingsLoaded())));
+        ReportEntity byFileName = reportDetailRepository.findByFileName("SampleRecord.xml");
+        assertNotNull(byFileName);
+
     }
 }

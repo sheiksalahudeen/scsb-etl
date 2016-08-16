@@ -7,18 +7,21 @@ import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.XmlRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
 /**
  * Created by peris on 7/17/16.
  */
+
 public class XmlProcessor implements Processor {
 
     Logger logger = LoggerFactory.getLogger(XmlProcessor.class);
 
     private final XmlRecordRepository xmlRecordRepository;
 
+    @Autowired
     public XmlProcessor(XmlRecordRepository xmlRecordRepository) {
         this.xmlRecordRepository = xmlRecordRepository;
     }

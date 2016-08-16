@@ -60,16 +60,17 @@ public class CSVRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from("seda:etlFailureReportQ")
-                .routeId("failureReportQRoute")
-                .process(new CSVFailureFileNameProcessor()).marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
-                .to("file:"+reportDirectoryPath + File.separator + "?fileName=${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append")
-                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.institutionName}/${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append");
+//        from("seda:etlFailureReportQ")
+//                .routeId("failureReportQRoute")
+//                .process(new CSVFailureFileNameProcessor()).marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
+//                .to("file:"+reportDirectoryPath + File.separator + "?fileName=${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append")
+//                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.institutionName}/${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append");
+//
+//        from("seda:etlSuccessReportQ")
+//                .routeId("successReportQRoute")
+//                .process(new CSVSuccessFileNameProcessor()).marshal().bindy(BindyType.Csv, SuccessReportReCAPCSVRecord.class)
+//                .to("file:"+reportDirectoryPath + File.separator + "?fileName=${in.header.reportFileName}-Success-${date:now:ddMMMyyyy}.csv&fileExist=append")
+//                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.institutionName}/${in.header.reportFileName}-Success-${date:now:ddMMMyyyy}.csv&fileExist=append");
 
-        from("seda:etlSuccessReportQ")
-                .routeId("successReportQRoute")
-                .process(new CSVSuccessFileNameProcessor()).marshal().bindy(BindyType.Csv, SuccessReportReCAPCSVRecord.class)
-                .to("file:"+reportDirectoryPath + File.separator + "?fileName=${in.header.reportFileName}-Success-${date:now:ddMMMyyyy}.csv&fileExist=append")
-                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.institutionName}/${in.header.reportFileName}-Success-${date:now:ddMMMyyyy}.csv&fileExist=append");
     }
 }

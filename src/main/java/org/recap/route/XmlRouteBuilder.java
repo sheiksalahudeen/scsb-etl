@@ -1,74 +1,53 @@
 package org.recap.route;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
 import org.apache.commons.io.FilenameUtils;
 import org.recap.repository.XmlRecordRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by angelind on 21/7/16.
  */
-public class XmlRouteBuilder extends RouteBuilder {
 
-    private String xmlTagName;
-    private String inputDirectoryPath;
-    private Integer poolSize;
-    private Integer maxPoolSize;
-    private XmlRecordRepository xmlRecordRepository;
+@Component
+public class XmlRouteBuilder {
 
-    public String getXmlTagName() {
-        return xmlTagName;
-    }
+    Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
-    public void setXmlTagName(String xmlTagName) {
-        this.xmlTagName = xmlTagName;
-    }
+    @Autowired
+    public XmlRouteBuilder(CamelContext context, XmlRecordRepository xmlRecordRepository, ReportProcessor reportProcessor,
+                           @Value("${etl.split.xml.tag.name}") String xmlTagName,
+                           @Value("${etl.load.directory}") String inputDirectoryPath,
+                           @Value("${etl.pool.size}") Integer poolSize, @Value("${etl.max.pool.size}") Integer maxPoolSize) {
 
-    public String getInputDirectoryPath() {
-        return inputDirectoryPath;
-    }
+        try {
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    FileEndpoint fileEndpoint = endpoint("file:" + inputDirectoryPath, FileEndpoint.class);
+                    fileEndpoint.setFilter(new XmlFileFilter());
 
-    public void setInputDirectoryPath(String inputDirectoryPath) {
-        this.inputDirectoryPath = inputDirectoryPath;
-    }
+                    from(fileEndpoint)
+                            .split()
+                            .tokenizeXML(xmlTagName)
+                            .streaming()
+                            .parallelProcessing().threads(poolSize, maxPoolSize)
+                            .process(new XmlProcessor(xmlRecordRepository));
 
-    public Integer getPoolSize() {
-        return poolSize;
-    }
+                }
+            });
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
 
-    public void setPoolSize(Integer poolSize) {
-        this.poolSize = poolSize;
-    }
-
-    public Integer getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public void setMaxPoolSize(Integer maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
-    public XmlRecordRepository getXmlRecordRepository() {
-        return xmlRecordRepository;
-    }
-
-    public void setXmlRecordRepository(XmlRecordRepository xmlRecordRepository) {
-        this.xmlRecordRepository = xmlRecordRepository;
-    }
-
-    @Override
-    public void configure() throws Exception {
-        FileEndpoint fileEndpoint = endpoint("file:" + inputDirectoryPath, FileEndpoint.class);
-        fileEndpoint.setFilter(new XmlFileFilter());
-
-        from(fileEndpoint)
-                .split()
-                .tokenizeXML(xmlTagName)
-                .streaming()
-                .parallelProcessing().threads(poolSize, maxPoolSize)
-                .process(new XmlProcessor(xmlRecordRepository));
     }
 
     class XmlFileFilter implements GenericFileFilter {
