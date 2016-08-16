@@ -27,10 +27,10 @@ public class FailureReportReCAPCSVRecord  {
     private String title;
     @DataField(pos = 8)
     private String collectionGroupDesignation;
-    @DataField(pos = 9, pattern="MM/dd/yyyy hh:mm:ss a")
-    private Date createDateItem;
-    @DataField(pos = 10, pattern="MM/dd/yyyy hh:mm:ss a")
-    private Date lastUpdatedDateItem;
+    @DataField(pos = 9)
+    private String createDateItem;
+    @DataField(pos = 10)
+    private String lastUpdatedDateItem;
     @DataField(pos = 11)
     private String exceptionMessage;
     @DataField(pos = 12)
@@ -102,19 +102,19 @@ public class FailureReportReCAPCSVRecord  {
         this.collectionGroupDesignation = collectionGroupDesignation;
     }
 
-    public Date getCreateDateItem() {
+    public String getCreateDateItem() {
         return createDateItem;
     }
 
-    public void setCreateDateItem(Date createDateItem) {
+    public void setCreateDateItem(String createDateItem) {
         this.createDateItem = createDateItem;
     }
 
-    public Date getLastUpdatedDateItem() {
+    public String getLastUpdatedDateItem() {
         return lastUpdatedDateItem;
     }
 
-    public void setLastUpdatedDateItem(Date lastUpdatedDateItem) {
+    public void setLastUpdatedDateItem(String lastUpdatedDateItem) {
         this.lastUpdatedDateItem = lastUpdatedDateItem;
     }
 

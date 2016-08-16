@@ -1,7 +1,8 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.model.csv.SuccessReportReCAPCSVRecord;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,7 +85,8 @@ public class EtlDataLoadProcessor {
     }
 
     private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName, long oldBibHoldingsCount, long oldBibItemsCount) {
-        SuccessReportReCAPCSVRecord successReportReCAPCSVRecord = new SuccessReportReCAPCSVRecord();
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         long newBibsCount = bibliographicDetailsRepository.count();
         long newHoldingsCount = holdingsDetailsRepository.count();
         long newItemsCount = itemDetailsRepository.count();
@@ -95,15 +99,43 @@ public class EtlDataLoadProcessor {
         Integer processedBibHoldingsCount = Integer.valueOf(new Long(newBibHoldingsCount).toString()) - Integer.valueOf(new Long(oldBibHoldingsCount).toString());
         Integer processedBibItemsCount = Integer.valueOf(new Long(newBibItemsCount).toString()) - Integer.valueOf(new Long(oldBibItemsCount).toString());
         Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
-        successReportReCAPCSVRecord.setFileName(fileName);
-        successReportReCAPCSVRecord.setTotalRecordsInFile(totalRecordsInfile);
-        successReportReCAPCSVRecord.setTotalBibsLoaded(processedBibsCount);
-        successReportReCAPCSVRecord.setTotalHoldingsLoaded(processedHoldingsCount);
-        successReportReCAPCSVRecord.setTotalItemsLoaded(processedItemsCount);
-        successReportReCAPCSVRecord.setTotalBibHoldingsLoaded(processedBibHoldingsCount);
-        successReportReCAPCSVRecord.setTotalBibItemsLoaded(processedBibItemsCount);
-        successReportReCAPCSVRecord.setOwningInstitution(institutionName);
-        producer.sendBody("seda:etlSuccessReportQ", successReportReCAPCSVRecord);
+
+        ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
+        totalRecordsInFileEntity.setHeaderName("Total Records In File");
+        totalRecordsInFileEntity.setHeaderValue(String.valueOf(totalRecordsInfile));
+        reportDataEntities.add(totalRecordsInFileEntity);
+
+        ReportDataEntity totalBibsLoadedEntity = new ReportDataEntity();
+        totalBibsLoadedEntity.setHeaderName("Total Bibs Loaded");
+        totalBibsLoadedEntity.setHeaderValue(String.valueOf(processedBibsCount));
+        reportDataEntities.add(totalBibsLoadedEntity);
+
+        ReportDataEntity totalHoldingsLoadedEntity = new ReportDataEntity();
+        totalHoldingsLoadedEntity.setHeaderName("Total Holdings Loaded");
+        totalHoldingsLoadedEntity.setHeaderValue(String.valueOf(processedHoldingsCount));
+        reportDataEntities.add(totalHoldingsLoadedEntity);
+
+        ReportDataEntity totalItemsLoadedEntity = new ReportDataEntity();
+        totalItemsLoadedEntity.setHeaderName("Total Items Loaded");
+        totalItemsLoadedEntity.setHeaderValue(String.valueOf(processedItemsCount));
+        reportDataEntities.add(totalItemsLoadedEntity);
+
+        ReportDataEntity totalBibHoldingsLoadedEntity = new ReportDataEntity();
+        totalBibHoldingsLoadedEntity.setHeaderName("Total Bib-Holdings Loaded");
+        totalBibHoldingsLoadedEntity.setHeaderValue(String.valueOf(processedBibHoldingsCount));
+        reportDataEntities.add(totalBibHoldingsLoadedEntity);
+
+        ReportDataEntity totalBiBItemsLoadedEntity = new ReportDataEntity();
+        totalBiBItemsLoadedEntity.setHeaderName("Total Bib-Items Loaded");
+        totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(processedBibItemsCount));
+        reportDataEntities.add(totalBiBItemsLoadedEntity);
+
+        reportEntity.setFileName(fileName);
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("Success");
+        reportEntity.setReportDataEntities(reportDataEntities);
+
+        producer.sendBody("seda:reportQ", reportEntity);
     }
 
     public Logger getLogger() {

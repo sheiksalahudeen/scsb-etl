@@ -1,25 +1,21 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.model.csv.FailureReportReCAPCSVRecord;
-import org.recap.model.csv.ReCAPCSVRecord;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.HoldingsDetailsRepository;
 import org.recap.repository.ItemDetailsRepository;
-import org.recap.util.LoadReportUtil;
+import org.recap.util.DBReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,10 +44,13 @@ public class BibDataProcessor {
     @PersistenceContext
     EntityManager entityManager;
 
+    @Autowired
+    DBReportUtil DBReportUtil;
+
     @Transactional
     public void processETLExchagneAndPersistToDB(ETLExchange etlExchange) {
+        ReportEntity reportEntity = null;
         if (etlExchange != null) {
-            List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntityList = etlExchange.getBibliographicEntities();
 
             try {
@@ -59,30 +58,30 @@ public class BibDataProcessor {
                 flushAndClearSession();
             } catch (Exception e) {
                 clearSession();
-                LoadReportUtil loadReportUtil = new LoadReportUtil(etlExchange.getInstitutionEntityMap(), etlExchange.getCollectionGroupMap());
+                DBReportUtil.setCollectionGroupMap(etlExchange.getCollectionGroupMap());
+                DBReportUtil.setInstitutionEntitiesMap(etlExchange.getInstitutionEntityMap());
                 for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
                     try {
                         bibliographicDetailsRepository.save(bibliographicEntity);
                         flushAndClearSession();
                     } catch (Exception ex) {
                         clearSession();
-                        List<FailureReportReCAPCSVRecord> failureReportEntities = processBibHoldingsItems(loadReportUtil, bibliographicEntity);
-                        failureReportReCAPCSVRecords.addAll(failureReportEntities);
+                        reportEntity = processBibHoldingsItems(DBReportUtil, bibliographicEntity);
                     }
                 }
             }
-            if (!CollectionUtils.isEmpty(failureReportReCAPCSVRecords)) {
-                ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-                reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-                producer.sendBody("seda:etlFailureReportQ", reCAPCSVRecord);
+            if (null != reportEntity) {
+                producer.sendBody("seda:reportQ", reportEntity);
             }
         }
     }
 
-    public List<FailureReportReCAPCSVRecord> processBibHoldingsItems(LoadReportUtil loadReportUtil, BibliographicEntity bibliographicEntity) {
-        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
+    public ReportEntity processBibHoldingsItems(DBReportUtil dbReportUtil, BibliographicEntity bibliographicEntity) {
+        ReportEntity reportEntity = new ReportEntity();
+
         List<HoldingsEntity> savedHoldingsEntities = new ArrayList<>();
         List<ItemEntity> savedItemEntities = new ArrayList<>();
+
         try {
             List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
             bibliographicEntity.setHoldingsEntities(null);
@@ -105,18 +104,29 @@ public class BibDataProcessor {
                             savedItemEntities.add(savedItemEntity);
                         } catch (Exception itemEx) {
                             clearSession();
-                            FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibHoldingsItemInfo(bibliographicEntity, holdingsEntity, itemEntity);
-                            failureReportReCAPCSVRecord.setExceptionMessage(itemEx.getCause().getCause().getMessage());
-                            failureReportReCAPCSVRecord.setFileName(xmlFileName);
-                            failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
+                            List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
+                            ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
+                            exceptionReportDataEntity.setHeaderName("ExceptionMessage");
+                            exceptionReportDataEntity.setHeaderValue(itemEx.getCause().getCause().getMessage());
+                            reportDataEntities.add(exceptionReportDataEntity);
+
+                            reportEntity.setReportDataEntities(reportDataEntities);
+                            reportEntity.setFileName(xmlFileName);
+                            reportEntity.setCreatedDate(new Date());
+                            reportEntity.setType("Failure");
                         }
                     }
                 } catch (Exception holdingsEx) {
                     clearSession();
-                    FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibHoldingsInfo(bibliographicEntity, holdingsEntity);
-                    failureReportReCAPCSVRecord.setExceptionMessage(holdingsEx.getCause().getCause().getMessage());
-                    failureReportReCAPCSVRecord.setFileName(xmlFileName);
-                    failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
+                    List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsFaiureReortEntity(bibliographicEntity, holdingsEntity);
+                    reportEntity.setReportDataEntities(reportDataEntities);
+                    ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
+                    exceptionReportDataEntity.setHeaderName("ExceptionMessage");
+                    exceptionReportDataEntity.setHeaderValue(holdingsEx.getCause().getCause().getMessage());
+                    reportDataEntities.add(exceptionReportDataEntity);
+                    reportEntity.setFileName(xmlFileName);
+                    reportEntity.setCreatedDate(new Date());
+                    reportEntity.setType("Failure");
                 }
             }
             bibliographicEntity.setHoldingsEntities(savedHoldingsEntities);
@@ -125,16 +135,22 @@ public class BibDataProcessor {
             flushAndClearSession();
         } catch (Exception bibEx) {
             clearSession();
-            FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = loadReportUtil.populateBibInfo(bibliographicEntity);
+            List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibFailureReportEntity(bibliographicEntity);
+
+            ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
+            exceptionReportDataEntity.setHeaderName("ExceptionMessage");
+
             if(bibEx.getCause() != null && bibEx.getCause().getCause() != null) {
-                failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getCause().getCause().getMessage());
+                exceptionReportDataEntity.setHeaderValue(bibEx.getCause().getCause().getMessage());
             } else {
-                failureReportReCAPCSVRecord.setExceptionMessage(bibEx.getMessage());
+                exceptionReportDataEntity.setHeaderValue(bibEx.getMessage());
             }
-            failureReportReCAPCSVRecord.setFileName(xmlFileName);
-            failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
+            reportDataEntities.add(exceptionReportDataEntity);
+            reportEntity.setFileName(xmlFileName);
+            reportEntity.setCreatedDate(new Date());
+            reportEntity.setType("Failure");
         }
-        return failureReportReCAPCSVRecords;
+        return reportEntity;
     }
 
     private void flushAndClearSession() {

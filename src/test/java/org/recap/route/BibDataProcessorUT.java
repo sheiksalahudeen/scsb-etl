@@ -9,16 +9,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.XmlRecordEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.util.LoadReportUtil;
+import org.recap.util.DBReportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -55,6 +51,9 @@ public class BibDataProcessorUT extends BaseTestCase {
 
     @Autowired
     private ProducerTemplate producer;
+
+    @Autowired
+    private DBReportUtil dbReportUtil;
 
     @Before
     public void setUp() {
@@ -182,11 +181,13 @@ public class BibDataProcessorUT extends BaseTestCase {
 
         holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
 
-        LoadReportUtil loadReportUtil = new LoadReportUtil(institutionMap, collectionGroupMap);
+        dbReportUtil.setInstitutionEntitiesMap(institutionMap);
+        dbReportUtil.setCollectionGroupMap(collectionGroupMap);
         bibDataProcessor.setXmlFileName("testFailureForItemsAndHoldings.xml");
-        List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = bibDataProcessor.processBibHoldingsItems(loadReportUtil, bibliographicEntity);
-        assertEquals(failureReportReCAPCSVRecords.size() , 1);
-        assertEquals(bibDataProcessor.getXmlFileName(), failureReportReCAPCSVRecords.get(0).getFileName());
+
+        ReportEntity reportEntity = bibDataProcessor.processBibHoldingsItems(dbReportUtil, bibliographicEntity);
+        assertNotNull(reportEntity);
+        assertEquals(bibDataProcessor.getXmlFileName(), reportEntity.getFileName());
     }
 
     @Test

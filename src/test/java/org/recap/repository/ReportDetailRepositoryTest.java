@@ -1,12 +1,14 @@
 package org.recap.repository;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -19,44 +21,46 @@ public class ReportDetailRepositoryTest extends BaseTestCase {
     @Autowired
     private ReportDetailRepository reportDetailRepository;
 
-    @Ignore
     @Test
     public void testSaveReportEntity() {
 
-        List<ReportEntity> reportEntities = new ArrayList<>();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setHeaderName("Barcode");
-        reportEntity.setHeaderValue("103");
-        reportEntity.setFileName("sampleFile.xml");
-        reportEntity.setRecordNumber(1);
-        reportEntities.add(reportEntity);
+        reportEntity.setFileName("test.xml");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("Failure");
 
-        ReportEntity reportEntity2 = new ReportEntity();
-        reportEntity2.setHeaderName("CallNumber");
-        reportEntity2.setHeaderValue("X");
-        reportEntity2.setFileName("sampleFile.xml");
-        reportEntity2.setRecordNumber(1);
-        reportEntities.add(reportEntity2);
+        ReportDataEntity reportDataEntity = new ReportDataEntity();
+        reportDataEntity.setHeaderName("Barcode");
+        reportDataEntity.setHeaderValue("103");
+        reportDataEntities.add(reportDataEntity);
 
-        ReportEntity reportEntity3 = new ReportEntity();
-        reportEntity3.setHeaderName("Barcode");
-        reportEntity3.setHeaderValue("104");
-        reportEntity3.setFileName("sampleFile.xml");
-        reportEntity3.setRecordNumber(2);
-        reportEntities.add(reportEntity3);
+        ReportDataEntity reportDataEntity2 = new ReportDataEntity();
+        reportDataEntity2.setHeaderName("CallNumber");
+        reportDataEntity2.setHeaderValue("X123");
+        reportDataEntities.add(reportDataEntity2);
 
-        ReportEntity reportEntity4 = new ReportEntity();
-        reportEntity4.setHeaderName("CallNumber");
-        reportEntity4.setHeaderValue("X");
-        reportEntity4.setFileName("sampleFile.xml");
-        reportEntity4.setRecordNumber(2);
-        reportEntities.add(reportEntity4);
+        ReportDataEntity reportDataEntity3 = new ReportDataEntity();
+        reportDataEntity3.setHeaderName("ItemId");
+        reportDataEntity3.setHeaderValue("10412");
+        reportDataEntities.add(reportDataEntity3);
 
-        Iterable<ReportEntity> savedEntities = reportDetailRepository.save(reportEntities);
+        ReportDataEntity reportDataEntity4 = new ReportDataEntity();
+        reportDataEntity4.setHeaderName("Institution");
+        reportDataEntity4.setHeaderValue("PUL");
+        reportDataEntities.add(reportDataEntity4);
 
-        for (ReportEntity savedReportEntity : savedEntities) {
-            assertNotNull(savedReportEntity.getReportId());
+        reportEntity.setReportDataEntities(reportDataEntities);
+
+        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
+
+        assertNotNull(savedReportEntity);
+        assertNotNull(savedReportEntity.getRecordNumber());
+        List<ReportDataEntity> savedReportDataEntities = savedReportEntity.getReportDataEntities();
+        for (Iterator<ReportDataEntity> iterator = savedReportDataEntities.iterator(); iterator.hasNext(); ) {
+            ReportDataEntity savedReportDataEntity = iterator.next();
+            System.out.println(savedReportDataEntity.getHeaderName() + " : " + savedReportDataEntity.getHeaderValue());
         }
     }
 
