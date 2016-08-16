@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -43,8 +44,9 @@ public class ReportRoutesBuilder_UT extends BaseTestCase {
 
         Thread.sleep(1000);
 
-        ReportEntity savedReportEntity = reportDetailRepository.findByFileName(reportEntity.getFileName());
+        List<ReportEntity> savedReportEntity = reportDetailRepository.findByFileName(reportEntity.getFileName());
         assertNotNull(savedReportEntity);
+        assertNotNull(savedReportEntity.get(0));
 
     }
 }

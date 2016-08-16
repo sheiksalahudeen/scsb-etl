@@ -152,8 +152,9 @@ public class JMSUT extends BaseTestCase {
         producer.sendBody("seda:reportQ", reportEntity);
         Thread.sleep(1000);
 
-        ReportEntity byFileName = reportDetailRepository.findByFileName("SampleRecord.xml");
+        List<ReportEntity> byFileName = reportDetailRepository.findByFileName("SampleRecord.xml");
         assertNotNull(byFileName);
+        assertNotNull(byFileName.get(0));
 
     }
 }
