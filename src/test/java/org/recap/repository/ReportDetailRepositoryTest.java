@@ -24,6 +24,30 @@ public class ReportDetailRepositoryTest extends BaseTestCase {
     @Test
     public void testSaveReportEntity() {
 
+        ReportEntity savedReportEntity = saveReportEntity();
+
+        assertNotNull(savedReportEntity);
+        assertNotNull(savedReportEntity.getRecordNumber());
+        List<ReportDataEntity> savedReportDataEntities = savedReportEntity.getReportDataEntities();
+        for (Iterator<ReportDataEntity> iterator = savedReportDataEntities.iterator(); iterator.hasNext(); ) {
+            ReportDataEntity savedReportDataEntity = iterator.next();
+            System.out.println(savedReportDataEntity.getHeaderName() + " : " + savedReportDataEntity.getHeaderValue());
+        }
+    }
+
+    @Test
+    public void saveAndFindReportEntity() {
+        ReportEntity reportEntity = saveReportEntity();
+
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileName(reportEntity.getFileName());
+
+        assertNotNull(reportEntities);
+        ReportEntity reportEntity1 = reportEntities.get(0);
+        assertNotNull(reportEntity1);
+        assertNotNull(reportEntity1.getReportDataEntities());
+    }
+
+    private ReportEntity saveReportEntity() {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
@@ -53,15 +77,7 @@ public class ReportDetailRepositoryTest extends BaseTestCase {
 
         reportEntity.setReportDataEntities(reportDataEntities);
 
-        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
-
-        assertNotNull(savedReportEntity);
-        assertNotNull(savedReportEntity.getRecordNumber());
-        List<ReportDataEntity> savedReportDataEntities = savedReportEntity.getReportDataEntities();
-        for (Iterator<ReportDataEntity> iterator = savedReportDataEntities.iterator(); iterator.hasNext(); ) {
-            ReportDataEntity savedReportDataEntity = iterator.next();
-            System.out.println(savedReportDataEntity.getHeaderName() + " : " + savedReportDataEntity.getHeaderValue());
-        }
+        return reportDetailRepository.save(reportEntity);
     }
 
 }
