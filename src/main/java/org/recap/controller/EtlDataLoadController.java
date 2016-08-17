@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.etl.EtlLoadRequest;
 import org.recap.report.CSVReportGenerator;
+import org.recap.report.FTPReportGenerator;
 import org.recap.repository.*;
 import org.recap.route.EtlDataLoadProcessor;
 import org.recap.route.RecordProcessor;
@@ -51,7 +52,7 @@ public class EtlDataLoadController {
     XmlRecordRepository xmlRecordRepository;
 
     @Autowired
-    CSVReportGenerator csvReportGenerator;
+    FTPReportGenerator ftpReportGenerator;
 
     @Value("${etl.load.batchSize}")
     private Integer batchSize;
@@ -128,7 +129,7 @@ public class EtlDataLoadController {
     public String generateReport(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                              BindingResult result,
                              Model model) {
-        csvReportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
+        ftpReportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getOwningInstitutionName(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
         return etlDataLoader(model);
     }
 }
