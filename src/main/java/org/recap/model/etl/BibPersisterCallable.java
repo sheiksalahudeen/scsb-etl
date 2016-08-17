@@ -25,6 +25,7 @@ public class BibPersisterCallable implements Callable {
     private BibRecord bibRecord;
     private XmlRecordEntity xmlRecordEntity;
     private Map institutionEntitiesMap;
+    private String institutionName;
 
     private Map itemStatusMap;
     private Map collectionGroupMap;
@@ -38,6 +39,7 @@ public class BibPersisterCallable implements Callable {
 
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
+        reportEntity.setInstitutionName(institutionName);
 
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();
@@ -308,6 +310,14 @@ public class BibPersisterCallable implements Callable {
 
     public void setInstitutionEntitiesMap(Map institutionEntitiesMap) {
         this.institutionEntitiesMap = institutionEntitiesMap;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 
     public Map getItemStatusMap() {

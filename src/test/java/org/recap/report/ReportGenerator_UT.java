@@ -74,6 +74,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Failure");
+        reportEntity.setInstitutionName("NYPL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
         reportDataEntity.setHeaderName("ItemBarcode");
@@ -92,7 +93,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportDataEntity reportDataEntity4 = new ReportDataEntity();
         reportDataEntity4.setHeaderName("OwningInstitution");
-        reportDataEntity4.setHeaderValue("PUL");
+        reportDataEntity4.setHeaderValue("NYPL");
         reportDataEntities.add(reportDataEntity4);
 
         reportEntity.setReportDataEntities(reportDataEntities);
@@ -115,7 +116,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-        String generatedReportFileName = reportGenerator.generateReport(fileName, from, to);
+        String generatedReportFileName = reportGenerator.generateReport(fileName, "Failure", from, to);
 
         Thread.sleep(1000);
 

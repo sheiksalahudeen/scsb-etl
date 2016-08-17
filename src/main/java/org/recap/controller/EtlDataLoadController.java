@@ -129,7 +129,7 @@ public class EtlDataLoadController {
     public String generateReport(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                              BindingResult result,
                              Model model) {
-        reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
+        reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
         return etlDataLoader(model);
     }
 }

@@ -149,6 +149,7 @@ public class JMSUT extends BaseTestCase {
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Success");
         reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntity.setInstitutionName("NYPL");
         producer.sendBody("seda:reportQ", reportEntity);
         Thread.sleep(1000);
 

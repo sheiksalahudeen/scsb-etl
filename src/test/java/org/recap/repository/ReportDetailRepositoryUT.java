@@ -52,6 +52,7 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Failure");
+        reportEntity.setInstitutionName("CUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
         reportDataEntity.setHeaderName("Barcode");
@@ -70,7 +71,7 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
 
         ReportDataEntity reportDataEntity4 = new ReportDataEntity();
         reportDataEntity4.setHeaderName("Institution");
-        reportDataEntity4.setHeaderValue("PUL");
+        reportDataEntity4.setHeaderValue("CUL");
         reportDataEntities.add(reportDataEntity4);
 
         reportEntity.setReportDataEntities(reportDataEntities);

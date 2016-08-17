@@ -29,6 +29,8 @@ public class BibDataProcessor {
 
     private String xmlFileName;
 
+    private String institutionName;
+
     @Autowired
     private ProducerTemplate producer;
 
@@ -114,6 +116,7 @@ public class BibDataProcessor {
                             reportEntity.setFileName(xmlFileName);
                             reportEntity.setCreatedDate(new Date());
                             reportEntity.setType("Failure");
+                            reportEntity.setInstitutionName(institutionName);
                         }
                     }
                 } catch (Exception holdingsEx) {
@@ -127,6 +130,7 @@ public class BibDataProcessor {
                     reportEntity.setFileName(xmlFileName);
                     reportEntity.setCreatedDate(new Date());
                     reportEntity.setType("Failure");
+                    reportEntity.setInstitutionName(institutionName);
                 }
             }
             bibliographicEntity.setHoldingsEntities(savedHoldingsEntities);
@@ -149,6 +153,7 @@ public class BibDataProcessor {
             reportEntity.setFileName(xmlFileName);
             reportEntity.setCreatedDate(new Date());
             reportEntity.setType("Failure");
+            reportEntity.setInstitutionName(institutionName);
         }
         return reportEntity;
     }
@@ -168,5 +173,13 @@ public class BibDataProcessor {
 
     public void setXmlFileName(String xmlFileName) {
         this.xmlFileName = xmlFileName;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 }

@@ -35,6 +35,7 @@ public class RecordProcessor {
     private Map collectionGroupMap;
     private JAXBHandler jaxbHandler;
     private String xmlFileName;
+    private String institutionName;
 
     @Autowired
     private ProducerTemplate producer;
@@ -85,6 +86,7 @@ public class RecordProcessor {
             etlExchange.setInstitutionEntityMap(getInstitutionEntityMap());
             etlExchange.setCollectionGroupMap(getCollectionGroupMap());
             bibDataProcessor.setXmlFileName(xmlFileName);
+            bibDataProcessor.setInstitutionName(institutionName);
             bibDataProcessor.processETLExchagneAndPersistToDB(etlExchange);
         }
 
@@ -127,6 +129,7 @@ public class RecordProcessor {
             bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
             bibPersisterCallable.setItemStatusMap(getItemStatusMap());
             bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
+            bibPersisterCallable.setInstitutionName(institutionName);
             Future submit = getExecutorService().submit(bibPersisterCallable);
             futures.add(submit);
         }
@@ -191,6 +194,14 @@ public class RecordProcessor {
 
     public void setXmlFileName(String xmlFileName) {
         this.xmlFileName = xmlFileName;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 
     public void setExecutorService(ExecutorService executorService) {
