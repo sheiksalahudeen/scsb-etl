@@ -1,6 +1,9 @@
 package org.recap.model.etl;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
 
 /**
  * Created by rajeshbabuk on 22/6/16.
@@ -12,6 +15,10 @@ public class EtlLoadRequest {
     private MultipartFile file;
     private String userName;
     private String owningInstitutionName;
+    private String reportFileName;
+    private String reportType;
+    private Date dateFrom;
+    private Date dateTo;
 
     public String getFileName() {
         return fileName;
@@ -51,5 +58,37 @@ public class EtlLoadRequest {
 
     public void setOwningInstitutionName(String owningInstitutionName) {
         this.owningInstitutionName = owningInstitutionName;
+    }
+
+    public String getReportFileName() {
+        return reportFileName;
+    }
+
+    public void setReportFileName(String reportFileName) {
+        this.reportFileName = reportFileName;
+    }
+
+    public String getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
+    }
+
+    public Date getDateFrom() {
+        return dateFrom;
+    }
+
+    public void setDateFrom(Date dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    public Date getDateTo() {
+        return dateTo;
+    }
+
+    public void setDateTo(Date dateTo) {
+        this.dateTo = dateTo;
     }
 }

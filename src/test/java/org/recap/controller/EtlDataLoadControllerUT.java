@@ -9,10 +9,14 @@ import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.etl.EtlLoadRequest;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.ReportDetailRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -23,6 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
@@ -41,6 +49,12 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
 
     @Autowired
     XmlRecordRepository xmlRecordRepository;
+
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
+
+    @Value("${etl.report.directory}")
+    private String reportDirectory;
 
     @Mock
     Model model;
@@ -100,6 +114,61 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
         assertNotNull(bibliographicEntity);
         assertNotNull(bibliographicEntity.getHoldingsEntities());
         assertNotNull(bibliographicEntity.getItemEntities());
+    }
+
+    @Test
+    public void testReports() throws Exception {
+        String fileName = "test.xml";
+
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setFileName(fileName);
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("Failure");
+
+        ReportDataEntity reportDataEntity = new ReportDataEntity();
+        reportDataEntity.setHeaderName("ItemBarcode");
+        reportDataEntity.setHeaderValue("103");
+        reportDataEntities.add(reportDataEntity);
+
+        reportEntity.setReportDataEntities(reportDataEntities);
+
+        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
+        assertNotNull(savedReportEntity);
+
+        Calendar cal = Calendar.getInstance();
+        Date from = savedReportEntity.getCreatedDate();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = savedReportEntity.getCreatedDate();
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
+        etlLoadRequest.setReportFileName(fileName);
+        etlLoadRequest.setReportType("csv");
+        etlLoadRequest.setDateFrom(from);
+        etlLoadRequest.setDateTo(to);
+
+        String dateString = new SimpleDateFormat("ddMMMyyyy").format(new Date());
+        String reportFileName = "test"+"-Failure"+"-"+dateString+".csv";
+
+        etlDataLoadController.generateReport(etlLoadRequest, bindingResult, model);
+        Thread.sleep(1000);
+
+        assertNotNull(reportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, reportFileName).exists();
+        assertTrue(directoryContains);
     }
 
 }
