@@ -8,6 +8,9 @@ jQuery(document).ready(function ($) {
         event.preventDefault();
         bulkIngest();
     });
+    $('#dateFrom, #dateTo').datepicker({
+        format: "yyyy/mm/dd"
+    });
 });
 
 
@@ -42,7 +45,7 @@ function bulkIngest() {
 
 function updateStatus() {
     var request = $.ajax({
-        url: "etlDataLoader/report",
+        url: "etlDataLoader/status",
         type: "GET",
         contentType: "application/json"
     });

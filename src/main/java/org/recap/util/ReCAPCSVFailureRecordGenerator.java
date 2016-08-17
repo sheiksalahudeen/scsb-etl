@@ -22,7 +22,6 @@ public class ReCAPCSVFailureRecordGenerator {
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
 
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
-        failureReportReCAPCSVRecord.setFileName(reportEntity.getFileName());
 
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity report =  iterator.next();

@@ -6,10 +6,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.etl.EtlLoadRequest;
-import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.HoldingsDetailsRepository;
-import org.recap.repository.ItemDetailsRepository;
-import org.recap.repository.XmlRecordRepository;
+import org.recap.report.ReportGenerator;
+import org.recap.repository.*;
 import org.recap.route.EtlDataLoadProcessor;
 import org.recap.route.RecordProcessor;
 import org.slf4j.Logger;
@@ -53,6 +51,9 @@ public class EtlDataLoadController {
     @Autowired
     XmlRecordRepository xmlRecordRepository;
 
+    @Autowired
+    ReportGenerator reportGenerator;
+
     @Value("${etl.load.batchSize}")
     private Integer batchSize;
 
@@ -94,7 +95,7 @@ public class EtlDataLoadController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/etlDataLoader/report", method = RequestMethod.GET)
+    @RequestMapping(value = "/etlDataLoader/status", method = RequestMethod.GET)
     public String report() {
         String status = "Process Started";
         if (camelContext.getStatus().isStarted()) {
@@ -120,6 +121,15 @@ public class EtlDataLoadController {
         File uploadFile = new File(multipartFile.getOriginalFilename());
         FileUtils.writeByteArrayToFile(uploadFile, etlLoadRequest.getFile().getBytes());
         FileUtils.copyFile(uploadFile, new File(inputDirectoryPath + File.separator + multipartFile.getOriginalFilename()));
+        return etlDataLoader(model);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/etlDataLoader/reports", method = RequestMethod.POST)
+    public String generateReport(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
+                             BindingResult result,
+                             Model model) {
+        reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
         return etlDataLoader(model);
     }
 }
