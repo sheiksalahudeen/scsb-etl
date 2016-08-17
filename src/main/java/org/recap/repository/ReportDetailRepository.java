@@ -5,6 +5,7 @@ import org.recap.model.jpa.ReportEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,5 +15,5 @@ public interface ReportDetailRepository extends PagingAndSortingRepository<Repor
     List<ReportEntity> findByFileName(String fileName);
 
     @Query(value = "",  nativeQuery = true)
-    Long findByFileAndDateRange();
+    List<ReportEntity> findByFileAndDateRange(String fileName, Date from, Date to);
 }
