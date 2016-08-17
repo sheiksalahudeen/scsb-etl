@@ -44,13 +44,15 @@ public class FTPReportGenerator {
             }
 
             ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+            reCAPCSVRecord.setReportType(reportType);
+            reCAPCSVRecord.setInstitutionName(institutionName);
             reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
 
             producerTemplate.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
         }
 
         String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
-        String expectedGeneratedFileName = "test"+"-Failure-"+ddMMMyyyy+".csv";
+        String expectedGeneratedFileName = fileName+"-"+reportType+"-"+ddMMMyyyy+".csv";
 
         return  expectedGeneratedFileName;
     }
