@@ -2,8 +2,6 @@ package org.recap.route;
 
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
@@ -11,11 +9,10 @@ import org.recap.model.csv.ReCAPCSVRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
-import org.recap.util.CSVReportHelperUtil;
+import org.recap.util.ReCAPCSVFailureRecordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -79,7 +76,7 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity = byFileName.get(0);
 
-        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new CSVReportHelperUtil().prepareFailureReportReCAPCSVRecord(savedReportEntity);
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(savedReportEntity);
         ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
         reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 

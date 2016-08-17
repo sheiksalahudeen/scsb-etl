@@ -6,7 +6,6 @@ import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -18,7 +17,7 @@ public class CSVReportHelperUtil_UT {
 
     @Test
     public void generateCSVRecord() throws Exception {
-        CSVReportHelperUtil csvReportHelperUtil = new CSVReportHelperUtil();
+        ReCAPCSVFailureRecordGenerator reCAPCSVFailureRecordGenerator = new ReCAPCSVFailureRecordGenerator();
 
         ReportEntity reportEntity = new ReportEntity();
         List dataEntities = new ArrayList<>();
@@ -37,7 +36,7 @@ public class CSVReportHelperUtil_UT {
         reportEntity.setReportDataEntities(dataEntities);
 
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord =
-                csvReportHelperUtil.prepareFailureReportReCAPCSVRecord(reportEntity);
+                reCAPCSVFailureRecordGenerator.prepareFailureReportReCAPCSVRecord(reportEntity);
 
         assertNotNull(failureReportReCAPCSVRecord);
 

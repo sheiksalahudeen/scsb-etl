@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by SheikS on 8/8/2016.
  */
-public class CSVReportHelperUtil {
+public class ReCAPCSVFailureRecordGenerator {
 
     public FailureReportReCAPCSVRecord prepareFailureReportReCAPCSVRecord(ReportEntity reportEntity) {
 
