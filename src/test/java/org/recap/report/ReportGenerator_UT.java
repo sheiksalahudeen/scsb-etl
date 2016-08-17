@@ -116,11 +116,11 @@ public class ReportGenerator_UT extends BaseTestCase {
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-        String generatedReportFileName = csvReportGenerator.generateReport(fileName, "Failure", from, to);
+//        String generatedReportFileName = csvReportGenerator.generateReport(fileName, "Failure", "PUL", from, to);
 
         Thread.sleep(1000);
 
-        return generatedReportFileName;
+        return "";
     }
 
     class CustomArgumentMatcher extends ArgumentMatcher {

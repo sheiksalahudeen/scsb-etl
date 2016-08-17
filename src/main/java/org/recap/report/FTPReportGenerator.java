@@ -21,47 +21,24 @@ import java.util.List;
  */
 
 @Component
-public class FTPReportGenerator {
-
-    @Autowired
-    ReportDetailRepository reportDetailRepository;
-
-    @Autowired
-    ProducerTemplate producerTemplate;
-
-    @Value("${etl.report.directory}")
-    private String reportDirectory;
-
-    public String generateReport(String fileName, String reportType, String institutionName, Date from, Date to) {
-
-        List<ReportEntity> reportEntities = getReportDetailRepository().findByFileAndDateRange(fileName, from, to);
-
-        if (!CollectionUtils.isEmpty(reportEntities)) {
-            List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
-            for(ReportEntity reportEntity : reportEntities) {
-                FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(reportEntity);
-                failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
-            }
-
-            ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-            reCAPCSVRecord.setReportType(reportType);
-            reCAPCSVRecord.setInstitutionName(institutionName);
-            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-
-            producerTemplate.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
-        }
-
-        String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
-        String expectedGeneratedFileName = fileName+"-"+reportType+"-"+ddMMMyyyy+".csv";
-
-        return  expectedGeneratedFileName;
+public class FTPReportGenerator implements ReportGeneratorInterface {
+    @Override
+    public boolean isInterested(String reportType) {
+        return false;
     }
 
-    public void setReportDetailRepository(ReportDetailRepository reportDetailRepository) {
-        this.reportDetailRepository = reportDetailRepository;
+    @Override
+    public void generateReport(List<ReportEntity> reportEntities) {
+
     }
 
-    public ReportDetailRepository getReportDetailRepository() {
-        return reportDetailRepository;
-    }
+//    @Override
+//    public void transmit(ReCAPCSVRecord reCAPCSVRecord) {
+//        producerTemplate.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
+//    }
+//
+//    @Override
+//    public boolean isInterested(String reportType) {
+//        return reportType.equals("Failure")? true : false;
+//    }
 }
