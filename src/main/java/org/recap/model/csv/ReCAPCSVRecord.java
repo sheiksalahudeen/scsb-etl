@@ -1,5 +1,6 @@
 package org.recap.model.csv;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.apache.camel.dataformat.bindy.annotation.OneToMany;
@@ -37,8 +38,15 @@ public class ReCAPCSVRecord {
     private String exceptionMessage;
     @DataField(pos = 12)
     private String errorDescription;
-    @DataField(pos = 13)
+
+    @Ignore
     private String fileName;
+
+    @Ignore
+    private String reportType;
+
+    @Ignore
+    private String institutionName;
 
     @OneToMany(mappedTo = "org.recap.model.csv.FailureReportReCAPCSVRecord")
     List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecordList;
@@ -49,5 +57,29 @@ public class ReCAPCSVRecord {
 
     public void setFailureReportReCAPCSVRecordList(List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecordList) {
         this.failureReportReCAPCSVRecordList = failureReportReCAPCSVRecordList;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 }

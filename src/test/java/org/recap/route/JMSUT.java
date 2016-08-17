@@ -71,7 +71,6 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setLastUpdatedDateItem(new SimpleDateFormat("mm-dd-yyyy").format(new Date()));
         failureReportReCAPCSVRecord.setExceptionMessage("exception");
         failureReportReCAPCSVRecord.setErrorDescription("error");
-        failureReportReCAPCSVRecord.setFileName("testReport1.xml");
 
         ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
@@ -83,7 +82,7 @@ public class JMSUT extends BaseTestCase {
         Thread.sleep(1000);
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
-        String fileName = FilenameUtils.removeExtension(failureReportReCAPCSVRecord.getFileName()) + "-Failure-" + df.format(new Date());
+        String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFileName()) + "-Failure-" + df.format(new Date());
         File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
         assertTrue(file.exists());
         String fileContents = Files.toString(file, Charsets.UTF_8);
@@ -104,7 +103,7 @@ public class JMSUT extends BaseTestCase {
        @Override
        public void process(Exchange exchange) throws Exception {
            ReCAPCSVRecord reCAPCSVRecord = (ReCAPCSVRecord) exchange.getIn().getBody();
-           String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFailureReportReCAPCSVRecordList().get(0).getFileName());
+           String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFileName());
            exchange.getIn().setHeader("reportFileName", fileName);
        }
    }

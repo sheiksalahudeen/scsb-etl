@@ -8,26 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-
 /**
- * Created by chenchulakshmig on 4/7/16.
+ * Created by peris on 8/16/16.
  */
 
 @Component
-public class CSVRouteBuilder {
-
+public class FtpRouteBuilderForCSVRecords {
     @Autowired
-    public CSVRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
+    public FtpRouteBuilderForCSVRecords(CamelContext context,
+                                        @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.remote.server}") String ftpRemoteServer,
+                                        @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
+
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from("seda:csvQ")
-                            .routeId("csvQ")
+                    from("seda:ftpQForCSV")
+                            .routeId("ftpQForCSV")
                             .process(new CSVFileNameProcessorForFTP())
                             .marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
-                            .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append");
+                            .to("sftp://" + ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.directoryName}/${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });
         } catch (Exception e) {

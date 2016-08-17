@@ -35,8 +35,6 @@ public class FailureReportReCAPCSVRecord  {
     private String exceptionMessage;
     @DataField(pos = 12)
     private String errorDescription;
-    @DataField(pos = 13)
-    private String fileName;
 
     public String getOwningInstitution() {
         return owningInstitution;
@@ -132,13 +130,5 @@ public class FailureReportReCAPCSVRecord  {
 
     public void setErrorDescription(String errorDescription) {
         this.errorDescription = errorDescription;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 }
