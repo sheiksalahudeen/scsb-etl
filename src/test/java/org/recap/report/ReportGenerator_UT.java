@@ -1,13 +1,7 @@
 package org.recap.report;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -16,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by peris on 8/17/16.
@@ -43,6 +37,37 @@ public class ReportGenerator_UT extends BaseTestCase {
     @Test
     public void generateTest() throws Exception {
 
+        ReportEntity savedReportEntity1 = saveReportEntity();
+
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate());
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
+    @Test
+    public void generateReportForTwoEntity() throws Exception {
+        ReportEntity savedReportEntity1 = saveReportEntity();
+        ReportEntity savedReportEntity2 = saveReportEntity();
+
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate());
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+
+    }
+
+    private ReportEntity saveReportEntity() {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
@@ -72,37 +97,29 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         reportEntity.setReportDataEntities(reportDataEntities);
 
-        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
+        return reportDetailRepository.save(reportEntity);
+    }
 
+    private String generateReport(Date createdDate) throws InterruptedException {
         Calendar cal = Calendar.getInstance();
-        Date from = savedReportEntity.getCreatedDate();
+        Date from = createdDate;
         cal.setTime(from);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         from = cal.getTime();
-        Date to = savedReportEntity.getCreatedDate();
+        Date to = createdDate;
         cal.setTime(to);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-
-        ArrayList<ReportEntity> expectedReportEntities = new ArrayList<>();
-        expectedReportEntities.add(reportEntity);
-
         String generatedReportFileName = reportGenerator.generateReport(fileName, from, to);
 
         Thread.sleep(1000);
 
-        assertNotNull(generatedReportFileName);
-
-        File directory = new File(reportDirectory);
-        assertTrue(directory.isDirectory());
-
-        boolean directoryContains = new File(directory, generatedReportFileName).exists();
-        assertTrue(directoryContains);
+        return generatedReportFileName;
     }
 
     class CustomArgumentMatcher extends ArgumentMatcher {
@@ -111,6 +128,5 @@ public class ReportGenerator_UT extends BaseTestCase {
             return false;
         }
     }
-
 
 }
