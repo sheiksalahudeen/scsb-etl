@@ -11,9 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,17 +37,20 @@ public class ReportGenerator {
         List<ReportEntity> reportEntities = getReportDetailRepository().findByFileAndDateRange(fileName, from, to);
 
         if (!CollectionUtils.isEmpty(reportEntities)) {
-            ReportEntity savedReportEntity = reportEntities.get(0);
+            List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
+            for(ReportEntity reportEntity : reportEntities) {
+                FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(reportEntity);
+                failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
+            }
 
-            FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(savedReportEntity);
             ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
+            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
 
             producerTemplate.sendBody("seda:csvQ", reCAPCSVRecord);
         }
 
         String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
-        String expectedGeneratedFileName = "test"+"-Failure"+"-"+ddMMMyyyy+".csv";
+        String expectedGeneratedFileName = "test"+"-Failure-"+ddMMMyyyy+".csv";
 
         return  expectedGeneratedFileName;
     }

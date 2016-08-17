@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 /**
  * Created by SheikS on 8/8/2016.
  */
-public class ReportDetailRepositoryTest extends BaseTestCase {
+public class ReportDetailRepositoryUT extends BaseTestCase {
 
     @Autowired
     private ReportDetailRepository reportDetailRepository;
