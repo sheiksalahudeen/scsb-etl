@@ -21,10 +21,24 @@ import java.util.List;
  */
 
 @Component
-public class FTPReportGenerator extends ReportGenerator {
+public class FTPReportGenerator implements ReportGeneratorInterface {
+    @Override
+    public boolean isInterested(String reportType) {
+        return false;
+    }
 
     @Override
-    public void transmit(ReCAPCSVRecord reCAPCSVRecord) {
-        producerTemplate.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
+    public void generateReport(List<ReportEntity> reportEntities) {
+
     }
+
+//    @Override
+//    public void transmit(ReCAPCSVRecord reCAPCSVRecord) {
+//        producerTemplate.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
+//    }
+//
+//    @Override
+//    public boolean isInterested(String reportType) {
+//        return reportType.equals("Failure")? true : false;
+//    }
 }

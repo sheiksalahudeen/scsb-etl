@@ -13,12 +13,13 @@ import org.springframework.util.CollectionUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by peris on 8/17/16.
  */
-public abstract class ReportGenerator {
+public class ReportGenerator {
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
@@ -28,33 +29,36 @@ public abstract class ReportGenerator {
     @Value("${etl.report.directory}")
     private String reportDirectory;
 
+    @Autowired
+    FTPReportGenerator ftpReportGenerator;
+
+    @Autowired
+    CSVReportGenerator csvReportGenerator;
+
+
+    List<ReportGeneratorInterface> reportGenerators;
+
+
+    public ReportGenerator() {
+        reportGenerators = new ArrayList<>();
+        reportGenerators.add(ftpReportGenerator);
+        reportGenerators.add(csvReportGenerator);
+    }
 
     public String generateReport(String fileName, String reportType, String institutionName, Date from, Date to) {
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndDateRange(fileName, from, to);
 
-        if (!CollectionUtils.isEmpty(reportEntities)) {
-            List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
-            for(ReportEntity reportEntity : reportEntities) {
-                FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(reportEntity);
-                failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
+        for (Iterator<ReportGeneratorInterface> iterator = reportGenerators.iterator(); iterator.hasNext(); ) {
+            ReportGeneratorInterface reportGeneratorInterface = iterator.next();
+            if(reportGeneratorInterface.isInterested(reportType)){
+                reportGeneratorInterface.generateReport(reportEntities);
             }
-
-            ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-            reCAPCSVRecord.setReportType(reportType);
-            reCAPCSVRecord.setInstitutionName(institutionName);
-            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-
-            transmit(reCAPCSVRecord);
         }
 
-        String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
-        String expectedGeneratedFileName = fileName+"-"+reportType+"-"+ddMMMyyyy+".csv";
+        return null;
 
-        return  expectedGeneratedFileName;
     }
-
-    public abstract void transmit(ReCAPCSVRecord reCAPCSVRecord);
 
 
 }

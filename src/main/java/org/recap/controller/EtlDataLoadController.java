@@ -129,7 +129,7 @@ public class EtlDataLoadController {
     public String generateReport(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                              BindingResult result,
                              Model model) {
-        ftpReportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
+//        ftpReportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
         return etlDataLoader(model);
     }
 }

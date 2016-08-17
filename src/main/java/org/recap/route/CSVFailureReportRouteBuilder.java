@@ -15,10 +15,10 @@ import java.io.File;
  */
 
 @Component
-public class CSVRouteBuilder {
+public class CSVFailureReportRouteBuilder {
 
     @Autowired
-    public CSVRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
+    public CSVFailureReportRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override
