@@ -17,6 +17,8 @@ public class EtlLoadRequest {
     private String owningInstitutionName;
     private String reportFileName;
     private String reportType;
+    private String transmissionType;
+    private String reportInstitutionName;
     private Date dateFrom;
     private Date dateTo;
 
@@ -74,6 +76,22 @@ public class EtlLoadRequest {
 
     public void setReportType(String reportType) {
         this.reportType = reportType;
+    }
+
+    public String getTransmissionType() {
+        return transmissionType;
+    }
+
+    public void setTransmissionType(String transmissionType) {
+        this.transmissionType = transmissionType;
+    }
+
+    public String getReportInstitutionName() {
+        return reportInstitutionName;
+    }
+
+    public void setReportInstitutionName(String reportInstitutionName) {
+        this.reportInstitutionName = reportInstitutionName;
     }
 
     public Date getDateFrom() {

@@ -192,10 +192,42 @@
                                                         <label for="reportType" class="col-sm-4">Report Type</label>
 
                                                         <div class="col-sm-4">
-                                                            <input type="text" th:field="*{reportType}"
-                                                                   class="form-control bfh-number"
-                                                                   id="reportType"
-                                                                   placeholder="Report Type"/>
+                                                            <select id="reportType"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{reportType}">
+                                                                <option value="Success">Success</option>
+                                                                <option value="Failure">Failure</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="reportInstitutionName" class="col-sm-4">Institution</label>
+
+                                                        <div class="col-sm-4">
+                                                            <select id="reportInstitutionName"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{reportInstitutionName}">
+                                                                <option value="PUL">PUL</option>
+                                                                <option value="CUL">CUL</option>
+                                                                <option value="NYPL">NYPL</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="transmissionType" class="col-sm-4">Transmission Type</label>
+
+                                                        <div class="col-sm-4">
+                                                            <select id="transmissionType"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{transmissionType}">
+                                                                <option value="FileSystem">File System</option>
+                                                                <option value="FTP">FTP</option>
+                                                            </select>
                                                         </div>
                                                     </div>
 
@@ -222,9 +254,10 @@
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <div class="col-sm-5">
+                                                        <label class="col-sm-4"></label>
+                                                        <div class="col-sm-4">
                                                             <button id="report" type="submit" name="report"
-                                                                    class="btn btn-info active  pull-right" align="right">Generate Report
+                                                                    class="btn btn-info active">Generate Report
                                                             </button>
                                                         </div>
                                                     </div>
