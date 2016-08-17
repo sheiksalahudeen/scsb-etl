@@ -2,6 +2,8 @@ package org.recap.route;
 
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
@@ -13,6 +15,8 @@ import org.recap.util.ReCAPCSVFailureRecordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -84,8 +88,16 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
 
         Thread.sleep(1000);
 
-        //TODO: Assert the file got created.
+        String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
+        String expectedGeneratedFileName = "test"+"-Failure"+"-"+ddMMMyyyy+".csv";
 
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, expectedGeneratedFileName).exists();
+        assertTrue(directoryContains);
+
+        FileUtils.forceDelete(new File(reportDirectory+File.separator+expectedGeneratedFileName));
 
     }
 }
