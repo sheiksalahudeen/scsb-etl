@@ -73,11 +73,12 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setErrorDescription("error");
 
         ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+        reCAPCSVRecord.setFileName("test.xml");
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:reportQ", reCAPCSVRecord);
+        producer.sendBody("seda:csvQ", reCAPCSVRecord);
 
         Thread.sleep(1000);
 

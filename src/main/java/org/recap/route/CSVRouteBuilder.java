@@ -25,9 +25,9 @@ public class CSVRouteBuilder {
                 public void configure() throws Exception {
                     from("seda:csvQ")
                             .routeId("csvQ")
-                            .process(new CSVFileNameProcessorForFTP())
+                            .process(new CSVFileNameProcessorForFileSystem())
                             .marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
-                            .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append");
+                            .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });
         } catch (Exception e) {
