@@ -101,4 +101,57 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         assertNotNull(byFileAndDateRange.get(0));
     }
 
+    @Test
+    public void testFindByFileAndType() throws Exception {
+        ReportEntity reportEntity = saveReportEntity();
+
+        List<ReportEntity> byFileAndDateRange = reportDetailRepository.findByFileAndType(reportEntity.getFileName(), reportEntity.getType());
+        assertNotNull(byFileAndDateRange);
+        assertNotNull(byFileAndDateRange.get(0));
+    }
+
+    @Test
+    public void testFindByTypeAndDateRange() throws Exception {
+        ReportEntity reportEntity = saveReportEntity();
+        Calendar cal = Calendar.getInstance();
+        Date from = reportEntity.getCreatedDate();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = reportEntity.getCreatedDate();
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        List<ReportEntity> byFileAndDateRange = reportDetailRepository.findByTypeAndDateRange(reportEntity.getType(), from, to);
+        assertNotNull(byFileAndDateRange);
+        assertNotNull(byFileAndDateRange.get(0));
+    }
+
+    @Test
+    public void testFindByFileAndTypeAndDateRange() throws Exception {
+        ReportEntity reportEntity = saveReportEntity();
+        Calendar cal = Calendar.getInstance();
+        Date from = reportEntity.getCreatedDate();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = reportEntity.getCreatedDate();
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        List<ReportEntity> byFileAndDateRange = reportDetailRepository.findByFileAndTypeAndDateRange(reportEntity.getFileName(), reportEntity.getType(), from, to);
+        assertNotNull(byFileAndDateRange);
+        assertNotNull(byFileAndDateRange.get(0));
+    }
+
 }

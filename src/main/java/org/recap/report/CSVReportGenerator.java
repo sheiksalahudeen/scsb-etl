@@ -54,7 +54,7 @@ public class CSVReportGenerator {
         }
 
         String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
-        String expectedGeneratedFileName = "test"+"-Failure-"+ddMMMyyyy+".csv";
+        String expectedGeneratedFileName = fileName + "-" + reportType + "-" +ddMMMyyyy+".csv";
 
         return  expectedGeneratedFileName;
     }
