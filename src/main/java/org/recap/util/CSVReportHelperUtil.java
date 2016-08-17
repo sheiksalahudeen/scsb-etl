@@ -3,6 +3,7 @@ package org.recap.util;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -16,9 +17,14 @@ import java.util.List;
  */
 public class CSVReportHelperUtil {
 
-    public FailureReportReCAPCSVRecord prepareFailureReportReCAPCSVRecord(List<ReportDataEntity> reportEntities) {
+    public FailureReportReCAPCSVRecord prepareFailureReportReCAPCSVRecord(ReportEntity reportEntity) {
+
+        List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
+
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
-        for (Iterator<ReportDataEntity> iterator = reportEntities.iterator(); iterator.hasNext(); ) {
+        failureReportReCAPCSVRecord.setFileName(reportEntity.getFileName());
+
+        for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity report =  iterator.next();
             String headerName = report.getHeaderName();
             String headerValue = report.getHeaderValue();

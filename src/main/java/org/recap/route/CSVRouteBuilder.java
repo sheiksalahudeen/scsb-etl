@@ -1,76 +1,37 @@
 package org.recap.route;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.recap.model.csv.ReCAPCSVRecord;
-import org.recap.model.csv.SuccessReportReCAPCSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 
 /**
  * Created by chenchulakshmig on 4/7/16.
  */
-public class CSVRouteBuilder extends RouteBuilder {
 
-    private String reportDirectoryPath;
-    private String ftpPrivateKey;
-    private String ftpKnownHost;
-    private String ftpUserName;
-    private String ftpRemoteServer;
+@Component
+public class CSVRouteBuilder {
 
-    public String getReportDirectoryPath() {
-        return reportDirectoryPath;
-    }
-
-    public void setReportDirectoryPath(String reportDirectoryPath) {
-        this.reportDirectoryPath = reportDirectoryPath;
-    }
-
-    public String getFtpPrivateKey() {
-        return ftpPrivateKey;
-    }
-
-    public void setFtpPrivateKey(String ftpPrivateKey) {
-        this.ftpPrivateKey = ftpPrivateKey;
-    }
-
-    public String getFtpKnownHost() {
-        return ftpKnownHost;
-    }
-
-    public void setFtpKnownHost(String ftpKnownHost) {
-        this.ftpKnownHost = ftpKnownHost;
-    }
-
-    public String getFtpUserName() {
-        return ftpUserName;
-    }
-
-    public void setFtpUserName(String ftpUserName) {
-        this.ftpUserName = ftpUserName;
-    }
-
-    public String getFtpRemoteServer() {
-        return ftpRemoteServer;
-    }
-
-    public void setFtpRemoteServer(String ftpRemoteServer) {
-        this.ftpRemoteServer = ftpRemoteServer;
-    }
-
-    @Override
-    public void configure() throws Exception {
-//        from("seda:etlFailureReportQ")
-//                .routeId("failureReportQRoute")
-//                .process(new CSVFailureFileNameProcessor()).marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
-//                .to("file:"+reportDirectoryPath + File.separator + "?fileName=${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append")
-//                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.institutionName}/${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append");
-//
-//        from("seda:etlSuccessReportQ")
-//                .routeId("successReportQRoute")
-//                .process(new CSVSuccessFileNameProcessor()).marshal().bindy(BindyType.Csv, SuccessReportReCAPCSVRecord.class)
-//                .to("file:"+reportDirectoryPath + File.separator + "?fileName=${in.header.reportFileName}-Success-${date:now:ddMMMyyyy}.csv&fileExist=append")
-//                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.institutionName}/${in.header.reportFileName}-Success-${date:now:ddMMMyyyy}.csv&fileExist=append");
-
+    @Autowired
+    public CSVRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
+        try {
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from("seda:csvQ")
+                            .routeId("csvQ")
+                            .process(new FileNameProcessor())
+                            .marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
+                            .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.reportFileName}-Failure-${date:now:ddMMMyyyy}.csv&fileExist=append");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
