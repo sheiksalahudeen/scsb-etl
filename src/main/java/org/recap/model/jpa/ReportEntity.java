@@ -27,7 +27,7 @@ public class ReportEntity {
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
-    @Column(name = "INSTITUTUION_NAME")
+    @Column(name = "INSTITUTION_NAME")
     private String institutionName;
 
     @OneToMany(cascade = CascadeType.ALL)

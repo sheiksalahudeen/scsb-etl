@@ -125,6 +125,7 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Failure");
+        reportEntity.setInstitutionName("NYPL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
         reportDataEntity.setHeaderName("ItemBarcode");
@@ -152,7 +153,7 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
 
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
         etlLoadRequest.setReportFileName(fileName);
-        etlLoadRequest.setReportType("csv");
+        etlLoadRequest.setReportType("Failure");
         etlLoadRequest.setDateFrom(from);
         etlLoadRequest.setDateTo(to);
 
