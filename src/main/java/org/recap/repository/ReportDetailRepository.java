@@ -14,6 +14,6 @@ import java.util.List;
 public interface ReportDetailRepository extends PagingAndSortingRepository<ReportEntity, Integer> {
     List<ReportEntity> findByFileName(String fileName);
 
-    @Query(value = "",  nativeQuery = true)
+    @Query(value = "select * from report_t where FILE_NAME=?1 and CREATED_DATE >= ?2 and CREATED_DATE <= ?3",  nativeQuery = true)
     List<ReportEntity> findByFileAndDateRange(String fileName, Date from, Date to);
 }

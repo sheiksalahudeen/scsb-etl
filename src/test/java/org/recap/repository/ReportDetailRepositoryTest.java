@@ -6,10 +6,8 @@ import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -78,6 +76,28 @@ public class ReportDetailRepositoryTest extends BaseTestCase {
         reportEntity.setReportDataEntities(reportDataEntities);
 
         return reportDetailRepository.save(reportEntity);
+    }
+
+    @Test
+    public void testFindByFileAndDateRange() throws Exception {
+        ReportEntity reportEntity = saveReportEntity();
+        Calendar cal = Calendar.getInstance();
+        Date from = reportEntity.getCreatedDate();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = reportEntity.getCreatedDate();
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        List<ReportEntity> byFileAndDateRange = reportDetailRepository.findByFileAndDateRange("test.xml", from, to);
+        assertNotNull(byFileAndDateRange);
+        assertNotNull(byFileAndDateRange.get(0));
     }
 
 }
