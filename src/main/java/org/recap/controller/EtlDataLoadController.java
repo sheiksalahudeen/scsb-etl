@@ -4,9 +4,8 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.etl.EtlLoadRequest;
-import org.recap.report.ReportGenerator;
+import org.recap.report.CSVReportGenerator;
 import org.recap.repository.*;
 import org.recap.route.EtlDataLoadProcessor;
 import org.recap.route.RecordProcessor;
@@ -52,7 +51,7 @@ public class EtlDataLoadController {
     XmlRecordRepository xmlRecordRepository;
 
     @Autowired
-    ReportGenerator reportGenerator;
+    CSVReportGenerator csvReportGenerator;
 
     @Value("${etl.load.batchSize}")
     private Integer batchSize;
@@ -129,7 +128,7 @@ public class EtlDataLoadController {
     public String generateReport(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                              BindingResult result,
                              Model model) {
-        reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
+        csvReportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
         return etlDataLoader(model);
     }
 }

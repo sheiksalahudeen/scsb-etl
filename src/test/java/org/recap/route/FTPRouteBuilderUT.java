@@ -6,11 +6,16 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.csv.FailureReportReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -40,49 +45,31 @@ public class FTPRouteBuilderUT extends BaseTestCase{
 
     @Test
     public void uploadFileToFTP() throws Exception {
-        File file = new File(reportDirectoryPath + File.separator + "uploadTestFileToFTP.csv");
-        String content = "File \n Uploaded \n Successfully";
-        file.createNewFile();
-        assertTrue(file.exists());
-        new FileWriter(file).append(content).flush();
-        String fileName = reportDirectoryPath + File.separator + "uploadTestFileToFTP.csv";
-        camelContext.addRoutes((new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("seda:uploadFile")
-                        .process(new FTPUploadFileProcessor())
-                        .to("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileNameToUpload}");
-            }
-        }));
-        producer.sendBody("seda:uploadFile", fileName);
 
-        Thread.sleep(1000);
+        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new FailureReportReCAPCSVRecord();
+        failureReportReCAPCSVRecord.setOwningInstitution("PUL");
+        failureReportReCAPCSVRecord.setOwningInstitutionBibId("1111");
+        failureReportReCAPCSVRecord.setOwningInstitutionHoldingsId("2222");
+        failureReportReCAPCSVRecord.setLocalItemId("333333333");
+        failureReportReCAPCSVRecord.setItemBarcode("4444");
+        failureReportReCAPCSVRecord.setCustomerCode("PA");
+        failureReportReCAPCSVRecord.setTitle("History, of Science");
+        failureReportReCAPCSVRecord.setCollectionGroupDesignation("open");
+        failureReportReCAPCSVRecord.setCreateDateItem(new SimpleDateFormat("mm-dd-yyyy").format(new Date()));
+        failureReportReCAPCSVRecord.setLastUpdatedDateItem(new SimpleDateFormat("mm-dd-yyyy").format(new Date()));
+        failureReportReCAPCSVRecord.setExceptionMessage("exception");
+        failureReportReCAPCSVRecord.setErrorDescription("error");
 
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("seda:getFileContent")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=uploadTestFileToFTP.csv");
-            }
-        });
+        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+        reCAPCSVRecord.setFileName("test.xml");
+        reCAPCSVRecord.setInstitutionName("PUL");
+        reCAPCSVRecord.setReportType("failure");
+        assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
+        assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
+        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        String response = producer.requestBody("seda:getFileContent", "", String.class);
+        producer.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
 
-        Thread.sleep(1000);
-
-        assertNotNull(response);
-        System.out.println(response);
-        assertTrue(response.equals(content));
-    }
-
-    public class FTPUploadFileProcessor implements Processor {
-
-        @Override
-        public void process(Exchange exchange) throws Exception {
-            String filename = (String) exchange.getIn().getBody();
-            File file = new File(filename);
-            exchange.getIn().setBody(file);
-            exchange.getIn().setHeader("fileNameToUpload", file.getName());
-        }
+        Thread.sleep(2000);
     }
 }

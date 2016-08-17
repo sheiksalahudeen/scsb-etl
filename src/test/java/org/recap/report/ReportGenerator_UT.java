@@ -27,7 +27,7 @@ public class ReportGenerator_UT extends BaseTestCase {
     ReportDetailRepository reportDetailRepository;
 
     @Autowired
-    ReportGenerator reportGenerator;
+    CSVReportGenerator csvReportGenerator;
     private String fileName = "test.xml";
 
     @Value("${etl.report.directory}")
@@ -93,7 +93,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportDataEntity reportDataEntity4 = new ReportDataEntity();
         reportDataEntity4.setHeaderName("OwningInstitution");
-        reportDataEntity4.setHeaderValue("NYPL");
+        reportDataEntity4.setHeaderValue("PUL");
         reportDataEntities.add(reportDataEntity4);
 
         reportEntity.setReportDataEntities(reportDataEntities);
@@ -116,7 +116,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-        String generatedReportFileName = reportGenerator.generateReport(fileName, "Failure", from, to);
+        String generatedReportFileName = csvReportGenerator.generateReport(fileName, "Failure", from, to);
 
         Thread.sleep(1000);
 

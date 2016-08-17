@@ -22,7 +22,7 @@ import java.util.List;
  */
 
 @Component
-public class ReportGenerator {
+public class CSVReportGenerator {
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
