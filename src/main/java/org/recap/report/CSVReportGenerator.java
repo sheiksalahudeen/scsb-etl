@@ -22,48 +22,10 @@ import java.util.List;
  */
 
 @Component
-public class CSVReportGenerator {
+public class CSVReportGenerator extends ReportGenerator {
 
-    @Autowired
-    ReportDetailRepository reportDetailRepository;
-
-    @Autowired
-    ProducerTemplate producerTemplate;
-
-    @Value("${etl.report.directory}")
-    private String reportDirectory;
-
-    public String generateReport(String fileName, String reportType, Date from, Date to) {
-
-        List<ReportEntity> reportEntities = getReportDetailRepository().findByFileAndDateRange(fileName, from, to);
-
-        if (!CollectionUtils.isEmpty(reportEntities)) {
-            List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecords = new ArrayList<>();
-            for(ReportEntity reportEntity : reportEntities) {
-                FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(reportEntity);
-                failureReportReCAPCSVRecords.add(failureReportReCAPCSVRecord);
-            }
-
-            ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-            reCAPCSVRecord.setInstitutionName(reportEntities.get(0).getInstitutionName());
-            reCAPCSVRecord.setFileName(fileName);
-            reCAPCSVRecord.setReportType(reportType);
-            reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-
-            producerTemplate.sendBody("seda:csvQ", reCAPCSVRecord);
-        }
-
-        String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
-        String expectedGeneratedFileName = fileName + "-" + reportType + "-" +ddMMMyyyy+".csv";
-
-        return  expectedGeneratedFileName;
-    }
-
-    public void setReportDetailRepository(ReportDetailRepository reportDetailRepository) {
-        this.reportDetailRepository = reportDetailRepository;
-    }
-
-    public ReportDetailRepository getReportDetailRepository() {
-        return reportDetailRepository;
+    @Override
+    public void transmit(ReCAPCSVRecord reCAPCSVRecord) {
+        producerTemplate.sendBody("seda:csvQ", reCAPCSVRecord);
     }
 }
