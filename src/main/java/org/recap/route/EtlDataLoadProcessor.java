@@ -66,6 +66,7 @@ public class EtlDataLoadProcessor {
                         long startTime = System.currentTimeMillis();
                         xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), distinctFileName);
                         recordProcessor.setXmlFileName(distinctFileName);
+                        recordProcessor.setInstitutionName(institutionName);
                         recordProcessor.process(xmlRecordEntities);
                         long endTime = System.currentTimeMillis();
                         logger.info("Time taken to save: " + xmlRecordEntities.getNumberOfElements() + " bibs and related data is: " + (endTime - startTime) / 1000 + " seconds.");
@@ -134,6 +135,7 @@ public class EtlDataLoadProcessor {
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Success");
         reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntity.setInstitutionName(institutionName);
 
         producer.sendBody("seda:reportQ", reportEntity);
     }

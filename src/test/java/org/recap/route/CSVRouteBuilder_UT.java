@@ -51,6 +51,7 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Failure");
+        reportEntity.setInstitutionName("PUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
         reportDataEntity.setHeaderName("ItemBarcode");

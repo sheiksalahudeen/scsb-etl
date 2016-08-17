@@ -27,6 +27,9 @@ public class ReportEntity {
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
+    @Column(name = "INSTITUTUION_NAME")
+    private String institutionName;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "RECORD_NUM")
     private List<ReportDataEntity> reportDataEntities = new ArrayList<>();
@@ -69,6 +72,14 @@ public class ReportEntity {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 
     public void addAll(List<ReportDataEntity> reportDataEntities) {

@@ -31,6 +31,7 @@ public class ReportRoutesBuilder_UT extends BaseTestCase {
         reportEntity.setType("Failure");
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
+        reportEntity.setInstitutionName("CUL");
 
         ReportDataEntity reportDataEntity1 = new ReportDataEntity();
         reportDataEntity1.setHeaderName("barcode");

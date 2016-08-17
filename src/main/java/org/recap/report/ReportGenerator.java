@@ -33,7 +33,7 @@ public class ReportGenerator {
     @Value("${etl.report.directory}")
     private String reportDirectory;
 
-    public String generateReport(String fileName, Date from, Date to) {
+    public String generateReport(String fileName, String reportType, Date from, Date to) {
 
         List<ReportEntity> reportEntities = getReportDetailRepository().findByFileAndDateRange(fileName, from, to);
 
@@ -45,6 +45,9 @@ public class ReportGenerator {
             }
 
             ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
+            reCAPCSVRecord.setInstitutionName(reportEntities.get(0).getInstitutionName());
+            reCAPCSVRecord.setFileName(fileName);
+            reCAPCSVRecord.setReportType(reportType);
             reCAPCSVRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
 
             producerTemplate.sendBody("seda:csvQ", reCAPCSVRecord);
