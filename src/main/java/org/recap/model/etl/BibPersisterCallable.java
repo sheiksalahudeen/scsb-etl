@@ -37,19 +37,16 @@ public class BibPersisterCallable implements Callable {
         Map<String, Object> map = new HashMap<>();
         boolean processBib = false;
 
-        ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
-        reportEntity.setInstitutionName(institutionName);
-
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();
+        List<ReportEntity> reportEntities = new ArrayList<>();
 
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
         Map<String, Object> bibMap = processAndValidateBibliographicEntity(owningInstitutionId);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
-        List<ReportDataEntity> reportDataEntities = (List<ReportDataEntity>) bibMap.get("reportDataEntities");
-        if (!CollectionUtils.isEmpty(reportDataEntities)) {
-            reportEntity.setReportDataEntities(reportDataEntities);
+        ReportEntity bibReportEntity = (ReportEntity) bibMap.get("bibReportEntity");
+        if (bibReportEntity != null) {
+            reportEntities.add(bibReportEntity);
         } else {
             processBib = true;
         }
@@ -68,9 +65,9 @@ public class BibPersisterCallable implements Callable {
 
                     Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, holdingEnt, holdingContentCollection);
                     HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
-                    List<ReportDataEntity> holdingReportDataEntities = (List<ReportDataEntity>) holdingsMap.get("reportDataEntities");
-                    if (!CollectionUtils.isEmpty(holdingReportDataEntities)) {
-                        reportEntity.addAll(holdingReportDataEntities);
+                    ReportEntity holdingsReportEntity = (ReportEntity) holdingsMap.get("holdingsReportEntity");
+                    if (holdingsReportEntity != null) {
+                        reportEntities.add(holdingsReportEntity);
                     } else {
                         processHoldings = true;
                         holdingsEntities.add(holdingsEntity);
@@ -88,9 +85,9 @@ public class BibPersisterCallable implements Callable {
                         for (RecordType itemRecordType : itemRecordTypes) {
                             Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecordType);
                             ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
-                            List<ReportDataEntity> itemReportDataEntities = (List<ReportDataEntity>) itemMap.get("reportDataEntities");
-                            if (!CollectionUtils.isEmpty(itemReportDataEntities)) {
-                                reportEntity.addAll(itemReportDataEntities);
+                            ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
+                            if (itemReportEntity != null) {
+                                reportEntities.add(itemReportEntity);
                             } else if (processHoldings) {
                                 if (holdingsEntity.getItemEntities() == null) {
                                     holdingsEntity.setItemEntities(new ArrayList<>());
@@ -106,8 +103,8 @@ public class BibPersisterCallable implements Callable {
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
         bibliographicEntity.setItemEntities(itemEntities);
 
-        if (!CollectionUtils.isEmpty(reportEntity.getReportDataEntities())) {
-            map.put("reportEntity", reportEntity);
+        if (!CollectionUtils.isEmpty(reportEntities)) {
+            map.put("reportEntities", reportEntities);
         }
         if (processBib) {
             map.put("bibliographicEntity", bibliographicEntity);
@@ -119,6 +116,12 @@ public class BibPersisterCallable implements Callable {
         Map<String, Object> map = new HashMap<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         StringBuffer errorMessage = new StringBuffer();
+
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
+        reportEntity.setInstitutionName(institutionName);
+        reportEntity.setType("Failure");
+        reportEntity.setCreatedDate(new Date());
 
         Bib bib = bibRecord.getBib();
         String owningInstitutionBibId = getOwningInstitutionBibId(bibRecord, bib);
@@ -162,22 +165,32 @@ public class BibPersisterCallable implements Callable {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
+            getDBReportUtil().setCollectionGroupMap(collectionGroupMap);
+            getDBReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
             reportDataEntities = getDBReportUtil().generateBibFailureReportEntity(bibliographicEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName("ErrorMessage");
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
         }
+        if(!CollectionUtils.isEmpty(reportDataEntities)) {
+            reportEntity.addAll(reportDataEntities);
+            map.put("bibReportEntity", reportEntity);
+        }
         map.put("bibliographicEntity", bibliographicEntity);
-        map.put("reportDataEntities", reportDataEntities);
         return map;
     }
 
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Holding holdingEnt, CollectionType holdingContentCollection) {
         StringBuffer errorMessage = new StringBuffer();
-        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = null;
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
+
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
+        reportEntity.setInstitutionName(institutionName);
+        reportEntity.setType("Failure");
+        reportEntity.setCreatedDate(new Date());
 
         String holdingsContent = holdingContentCollection.serialize(holdingContentCollection);
         if (StringUtils.isNotBlank(holdingsContent)) {
@@ -205,22 +218,31 @@ public class BibPersisterCallable implements Callable {
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstituionHoldingsId);
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            getDBReportUtil().generateBibHoldingsFaiureReortEntity(bibliographicEntity, holdingsEntity);
+            getDBReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName("ErrorMessage");
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
         }
+
+        if(!CollectionUtils.isEmpty(reportDataEntities)) {
+            reportEntity.addAll(reportDataEntities);
+            map.put("holdingsReportEntity", reportEntity);
+        }
         map.put("holdingsEntity", holdingsEntity);
-        map.put("reportDataEntities", reportDataEntities);
         return map;
     }
 
     private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, String holdingsCallNumberType, RecordType itemRecordType) {
         StringBuffer errorMessage = new StringBuffer();
-        FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = null;
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
+
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
+        reportEntity.setInstitutionName(institutionName);
+        reportEntity.setType("Failure");
+        reportEntity.setCreatedDate(new Date());
 
         String itemBarcode = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "p");
         if (StringUtils.isNotBlank(itemBarcode)) {
@@ -282,8 +304,11 @@ public class BibPersisterCallable implements Callable {
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
         }
+        if(!CollectionUtils.isEmpty(reportDataEntities)) {
+            reportEntity.addAll(reportDataEntities);
+            map.put("itemReportEntity", reportEntity);
+        }
         map.put("itemEntity", itemEntity);
-        map.put("reportDataEntities", reportDataEntities);
         return map;
     }
 

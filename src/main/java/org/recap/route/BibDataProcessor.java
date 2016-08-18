@@ -121,7 +121,7 @@ public class BibDataProcessor {
                     }
                 } catch (Exception holdingsEx) {
                     clearSession();
-                    List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsFaiureReortEntity(bibliographicEntity, holdingsEntity);
+                    List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
                     reportEntity.setReportDataEntities(reportDataEntities);
                     ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
                     exceptionReportDataEntity.setHeaderName("ExceptionMessage");
