@@ -17,7 +17,7 @@ public class CSVReportHelperUtil_UT {
 
     @Test
     public void generateCSVRecord() throws Exception {
-        ReCAPCSVFailureRecordGenerator reCAPCSVFailureRecordGenerator = new ReCAPCSVFailureRecordGenerator();
+        ReCAPCSVFailureRecordGenerator reCAPCSVRecordGenerator = new ReCAPCSVFailureRecordGenerator();
 
         ReportEntity reportEntity = new ReportEntity();
         List dataEntities = new ArrayList<>();
@@ -36,7 +36,7 @@ public class CSVReportHelperUtil_UT {
         reportEntity.setReportDataEntities(dataEntities);
 
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord =
-                reCAPCSVFailureRecordGenerator.prepareFailureReportReCAPCSVRecord(reportEntity);
+                reCAPCSVRecordGenerator.prepareFailureReportReCAPCSVRecord(reportEntity);
 
         assertNotNull(failureReportReCAPCSVRecord);
 

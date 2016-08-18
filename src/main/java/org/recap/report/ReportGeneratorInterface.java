@@ -11,5 +11,7 @@ public interface ReportGeneratorInterface {
 
     boolean isInterested(String reportType);
 
-    void generateReport(List<ReportEntity> reportEntities);
+    boolean isTransmitted(String transmissionType);
+
+    String generateReport(List<ReportEntity> reportEntities);
 }

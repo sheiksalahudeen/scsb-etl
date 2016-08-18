@@ -1,24 +1,18 @@
 package org.recap.route;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
-import org.recap.model.csv.ReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by angelind on 21/7/16.
@@ -60,15 +54,15 @@ public class FTPRouteBuilderUT extends BaseTestCase{
         failureReportReCAPCSVRecord.setExceptionMessage("exception");
         failureReportReCAPCSVRecord.setErrorDescription("error");
 
-        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-        reCAPCSVRecord.setFileName("test.xml");
-        reCAPCSVRecord.setInstitutionName("PUL");
-        reCAPCSVRecord.setReportType("failure");
+        ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
+        reCAPCSVFailureRecord.setFileName("test.xml");
+        reCAPCSVFailureRecord.setInstitutionName("PUL");
+        reCAPCSVFailureRecord.setReportType("failure");
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
-        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
+        reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:ftpQForCSV", reCAPCSVRecord);
+        producer.sendBody("seda:ftpFailureQ", reCAPCSVFailureRecord);
 
         Thread.sleep(2000);
     }

@@ -13,7 +13,7 @@ import java.util.List;
  */
 
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
-public class ReCAPCSVRecord {
+public class ReCAPCSVFailureRecord {
     @DataField(pos = 1)
     private String owningInstitution;
     @DataField(pos = 2)

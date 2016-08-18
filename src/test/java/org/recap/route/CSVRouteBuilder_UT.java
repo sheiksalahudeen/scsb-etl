@@ -3,11 +3,10 @@ package org.recap.route;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
-import org.recap.model.csv.ReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
@@ -22,7 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -82,10 +80,10 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
         ReportEntity savedReportEntity = byFileName.get(0);
 
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(savedReportEntity);
-        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
+        ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
+        reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:csvQ",reCAPCSVRecord);
+        producer.sendBody("seda:csvFailureQ", reCAPCSVFailureRecord);
 
         Thread.sleep(1000);
 
