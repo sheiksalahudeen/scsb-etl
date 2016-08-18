@@ -26,20 +26,21 @@ public class ReportGenerator_UT extends BaseTestCase {
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
-    @Autowired
-    CSVReportGenerator csvReportGenerator;
     private String fileName = "test.xml";
 
     @Value("${etl.report.directory}")
     private String reportDirectory;
 
+    @Autowired
+    ReportGenerator reportGenerator;
+
 
     @Test
-    public void generateTest() throws Exception {
+    public void generateFailureReportTest() throws Exception {
 
-        ReportEntity savedReportEntity1 = saveReportEntity();
+        ReportEntity savedReportEntity1 = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate());
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), "FileSystem");
 
         assertNotNull(generatedReportFileName);
 
@@ -51,11 +52,27 @@ public class ReportGenerator_UT extends BaseTestCase {
     }
 
     @Test
-    public void generateReportForTwoEntity() throws Exception {
-        ReportEntity savedReportEntity1 = saveReportEntity();
-        ReportEntity savedReportEntity2 = saveReportEntity();
+    public void generateSuccessReportTest() throws Exception {
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate());
+        ReportEntity savedReportEntity1 = saveSuccessReportEntity();
+
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), "FileSystem");
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
+    @Test
+    public void generateFailureReportForTwoEntity() throws Exception {
+        ReportEntity savedReportEntity1 = saveFailureReportEntity();
+        ReportEntity savedReportEntity2 = saveFailureReportEntity();
+
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), "FileSystem");
 
         assertNotNull(generatedReportFileName);
 
@@ -67,14 +84,32 @@ public class ReportGenerator_UT extends BaseTestCase {
 
     }
 
-    private ReportEntity saveReportEntity() {
+    @Test
+    public void uploadFailureReportToFTP() throws Exception {
+        ReportEntity savedReportEntity = saveFailureReportEntity();
+
+        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), savedReportEntity.getType(), savedReportEntity.getInstitutionName(), "FTP");
+
+        assertNotNull(generatedReportFileName);
+    }
+
+    @Test
+    public void uploadSuccessReportToFTP() throws Exception {
+        ReportEntity savedReportEntity = saveSuccessReportEntity();
+
+        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), savedReportEntity.getType(), savedReportEntity.getInstitutionName(), "FTP");
+
+        assertNotNull(generatedReportFileName);
+    }
+
+    private ReportEntity saveFailureReportEntity() {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("Failure");
-        reportEntity.setInstitutionName("NYPL");
+        reportEntity.setInstitutionName("PUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
         reportDataEntity.setHeaderName("ItemBarcode");
@@ -101,7 +136,51 @@ public class ReportGenerator_UT extends BaseTestCase {
         return reportDetailRepository.save(reportEntity);
     }
 
-    private String generateReport(Date createdDate) throws InterruptedException {
+    private ReportEntity saveSuccessReportEntity() {
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+
+        ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
+        totalRecordsInFileEntity.setHeaderName("TotalRecordsInFile");
+        totalRecordsInFileEntity.setHeaderValue(String.valueOf(10000));
+        reportDataEntities.add(totalRecordsInFileEntity);
+
+        ReportDataEntity totalBibsLoadedEntity = new ReportDataEntity();
+        totalBibsLoadedEntity.setHeaderName("TotalBibsLoaded");
+        totalBibsLoadedEntity.setHeaderValue(String.valueOf(10000));
+        reportDataEntities.add(totalBibsLoadedEntity);
+
+        ReportDataEntity totalHoldingsLoadedEntity = new ReportDataEntity();
+        totalHoldingsLoadedEntity.setHeaderName("TotalHoldingsLoaded");
+        totalHoldingsLoadedEntity.setHeaderValue(String.valueOf(8000));
+        reportDataEntities.add(totalHoldingsLoadedEntity);
+
+        ReportDataEntity totalItemsLoadedEntity = new ReportDataEntity();
+        totalItemsLoadedEntity.setHeaderName("TotalItemsLoaded");
+        totalItemsLoadedEntity.setHeaderValue(String.valueOf(12000));
+        reportDataEntities.add(totalItemsLoadedEntity);
+
+        ReportDataEntity totalBibHoldingsLoadedEntity = new ReportDataEntity();
+        totalBibHoldingsLoadedEntity.setHeaderName("TotalBibHoldingsLoaded");
+        totalBibHoldingsLoadedEntity.setHeaderValue(String.valueOf(18000));
+        reportDataEntities.add(totalBibHoldingsLoadedEntity);
+
+        ReportDataEntity totalBiBItemsLoadedEntity = new ReportDataEntity();
+        totalBiBItemsLoadedEntity.setHeaderName("TotalBibItemsLoaded");
+        totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(22000));
+        reportDataEntities.add(totalBiBItemsLoadedEntity);
+
+        reportEntity.setFileName(fileName);
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("Success");
+        reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntity.setInstitutionName("PUL");
+
+        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
+        return savedReportEntity;
+    }
+
+    private String generateReport(Date createdDate, String reportType, String institutionName, String transmissionType) throws InterruptedException {
         Calendar cal = Calendar.getInstance();
         Date from = createdDate;
         cal.setTime(from);
@@ -116,11 +195,11 @@ public class ReportGenerator_UT extends BaseTestCase {
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-//        String generatedReportFileName = csvReportGenerator.generateReport(fileName, "Failure", "PUL", from, to);
+        String generatedFileName = reportGenerator.generateReport(fileName, reportType, institutionName, from, to, transmissionType);
 
         Thread.sleep(1000);
 
-        return "";
+        return generatedFileName;
     }
 
     class CustomArgumentMatcher extends ArgumentMatcher {

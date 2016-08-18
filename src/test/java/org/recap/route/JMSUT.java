@@ -7,7 +7,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
-import org.recap.model.csv.ReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
@@ -72,18 +72,18 @@ public class JMSUT extends BaseTestCase {
         failureReportReCAPCSVRecord.setExceptionMessage("exception");
         failureReportReCAPCSVRecord.setErrorDescription("error");
 
-        ReCAPCSVRecord reCAPCSVRecord = new ReCAPCSVRecord();
-        reCAPCSVRecord.setFileName("test.xml");
+        ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
+        reCAPCSVFailureRecord.setFileName("test.xml");
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
-        reCAPCSVRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
+        reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:csvQ", reCAPCSVRecord);
+        producer.sendBody("seda:csvFailureQ", reCAPCSVFailureRecord);
 
         Thread.sleep(1000);
 
         DateFormat df = new SimpleDateFormat("ddMMMyyyy");
-        String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFileName()) + "-Failure-" + df.format(new Date());
+        String fileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName()) + "-Failure-" + df.format(new Date());
         File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
         assertTrue(file.exists());
         String fileContents = Files.toString(file, Charsets.UTF_8);
@@ -103,8 +103,8 @@ public class JMSUT extends BaseTestCase {
    public class FileNameProcessor implements Processor {
        @Override
        public void process(Exchange exchange) throws Exception {
-           ReCAPCSVRecord reCAPCSVRecord = (ReCAPCSVRecord) exchange.getIn().getBody();
-           String fileName = FilenameUtils.removeExtension(reCAPCSVRecord.getFileName());
+           ReCAPCSVFailureRecord reCAPCSVFailureRecord = (ReCAPCSVFailureRecord) exchange.getIn().getBody();
+           String fileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName());
            exchange.getIn().setHeader("reportFileName", fileName);
        }
    }

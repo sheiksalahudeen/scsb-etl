@@ -3,7 +3,7 @@ package org.recap.route;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
-import org.recap.model.csv.ReCAPCSVRecord;
+import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,9 +13,10 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class FtpRouteBuilderForCSVRecords {
+public class FtpFailureReportRouteBuilder {
+
     @Autowired
-    public FtpRouteBuilderForCSVRecords(CamelContext context,
+    public FtpFailureReportRouteBuilder(CamelContext context,
                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.remote.server}") String ftpRemoteServer,
                                         @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
 
@@ -23,10 +24,10 @@ public class FtpRouteBuilderForCSVRecords {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from("seda:ftpQForCSV")
-                            .routeId("ftpQForCSV")
-                            .process(new CSVFileNameProcessorForFTP())
-                            .marshal().bindy(BindyType.Csv, ReCAPCSVRecord.class)
+                    from("seda:ftpFailureQ")
+                            .routeId("ftpFailureQ")
+                            .process(new FileNameProcessorForFailureRecord())
+                            .marshal().bindy(BindyType.Csv, ReCAPCSVFailureRecord.class)
                             .to("sftp://" + ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.directoryName}/${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });

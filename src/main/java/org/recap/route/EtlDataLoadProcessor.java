@@ -102,34 +102,39 @@ public class EtlDataLoadProcessor {
         Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
 
         ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
-        totalRecordsInFileEntity.setHeaderName("Total Records In File");
+        totalRecordsInFileEntity.setHeaderName("TotalRecordsInFile");
         totalRecordsInFileEntity.setHeaderValue(String.valueOf(totalRecordsInfile));
         reportDataEntities.add(totalRecordsInFileEntity);
 
         ReportDataEntity totalBibsLoadedEntity = new ReportDataEntity();
-        totalBibsLoadedEntity.setHeaderName("Total Bibs Loaded");
+        totalBibsLoadedEntity.setHeaderName("TotalBibsLoaded");
         totalBibsLoadedEntity.setHeaderValue(String.valueOf(processedBibsCount));
         reportDataEntities.add(totalBibsLoadedEntity);
 
         ReportDataEntity totalHoldingsLoadedEntity = new ReportDataEntity();
-        totalHoldingsLoadedEntity.setHeaderName("Total Holdings Loaded");
+        totalHoldingsLoadedEntity.setHeaderName("TotalHoldingsLoaded");
         totalHoldingsLoadedEntity.setHeaderValue(String.valueOf(processedHoldingsCount));
         reportDataEntities.add(totalHoldingsLoadedEntity);
 
         ReportDataEntity totalItemsLoadedEntity = new ReportDataEntity();
-        totalItemsLoadedEntity.setHeaderName("Total Items Loaded");
+        totalItemsLoadedEntity.setHeaderName("TotalItemsLoaded");
         totalItemsLoadedEntity.setHeaderValue(String.valueOf(processedItemsCount));
         reportDataEntities.add(totalItemsLoadedEntity);
 
         ReportDataEntity totalBibHoldingsLoadedEntity = new ReportDataEntity();
-        totalBibHoldingsLoadedEntity.setHeaderName("Total Bib-Holdings Loaded");
+        totalBibHoldingsLoadedEntity.setHeaderName("TotalBibHoldingsLoaded");
         totalBibHoldingsLoadedEntity.setHeaderValue(String.valueOf(processedBibHoldingsCount));
         reportDataEntities.add(totalBibHoldingsLoadedEntity);
 
         ReportDataEntity totalBiBItemsLoadedEntity = new ReportDataEntity();
-        totalBiBItemsLoadedEntity.setHeaderName("Total Bib-Items Loaded");
+        totalBiBItemsLoadedEntity.setHeaderName("TotalBibItemsLoaded");
         totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(processedBibItemsCount));
         reportDataEntities.add(totalBiBItemsLoadedEntity);
+
+        ReportDataEntity fileNameEntity = new ReportDataEntity();
+        fileNameEntity.setHeaderName("FileName");
+        fileNameEntity.setHeaderValue(fileName);
+        reportDataEntities.add(fileNameEntity);
 
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
