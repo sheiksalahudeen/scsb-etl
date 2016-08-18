@@ -92,7 +92,9 @@ public class RecordProcessor {
 
 
         if (!CollectionUtils.isEmpty(reportEntities)) {
-            producer.sendBody("seda:reportQ", reportEntities);
+            for(ReportEntity reportEntity : reportEntities) {
+                producer.sendBody("seda:reportQ", reportEntity);
+            }
         }
 
     }
@@ -102,12 +104,12 @@ public class RecordProcessor {
 
         if (object != null) {
             Object bibliographicEntity = resultMap.get("bibliographicEntity");
-            ReportEntity reportEntity = (ReportEntity) resultMap.get("reportEntity");
+            List<ReportEntity> reportEntityList = (List<ReportEntity>) resultMap.get("reportEntities");
             if (bibliographicEntity != null) {
                 bibliographicEntities.add((BibliographicEntity) bibliographicEntity);
             }
-            if (reportEntity != null) {
-                reportEntities.add(reportEntity);
+            if (!CollectionUtils.isEmpty(reportEntityList)) {
+                reportEntities.addAll(reportEntityList);
             }
         }
     }
