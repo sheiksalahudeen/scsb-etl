@@ -5,6 +5,8 @@ import org.recap.model.jaxb.marc.*;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.nio.charset.Charset;
@@ -17,6 +19,7 @@ import java.util.List;
  */
 public class DataDumpUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpUtil.class);
     public BibRecords getBibRecords(List<BibliographicEntity> bibliographicEntities) {
         BibRecords bibRecords = new BibRecords();
         List<BibRecord> bibRecordList = getBibRecordList(bibliographicEntities);
@@ -45,7 +48,7 @@ public class DataDumpUtil {
         return bibRecord;
     }
 
-    public Bib getBib(BibliographicEntity bibliographicEntity) {
+    private Bib getBib(BibliographicEntity bibliographicEntity) {
         Bib bib = new Bib();
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         bib.setOwningInstitutionId(bibliographicEntity.getInstitutionEntity().getInstitutionCode());
@@ -54,17 +57,19 @@ public class DataDumpUtil {
         return bib;
     }
 
-    public List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) {
+    private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) {
         List<Holdings> holdingsList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(holdingsEntityList)) {
+        if (holdingsEntityList!=null && !CollectionUtils.isEmpty(holdingsEntityList)) {
             for (HoldingsEntity holdingsEntity : holdingsEntityList) {
                 Holdings holdings = new Holdings();
                 Holding holding = new Holding();
                 holding.setOwningInstitutionHoldingsId(holdingsEntity.getOwningInstitutionHoldingsId());
                 ContentType contentType = getContentType(holdingsEntity.getContent());
                 holding.setContent(contentType);
-                Items items = getItems(holdingsEntity.getItemEntities());
-                holding.setItems(Arrays.asList(items));
+                if(holdingsEntity.getItemEntities()!=null) {
+                    Items items = getItems(holdingsEntity.getItemEntities());
+                    holding.setItems(Arrays.asList(items));
+                }
                 holdings.setHolding(Arrays.asList(holding));
                 holdingsList.add(holdings);
             }
@@ -72,7 +77,7 @@ public class DataDumpUtil {
         return holdingsList;
     }
 
-    public Items getItems(List<ItemEntity> itemEntities) {
+    private Items getItems(List<ItemEntity> itemEntities) {
         Items items = new Items();
         ContentType itemContentType = new ContentType();
         CollectionType collectionType = new CollectionType();
@@ -82,9 +87,9 @@ public class DataDumpUtil {
         return items;
     }
 
-    public List<RecordType> buildRecordTypes(List<ItemEntity> itemEntities) {
+    private List<RecordType> buildRecordTypes(List<ItemEntity> itemEntities) {
         List<RecordType> recordTypes = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(itemEntities)) {
+        if (itemEntities!=null) {
             for (ItemEntity itemEntity : itemEntities) {
                 RecordType recordType = new RecordType();
                 List<DataFieldType> dataFieldTypeList = new ArrayList<>();
@@ -97,7 +102,7 @@ public class DataDumpUtil {
         return recordTypes;
     }
 
-    public DataFieldType build900DataField(ItemEntity itemEntity) {
+    private DataFieldType build900DataField(ItemEntity itemEntity) {
         DataFieldType dataFieldType = new DataFieldType();
         List<SubfieldatafieldType> subfieldatafieldTypes = new ArrayList<>();
         dataFieldType.setTag("900");
@@ -109,7 +114,7 @@ public class DataDumpUtil {
         return dataFieldType;
     }
 
-    public DataFieldType build876DataField(ItemEntity itemEntity) {
+    private DataFieldType build876DataField(ItemEntity itemEntity) {
         DataFieldType dataFieldType = new DataFieldType();
         List<SubfieldatafieldType> subfieldatafieldTypes = new ArrayList<>();
         dataFieldType.setTag("876");
@@ -125,14 +130,14 @@ public class DataDumpUtil {
         return dataFieldType;
     }
 
-    public SubfieldatafieldType getSubfieldatafieldType(String code, String value) {
+    private SubfieldatafieldType getSubfieldatafieldType(String code, String value) {
         SubfieldatafieldType subfieldatafieldType = new SubfieldatafieldType();
         subfieldatafieldType.setCode(code);
         subfieldatafieldType.setValue(value);
         return subfieldatafieldType;
     }
 
-    public ContentType getContentType(byte[] byteContent) {
+    private ContentType getContentType(byte[] byteContent) {
         String content = new String(byteContent, Charset.forName("UTF-8"));
         CollectionType collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
         ContentType contentType = new ContentType();

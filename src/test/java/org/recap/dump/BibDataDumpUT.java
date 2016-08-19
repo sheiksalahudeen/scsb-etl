@@ -1,5 +1,6 @@
 package org.recap.dump;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,7 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
+import org.recap.executors.ExportDataDumpExecutorService;
 import org.recap.model.etl.BibPersisterCallable;
+import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
@@ -16,7 +20,10 @@ import org.recap.model.jpa.BibliographicPK;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DataDumpUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,10 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -50,6 +54,17 @@ public class BibDataDumpUT extends BaseTestCase {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Value("${etl.dump.directory}")
+    private String dumpDirectoryPath;
+
+    private static final Logger logger = LoggerFactory.getLogger(BibDataDumpUT.class);
+
+    @Autowired
+    ProducerTemplate producer;
+
+    @Autowired
+    private ExportDataDumpExecutorService exportDataDumpExecutorService;
 
     @Before
     public void setUp() {
@@ -95,7 +110,7 @@ public class BibDataDumpUT extends BaseTestCase {
         String xmlContent = JAXBHandler.getInstance().marshal(bibRecord);
         assertNotNull(xmlContent);
 
-        File file = new File(xmlFileName);
+        File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
         FileUtils.writeStringToFile(file, xmlContent);
         assertTrue(file.exists());
     }
@@ -140,7 +155,7 @@ public class BibDataDumpUT extends BaseTestCase {
         String xmlContent = JAXBHandler.getInstance().marshal(bibRecord);
         assertNotNull(xmlContent);
 
-        File file = new File(xmlFileName);
+        File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
         FileUtils.writeStringToFile(file, xmlContent);
         assertTrue(file.exists());
     }
@@ -185,7 +200,7 @@ public class BibDataDumpUT extends BaseTestCase {
         String xmlContent = JAXBHandler.getInstance().marshal(bibRecord);
         assertNotNull(xmlContent);
 
-        File file = new File(xmlFileName);
+        File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
         FileUtils.writeStringToFile(file, xmlContent);
         assertTrue(file.exists());
     }
@@ -249,12 +264,57 @@ public class BibDataDumpUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity2);
 
         BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(savedBibliographicEntity1, savedBibliographicEntity2));
-        String xmlContent = JAXBHandler.getInstance().marshal(bibRecords);
-        assertNotNull(xmlContent);
 
-        File file = new File("multipleRecords.xml");
-        FileUtils.writeStringToFile(file, xmlContent);
+        String fileName = "Data-Dump.xml";
+        producer.sendBodyAndHeader("seda:marshal", bibRecords, "fileName", fileName);
+
+        Thread.sleep(1000);
+        File file = new File(dumpDirectoryPath + File.separator + fileName);
         assertTrue(file.exists());
     }
 
+    @Test
+    public void getFullDumpWithSingleThread()throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(1);
+        dataDumpRequest.setBatchSize(1000);
+        exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.count();
+        int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
+        Thread.sleep(100);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + RecapConstants.DATA_DUMP_FILE_NAME+fileCount+RecapConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+        }
+    }
+
+    @Test
+    public void getFullDumpWithMultipleThreads()throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(8000);
+        exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.count();
+        int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
+        Thread.sleep(100);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + RecapConstants.DATA_DUMP_FILE_NAME+fileCount+RecapConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+        }
+    }
+
+    private int getLoopCount(Long totalRecordCount,int batchSize){
+        int quotient = Integer.valueOf(Long.toString(totalRecordCount)) / (batchSize);
+        int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
+        int loopCount = remainder == 0 ? quotient : quotient + 1;
+        return loopCount;
+    }
 }

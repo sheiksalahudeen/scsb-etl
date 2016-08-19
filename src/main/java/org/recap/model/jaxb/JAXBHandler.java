@@ -53,7 +53,7 @@ public class JAXBHandler {
         return getMarshallerMap().get(cl.getName());
     }
 
-    public Object unmarshal(String content, Class cl) {
+    synchronized public Object unmarshal(String content, Class cl) {
         Object object = null;
         try {
             Unmarshaller unmarshaller = getUnmarshaller(cl);
