@@ -1,6 +1,7 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
@@ -65,7 +66,7 @@ public class RecordProcessor {
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
 
-        List<Future> futures = prepareFutureTasks(xmlRecordEntities);
+        List<Future> futures = prepareFutureTasks(xmlRecordEntities, reportEntities);
 
         for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
             Future future = iterator.next();
@@ -115,26 +116,58 @@ public class RecordProcessor {
         }
     }
 
-    private List<Future> prepareFutureTasks(Page<XmlRecordEntity> xmlRecordEntities) {
+    private List<Future> prepareFutureTasks(Page<XmlRecordEntity> xmlRecordEntities, List<ReportEntity> reportEntities) {
         List<Future> futures = new ArrayList<>();
-        BibRecord bibRecord;
+        BibRecord bibRecord = new BibRecord();
 
         for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
             XmlRecordEntity xmlRecordEntity = iterator.next();
             String xml = new String(xmlRecordEntity.getXml());
+            try {
+                bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
+                BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+                bibPersisterCallable.setDBReportUtil(DBReportUtil);
+                bibPersisterCallable.setBibRecord(bibRecord);
+                bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
+                bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
+                bibPersisterCallable.setItemStatusMap(getItemStatusMap());
+                bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
+                bibPersisterCallable.setInstitutionName(institutionName);
+                Future submit = getExecutorService().submit(bibPersisterCallable);
+                futures.add(submit);
+            } catch (Exception e) {
+                ReportEntity reportEntity = new ReportEntity();
+                List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+                String owningInst = xmlRecordEntity.getOwningInst();
+                reportEntity.setCreatedDate(new Date());
+                reportEntity.setType(ReCAPConstants.FAILURE);
+                reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
+                reportEntity.setInstitutionName(owningInst);
 
-            bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
+                if(StringUtils.isNotBlank(owningInst)) {
+                    ReportDataEntity reportDataEntity = new ReportDataEntity();
+                    reportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION);
+                    reportDataEntity.setHeaderValue((String) institutionEntityMap.get(owningInst));
+                    reportDataEntities.add(reportDataEntity);
+                }
 
-            BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
-            bibPersisterCallable.setDBReportUtil(DBReportUtil);
-            bibPersisterCallable.setBibRecord(bibRecord);
-            bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
-            bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
-            bibPersisterCallable.setItemStatusMap(getItemStatusMap());
-            bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
-            bibPersisterCallable.setInstitutionName(institutionName);
-            Future submit = getExecutorService().submit(bibPersisterCallable);
-            futures.add(submit);
+                if(StringUtils.isNotBlank(xmlRecordEntity.getOwningInstBibId())) {
+                    ReportDataEntity reportDataEntity = new ReportDataEntity();
+                    reportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION_BIB_ID);
+                    reportDataEntity.setHeaderValue(xmlRecordEntity.getOwningInstBibId());
+                    reportDataEntities.add(reportDataEntity);
+                }
+
+                if(e.getCause() != null) {
+                    ReportDataEntity reportDataEntity = new ReportDataEntity();
+                    reportDataEntity.setHeaderName(ReCAPConstants.EXCEPTION_MESSAGE);
+                    reportDataEntity.setHeaderValue(e.getCause().getMessage());
+                    reportDataEntities.add(reportDataEntity);
+                }
+
+                reportEntity.setReportDataEntities(reportDataEntities);
+                reportEntities.add(reportEntity);
+            }
         }
 
         return futures;
