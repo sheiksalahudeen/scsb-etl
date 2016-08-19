@@ -2,6 +2,7 @@ package org.recap.route;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.recap.ReCAPConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ public class ReportsRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from("seda:reportQ")
-                            .routeId("reportQRoute")
+                    from(ReCAPConstants.REPORT_Q)
+                            .routeId(ReCAPConstants.REPORT_ROUTE_ID)
                             .process(reportProcessor);
                 }
             });

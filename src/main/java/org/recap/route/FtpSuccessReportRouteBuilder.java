@@ -3,6 +3,7 @@ package org.recap.route;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.ReCAPCSVSuccessRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +24,8 @@ public class FtpSuccessReportRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from("seda:ftpSuccessQ")
-                            .routeId("ftpSuccessQ")
+                    from(ReCAPConstants.FTP_FAILURE_Q)
+                            .routeId(ReCAPConstants.FTP_FAILURE_ROUTE_ID)
                             .process(new FileNameProcessorForSuccessRecord())
                             .marshal().bindy(BindyType.Csv, ReCAPCSVSuccessRecord.class)
                             .to("sftp://" + ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.directoryName}/${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");

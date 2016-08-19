@@ -3,6 +3,7 @@ package org.recap.route;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +24,8 @@ public class CSVFailureReportRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from("seda:csvFailureQ")
-                            .routeId("csvFailureQ")
+                    from(ReCAPConstants.CSV_FAILURE_Q)
+                            .routeId(ReCAPConstants.CSV_FAILURE_ROUTE_ID)
                             .process(new FileNameProcessorForFailureRecord())
                             .marshal().bindy(BindyType.Csv, ReCAPCSVFailureRecord.class)
                             .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");

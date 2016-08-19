@@ -6,6 +6,7 @@ import org.apache.camel.*;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.recap.model.jpa.ReportDataEntity;
@@ -78,11 +79,11 @@ public class JMSUT extends BaseTestCase {
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:csvFailureQ", reCAPCSVFailureRecord);
+        producer.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
 
         Thread.sleep(1000);
 
-        DateFormat df = new SimpleDateFormat("ddMMMyyyy");
+        DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
         String fileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName()) + "-Failure-" + df.format(new Date());
         File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
         assertTrue(file.exists());
@@ -147,10 +148,10 @@ public class JMSUT extends BaseTestCase {
 
         reportEntity.setFileName("SampleRecord.xml");
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType("Success");
+        reportEntity.setType(org.recap.ReCAPConstants.SUCCESS);
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntity.setInstitutionName("NYPL");
-        producer.sendBody("seda:reportQ", reportEntity);
+        producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
         Thread.sleep(1000);
 
         List<ReportEntity> byFileName = reportDetailRepository.findByFileName("SampleRecord.xml");
