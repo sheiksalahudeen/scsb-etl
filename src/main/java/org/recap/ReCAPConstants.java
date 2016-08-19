@@ -1,9 +1,23 @@
 package org.recap;
 
 /**
- * Created by angelind on 19/8/16.
+ * Created by premkb on 19/8/16.
  */
 public class ReCAPConstants {
+
+    public static final String DATA_DUMP_FILE_NAME = "Data-Dump";
+    public static final String XML_FILE_FORMAT = ".xml";
+
+    //General Constants
+    public static final String INST_NAME= "institutionName";
+
+
+    //Report
+    public static final String FILE_LOAD_STATUS= "FileLoadStatus";
+    public static final String FILE_LOADED= "Loaded";
+    public static final String XML_LOAD= "XMLLoad";
+    public static final String CAMEL_EXCHANGE_FILE = "CamelFileExchangeFile";
+
 
     //Camel Queue Constants
     public static final String REPORT_Q= "seda:reportQ";
@@ -56,9 +70,5 @@ public class ReCAPConstants {
     public static final String REPORT_FILE_NAME = "fileName";
     public static final String REPORT_TYPE = "reportType";
     public static final String DIRECTORY_NAME = "directoryName";
-
-
-
-
 
 }

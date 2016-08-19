@@ -1,7 +1,7 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
+import org.recap.ReCAPConstants;
 import org.recap.model.etl.ExportDataDumpCallable;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.marc.BibRecords;
@@ -12,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -51,7 +48,7 @@ public class ExportDataDumpExecutorService {
             stopWatchPerFile.start();
             Callable callable = getExportDataDumpCallable(pageNum,batchSize,bibliographicDetailsRepository);
             BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
-            String fileName = RecapConstants.DATA_DUMP_FILE_NAME + pageNum + RecapConstants.XML_FILE_FORMAT;
+            String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + pageNum + ReCAPConstants.XML_FILE_FORMAT;
             producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
             stopWatchPerFile.stop();
             if(logger.isInfoEnabled()){
