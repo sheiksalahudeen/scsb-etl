@@ -1,6 +1,7 @@
 package org.recap.route;
 
 import org.apache.camel.ProducerTemplate;
+import org.recap.ReCAPConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
@@ -93,7 +94,7 @@ public class RecordProcessor {
 
         if (!CollectionUtils.isEmpty(reportEntities)) {
             for(ReportEntity reportEntity : reportEntities) {
-                producer.sendBody("seda:reportQ", reportEntity);
+                producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
             }
         }
 

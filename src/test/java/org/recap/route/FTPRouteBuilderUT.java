@@ -3,6 +3,7 @@ package org.recap.route;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +58,12 @@ public class FTPRouteBuilderUT extends BaseTestCase{
         ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
         reCAPCSVFailureRecord.setFileName("test.xml");
         reCAPCSVFailureRecord.setInstitutionName("PUL");
-        reCAPCSVFailureRecord.setReportType("failure");
+        reCAPCSVFailureRecord.setReportType(org.recap.ReCAPConstants.FAILURE);
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:ftpFailureQ", reCAPCSVFailureRecord);
+        producer.sendBody(ReCAPConstants.FTP_SUCCESS_Q, reCAPCSVFailureRecord);
 
         Thread.sleep(2000);
     }

@@ -3,6 +3,7 @@ package org.recap.route;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.io.FilenameUtils;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,9 @@ public class FileNameProcessorForFailureRecord implements Processor {
     public void process(Exchange exchange) throws Exception {
         ReCAPCSVFailureRecord reCAPCSVFailureRecord = (ReCAPCSVFailureRecord) exchange.getIn().getBody();
         String fileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName());
-        exchange.getIn().setHeader("fileName", fileName);
-        exchange.getIn().setHeader("directoryName", reCAPCSVFailureRecord.getInstitutionName());
-        exchange.getIn().setHeader("reportType", reCAPCSVFailureRecord.getReportType());
+        exchange.getIn().setHeader(ReCAPConstants.REPORT_FILE_NAME, fileName);
+        exchange.getIn().setHeader(ReCAPConstants.DIRECTORY_NAME, reCAPCSVFailureRecord.getInstitutionName());
+        exchange.getIn().setHeader(ReCAPConstants.REPORT_TYPE, reCAPCSVFailureRecord.getReportType());
 
     }
 }

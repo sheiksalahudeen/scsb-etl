@@ -2,6 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FilenameUtils;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.recap.model.jpa.ReportEntity;
@@ -28,12 +29,12 @@ public class CSVFailureReportGenerator implements ReportGeneratorInterface  {
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase("Failure") ? true : false;
+        return reportType.equalsIgnoreCase(org.recap.ReCAPConstants.FAILURE) ? true : false;
     }
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return transmissionType.equalsIgnoreCase("FileSystem") ? true : false;
+        return transmissionType.equalsIgnoreCase(org.recap.ReCAPConstants.FILE_SYSTEM) ? true : false;
     }
 
     @Override
@@ -51,8 +52,8 @@ public class CSVFailureReportGenerator implements ReportGeneratorInterface  {
             reCAPCSVFailureRecord.setInstitutionName(reportEntity.getInstitutionName());
             reCAPCSVFailureRecord.setFileName(reportEntity.getFileName());
             reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
-            producerTemplate.sendBody("seda:csvFailureQ", reCAPCSVFailureRecord);
-            DateFormat df = new SimpleDateFormat("ddMMMyyyy");
+            producerTemplate.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
+            DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
             String generatedFileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName()) + "-" + reCAPCSVFailureRecord.getReportType() + "-" + df.format(new Date()) + ".csv";
             return generatedFileName;
         }

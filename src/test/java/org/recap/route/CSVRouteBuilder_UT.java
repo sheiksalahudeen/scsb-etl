@@ -5,6 +5,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.recap.model.jpa.ReportDataEntity;
@@ -48,26 +49,26 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType("Failure");
+        reportEntity.setType(org.recap.ReCAPConstants.FAILURE);
         reportEntity.setInstitutionName("PUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
-        reportDataEntity.setHeaderName("ItemBarcode");
+        reportDataEntity.setHeaderName(ReCAPConstants.ITEM_BARCODE);
         reportDataEntity.setHeaderValue("103");
         reportDataEntities.add(reportDataEntity);
 
         ReportDataEntity reportDataEntity2 = new ReportDataEntity();
-        reportDataEntity2.setHeaderName("CustomerCode");
+        reportDataEntity2.setHeaderName(ReCAPConstants.CUSTOMER_CODE);
         reportDataEntity2.setHeaderValue("PA");
         reportDataEntities.add(reportDataEntity2);
 
         ReportDataEntity reportDataEntity3 = new ReportDataEntity();
-        reportDataEntity3.setHeaderName("LocalItemId");
+        reportDataEntity3.setHeaderName(ReCAPConstants.LOCAL_ITEM_ID);
         reportDataEntity3.setHeaderValue("10412");
         reportDataEntities.add(reportDataEntity3);
 
         ReportDataEntity reportDataEntity4 = new ReportDataEntity();
-        reportDataEntity4.setHeaderName("OwningInstitution");
+        reportDataEntity4.setHeaderName(ReCAPConstants.OWNING_INSTITUTION);
         reportDataEntity4.setHeaderValue("PUL");
         reportDataEntities.add(reportDataEntity4);
 
@@ -83,11 +84,11 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
         ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
         reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody("seda:csvFailureQ", reCAPCSVFailureRecord);
+        producer.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
 
         Thread.sleep(1000);
 
-        String ddMMMyyyy = new SimpleDateFormat("ddMMMyyyy").format(new Date());
+        String ddMMMyyyy = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME).format(new Date());
         String expectedGeneratedFileName = "test"+"-Failure"+"-"+ddMMMyyyy+".csv";
 
         File directory = new File(reportDirectory);

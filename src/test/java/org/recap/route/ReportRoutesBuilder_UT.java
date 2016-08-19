@@ -3,6 +3,7 @@ package org.recap.route;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
@@ -28,7 +29,7 @@ public class ReportRoutesBuilder_UT extends BaseTestCase {
     @Test
     public void failureReportEntity() throws Exception {
         ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setType("Failure");
+        reportEntity.setType(org.recap.ReCAPConstants.FAILURE);
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
         reportEntity.setInstitutionName("CUL");
@@ -41,7 +42,7 @@ public class ReportRoutesBuilder_UT extends BaseTestCase {
         reportDataEntities.add(reportDataEntity1);
         reportEntity.setReportDataEntities(reportDataEntities);
 
-        producer.sendBody("seda:reportQ", reportEntity);
+        producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
 
         Thread.sleep(1000);
 

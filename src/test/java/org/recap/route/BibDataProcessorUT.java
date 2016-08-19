@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
@@ -256,7 +257,7 @@ public class BibDataProcessorUT extends BaseTestCase {
 
         java.lang.Thread.sleep(500);
 
-        DateFormat df = new SimpleDateFormat("ddMMMyyyy");
+        DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
         String fileName = FilenameUtils.removeExtension(bibDataProcessor.getXmlFileName()) + "-Failure-" + df.format(new Date());
         file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
         assertTrue(file.exists());

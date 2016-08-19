@@ -1,6 +1,7 @@
 package org.recap.model.etl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.CollectionType;
@@ -40,6 +41,9 @@ public class BibPersisterCallable implements Callable {
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
+
+        getDBReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
+        getDBReportUtil().setCollectionGroupMap(collectionGroupMap);
 
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
         Map<String, Object> bibMap = processAndValidateBibliographicEntity(owningInstitutionId);
@@ -120,7 +124,7 @@ public class BibPersisterCallable implements Callable {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
         reportEntity.setInstitutionName(institutionName);
-        reportEntity.setType("Failure");
+        reportEntity.setType(org.recap.ReCAPConstants.FAILURE);
         reportEntity.setCreatedDate(new Date());
 
         Bib bib = bibRecord.getBib();
@@ -165,11 +169,9 @@ public class BibPersisterCallable implements Callable {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            getDBReportUtil().setCollectionGroupMap(collectionGroupMap);
-            getDBReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
             reportDataEntities = getDBReportUtil().generateBibFailureReportEntity(bibliographicEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
-            errorReportDataEntity.setHeaderName("ErrorMessage");
+            errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
         }
@@ -189,7 +191,7 @@ public class BibPersisterCallable implements Callable {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
         reportEntity.setInstitutionName(institutionName);
-        reportEntity.setType("Failure");
+        reportEntity.setType(org.recap.ReCAPConstants.FAILURE);
         reportEntity.setCreatedDate(new Date());
 
         String holdingsContent = holdingContentCollection.serialize(holdingContentCollection);
@@ -220,7 +222,7 @@ public class BibPersisterCallable implements Callable {
         if (errorMessage.toString().length() > 1) {
             getDBReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
-            errorReportDataEntity.setHeaderName("ErrorMessage");
+            errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
         }
@@ -241,7 +243,7 @@ public class BibPersisterCallable implements Callable {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
         reportEntity.setInstitutionName(institutionName);
-        reportEntity.setType("Failure");
+        reportEntity.setType(org.recap.ReCAPConstants.FAILURE);
         reportEntity.setCreatedDate(new Date());
 
         String itemBarcode = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "p");
@@ -300,7 +302,7 @@ public class BibPersisterCallable implements Callable {
         if (errorMessage.toString().length() > 1) {
             reportDataEntities = getDBReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, itemEntity.getHoldingsEntity(), itemEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
-            errorReportDataEntity.setHeaderName("ErrorMessage");
+            errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
         }

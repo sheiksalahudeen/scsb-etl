@@ -131,18 +131,31 @@ public class EtlDataLoadController {
                              BindingResult result,
                              Model model) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(etlLoadRequest.getDateFrom());
+        Date dateFrom = etlLoadRequest.getDateFrom();
+        if(dateFrom != null) {
+            cal.setTime(dateFrom);
+        } else {
+            cal.setTime(new Date());
+        }
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Date from = cal.getTime();
-        cal.setTime(etlLoadRequest.getDateTo());
+        Date dateTo = etlLoadRequest.getDateTo();
+        if(dateTo != null) {
+            cal.setTime(dateTo);
+        } else {
+            cal.setTime(new Date());
+        }
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         Date to = cal.getTime();
-        String generatedReportFileName = reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(),
-                from, to, etlLoadRequest.getTransmissionType());
+        String reportFileName = etlLoadRequest.getReportFileName();
+        if(StringUtils.isNotBlank(reportFileName)) {
+            String generatedReportFileName = reportGenerator.generateReport(reportFileName, etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(),
+                    from, to, etlLoadRequest.getTransmissionType());
+        }
         return etlDataLoader(model);
     }
 }
