@@ -5,7 +5,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.jpa.XmlRecordEntity;
+import org.recap.repository.ReportDetailRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +42,9 @@ public class XMLProcessorUT extends BaseTestCase {
 
     @Autowired
     XmlRecordRepository xmlRecordRepository;
+
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
 
     @Test
     public void process() throws Exception {
@@ -102,5 +109,23 @@ public class XMLProcessorUT extends BaseTestCase {
         xmlRecordEntity.setXmlFileName(fileName);
         xmlRecordRepository.save(xmlRecordEntity);
         return xmlRecordEntity;
+    }
+
+    @Test
+    public void testLoadReport() throws Exception {
+        String fileName = "sampleRecordForEtlLoadTest.xml";
+        File file = new File(getClass().getResource(fileName).toURI());
+        FileUtils.copyFileToDirectory(file, new File(etlLoadDir));
+
+        Thread.sleep(5000);
+
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileName("sampleRecordForEtlLoadTest.xml");
+        ReportEntity reportEntity = reportEntities.get(0);
+        List<ReportDataEntity> reportDataEntities =
+                reportEntity.getReportDataEntities();
+
+        ReportDataEntity reportDataEntity = reportDataEntities.get(0);
+        assertEquals(ReCAPConstants.FILE_LOAD_STATUS, reportDataEntity.getHeaderName());
+        assertEquals(ReCAPConstants.FILE_LOADED, reportDataEntity.getHeaderValue());
     }
 }

@@ -15,6 +15,7 @@ public class ReCAPConstants {
     //Report
     public static final String FILE_LOAD_STATUS= "FileLoadStatus";
     public static final String FILE_LOADED= "Loaded";
+    public static final String FILE_LOAD_EXCEPTION= "Exception";
     public static final String XML_LOAD= "XMLLoad";
     public static final String CAMEL_EXCHANGE_FILE = "CamelFileExchangeFile";
 
