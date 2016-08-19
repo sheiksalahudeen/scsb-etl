@@ -19,6 +19,18 @@ public class FtpDataDumpRouteBuilder extends RouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FtpDataDumpRouteBuilder.class);
 
+    @Value("${ftp.userName}")
+    String ftpUserName;
+
+    @Value("${ftp.knownHost}")
+    String ftpKnownHost;
+
+    @Value("${ftp.privateKey}")
+    String ftpPrivateKey;
+
+    @Value("${ftp.datadump.remote.server}")
+    String ftpDataDumpRemoteServer;
+
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
@@ -36,6 +48,7 @@ public class FtpDataDumpRouteBuilder extends RouteBuilder {
         JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
         jaxbDataFormat.setContext(context);
         from("seda:dataDumpQ").marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator + "?fileName=${in.header.fileName}")
+                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileName}")
                 .end();
     }
 }
