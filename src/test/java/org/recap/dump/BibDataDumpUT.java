@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -215,7 +216,11 @@ public class BibDataDumpUT extends BaseTestCase {
         assertNotNull(file);
         assertTrue(file.exists());
         BibRecord bibRecord = null;
-        bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        try {
+            bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
         assertNotNull(bibRecord);
 
         BibliographicEntity bibliographicEntity = null;

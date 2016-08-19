@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import javax.xml.bind.JAXBException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,7 +140,12 @@ public class DataDumpUtil {
 
     private ContentType getContentType(byte[] byteContent) {
         String content = new String(byteContent, Charset.forName("UTF-8"));
-        CollectionType collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
+        CollectionType collectionType = null;
+        try {
+            collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
         ContentType contentType = new ContentType();
         contentType.setCollection(collectionType);
         return contentType;

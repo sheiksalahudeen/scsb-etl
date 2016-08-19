@@ -5,6 +5,7 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.*;
 
+import javax.xml.bind.JAXBException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -188,8 +189,13 @@ public class MarcUtilUT {
                 "    </holdings>\n" +
                 "  </bibRecord>";
 
-
-        return (BibRecord) jaxbHandler.unmarshal(content, BibRecord.class);
+        BibRecord bibRecord = null;
+        try {
+            bibRecord = (BibRecord) jaxbHandler.unmarshal(content, BibRecord.class);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        return bibRecord;
     }
 
     @Test
