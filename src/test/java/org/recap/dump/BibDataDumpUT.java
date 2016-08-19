@@ -1,6 +1,7 @@
 package org.recap.dump;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.BibliographicPK;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.util.DBReportUtil;
 import org.recap.util.DataDumpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,21 @@ public class BibDataDumpUT extends BaseTestCase {
 
     @Autowired
     private ExportDataDumpExecutorService exportDataDumpExecutorService;
+
+    @Autowired
+    DBReportUtil dbReportUtil;
+
+    @Value("${ftp.userName}")
+    String ftpUserName;
+
+    @Value("${ftp.knownHost}")
+    String ftpKnownHost;
+
+    @Value("${ftp.privateKey}")
+    String ftpPrivateKey;
+
+    @Value("${ftp.datadump.remote.server}")
+    String ftpDataDumpRemoteServer;
 
     @Before
     public void setUp() {
@@ -231,6 +248,7 @@ public class BibDataDumpUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
+        bibPersisterCallable.setDBReportUtil(dbReportUtil);
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");
@@ -322,4 +340,50 @@ public class BibDataDumpUT extends BaseTestCase {
         int loopCount = remainder == 0 ? quotient : quotient + 1;
         return loopCount;
     }
+
+    @Test
+    public void uploadDataDumpXmlToFTP()throws Exception{
+        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
+        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
+        Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
+
+        Map<String, Integer> institution = new HashMap<>();
+        institution.put("NYPL", 3);
+        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
+
+        Map<String, Integer> collection = new HashMap<>();
+        collection.put("Open", 2);
+        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
+
+        BibliographicEntity bibliographicEntity1 = getBibliographicEntity("singleRecord.xml");
+        assertNotNull(bibliographicEntity1);
+        BibliographicEntity savedBibliographicEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
+        entityManager.refresh(savedBibliographicEntity1);
+        assertNotNull(savedBibliographicEntity1);
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
+        bibliographicEntityList.add(savedBibliographicEntity1);
+        BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
+        String fileName = "final-Generated-Data-Dump.xml";
+        producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
+        Thread.sleep(1000);
+        File file = new File(dumpDirectoryPath + File.separator + fileName);
+        assertTrue(file.exists());
+        Thread.sleep(1000);
+
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("seda:getUploadedDataDump")
+                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=final-Generated-Data-Dump.xml");
+            }
+        });
+
+        String response = producer.requestBody("seda:getUploadedDataDump", "", String.class);
+        Thread.sleep(1000);
+        assertNotNull(response);
+
+
+    }
+
 }
