@@ -117,7 +117,7 @@ public class XMLProcessorUT extends BaseTestCase {
         File file = new File(getClass().getResource(fileName).toURI());
         FileUtils.copyFileToDirectory(file, new File(etlLoadDir));
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileName("sampleRecordForEtlLoadTest.xml");
         ReportEntity reportEntity = reportEntities.get(0);
@@ -127,5 +127,17 @@ public class XMLProcessorUT extends BaseTestCase {
         ReportDataEntity reportDataEntity = reportDataEntities.get(0);
         assertEquals(ReCAPConstants.FILE_LOAD_STATUS, reportDataEntity.getHeaderName());
         assertEquals(ReCAPConstants.FILE_LOADED, reportDataEntity.getHeaderValue());
+    }
+
+    @Test
+    public void testDuplicateXMLFileProcessing() throws Exception {
+        String fileName = "sampleRecordForEtlLoadTest.xml";
+        File file = new File(getClass().getResource(fileName).toURI());
+        FileUtils.copyFileToDirectory(file, new File(etlLoadDir));
+
+        Thread.sleep(2000);
+
+        Long countByXmlFileName = xmlRecordRepository.countByXmlFileName(fileName);
+        assertEquals(new Long(1), Long.valueOf(countByXmlFileName));
     }
 }

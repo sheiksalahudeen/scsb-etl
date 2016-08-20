@@ -33,35 +33,37 @@ public class XmlProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String xmlRecord = (String) exchange.getIn().getBody();
-        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
-        xmlRecordEntity.setXml(xmlRecord.getBytes());
+        if (StringUtils.isNotEmpty(xmlRecord)) {
+            XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+            xmlRecordEntity.setXml(xmlRecord.getBytes());
 
-        String camelFileName = (String) exchange.getIn().getHeader("CamelFileName");
-        xmlRecordEntity.setXmlFileName(camelFileName);
+            String camelFileName = (String) exchange.getIn().getHeader("CamelFileName");
+            xmlRecordEntity.setXmlFileName(camelFileName);
 
-        String owningInstitutionId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionId>", "</owningInstitutionId>");
+            String owningInstitutionId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionId>", "</owningInstitutionId>");
 
-        xmlRecordEntity.setOwningInst(owningInstitutionId);
-        String owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
+            xmlRecordEntity.setOwningInst(owningInstitutionId);
+            String owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
 
-        if (StringUtils.isBlank(owningInstitutionBibId)) {
-            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag=\"001\">", "</controlfield>");
+            if (StringUtils.isBlank(owningInstitutionBibId)) {
+                owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag=\"001\">", "</controlfield>");
+            }
+
+            if (StringUtils.isBlank(owningInstitutionBibId)) {
+                owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag='001'>", "</controlfield>");
+            }
+            xmlRecordEntity.setOwningInstBibId(owningInstitutionBibId);
+            Date date = new Date();
+            xmlRecordEntity.setDataLoaded(date);
+
+            try {
+                xmlRecordRepository.save(xmlRecordEntity);
+            } catch (Exception e) {
+                logger.error("Exception " + e);
+            }
+
+            setInstitutionOnHeader(exchange, owningInstitutionId);
         }
-
-        if (StringUtils.isBlank(owningInstitutionBibId)) {
-            owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<controlfield tag='001'>", "</controlfield>");
-        }
-        xmlRecordEntity.setOwningInstBibId(owningInstitutionBibId);
-        Date date = new Date();
-        xmlRecordEntity.setDataLoaded(date);
-
-        try {
-            xmlRecordRepository.save(xmlRecordEntity);
-        } catch (Exception e) {
-            logger.error("Exception " + e);
-        }
-
-        setInstitutionOnHeader(exchange, owningInstitutionId);
     }
 
     private void setInstitutionOnHeader(Exchange exchange, String owningInstitutionId) {

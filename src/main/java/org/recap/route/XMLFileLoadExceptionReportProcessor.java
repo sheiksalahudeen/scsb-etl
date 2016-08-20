@@ -3,6 +3,7 @@ package org.recap.route;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.file.GenericFile;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -25,20 +26,23 @@ public class XMLFileLoadExceptionReportProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setCreatedDate(new Date());
-        GenericFile camelFileExchangeFile = (GenericFile) exchange.getProperty(ReCAPConstants.CAMEL_EXCHANGE_FILE);
-        reportEntity.setFileName(camelFileExchangeFile.getFileName());
-        reportEntity.setType(ReCAPConstants.XML_LOAD);
-        reportEntity.setInstitutionName((String) exchange.getProperty(ReCAPConstants.INST_NAME));
+        String institutionName = (String) exchange.getProperty(ReCAPConstants.INST_NAME);
+        if (StringUtils.isNotEmpty(institutionName)) {
+            ReportEntity reportEntity = new ReportEntity();
+            reportEntity.setCreatedDate(new Date());
+            GenericFile camelFileExchangeFile = (GenericFile) exchange.getProperty(ReCAPConstants.CAMEL_EXCHANGE_FILE);
+            reportEntity.setFileName(camelFileExchangeFile.getFileName());
+            reportEntity.setType(ReCAPConstants.XML_LOAD);
+            reportEntity.setInstitutionName(institutionName);
 
-        ReportDataEntity reportDataEntity = new ReportDataEntity();
-        reportDataEntity.setHeaderName(ReCAPConstants.FILE_LOAD_STATUS);
-        reportDataEntity.setHeaderValue(ReCAPConstants.FILE_LOAD_EXCEPTION);
+            ReportDataEntity reportDataEntity = new ReportDataEntity();
+            reportDataEntity.setHeaderName(ReCAPConstants.FILE_LOAD_STATUS);
+            reportDataEntity.setHeaderValue(ReCAPConstants.FILE_LOAD_EXCEPTION);
 
-        reportEntity.setReportDataEntities(Arrays.asList(reportDataEntity));
+            reportEntity.setReportDataEntities(Arrays.asList(reportDataEntity));
 
-        reportDetailRepository.save(reportEntity);
+            reportDetailRepository.save(reportEntity);
+        }
 
     }
 }

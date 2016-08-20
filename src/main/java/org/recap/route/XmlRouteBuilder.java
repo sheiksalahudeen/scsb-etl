@@ -24,7 +24,7 @@ public class XmlRouteBuilder {
     Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
     @Autowired
-    public XmlRouteBuilder(CamelContext context, XmlRecordRepository xmlRecordRepository, XMLFileLoadReportProcessor xmlFileLoadReportProcessor, XMLFileLoadExceptionReportProcessor xmlFileLoadExceptionReportProcessor,
+    public XmlRouteBuilder(CamelContext context, XmlRecordRepository xmlRecordRepository, XMLFileLoadReportProcessor xmlFileLoadReportProcessor, XMLFileLoadExceptionReportProcessor xmlFileLoadExceptionReportProcessor, XMLFileLoadValidator xmlFileLoadValidator,
                            @Value("${etl.split.xml.tag.name}") String xmlTagName,
                            @Value("${etl.load.directory}") String inputDirectoryPath,
                            @Value("${etl.pool.size}") Integer poolSize, @Value("${etl.max.pool.size}") Integer maxPoolSize) {
@@ -43,9 +43,11 @@ public class XmlRouteBuilder {
                             .onException(Exception.class)
                             .process(xmlFileLoadExceptionReportProcessor)
                             .end()
+                            .process(xmlFileLoadValidator)
                             .split()
                             .tokenizeXML(xmlTagName)
                             .streaming()
+                            .parallelProcessing().threads(poolSize, maxPoolSize)
                             .process(new XmlProcessor(xmlRecordRepository));
                 }
             });
