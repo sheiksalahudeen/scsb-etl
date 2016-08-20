@@ -20,6 +20,12 @@ public class XMLFileLoadValidator implements Processor {
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    /**
+     * Check to see if the xml file has been loaded already. If so, set empty body such that the file doesn't get
+     * processed again.
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         String camelFileName = (String) exchange.getIn().getHeader("CamelFileName");
