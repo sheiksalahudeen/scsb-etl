@@ -1,4 +1,4 @@
-package org.recap.route;
+package org.recap.camel;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;

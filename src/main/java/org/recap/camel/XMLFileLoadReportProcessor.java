@@ -1,4 +1,4 @@
-package org.recap.route;
+package org.recap.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -19,7 +19,7 @@ import java.util.Date;
  */
 
 @Component
-public class XMLFileLoadExceptionReportProcessor implements Processor {
+public class XMLFileLoadReportProcessor implements Processor {
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
@@ -37,7 +37,7 @@ public class XMLFileLoadExceptionReportProcessor implements Processor {
 
             ReportDataEntity reportDataEntity = new ReportDataEntity();
             reportDataEntity.setHeaderName(ReCAPConstants.FILE_LOAD_STATUS);
-            reportDataEntity.setHeaderValue(ReCAPConstants.FILE_LOAD_EXCEPTION);
+            reportDataEntity.setHeaderValue(ReCAPConstants.FILE_LOADED);
 
             reportEntity.setReportDataEntities(Arrays.asList(reportDataEntity));
 

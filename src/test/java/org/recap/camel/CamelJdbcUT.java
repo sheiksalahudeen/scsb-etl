@@ -1,20 +1,14 @@
-package org.recap.route;
+package org.recap.camel;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
-import org.apache.camel.model.ThreadsDefinition;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
-import java.io.File;
-import java.net.URL;
-
-import org.recap.ReCAPInitializer;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package org.recap.route;
+package org.recap.camel;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

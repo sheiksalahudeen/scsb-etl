@@ -1,4 +1,4 @@
-package org.recap.route;
+package org.recap.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.commons.io.FileUtils;
