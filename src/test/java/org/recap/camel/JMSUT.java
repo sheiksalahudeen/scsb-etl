@@ -75,6 +75,8 @@ public class JMSUT extends BaseTestCase {
 
         ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
         reCAPCSVFailureRecord.setFileName("test.xml");
+        reCAPCSVFailureRecord.setReportType(ReCAPConstants.FAILURE);
+        reCAPCSVFailureRecord.setInstitutionName("PUL");
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));

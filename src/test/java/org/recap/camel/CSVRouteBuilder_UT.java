@@ -3,6 +3,7 @@ package org.recap.camel;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
@@ -88,6 +89,10 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
         FailureReportReCAPCSVRecord failureReportReCAPCSVRecord = new ReCAPCSVFailureRecordGenerator().prepareFailureReportReCAPCSVRecord(savedReportEntity);
         ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
         reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
+        reCAPCSVFailureRecord.setFileName("test.xml");
+        reCAPCSVFailureRecord.setInstitutionName("PUL");
+        reCAPCSVFailureRecord.setReportType(ReCAPConstants.FAILURE);
+
 
         producer.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
 

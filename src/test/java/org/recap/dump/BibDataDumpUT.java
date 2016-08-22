@@ -4,6 +4,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -289,7 +290,7 @@ public class BibDataDumpUT extends BaseTestCase {
         BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(savedBibliographicEntity1, savedBibliographicEntity2));
 
         String fileName = "Data-Dump.xml";
-        producer.sendBodyAndHeader("seda:marshal", bibRecords, "fileName", fileName);
+        producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
 
         Thread.sleep(1000);
         File file = new File(dumpDirectoryPath + File.separator + fileName);
