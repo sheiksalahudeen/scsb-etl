@@ -43,7 +43,7 @@ public class XmlRouteBuilder {
                             .end()
                             .onException(Exception.class)
                             .process(xmlFileLoadExceptionReportProcessor)
-                            .to("file:" + inputDirectoryPath + File.separator + "exception")
+//                            .to("file:" + inputDirectoryPath + File.separator + "exception")
                             .end()
                             .process(xmlFileLoadValidator)
                             .split()
