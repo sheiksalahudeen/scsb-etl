@@ -34,7 +34,7 @@ public class XmlRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() {
-                    FileEndpoint fileEndpoint = endpoint("file:" + inputDirectoryPath, FileEndpoint.class);
+                    FileEndpoint fileEndpoint = endpoint("file:" + inputDirectoryPath + "?moveFailed=" + inputDirectoryPath + File.separator + "exception", FileEndpoint.class);
                     fileEndpoint.setFilter(new XmlFileFilter());
 
                     from(fileEndpoint)
@@ -43,7 +43,6 @@ public class XmlRouteBuilder {
                             .end()
                             .onException(Exception.class)
                             .process(xmlFileLoadExceptionReportProcessor)
-//                            .to("file:" + inputDirectoryPath + File.separator + "exception")
                             .end()
                             .process(xmlFileLoadValidator)
                             .split()
