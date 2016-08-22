@@ -302,6 +302,7 @@ public class BibDataDumpUT extends BaseTestCase {
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setNoOfThreads(1);
         dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
@@ -325,7 +326,7 @@ public class BibDataDumpUT extends BaseTestCase {
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(6000);
+        Thread.sleep(1000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -333,7 +334,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
-            Thread.sleep(6000);
+            Thread.sleep(1000);
         }
     }
 
@@ -352,7 +353,7 @@ public class BibDataDumpUT extends BaseTestCase {
         logger.info("isExportSuccess---->"+isExportSuccess);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(6000);
+        Thread.sleep(1000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -360,7 +361,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
-            Thread.sleep(6000);
+            Thread.sleep(1000);
         }
     }
 
@@ -370,13 +371,14 @@ public class BibDataDumpUT extends BaseTestCase {
         dataDumpRequest.setNoOfThreads(5);
         dataDumpRequest.setBatchSize(1000);
         List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setFetchType(1);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(institutionCodes);
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(6000);
+        Thread.sleep(1000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -384,7 +386,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
-            Thread.sleep(6000);
+            Thread.sleep(1000);
         }
     }
 
@@ -401,7 +403,7 @@ public class BibDataDumpUT extends BaseTestCase {
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByLastUpdatedDate(DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(6000);
+        Thread.sleep(1000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -409,7 +411,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
-            Thread.sleep(6000);
+            Thread.sleep(1000);
         }
     }
 

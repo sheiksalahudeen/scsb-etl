@@ -40,7 +40,8 @@ public class DataDumpRestController {
         try {
             successFlag = exportDataDumpExecutorService.exportDump(dataDumpRequest);
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            return new ResponseEntity("Data dump export failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (successFlag) {
             return new ResponseEntity("Data dump exported successfully", HttpStatus.OK);
