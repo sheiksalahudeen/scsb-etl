@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 /**
  * Created by angelind on 21/7/16.
  */
@@ -41,6 +43,7 @@ public class XmlRouteBuilder {
                             .end()
                             .onException(Exception.class)
                             .process(xmlFileLoadExceptionReportProcessor)
+                            .to("file:" + inputDirectoryPath + File.separator + "exception")
                             .end()
                             .process(xmlFileLoadValidator)
                             .split()

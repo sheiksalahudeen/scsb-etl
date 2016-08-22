@@ -41,6 +41,7 @@ public class XmlProcessor implements Processor {
             xmlRecordEntity.setXmlFileName(camelFileName);
 
             String owningInstitutionId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionId>", "</owningInstitutionId>");
+            setInstitutionOnHeader(exchange, owningInstitutionId);
 
             xmlRecordEntity.setOwningInst(owningInstitutionId);
             String owningInstitutionBibId = StringUtils.substringBetween(xmlRecord, "<owningInstitutionBibId>", "</owningInstitutionBibId>");
@@ -62,7 +63,6 @@ public class XmlProcessor implements Processor {
                 logger.error("Exception " + e);
             }
 
-            setInstitutionOnHeader(exchange, owningInstitutionId);
         }
     }
 
