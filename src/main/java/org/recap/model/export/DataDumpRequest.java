@@ -1,22 +1,24 @@
 package org.recap.model.export;
 
+import java.util.List;
+
 /**
  * Created by premkb on 19/8/16.
  */
 public class DataDumpRequest {
 
-    private String[] institutionIds;
+    private List<String> institutionCodes;
     private Integer fetchType;
     private String date;
     private int noOfThreads = 5;
     private int batchSize = 8000;
 
-    public String[] getInstitutionIds() {
-        return institutionIds;
+    public List<String> getInstitutionCodes() {
+        return institutionCodes;
     }
 
-    public void setInstitutionIds(String[] institutionIds) {
-        this.institutionIds = institutionIds;
+    public void setInstitutionCodes(List<String> institutionCodes) {
+        this.institutionCodes = institutionCodes;
     }
 
     public Integer getFetchType() {

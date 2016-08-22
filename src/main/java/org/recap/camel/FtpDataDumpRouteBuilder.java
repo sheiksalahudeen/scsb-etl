@@ -2,6 +2,7 @@ package org.recap.camel;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
+import org.recap.ReCAPConstants;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class FtpDataDumpRouteBuilder extends RouteBuilder {
         JAXBContext context = JAXBContext.newInstance(BibRecords.class);
         JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
         jaxbDataFormat.setContext(context);
-        from("seda:dataDumpQ").marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator + "?fileName=${in.header.fileName}")
+        from(ReCAPConstants.DATA_DUMP_Q).marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator + "?fileName=${in.header.fileName}")
                 .onCompletion().to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileName}")
                 .end();
     }

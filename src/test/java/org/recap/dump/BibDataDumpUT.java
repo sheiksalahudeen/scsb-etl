@@ -23,6 +23,7 @@ import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DBReportUtil;
 import org.recap.util.DataDumpUtil;
+import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -302,6 +303,7 @@ public class BibDataDumpUT extends BaseTestCase {
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setNoOfThreads(1);
         dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
@@ -320,11 +322,12 @@ public class BibDataDumpUT extends BaseTestCase {
     public void getFullDumpWithMultipleThreads()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(8000);
+        dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(100);
+        Thread.sleep(1000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -332,6 +335,84 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
+            Thread.sleep(1000);
+        }
+    }
+
+    @Test
+    public void getIncrementalDumpWithInstitutionCodesAndLastUpdatedDateAsInput() throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        String inputDate = "08-18-2016";
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setFetchType(1);
+        dataDumpRequest.setDate(inputDate);
+        boolean isExportSuccess = exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        logger.info("isExportSuccess---->"+isExportSuccess);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
+        int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
+        Thread.sleep(1000);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(1000);
+        }
+    }
+
+    @Test
+    public void getIncrementalDumpWithInstitutionCodesAsInput() throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
+        institutionCodes.add("PUL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setFetchType(1);
+        exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(institutionCodes);
+        int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
+        Thread.sleep(1000);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(1000);
+        }
+    }
+
+    @Test
+    public void getIncrementalDumpWithLastUpdatedDateAsInput() throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        String inputDate = "08-18-2016";
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        dataDumpRequest.setFetchType(1);
+        dataDumpRequest.setDate(inputDate);
+        exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByLastUpdatedDate(DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
+        int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
+        Thread.sleep(1000);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(1000);
         }
     }
 

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,4 +26,23 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
 
     @Query(value = "select count(owning_inst_bib_id) from bibliographic_holdings_t",  nativeQuery = true)
     Long findCountOfBibliographicHoldings();
+
+    @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE INST.institutionCode IN ?1 ")
+    Long countByInstitutionCodes(Collection<String> institutionCodes);
+
+    @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE BIB.lastUpdatedDate > ?1 ")
+    Long countByLastUpdatedDate(Date lastUpdatedDate);
+
+    @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE INST.institutionCode IN ?1 AND BIB.lastUpdatedDate > ?2 ")
+    Long countByInstitutionCodesAndLastUpdatedDate(Collection<String> institutionIds, Date lastUpdatedDate);
+
+    @Query(value="SELECT BIB FROM BibliographicEntity BIB INNER JOIN BIB.institutionEntity INST WHERE INST.institutionCode IN ?1 AND BIB.lastUpdatedDate > ?2 ORDER BY INST.institutionCode")
+    Page<BibliographicEntity> findByInstitutionCodeAndLastUpdatedDate(Pageable pageable, Collection<String> institutionCodes, Date lastUpdatedDate);
+
+    @Query(value="SELECT BIB FROM BibliographicEntity BIB INNER JOIN BIB.institutionEntity INST WHERE INST.institutionCode IN ?1 ORDER BY INST.institutionCode")
+    Page<BibliographicEntity> findByInstitutionCodes(Pageable pageable, Collection<String> institutionCodes);
+
+    Page<BibliographicEntity> findByLastUpdatedDateAfter(Pageable pageable, Date lastUpdatedDate);
+
+
 }
