@@ -325,7 +325,7 @@ public class BibDataDumpUT extends BaseTestCase {
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(100);
+        Thread.sleep(6000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -333,6 +333,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
+            Thread.sleep(6000);
         }
     }
 
@@ -351,7 +352,7 @@ public class BibDataDumpUT extends BaseTestCase {
         logger.info("isExportSuccess---->"+isExportSuccess);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(100);
+        Thread.sleep(6000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -359,6 +360,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
+            Thread.sleep(6000);
         }
     }
 
@@ -374,7 +376,7 @@ public class BibDataDumpUT extends BaseTestCase {
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(institutionCodes);
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(100);
+        Thread.sleep(6000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -382,6 +384,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
+            Thread.sleep(6000);
         }
     }
 
@@ -398,7 +401,7 @@ public class BibDataDumpUT extends BaseTestCase {
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByLastUpdatedDate(DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
-        Thread.sleep(100);
+        Thread.sleep(6000);
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -406,6 +409,7 @@ public class BibDataDumpUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
+            Thread.sleep(6000);
         }
     }
 
