@@ -33,6 +33,10 @@ public class CSVReportHelperUtil_UT {
         callNumberReportDataEntity.setHeaderValue("1231");
         dataEntities.add(callNumberReportDataEntity);
 
+        ReportDataEntity errrorDescriptionDataEntity = new ReportDataEntity();
+        errrorDescriptionDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
+        errrorDescriptionDataEntity.setHeaderValue("At least on subfield should be there for $245");
+        dataEntities.add(errrorDescriptionDataEntity);
 
         reportEntity.setReportDataEntities(dataEntities);
 

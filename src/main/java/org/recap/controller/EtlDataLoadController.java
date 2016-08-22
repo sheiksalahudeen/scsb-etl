@@ -155,6 +155,11 @@ public class EtlDataLoadController {
         if(StringUtils.isNotBlank(reportFileName)) {
             String generatedReportFileName = reportGenerator.generateReport(reportFileName, etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(),
                     from, to, etlLoadRequest.getTransmissionType());
+            if(StringUtils.isBlank(generatedReportFileName)){
+                logger.error("Report wasn't generated! Please contact help desk!");
+            } else {
+                logger.info("Report successfully generated!" + " : " + generatedReportFileName);
+            }
         }
         return etlDataLoader(model);
     }
