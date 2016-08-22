@@ -72,6 +72,11 @@ public class CSVRouteBuilder_UT extends BaseTestCase {
         reportDataEntity4.setHeaderValue("PUL");
         reportDataEntities.add(reportDataEntity4);
 
+        ReportDataEntity reportDataEntity5 = new ReportDataEntity();
+        reportDataEntity5.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
+        reportDataEntity5.setHeaderValue("At least one $245 must be present.");
+        reportDataEntities.add(reportDataEntity5);
+
         reportEntity.setReportDataEntities(reportDataEntities);
 
         reportDetailRepository.save(reportEntity);
