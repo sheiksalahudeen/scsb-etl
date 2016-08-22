@@ -320,7 +320,8 @@ public class BibDataDumpUT extends BaseTestCase {
     public void getFullDumpWithMultipleThreads()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(8000);
+        dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
         int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());

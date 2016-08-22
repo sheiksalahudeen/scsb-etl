@@ -49,17 +49,17 @@ public class ExportDataDumpExecutorService {
             }
             int loopCount = getLoopCount(totalRecordCount,batchSize);
             setExecutorService(noOfThreads);
-            for(int pageNum=1;pageNum<=loopCount;pageNum++){
+            for(int pageNum = 0;pageNum < loopCount;pageNum++){
                 StopWatch stopWatchPerFile = new StopWatch();
                 stopWatchPerFile.start();
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
-                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + pageNum + ReCAPConstants.XML_FILE_FORMAT;
+                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1) + ReCAPConstants.XML_FILE_FORMAT;
                 producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_Q, bibRecords, "fileName", fileName);
                 stopWatchPerFile.stop();
                 if(logger.isInfoEnabled()){
-                    logger.info("Total time taken to export file no. "+pageNum+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
-                    logger.info("File no. "+pageNum+" exported");
+                    logger.info("Total time taken to export file no. "+(pageNum+1)+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
+                    logger.info("File no. "+(pageNum+1)+" exported");
                 }
             }
             getExecutorService().shutdownNow();
