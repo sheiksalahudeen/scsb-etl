@@ -38,7 +38,7 @@ public class FTPSuccessReportGenerator implements ReportGeneratorInterface {
     }
 
     @Override
-    public String generateReport(List<ReportEntity> reportEntities) {
+    public String generateReport(List<ReportEntity> reportEntities, String fileName) {
 
         if(!CollectionUtils.isEmpty(reportEntities)) {
             ReCAPCSVSuccessRecord reCAPCSVSuccessRecord = new ReCAPCSVSuccessRecord();
@@ -50,7 +50,7 @@ public class FTPSuccessReportGenerator implements ReportGeneratorInterface {
             ReportEntity reportEntity = reportEntities.get(0);
             reCAPCSVSuccessRecord.setReportType(reportEntity.getType());
             reCAPCSVSuccessRecord.setInstitutionName(reportEntity.getInstitutionName());
-            reCAPCSVSuccessRecord.setReportFileName(reportEntity.getFileName());
+            reCAPCSVSuccessRecord.setReportFileName(fileName);
             reCAPCSVSuccessRecord.setSuccessReportReCAPCSVRecordList(successReportReCAPCSVRecords);
             producerTemplate.sendBody(ReCAPConstants.FTP_FAILURE_Q, reCAPCSVSuccessRecord);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);

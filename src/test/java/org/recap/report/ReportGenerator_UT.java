@@ -103,6 +103,22 @@ public class ReportGenerator_UT extends BaseTestCase {
         assertNotNull(generatedReportFileName);
     }
 
+    @Test
+    public void generateReportWithoutFileName() throws Exception {
+        ReportEntity savedSuccessReportEntity1 = saveSuccessReportEntity();
+        ReportEntity savedSuccessReportEntity2 = saveSuccessReportEntity();
+        fileName = "";
+        String generatedReportFileName = generateReport(savedSuccessReportEntity1.getCreatedDate(), savedSuccessReportEntity1.getType(), savedSuccessReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
     private ReportEntity saveFailureReportEntity() {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
@@ -170,6 +186,11 @@ public class ReportGenerator_UT extends BaseTestCase {
         totalBiBItemsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIB_ITEMS_LOADED);
         totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(22000));
         reportDataEntities.add(totalBiBItemsLoadedEntity);
+
+        ReportDataEntity fileNameLoadedEntity = new ReportDataEntity();
+        fileNameLoadedEntity.setHeaderName(ReCAPConstants.FILE_NAME);
+        fileNameLoadedEntity.setHeaderValue(fileName);
+        reportDataEntities.add(fileNameLoadedEntity);
 
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());

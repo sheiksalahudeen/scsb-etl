@@ -38,7 +38,7 @@ public class CSVFailureReportGenerator implements ReportGeneratorInterface  {
     }
 
     @Override
-    public String generateReport(List<ReportEntity> reportEntities) {
+    public String generateReport(List<ReportEntity> reportEntities, String fileName) {
 
         if(!CollectionUtils.isEmpty(reportEntities)) {
             ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
@@ -50,7 +50,7 @@ public class CSVFailureReportGenerator implements ReportGeneratorInterface  {
             ReportEntity reportEntity = reportEntities.get(0);
             reCAPCSVFailureRecord.setReportType(reportEntity.getType());
             reCAPCSVFailureRecord.setInstitutionName(reportEntity.getInstitutionName());
-            reCAPCSVFailureRecord.setFileName(reportEntity.getFileName());
+            reCAPCSVFailureRecord.setFileName(fileName);
             reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
             producerTemplate.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
