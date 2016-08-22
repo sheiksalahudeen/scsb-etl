@@ -105,7 +105,8 @@ public class EtlDataLoadController {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Status  : " + status).append("\n");
-        stringBuilder.append("Number of Bibs loaded : " + bibliographicDetailsRepository.count()).append("\n");
+        //TODO: This call takes a long time to fetch the count.
+        //stringBuilder.append("Number of Bibs loaded : " + bibliographicDetailsRepository.count()).append("\n");
         return stringBuilder.toString();
     }
 
