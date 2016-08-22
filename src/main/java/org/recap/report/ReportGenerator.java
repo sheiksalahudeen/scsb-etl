@@ -1,6 +1,7 @@
 package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,18 @@ public class ReportGenerator {
 
     public String generateReport(String fileName, String reportType, String institutionName, Date from, Date to, String transmissionType) {
 
-        List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
+        List<ReportEntity> reportEntities;
+        if(StringUtils.isNotBlank(fileName)) {
+            reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
+        } else {
+            reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(institutionName, reportType, from, to);
+            fileName = institutionName;
+        }
 
         for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
             if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
-                String generatedFileName = reportGeneratorInterface.generateReport(reportEntities);
+                String generatedFileName = reportGeneratorInterface.generateReport(reportEntities, fileName);
                 return generatedFileName;
             }
         }

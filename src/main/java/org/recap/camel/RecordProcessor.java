@@ -147,7 +147,7 @@ public class RecordProcessor {
                 if(StringUtils.isNotBlank(owningInst)) {
                     ReportDataEntity reportDataEntity = new ReportDataEntity();
                     reportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION);
-                    reportDataEntity.setHeaderValue((String) institutionEntityMap.get(owningInst));
+                    reportDataEntity.setHeaderValue(String.valueOf(getInstitutionEntityMap().get(owningInst)));
                     reportDataEntities.add(reportDataEntity);
                 }
 
