@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.RecapConstants;
+import org.recap.ReCAPConstants;
 import org.recap.executors.ExportDataDumpExecutorService;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.export.DataDumpRequest;
@@ -308,7 +308,7 @@ public class BibDataDumpUT extends BaseTestCase {
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + RecapConstants.DATA_DUMP_FILE_NAME+fileCount+RecapConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -327,7 +327,7 @@ public class BibDataDumpUT extends BaseTestCase {
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + RecapConstants.DATA_DUMP_FILE_NAME+fileCount+RecapConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();

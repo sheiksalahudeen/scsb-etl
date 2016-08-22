@@ -12,7 +12,7 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.route.BibDataProcessor;
+import org.recap.camel.BibDataProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;

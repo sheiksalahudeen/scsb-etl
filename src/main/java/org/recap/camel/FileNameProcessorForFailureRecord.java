@@ -1,4 +1,4 @@
-package org.recap.route;
+package org.recap.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
