@@ -15,6 +15,7 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.ReportDetailRepository;
 import org.recap.util.DBReportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,9 @@ public class BibDataProcessorUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
 
     @Value("${etl.report.directory}")
     private String reportDirectoryPath;
@@ -225,6 +229,8 @@ public class BibDataProcessorUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
+        bibPersisterCallable.setDBReportUtil(dbReportUtil);
+        bibPersisterCallable.setInstitutionName("NYPL");
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
             Object object = map.get("bibliographicEntity");
@@ -244,7 +250,8 @@ public class BibDataProcessorUT extends BaseTestCase {
         etlExchange.setBibliographicEntities(Arrays.asList(bibliographicEntity));
         etlExchange.setInstitutionEntityMap(new HashMap());
         etlExchange.setCollectionGroupMap(new HashMap());
-        bibDataProcessor.setXmlFileName("BibMultipleHoldingsItems");
+        bibDataProcessor.setXmlFileName("BibMultipleHoldingsItems.xml");
+        bibDataProcessor.setInstitutionName("NYPL");
 
         bibDataProcessor.processETLExchagneAndPersistToDB(etlExchange);
 
@@ -257,10 +264,13 @@ public class BibDataProcessorUT extends BaseTestCase {
 
         java.lang.Thread.sleep(500);
 
-        DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndInstitutionNameAndType(bibDataProcessor.getXmlFileName(), bibDataProcessor.getInstitutionName(), ReCAPConstants.FAILURE);
+        assertNotNull(reportEntities);
+
+        /*DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
         String fileName = FilenameUtils.removeExtension(bibDataProcessor.getXmlFileName()) + "-Failure-" + df.format(new Date());
         file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
-        assertTrue(file.exists());
+        assertTrue(file.exists());*/
     }
 
 }

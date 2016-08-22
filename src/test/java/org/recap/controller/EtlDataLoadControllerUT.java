@@ -157,7 +157,9 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
         etlLoadRequest.setReportType(ReCAPConstants.FAILURE);
         etlLoadRequest.setDateFrom(from);
         etlLoadRequest.setDateTo(to);
-
+        etlLoadRequest.setTransmissionType(ReCAPConstants.FILE_SYSTEM);
+        etlLoadRequest.setOwningInstitutionName("NYPL");
+        etlLoadRequest.setReportInstitutionName("NYPL");
         String dateString = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME).format(new Date());
         String reportFileName = "test"+"-Failure"+"-"+dateString+".csv";
 
