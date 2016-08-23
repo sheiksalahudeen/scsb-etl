@@ -28,14 +28,19 @@ public class DataDumpRestController {
 
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity exportDataDump(@RequestParam(value="institutionCodes") String institutionCodes,
+    public ResponseEntity exportDataDump(@RequestParam(value="institutionCodes",required=false) String institutionCodes,
                                          @RequestParam(value="fetchType") Integer fetchType,
-                                         @RequestParam(value="date") String date){
+                                         @RequestParam(value="date",required=false) String date){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        List<String> institutionCodeList = getInstitutionCode(institutionCodes);
-        dataDumpRequest.setInstitutionCodes(institutionCodeList);
         dataDumpRequest.setFetchType(fetchType);
-        dataDumpRequest.setDate(date);
+        if(fetchType==1){
+            if(institutionCodes == null && date == null){
+                return new ResponseEntity("Either one of the parameter institutioncode or date is required", HttpStatus.BAD_REQUEST);
+            }else{
+                setDataDumpRequest(dataDumpRequest,institutionCodes,date);
+            }
+        }
+
         boolean successFlag = true;
         try {
             successFlag = exportDataDumpExecutorService.exportDump(dataDumpRequest);
@@ -54,5 +59,15 @@ public class DataDumpRestController {
         String[] institutionArray = institutionCodes.split(",");
         List<String> intitionCodesList = Arrays.asList(institutionArray);
         return intitionCodesList;
+    }
+
+    private void setDataDumpRequest(DataDumpRequest dataDumpRequest,String institutionCodes,String date){
+        if(institutionCodes!=null){
+            List<String> institutionCodeList = getInstitutionCode(institutionCodes);
+            dataDumpRequest.setInstitutionCodes(institutionCodeList);
+        }
+        if(date != null) {
+            dataDumpRequest.setDate(date);
+        }
     }
 }

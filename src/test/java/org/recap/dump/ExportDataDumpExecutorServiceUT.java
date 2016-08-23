@@ -4,7 +4,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,7 +42,7 @@ import static org.junit.Assert.*;
 /**
  * Created by chenchulakshmig on 3/8/16.
  */
-public class BibDataDumpUT extends BaseTestCase {
+public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
 
     @Mock
     private Map<String, Integer> institutionMap;
@@ -63,7 +62,7 @@ public class BibDataDumpUT extends BaseTestCase {
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
-    private static final Logger logger = LoggerFactory.getLogger(BibDataDumpUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExportDataDumpExecutorServiceUT.class);
 
     @Autowired
     ProducerTemplate producer;
