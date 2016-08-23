@@ -85,6 +85,9 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Value("${ftp.datadump.remote.server}")
     String ftpDataDumpRemoteServer;
 
+    @Value("${datadump.batchsize}")
+    private int batchSize;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -320,12 +323,10 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getFullDumpWithMultipleThreads()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
         dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
-        int loopCount = getLoopCount(totalRecordCount,dataDumpRequest.getBatchSize());
+        int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         File file;
         logger.info("file count---->"+loopCount);
@@ -334,7 +335,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         }
     }
 

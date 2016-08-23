@@ -11,6 +11,7 @@ import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -35,12 +36,18 @@ public class ExportDataDumpExecutorService {
 
     private StopWatch stopWatch;
 
+    @Value("${datadump.threads}")
+    private int noOfThreads;
+
+    @Value("${datadump.batchsize}")
+    private int batchSize;
+
     public boolean exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
         boolean successFlag = true;
         try {
             startProcess();
-            int noOfThreads = dataDumpRequest.getNoOfThreads();
-            int batchSize = dataDumpRequest.getBatchSize();
+            int noOfThreads = dataDumpRequest.getNoOfThreads() == 0 ? this.noOfThreads:dataDumpRequest.getNoOfThreads();
+            int batchSize = dataDumpRequest.getBatchSize() == 0 ? this.batchSize:dataDumpRequest.getBatchSize();
             Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
 
             if(logger.isInfoEnabled()){
