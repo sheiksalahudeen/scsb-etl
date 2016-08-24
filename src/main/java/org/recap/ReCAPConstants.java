@@ -76,4 +76,9 @@ public class ReCAPConstants {
     //Date Util
     public static final String DATE_FORMAT_MMDDYYY = "MM-dd-yyyy";
 
+    //Data Dump
+    public static final String DATADUMP_LIMIT_PAGE = "datadump.limit.page";;
+    public static final String DATADUMP_THREADS = "datadump.threads";;
+    public static final String DATADUMP_BATCHSIZE = "datadump.batchsize";;
+
 }

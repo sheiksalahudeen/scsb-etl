@@ -36,23 +36,18 @@ public class ExportDataDumpExecutorService {
 
     private StopWatch stopWatch;
 
-    @Value("${datadump.threads}")
-    private int noOfThreads;
-
-    @Value("${datadump.batchsize}")
-    private int batchSize;
-
-    @Value("${datadump.limit.page}")
     private int limitPage;
 
     public boolean exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
         boolean successFlag = true;
         try {
             startProcess();
-            int noOfThreads = dataDumpRequest.getNoOfThreads() == 0 ? this.noOfThreads:dataDumpRequest.getNoOfThreads();
-            int batchSize = dataDumpRequest.getBatchSize() == 0 ? this.batchSize:dataDumpRequest.getBatchSize();
+            int noOfThreads = dataDumpRequest.getNoOfThreads();
+            int batchSize = dataDumpRequest.getBatchSize();
             Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
-            int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
+            String limitPageString = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE);
+            limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
+            int loopCount = limitPageString == null ? getLoopCount(totalRecordCount,batchSize):(Integer.parseInt(limitPageString));
 
             if(logger.isInfoEnabled()){
                 logger.info("Total no. of records "+totalRecordCount);
