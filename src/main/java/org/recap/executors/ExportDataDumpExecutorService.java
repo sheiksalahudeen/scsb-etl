@@ -42,6 +42,9 @@ public class ExportDataDumpExecutorService {
     @Value("${datadump.batchsize}")
     private int batchSize;
 
+    @Value("${datadump.limit.page}")
+    private int limitPage;
+
     public boolean exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
         boolean successFlag = true;
         try {
@@ -49,12 +52,19 @@ public class ExportDataDumpExecutorService {
             int noOfThreads = dataDumpRequest.getNoOfThreads() == 0 ? this.noOfThreads:dataDumpRequest.getNoOfThreads();
             int batchSize = dataDumpRequest.getBatchSize() == 0 ? this.batchSize:dataDumpRequest.getBatchSize();
             Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
+            int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
 
             if(logger.isInfoEnabled()){
-                logger.info("Total no. of records to be exported - "+totalRecordCount);
+                logger.info("Total no. of records "+totalRecordCount);
+                int recordsToExport = 0;
+                if (limitPage == 0) {
+                    recordsToExport = totalRecordCount.intValue();
+                } else {
+                    recordsToExport = totalRecordCount > ((limitPage)*batchSize)?((limitPage)*batchSize) : totalRecordCount.intValue();
+                }
+                logger.info("Total no. of records to be exported based on page limit - "+recordsToExport);
                 logger.info("Records per file - "+batchSize);
             }
-            int loopCount = getLoopCount(totalRecordCount,batchSize);
             setExecutorService(noOfThreads);
             for(int pageNum = 0;pageNum < loopCount;pageNum++){
                 StopWatch stopWatchPerFile = new StopWatch();
