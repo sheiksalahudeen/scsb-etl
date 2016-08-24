@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import io.swagger.annotations.*;
 import org.recap.ReCAPConstants;
 import org.recap.executors.ExportDataDumpExecutorService;
 import org.recap.model.export.DataDumpRequest;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +22,10 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by premkb on 19/8/16.
  */
+@EnableSwagger2
 @RestController
+@RequestMapping("/dataDump")
+@Api(value="dataDump", description="Export data dump", position = 1)
 public class DataDumpRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpRestController.class);
@@ -35,10 +40,13 @@ public class DataDumpRestController {
     private int batchSize;
 
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
+    @ApiOperation(value = "exportDataDump",
+            notes = "Export datadumps to institutions", nickname = "exportDataDump", position = 0)
+    @ApiResponses(value = {@ApiResponse(code = 405, message = "Invalid input") })
     @ResponseBody
-    public ResponseEntity exportDataDump(@RequestParam(value="institutionCodes",required=false) String institutionCodes,
-                                         @RequestParam(value="fetchType") Integer fetchType,
-                                         @RequestParam(value="date",required=false) String date,
+    public ResponseEntity exportDataDump(@ApiParam(value = "Ids of institutions whose shared collection updates are requested. Use PR for Princeton, CL for Columbia and NY for NYPL." , name = "institutionCodes") @RequestParam(required=false) String institutionCodes,
+                                         @ApiParam(value = "Type of export - Full (use 0) or Incremental (use 1)" , required = true , name = "fetchType") @RequestParam Integer fetchType,
+                                         @ApiParam(value = "Get updates to middleware collection since the date provided. Default will be updates since the previous day. Date format will be a string (mm-dd-yyyy)", name = "date") @RequestParam(required=false) String date,
                                          @RequestParam(value="requestingInstitutionCode",required=false) String requestingInstitutionCode){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setFetchType(fetchType);
@@ -48,6 +56,9 @@ public class DataDumpRestController {
             }else{
                 setDataDumpRequest(dataDumpRequest,institutionCodes,date);
             }
+        }else{
+            dataDumpRequest.setBatchSize(batchSize);
+            dataDumpRequest.setNoOfThreads(noOfThreads);
         }
 
         boolean successFlag = true;
@@ -90,3 +101,4 @@ public class DataDumpRestController {
         dataDumpRequest.setBatchSize(batchSize);
     }
 }
+
