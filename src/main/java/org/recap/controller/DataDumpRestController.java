@@ -1,10 +1,12 @@
 package org.recap.controller;
 
+import org.recap.ReCAPConstants;
 import org.recap.executors.ExportDataDumpExecutorService;
 import org.recap.model.export.DataDumpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +28,18 @@ public class DataDumpRestController {
     @Autowired
     private ExportDataDumpExecutorService exportDataDumpExecutorService;
 
+    @Value("${datadump.threads}")
+    private int noOfThreads;
+
+    @Value("${datadump.batchsize}")
+    private int batchSize;
+
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity exportDataDump(@RequestParam(value="institutionCodes",required=false) String institutionCodes,
                                          @RequestParam(value="fetchType") Integer fetchType,
-                                         @RequestParam(value="date",required=false) String date){
+                                         @RequestParam(value="date",required=false) String date,
+                                         @RequestParam(value="requestingInstitutionCode",required=false) String requestingInstitutionCode){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setFetchType(fetchType);
         if(fetchType==1){
@@ -69,5 +78,15 @@ public class DataDumpRestController {
         if(date != null) {
             dataDumpRequest.setDate(date);
         }
+        String noOfThreadString = System.getProperty(ReCAPConstants.DATADUMP_THREADS);
+        if(noOfThreadString!=null){
+            noOfThreads = Integer.parseInt(noOfThreadString);
+        }
+        dataDumpRequest.setNoOfThreads(noOfThreads);
+        String batchSizeString = System.getProperty(ReCAPConstants.DATADUMP_BATCHSIZE);
+        if(batchSizeString!=null){
+            batchSize = Integer.parseInt(batchSizeString);
+        }
+        dataDumpRequest.setBatchSize(batchSize);
     }
 }

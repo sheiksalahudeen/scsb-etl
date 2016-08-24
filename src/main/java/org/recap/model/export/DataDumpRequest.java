@@ -10,8 +10,8 @@ public class DataDumpRequest {
     private List<String> institutionCodes;
     private Integer fetchType;
     private String date;
-    private int noOfThreads = 5;
-    private int batchSize = 8000;
+    private int noOfThreads;
+    private int batchSize;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;

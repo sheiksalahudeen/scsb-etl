@@ -11,6 +11,7 @@ import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -35,6 +36,8 @@ public class ExportDataDumpExecutorService {
 
     private StopWatch stopWatch;
 
+    private int limitPage;
+
     public boolean exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
         boolean successFlag = true;
         try {
@@ -42,12 +45,21 @@ public class ExportDataDumpExecutorService {
             int noOfThreads = dataDumpRequest.getNoOfThreads();
             int batchSize = dataDumpRequest.getBatchSize();
             Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
+            String limitPageString = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE);
+            limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
+            int loopCount = limitPageString == null ? getLoopCount(totalRecordCount,batchSize):(Integer.parseInt(limitPageString));
 
             if(logger.isInfoEnabled()){
-                logger.info("Total no. of records to be exported - "+totalRecordCount);
+                logger.info("Total no. of records "+totalRecordCount);
+                int recordsToExport = 0;
+                if (limitPage == 0) {
+                    recordsToExport = totalRecordCount.intValue();
+                } else {
+                    recordsToExport = totalRecordCount > ((limitPage)*batchSize)?((limitPage)*batchSize) : totalRecordCount.intValue();
+                }
+                logger.info("Total no. of records to be exported based on page limit - "+recordsToExport);
                 logger.info("Records per file - "+batchSize);
             }
-            int loopCount = getLoopCount(totalRecordCount,batchSize);
             setExecutorService(noOfThreads);
             for(int pageNum = 0;pageNum < loopCount;pageNum++){
                 StopWatch stopWatchPerFile = new StopWatch();
