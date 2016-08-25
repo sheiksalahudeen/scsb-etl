@@ -19,10 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -66,9 +63,9 @@ public class RecordProcessor {
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
 
-        List<Future> futures = prepareFutureTasks(xmlRecordEntities, reportEntities);
+        List<Future<Map<String, String>>> futures = prepareFutureTasks(xmlRecordEntities, reportEntities);
 
-        for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Future<Map<String, String>>> iterator = futures.iterator(); iterator.hasNext(); ) {
             Future future = iterator.next();
             Object object = null;
             try {
@@ -116,9 +113,10 @@ public class RecordProcessor {
         }
     }
 
-    private List<Future> prepareFutureTasks(Page<XmlRecordEntity> xmlRecordEntities, List<ReportEntity> reportEntities) {
-        List<Future> futures = new ArrayList<>();
-        BibRecord bibRecord = new BibRecord();
+    private List<Future<Map<String, String>>> prepareFutureTasks(Page<XmlRecordEntity> xmlRecordEntities, List<ReportEntity> reportEntities) {
+        BibRecord bibRecord;
+
+        List<Callable<Map<String, String>>> callables = new ArrayList<>();
 
         for (Iterator<XmlRecordEntity> iterator = xmlRecordEntities.iterator(); iterator.hasNext(); ) {
             XmlRecordEntity xmlRecordEntity = iterator.next();
@@ -133,8 +131,9 @@ public class RecordProcessor {
                 bibPersisterCallable.setItemStatusMap(getItemStatusMap());
                 bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
                 bibPersisterCallable.setInstitutionName(institutionName);
-                Future submit = getExecutorService().submit(bibPersisterCallable);
-                futures.add(submit);
+
+                callables.add(bibPersisterCallable);
+
             } catch (Exception e) {
                 ReportEntity reportEntity = new ReportEntity();
                 List<ReportDataEntity> reportDataEntities = new ArrayList<>();
@@ -169,6 +168,23 @@ public class RecordProcessor {
                 reportEntities.add(reportEntity);
             }
         }
+
+        List<Future<Map<String, String>>> futures = null;
+        try {
+            futures = getExecutorService().invokeAll(callables);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        futures
+                .stream()
+                .map(future -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                });
 
         return futures;
     }
