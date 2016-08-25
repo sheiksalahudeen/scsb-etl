@@ -2,6 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType("Failure");
+        reportEntity.setType(ReCAPConstants.FAILURE);
         reportEntity.setInstitutionName("CUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
@@ -189,6 +190,28 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         to = cal.getTime();
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(reportEntity.getFileName(), reportEntity.getInstitutionName(), reportEntity.getType(), from, to);
+        assertNotNull(reportEntities);
+        assertNotNull(reportEntities.get(0));
+    }
+
+    @Test
+    public void testFindByInstitutionAndTypeAndDateRange() throws Exception {
+        ReportEntity reportEntity = saveReportEntity();
+        Calendar cal = Calendar.getInstance();
+        Date from = reportEntity.getCreatedDate();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = reportEntity.getCreatedDate();
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        List<ReportEntity> reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(reportEntity.getInstitutionName(), reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
         assertNotNull(reportEntities.get(0));
     }

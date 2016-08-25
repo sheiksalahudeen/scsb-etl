@@ -5,11 +5,10 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.etl.EtlLoadRequest;
-import org.recap.report.CSVReportGenerator;
-import org.recap.report.FTPReportGenerator;
+import org.recap.report.ReportGenerator;
 import org.recap.repository.*;
-import org.recap.route.EtlDataLoadProcessor;
-import org.recap.route.RecordProcessor;
+import org.recap.camel.EtlDataLoadProcessor;
+import org.recap.camel.RecordProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by rajeshbabuk on 22/6/16.
@@ -51,9 +52,6 @@ public class EtlDataLoadController {
     @Autowired
     XmlRecordRepository xmlRecordRepository;
 
-    @Autowired
-    FTPReportGenerator ftpReportGenerator;
-
     @Value("${etl.load.batchSize}")
     private Integer batchSize;
 
@@ -65,6 +63,9 @@ public class EtlDataLoadController {
 
     @Autowired
     ProducerTemplate producer;
+
+    @Autowired
+    ReportGenerator reportGenerator;
 
     @RequestMapping("/")
     public String etlDataLoader(Model model) {
@@ -104,7 +105,8 @@ public class EtlDataLoadController {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Status  : " + status).append("\n");
-        stringBuilder.append("Number of Bibs loaded : " + bibliographicDetailsRepository.count()).append("\n");
+        //TODO: This call takes a long time to fetch the count.
+        //stringBuilder.append("Number of Bibs loaded : " + bibliographicDetailsRepository.count()).append("\n");
         return stringBuilder.toString();
     }
 
@@ -129,7 +131,34 @@ public class EtlDataLoadController {
     public String generateReport(@Valid @ModelAttribute("etlLoadRequest") EtlLoadRequest etlLoadRequest,
                              BindingResult result,
                              Model model) {
-//        ftpReportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(), etlLoadRequest.getDateFrom(), etlLoadRequest.getDateTo());
+        Calendar cal = Calendar.getInstance();
+        Date dateFrom = etlLoadRequest.getDateFrom();
+        if(dateFrom != null) {
+            cal.setTime(dateFrom);
+        } else {
+            cal.setTime(new Date());
+        }
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date from = cal.getTime();
+        Date dateTo = etlLoadRequest.getDateTo();
+        if(dateTo != null) {
+            cal.setTime(dateTo);
+        } else {
+            cal.setTime(new Date());
+        }
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date to = cal.getTime();
+        String generatedReportFileName = reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(),
+                from, to, etlLoadRequest.getTransmissionType());
+        if(StringUtils.isBlank(generatedReportFileName)){
+            logger.error("Report wasn't generated! Please contact help desk!");
+        } else {
+            logger.info("Report successfully generated!" + " : " + generatedReportFileName);
+        }
         return etlDataLoader(model);
     }
 }

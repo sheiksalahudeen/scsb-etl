@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
 import org.recap.model.etl.EtlLoadRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ReportDataEntity;
@@ -124,11 +125,11 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType("Failure");
+        reportEntity.setType(ReCAPConstants.FAILURE);
         reportEntity.setInstitutionName("NYPL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
-        reportDataEntity.setHeaderName("ItemBarcode");
+        reportDataEntity.setHeaderName(ReCAPConstants.ITEM_BARCODE);
         reportDataEntity.setHeaderValue("103");
         reportDataEntities.add(reportDataEntity);
 
@@ -153,11 +154,13 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
 
         EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
         etlLoadRequest.setReportFileName(fileName);
-        etlLoadRequest.setReportType("Failure");
+        etlLoadRequest.setReportType(ReCAPConstants.FAILURE);
         etlLoadRequest.setDateFrom(from);
         etlLoadRequest.setDateTo(to);
-
-        String dateString = new SimpleDateFormat("ddMMMyyyy").format(new Date());
+        etlLoadRequest.setTransmissionType(ReCAPConstants.FILE_SYSTEM);
+        etlLoadRequest.setOwningInstitutionName("NYPL");
+        etlLoadRequest.setReportInstitutionName("NYPL");
+        String dateString = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME).format(new Date());
         String reportFileName = "test"+"-Failure"+"-"+dateString+".csv";
 
         etlDataLoadController.generateReport(etlLoadRequest, bindingResult, model);

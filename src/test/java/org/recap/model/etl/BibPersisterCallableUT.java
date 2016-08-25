@@ -12,7 +12,8 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.route.BibDataProcessor;
+import org.recap.camel.BibDataProcessor;
+import org.recap.util.DBReportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -35,6 +36,9 @@ public class BibPersisterCallableUT extends BaseTestCase {
 
     @Autowired
     BibDataProcessor bibDataProcessor;
+
+    @Autowired
+    DBReportUtil dbReportUtil;
 
     @Mock
     private Map<String, Integer> institutionMap;
@@ -96,6 +100,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
+        bibPersisterCallable.setDBReportUtil(dbReportUtil);
         assertNotNull(bibPersisterCallable.getItemStatusMap());
         assertNotNull(bibPersisterCallable.getInstitutionEntitiesMap());
         assertNotNull(bibPersisterCallable.getCollectionGroupMap());
@@ -103,7 +108,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         assertNotNull(bibPersisterCallable.getBibRecord());
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
-            Object object = map.get("failureReportReCAPCSVRecord");
+            Object object = map.get("reportEntities");
             if (object != null) {
                 failureReportReCAPCSVRecords.addAll((List<FailureReportReCAPCSVRecord>) object);
             }

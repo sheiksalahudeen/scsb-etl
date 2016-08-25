@@ -1,31 +1,28 @@
 package org.recap.model.csv;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
 /**
  * Created by angelind on 22/7/16.
  */
-@CsvRecord(generateHeaderColumns = true, separator = ",", quote = "\"", crlf = "UNIX")
+@CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
 public class SuccessReportReCAPCSVRecord {
 
     @DataField(pos = 1)
     private String fileName;
     @DataField(pos = 2)
-    private Integer totalRecordsInFile;
+    private String totalRecordsInFile;
     @DataField(pos = 3)
-    private Integer totalBibsLoaded;
+    private String totalBibsLoaded;
     @DataField(pos = 4)
-    private Integer totalHoldingsLoaded;
+    private String totalHoldingsLoaded;
     @DataField(pos = 5)
-    private long totalBibHoldingsLoaded;
+    private String totalBibHoldingsLoaded;
     @DataField(pos = 6)
-    private Integer totalItemsLoaded;
+    private String totalItemsLoaded;
     @DataField(pos = 7)
-    private long totalBibItemsLoaded;
-    @Ignore
-    private String owningInstitution;
+    private String totalBibItemsLoaded;
 
     public String getFileName() {
         return fileName;
@@ -35,59 +32,51 @@ public class SuccessReportReCAPCSVRecord {
         this.fileName = fileName;
     }
 
-    public Integer getTotalRecordsInFile() {
+    public String getTotalRecordsInFile() {
         return totalRecordsInFile;
     }
 
-    public void setTotalRecordsInFile(Integer totalRecordsInFile) {
+    public void setTotalRecordsInFile(String totalRecordsInFile) {
         this.totalRecordsInFile = totalRecordsInFile;
     }
 
-    public Integer getTotalBibsLoaded() {
+    public String getTotalBibsLoaded() {
         return totalBibsLoaded;
     }
 
-    public void setTotalBibsLoaded(Integer totalBibsLoaded) {
+    public void setTotalBibsLoaded(String totalBibsLoaded) {
         this.totalBibsLoaded = totalBibsLoaded;
     }
 
-    public Integer getTotalHoldingsLoaded() {
+    public String getTotalHoldingsLoaded() {
         return totalHoldingsLoaded;
     }
 
-    public void setTotalHoldingsLoaded(Integer totalHoldingsLoaded) {
+    public void setTotalHoldingsLoaded(String totalHoldingsLoaded) {
         this.totalHoldingsLoaded = totalHoldingsLoaded;
     }
 
-    public Integer getTotalItemsLoaded() {
-        return totalItemsLoaded;
-    }
-
-    public void setTotalItemsLoaded(Integer totalItemsLoaded) {
-        this.totalItemsLoaded = totalItemsLoaded;
-    }
-
-    public void setTotalBibHoldingsLoaded(long totalBibHoldingsLoaded) {
-        this.totalBibHoldingsLoaded = totalBibHoldingsLoaded;
-    }
-
-    public void setTotalBibItemsLoaded(long totalBibItemsLoaded) {
-        this.totalBibItemsLoaded = totalBibItemsLoaded;
-    }
-
-    public long getTotalBibHoldingsLoaded() {
+    public String getTotalBibHoldingsLoaded() {
         return totalBibHoldingsLoaded;
     }
 
-    public long getTotalBibItemsLoaded() {
+    public void setTotalBibHoldingsLoaded(String totalBibHoldingsLoaded) {
+        this.totalBibHoldingsLoaded = totalBibHoldingsLoaded;
+    }
+
+    public String getTotalItemsLoaded() {
+        return totalItemsLoaded;
+    }
+
+    public void setTotalItemsLoaded(String totalItemsLoaded) {
+        this.totalItemsLoaded = totalItemsLoaded;
+    }
+
+    public String getTotalBibItemsLoaded() {
         return totalBibItemsLoaded;
     }
 
-    public String getOwningInstitution() {
-        return owningInstitution;
-    }
-
-    public void setOwningInstitution(String owningInstitution) {
-        this.owningInstitution = owningInstitution;
+    public void setTotalBibItemsLoaded(String totalBibItemsLoaded) {
+        this.totalBibItemsLoaded = totalBibItemsLoaded;
     }
 }

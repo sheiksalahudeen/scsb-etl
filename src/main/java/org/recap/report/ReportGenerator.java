@@ -1,16 +1,14 @@
 package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.model.csv.FailureReportReCAPCSVRecord;
-import org.recap.model.csv.ReCAPCSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
-import org.recap.util.ReCAPCSVFailureRecordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -19,7 +17,9 @@ import java.util.List;
 /**
  * Created by peris on 8/17/16.
  */
+@Component
 public class ReportGenerator {
+
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
@@ -30,29 +30,34 @@ public class ReportGenerator {
     private String reportDirectory;
 
     @Autowired
-    FTPReportGenerator ftpReportGenerator;
+    CSVFailureReportGenerator csvFailureReportGenerator;
 
     @Autowired
-    CSVReportGenerator csvReportGenerator;
+    CSVSuccessReportGenerator csvSuccessReportGenerator;
 
+    @Autowired
+    FTPFailureReportGenerator ftpFailureReportGenerator;
+
+    @Autowired
+    FTPSuccessReportGenerator ftpSuccessReportGenerator;
 
     List<ReportGeneratorInterface> reportGenerators;
 
+    public String generateReport(String fileName, String reportType, String institutionName, Date from, Date to, String transmissionType) {
 
-    public ReportGenerator() {
-        reportGenerators = new ArrayList<>();
-        reportGenerators.add(ftpReportGenerator);
-        reportGenerators.add(csvReportGenerator);
-    }
+        List<ReportEntity> reportEntities;
+        if(StringUtils.isNotBlank(fileName)) {
+            reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
+        } else {
+            reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(institutionName, reportType, from, to);
+            fileName = institutionName;
+        }
 
-    public String generateReport(String fileName, String reportType, String institutionName, Date from, Date to) {
-
-        List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndDateRange(fileName, from, to);
-
-        for (Iterator<ReportGeneratorInterface> iterator = reportGenerators.iterator(); iterator.hasNext(); ) {
+        for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
-            if(reportGeneratorInterface.isInterested(reportType)){
-                reportGeneratorInterface.generateReport(reportEntities);
+            if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
+                String generatedFileName = reportGeneratorInterface.generateReport(reportEntities, fileName);
+                return generatedFileName;
             }
         }
 
@@ -60,5 +65,14 @@ public class ReportGenerator {
 
     }
 
-
+    public List<ReportGeneratorInterface> getReportGenerators() {
+        if(CollectionUtils.isEmpty(reportGenerators)) {
+            reportGenerators = new ArrayList<>();
+            reportGenerators.add(csvFailureReportGenerator);
+            reportGenerators.add(csvSuccessReportGenerator);
+            reportGenerators.add(ftpFailureReportGenerator);
+            reportGenerators.add(ftpSuccessReportGenerator);
+        }
+        return reportGenerators;
+    }
 }
