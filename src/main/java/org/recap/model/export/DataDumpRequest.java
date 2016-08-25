@@ -12,6 +12,7 @@ public class DataDumpRequest {
     private String date;
     private int noOfThreads;
     private int batchSize;
+    private boolean isRecordsAvailable;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;
@@ -51,5 +52,13 @@ public class DataDumpRequest {
 
     public void setBatchSize(int batchSize) {
         this.batchSize = batchSize;
+    }
+
+    public boolean isRecordsAvailable() {
+        return isRecordsAvailable;
+    }
+
+    public void setRecordsAvailable(boolean recordsAvailable) {
+        isRecordsAvailable = recordsAvailable;
     }
 }

@@ -11,7 +11,6 @@ import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -45,6 +44,11 @@ public class ExportDataDumpExecutorService {
             int noOfThreads = dataDumpRequest.getNoOfThreads();
             int batchSize = dataDumpRequest.getBatchSize();
             Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
+            if(totalRecordCount == 0){
+                dataDumpRequest.setRecordsAvailable(false);
+            }else{
+                dataDumpRequest.setRecordsAvailable(true);
+            }
             String limitPageString = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE);
             limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
             int loopCount = limitPageString == null ? getLoopCount(totalRecordCount,batchSize):(Integer.parseInt(limitPageString));
