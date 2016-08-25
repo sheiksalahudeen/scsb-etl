@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -68,9 +66,11 @@ public class DataDumpRestController {
             logger.error(e.getMessage());
             return new ResponseEntity("Data dump export failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (successFlag) {
+        if (successFlag && dataDumpRequest.isRecordsAvailable()) {
             return new ResponseEntity("Data dump exported successfully", HttpStatus.OK);
-        } else {
+        }else if(successFlag && !dataDumpRequest.isRecordsAvailable()){
+            return new ResponseEntity("There is no data to export" , HttpStatus.OK);
+        }else {
             return new ResponseEntity("Data dump export failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
