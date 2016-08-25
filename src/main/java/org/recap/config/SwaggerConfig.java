@@ -20,8 +20,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * Created by hemalathas on 22/8/16.
  */
 @EnableSwagger2
-@Configuration
-@EnableWebMvc
 @ComponentScan("rest.controller")
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
     @Bean
