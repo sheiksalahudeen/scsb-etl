@@ -27,8 +27,6 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
     @Bean
     public Docket documentation() {
         return new Docket(DocumentationType.SWAGGER_2)
-//.host("middleware.recap.com")
-//.tags(new Tag("shared-collection", "Everything about your shared collection in the middleware."))
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
@@ -36,10 +34,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .pathMapping("/")
                 .apiInfo(metadata());
     }
-    @Bean
-    public UiConfiguration uiConfig() {
-        return UiConfiguration.DEFAULT;
-    }
+
     private ApiInfo metadata() {
         return new ApiInfoBuilder()
                 .title("ReCAP APIs")
