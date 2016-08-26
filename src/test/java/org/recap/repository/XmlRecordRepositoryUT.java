@@ -60,6 +60,20 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
 
     @Test
     public void findDistinctFileNames() throws Exception {
+        XmlRecordEntity xmlRecordEntity1 = new XmlRecordEntity();
+        xmlRecordEntity1.setXml("mock xml content".getBytes());
+        xmlRecordEntity1.setOwningInst("1");
+        xmlRecordEntity1.setOwningInstBibId("PUL");
+        xmlRecordEntity1.setXmlFileName("mockfile1.xml");
+        xmlRecordEntity1.setDataLoaded(new Date());
+        xmlRecordRepository.save(xmlRecordEntity1);
+        XmlRecordEntity xmlRecordEntity2 = new XmlRecordEntity();
+        xmlRecordEntity2.setXml("mock xml content".getBytes());
+        xmlRecordEntity2.setOwningInst("1");
+        xmlRecordEntity2.setOwningInstBibId("PUL");
+        xmlRecordEntity2.setXmlFileName("mockfile2.xml");
+        xmlRecordEntity2.setDataLoaded(new Date());
+        xmlRecordRepository.save(xmlRecordEntity2);
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
         assertNotNull(distinctFileNames);
         assertTrue(!distinctFileNames.isEmpty());

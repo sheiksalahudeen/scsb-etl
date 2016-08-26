@@ -36,13 +36,13 @@ public class DataDumpRestControllerUT extends BaseControllerUT{
     @Test
     public void exportDataDump() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/exportDataDump")
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")
                 .param("fetchType","1")
                 .param("date","08-18-2016"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals("Data dump exported successfully",mvcResult.getResponse().getContentAsString());
+        assertEquals("There is no data to export",mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 }

@@ -129,7 +129,7 @@ public class ExportDataDumpExecutorService {
         return executorService;
     }
 
-    public StopWatch getStopWatch() {
+    private StopWatch getStopWatch() {
         if (null == stopWatch) {
             stopWatch = new StopWatch();
         }
