@@ -326,6 +326,8 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getFullDumpWithMultipleThreads()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
         dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
