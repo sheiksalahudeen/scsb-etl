@@ -42,7 +42,10 @@ public class EtlDataLoadProcessor {
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     public void startLoadProcess() {
+        long st1 = System.currentTimeMillis();
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
+        long et1 = System.currentTimeMillis();
+        logger.info("Time taken to fetch distinct file names: " + (et1-st1)/1000 + " seconds");
         long totalStartTime = System.currentTimeMillis();
         for (Iterator iterator = distinctFileNames.iterator(); iterator.hasNext(); ) {
             String distinctFileName = (String) iterator.next();
@@ -54,7 +57,10 @@ public class EtlDataLoadProcessor {
                 long oldBibItemsCount = itemDetailsRepository.findCountOfBibliographicItems();
                 long totalDocCount;
 
+                long st2 = System.currentTimeMillis();
                 totalDocCount = xmlRecordRepository.countByXmlFileName(distinctFileName);
+                long et2 = System.currentTimeMillis();
+                logger.info("Time taken to total bib count by distinct file name: " + (et2-st2)/1000 + " seconds");
 
                 if (totalDocCount > 0) {
                     int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
