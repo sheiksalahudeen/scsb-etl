@@ -42,25 +42,20 @@ public class EtlDataLoadProcessor {
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     public void startLoadProcess() {
-        long st1 = System.currentTimeMillis();
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
-        long et1 = System.currentTimeMillis();
-        logger.info("Time taken to fetch distinct file names: " + (et1-st1)/1000 + " seconds");
         long totalStartTime = System.currentTimeMillis();
         for (Iterator iterator = distinctFileNames.iterator(); iterator.hasNext(); ) {
             String distinctFileName = (String) iterator.next();
             if (distinctFileName.contains(fileName)) {
-                long oldBibsCount = bibliographicDetailsRepository.count();
+                Integer instIdByFileName = xmlRecordRepository.findInstIdByFileNames(distinctFileName);
+                long oldBibsCount = bibliographicDetailsRepository.countByOwningInstitutionId(instIdByFileName);
                 long oldHoldingsCount = holdingsDetailsRepository.count();
-                long oldItemsCount = itemDetailsRepository.count();
-                long oldBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldings();
-                long oldBibItemsCount = itemDetailsRepository.findCountOfBibliographicItems();
+                long oldItemsCount = itemDetailsRepository.countByOwningInstitutionId(instIdByFileName);
+                long oldBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldingsByInstId(instIdByFileName);
+                long oldBibItemsCount = itemDetailsRepository.findCountOfBibliographicItemsByInstId(instIdByFileName);
                 long totalDocCount;
 
-                long st2 = System.currentTimeMillis();
                 totalDocCount = xmlRecordRepository.countByXmlFileName(distinctFileName);
-                long et2 = System.currentTimeMillis();
-                logger.info("Time taken to total bib count by distinct file name: " + (et2-st2)/1000 + " seconds");
 
                 if (totalDocCount > 0) {
                     int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
@@ -86,20 +81,20 @@ public class EtlDataLoadProcessor {
                     logger.info("No records found to load into DB");
                 }
 
-                generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, distinctFileName, oldBibHoldingsCount, oldBibItemsCount);
+                generateSuccessReport(oldBibsCount, oldHoldingsCount, oldItemsCount, distinctFileName, oldBibHoldingsCount, oldBibItemsCount, instIdByFileName);
             }
         }
         recordProcessor.shutdownExecutorService();
     }
 
-    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName, long oldBibHoldingsCount, long oldBibItemsCount) {
+    private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName, long oldBibHoldingsCount, long oldBibItemsCount, Integer instIdByFileName) {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
-        long newBibsCount = bibliographicDetailsRepository.count();
+        long newBibsCount = bibliographicDetailsRepository.countByOwningInstitutionId(instIdByFileName);
         long newHoldingsCount = holdingsDetailsRepository.count();
-        long newItemsCount = itemDetailsRepository.count();
-        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldings();
-        long newBibItemsCount = itemDetailsRepository.findCountOfBibliographicItems();
+        long newItemsCount = itemDetailsRepository.countByOwningInstitutionId(instIdByFileName);
+        long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldingsByInstId(instIdByFileName);
+        long newBibItemsCount = itemDetailsRepository.findCountOfBibliographicItemsByInstId(instIdByFileName);
 
         Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
         Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());

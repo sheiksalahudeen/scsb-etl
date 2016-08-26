@@ -27,6 +27,9 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     @Query(value = "select count(owning_inst_bib_id) from bibliographic_holdings_t",  nativeQuery = true)
     Long findCountOfBibliographicHoldings();
 
+    @Query(value = "select count(owning_inst_bib_id) from bibliographic_holdings_t where owning_inst_id = ?1",  nativeQuery = true)
+    Long findCountOfBibliographicHoldingsByInstId(Integer instId);
+
     @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE INST.institutionCode IN ?1 ")
     Long countByInstitutionCodes(Collection<String> institutionCodes);
 

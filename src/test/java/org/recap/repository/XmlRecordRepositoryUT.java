@@ -41,7 +41,7 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         assertEquals(byId.getOwningInst(), xmlRecordEntity.getOwningInst());
         assertEquals(byId.getOwningInstBibId(), xmlRecordEntity.getOwningInstBibId());
         assertEquals(byId.getXmlFileName(), xmlRecordEntity.getXmlFileName());
-        assertEquals(new String(byId.getXml()),"mock xml content");
+        assertEquals(new String(byId.getXml()), "mock xml content");
         System.out.println(new String(byId.getXml()));
 
         XmlRecordEntity xmlRecordEntityToUpdate = new XmlRecordEntity();
@@ -54,7 +54,7 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         xmlRecordRepository.save(xmlRecordEntityToUpdate);
         XmlRecordEntity byIdAfterUpdate = xmlRecordRepository.findById(savedEntity.getId());
         assertEquals(byIdAfterUpdate.getId(), byId.getId());
-        assertEquals(new String(byIdAfterUpdate.getXml()),"new mock xml content");
+        assertEquals(new String(byIdAfterUpdate.getXml()), "new mock xml content");
         System.out.println(new String(byIdAfterUpdate.getXml()));
     }
 
@@ -69,4 +69,19 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         }
     }
 
+    @Test
+    public void testFindInstByXmlFileName() throws Exception {
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXml("mock xml content".getBytes());
+        xmlRecordEntity.setOwningInst("PUL");
+        xmlRecordEntity.setOwningInstBibId("1");
+        xmlRecordEntity.setXmlFileName("mockfile.xml");
+        xmlRecordEntity.setDataLoaded(new Date());
+        XmlRecordEntity savedXmlRecordEntity = xmlRecordRepository.save(xmlRecordEntity);
+
+        Integer instId = xmlRecordRepository.findInstIdByFileNames(savedXmlRecordEntity.getXmlFileName());
+
+        assertNotNull(instId);
+        assertEquals(new Integer(1), instId);
+    }
 }
