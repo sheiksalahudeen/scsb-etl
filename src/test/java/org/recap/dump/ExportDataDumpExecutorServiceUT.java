@@ -374,8 +374,8 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getIncrementalDumpWithInstitutionCodesAsInput() throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-/*        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);*/
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
         institutionCodes.add("PUL");
