@@ -43,6 +43,7 @@ public class EtlDataLoadProcessor {
 
     public void startLoadProcess() {
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
+        long totalStartTime = System.currentTimeMillis();
         for (Iterator iterator = distinctFileNames.iterator(); iterator.hasNext(); ) {
             String distinctFileName = (String) iterator.next();
             if (distinctFileName.contains(fileName)) {
@@ -53,7 +54,7 @@ public class EtlDataLoadProcessor {
                 long oldBibItemsCount = itemDetailsRepository.findCountOfBibliographicItems();
                 long totalDocCount;
 
-                totalDocCount = xmlRecordRepository.countByXmlFileNameContaining(distinctFileName);
+                totalDocCount = xmlRecordRepository.countByXmlFileName(distinctFileName);
 
                 if (totalDocCount > 0) {
                     int quotient = Integer.valueOf(Long.toString(totalDocCount)) / (batchSize);
@@ -62,7 +63,6 @@ public class EtlDataLoadProcessor {
                     int loopCount = remainder == 0 ? quotient : quotient + 1;
 
                     Page<XmlRecordEntity> xmlRecordEntities = null;
-                    long totalStartTime = System.currentTimeMillis();
                     for (int i = 0; i < loopCount; i++) {
                         long startTime = System.currentTimeMillis();
                         xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), distinctFileName);
