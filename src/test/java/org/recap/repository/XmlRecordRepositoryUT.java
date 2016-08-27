@@ -41,7 +41,7 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         assertEquals(byId.getOwningInst(), xmlRecordEntity.getOwningInst());
         assertEquals(byId.getOwningInstBibId(), xmlRecordEntity.getOwningInstBibId());
         assertEquals(byId.getXmlFileName(), xmlRecordEntity.getXmlFileName());
-        assertEquals(new String(byId.getXml()),"mock xml content");
+        assertEquals(new String(byId.getXml()), "mock xml content");
         System.out.println(new String(byId.getXml()));
 
         XmlRecordEntity xmlRecordEntityToUpdate = new XmlRecordEntity();
@@ -54,12 +54,26 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         xmlRecordRepository.save(xmlRecordEntityToUpdate);
         XmlRecordEntity byIdAfterUpdate = xmlRecordRepository.findById(savedEntity.getId());
         assertEquals(byIdAfterUpdate.getId(), byId.getId());
-        assertEquals(new String(byIdAfterUpdate.getXml()),"new mock xml content");
+        assertEquals(new String(byIdAfterUpdate.getXml()), "new mock xml content");
         System.out.println(new String(byIdAfterUpdate.getXml()));
     }
 
     @Test
     public void findDistinctFileNames() throws Exception {
+        XmlRecordEntity xmlRecordEntity1 = new XmlRecordEntity();
+        xmlRecordEntity1.setXml("mock xml content".getBytes());
+        xmlRecordEntity1.setOwningInst("1");
+        xmlRecordEntity1.setOwningInstBibId("PUL");
+        xmlRecordEntity1.setXmlFileName("mockfile1.xml");
+        xmlRecordEntity1.setDataLoaded(new Date());
+        xmlRecordRepository.save(xmlRecordEntity1);
+        XmlRecordEntity xmlRecordEntity2 = new XmlRecordEntity();
+        xmlRecordEntity2.setXml("mock xml content".getBytes());
+        xmlRecordEntity2.setOwningInst("1");
+        xmlRecordEntity2.setOwningInstBibId("PUL");
+        xmlRecordEntity2.setXmlFileName("mockfile2.xml");
+        xmlRecordEntity2.setDataLoaded(new Date());
+        xmlRecordRepository.save(xmlRecordEntity2);
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
         assertNotNull(distinctFileNames);
         assertTrue(!distinctFileNames.isEmpty());
@@ -69,4 +83,19 @@ public class XmlRecordRepositoryUT extends BaseTestCase {
         }
     }
 
+    @Test
+    public void testFindInstByXmlFileName() throws Exception {
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXml("mock xml content".getBytes());
+        xmlRecordEntity.setOwningInst("PUL");
+        xmlRecordEntity.setOwningInstBibId("1");
+        xmlRecordEntity.setXmlFileName("mockfile.xml");
+        xmlRecordEntity.setDataLoaded(new Date());
+        XmlRecordEntity savedXmlRecordEntity = xmlRecordRepository.save(xmlRecordEntity);
+
+        Integer instId = xmlRecordRepository.findInstIdByFileNames(savedXmlRecordEntity.getXmlFileName());
+
+        assertNotNull(instId);
+        assertEquals(new Integer(1), instId);
+    }
 }

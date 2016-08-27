@@ -1,4 +1,4 @@
-package org.recap.dump;
+package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.executors.ExportDataDumpExecutorService;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.BibRecord;
@@ -326,6 +325,8 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getFullDumpWithMultipleThreads()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
         dataDumpRequest.setFetchType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.count();
@@ -372,8 +373,8 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getIncrementalDumpWithInstitutionCodesAsInput() throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-/*        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);*/
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
         institutionCodes.add("PUL");
