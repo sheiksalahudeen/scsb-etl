@@ -1,4 +1,4 @@
-package org.recap.dump;
+package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.executors.ExportDataDumpExecutorService;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.BibRecord;
