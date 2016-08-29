@@ -98,16 +98,12 @@ public class ExportDataDumpExecutorService {
     }
 
     private Long getTotalRecordCount(DataDumpRequest dataDumpRequest){
-        Long totalRecordCount;
+        Long totalRecordCount = new Long(0);
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYY);
-        if(dataDumpRequest.getFetchType() != null && dataDumpRequest.getFetchType() == 0){
-            totalRecordCount = bibliographicDetailsRepository.count();
-        }else{
-            if(dataDumpRequest.getInstitutionCodes() != null && dataDumpRequest.getDate() == null) {
+        if(dataDumpRequest.getFetchType() != null){
+            if(dataDumpRequest.getFetchType() == 0){
                 totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getInstitutionCodes());
-            }else if(dataDumpRequest.getInstitutionCodes() == null && dataDumpRequest.getDate() != null){
-                totalRecordCount = bibliographicDetailsRepository.countByLastUpdatedDate(inputDate);
-            } else{
+            }else if(dataDumpRequest.getFetchType() == 1 ){
                 totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getInstitutionCodes(), inputDate);
             }
         }

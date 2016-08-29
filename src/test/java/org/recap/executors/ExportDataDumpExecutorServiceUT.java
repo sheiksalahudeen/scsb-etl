@@ -87,11 +87,11 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Value("${datadump.batchsize}")
     private int batchSize;
 
-    @Value("${datadump.limit.page}")
     private int limitPage;
 
     @Before
     public void setUp() {
+        limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
         MockitoAnnotations.initMocks(this);
     }
 
@@ -308,8 +308,11 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setNoOfThreads(1);
         dataDumpRequest.setBatchSize(1000);
         dataDumpRequest.setFetchType(0);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.count();
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(100);
         File file;
@@ -326,10 +329,14 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     public void getFullDumpWithMultipleThreads()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType(0);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        institutionCodes.add("NYPL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.count();
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         File file;
