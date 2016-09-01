@@ -65,14 +65,14 @@ public class DataDumpRestController {
             successFlag = exportDataDumpExecutorService.exportDump(dataDumpRequest);
         } catch (InterruptedException | ExecutionException e) {
             logger.error(e.getMessage());
-            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, HttpStatus.BAD_REQUEST);
         }
         if (successFlag && dataDumpRequest.isRecordsAvailable()) {
             return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_SUCCESS, HttpStatus.OK);
         }else if(successFlag && !dataDumpRequest.isRecordsAvailable()){
             return new ResponseEntity(ReCAPConstants.DATADUMP_NO_RECORD, HttpStatus.OK);
         }else {
-            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, HttpStatus.BAD_REQUEST);
         }
     }
 
