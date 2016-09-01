@@ -49,7 +49,7 @@ public class EtlDataLoadProcessor {
             if (distinctFileName.contains(fileName)) {
                 Integer instIdByFileName = xmlRecordRepository.findInstIdByFileNames(distinctFileName);
                 long oldBibsCount = bibliographicDetailsRepository.countByOwningInstitutionId(instIdByFileName);
-                long oldHoldingsCount = holdingsDetailsRepository.count();
+                long oldHoldingsCount = holdingsDetailsRepository.countByOwningInstitutionId(instIdByFileName);
                 long oldItemsCount = itemDetailsRepository.countByOwningInstitutionId(instIdByFileName);
                 long oldBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldingsByInstId(instIdByFileName);
                 long oldBibItemsCount = itemDetailsRepository.findCountOfBibliographicItemsByInstId(instIdByFileName);
@@ -91,7 +91,7 @@ public class EtlDataLoadProcessor {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         long newBibsCount = bibliographicDetailsRepository.countByOwningInstitutionId(instIdByFileName);
-        long newHoldingsCount = holdingsDetailsRepository.count();
+        long newHoldingsCount = holdingsDetailsRepository.countByOwningInstitutionId(instIdByFileName);
         long newItemsCount = itemDetailsRepository.countByOwningInstitutionId(instIdByFileName);
         long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldingsByInstId(instIdByFileName);
         long newBibItemsCount = itemDetailsRepository.findCountOfBibliographicItemsByInstId(instIdByFileName);
