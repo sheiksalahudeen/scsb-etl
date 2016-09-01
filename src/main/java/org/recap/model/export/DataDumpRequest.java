@@ -13,6 +13,7 @@ public class DataDumpRequest {
     private int noOfThreads;
     private int batchSize;
     private boolean isRecordsAvailable;
+    private List<Integer> collectionGroupIds;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;
@@ -61,4 +62,13 @@ public class DataDumpRequest {
     public void setRecordsAvailable(boolean recordsAvailable) {
         isRecordsAvailable = recordsAvailable;
     }
+
+    public List<Integer> getCollectionGroupIds() {
+        return collectionGroupIds;
+    }
+
+    public void setCollectionGroupIds(List<Integer> collectionGroupIds) {
+        this.collectionGroupIds = collectionGroupIds;
+    }
+
 }

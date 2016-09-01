@@ -16,7 +16,6 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.BibliographicPK;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DBReportUtil;
@@ -34,9 +33,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by chenchulakshmig on 3/8/16.
@@ -87,17 +90,113 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Value("${datadump.batchsize}")
     private int batchSize;
 
-    @Value("${datadump.limit.page}")
     private int limitPage;
 
     @Before
     public void setUp() {
+        limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void saveAndGenerateDump() throws Exception {
+    public void getFullDumpWithSingleThread()throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(1);
+        dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setFetchType(0);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
+        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
+        Thread.sleep(100);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+        }
+    }
+
+    @Test
+    public void getFullDumpWithMultipleThreads()throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(10000);
+        dataDumpRequest.setFetchType(0);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        institutionCodes.add("NYPL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
+        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
+        Thread.sleep(1000);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(2000);
+        }
+    }
+
+    @Test
+    public void getIncrementalDumpWithInstitutionCodesAndLastUpdatedDateAsInput() throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        String inputDate = "08-18-2016";
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setFetchType(1);
+        dataDumpRequest.setDate(inputDate);
+        boolean isExportSuccess = exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        logger.info("isExportSuccess---->"+isExportSuccess);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
+        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
+        Thread.sleep(1000);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(1000);
+        }
+    }
+
+
+    private int getLoopCount(Long totalRecordCount,int batchSize){
+        int quotient = Integer.valueOf(Long.toString(totalRecordCount)) / (batchSize);
+        int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
+        int loopCount = remainder == 0 ? quotient : quotient + 1;
+        return loopCount;
+    }
+
+    @Test
+    public void uploadDataDumpXmlToFTP()throws Exception{
         DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
@@ -110,123 +209,38 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         collection.put("Open", 2);
         Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
 
-        String xmlFileName = "singleRecord.xml";
-        BibliographicEntity bibliographicEntity = getBibliographicEntity(xmlFileName);
-
-        assertNotNull(bibliographicEntity);
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 1);
-        assertNotNull(savedBibliographicEntity.getItemEntities());
-        assertEquals(savedBibliographicEntity.getItemEntities().size(), 1);
-
-        BibliographicPK bibliographicPK = new BibliographicPK(3, ".b103167134");
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findOne(bibliographicPK);
-        assertNotNull(fetchedBibliographicEntity);
-        assertNotNull(fetchedBibliographicEntity.getInstitutionEntity());
-        assertNotNull(fetchedBibliographicEntity.getHoldingsEntities());
-        assertEquals(fetchedBibliographicEntity.getHoldingsEntities().size(), 1);
-
-        BibRecord bibRecord = dataDumpUtil.getBibRecord(fetchedBibliographicEntity);
-
-        String xmlContent = JAXBHandler.getInstance().marshal(bibRecord);
-        assertNotNull(xmlContent);
-
-        File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
-        FileUtils.writeStringToFile(file, xmlContent);
+        BibliographicEntity bibliographicEntity1 = getBibliographicEntity("singleRecord.xml");
+        assertNotNull(bibliographicEntity1);
+        BibliographicEntity savedBibliographicEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
+        entityManager.refresh(savedBibliographicEntity1);
+        assertNotNull(savedBibliographicEntity1);
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
+        bibliographicEntityList.add(savedBibliographicEntity1);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
+        String fileName = "final-Generated-Data-Dump.xml";
+        producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
+        Thread.sleep(1000);
+        File file = new File(dumpDirectoryPath + File.separator + fileName);
         assertTrue(file.exists());
-    }
+        Thread.sleep(1000);
 
-    @Test
-    public void saveAndGenerateDumpForMultipleItems() throws Exception {
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
-        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
-        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
-        Mockito.when(collectionGroupMap.get("Shared")).thenReturn(1);
-        Mockito.when(collectionGroupMap.containsKey("Shared")).thenReturn(true);
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("seda:getUploadedDataDump")
+                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=final-Generated-Data-Dump.xml");
+            }
+        });
 
-        Map<String, Integer> institution = new HashMap<>();
-        institution.put("NYPL", 3);
-        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
+        String response = producer.requestBody("seda:getUploadedDataDump", "", String.class);
+        Thread.sleep(1000);
+        assertNotNull(response);
 
-        Map<String, Integer> collection = new HashMap<>();
-        collection.put("Shared", 1);
-        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
 
-        String xmlFileName = "BibHoldingsMultipleItems.xml";
-        BibliographicEntity bibliographicEntity = getBibliographicEntity(xmlFileName);
-
-        assertNotNull(bibliographicEntity);
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 1);
-        assertNotNull(savedBibliographicEntity.getItemEntities());
-        assertEquals(savedBibliographicEntity.getItemEntities().size(), 5);
-
-        BibliographicPK bibliographicPK = new BibliographicPK(3, ".b103167135");
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findOne(bibliographicPK);
-        assertNotNull(fetchedBibliographicEntity);
-        assertNotNull(fetchedBibliographicEntity.getInstitutionEntity());
-        assertNotNull(fetchedBibliographicEntity.getHoldingsEntities());
-        assertEquals(fetchedBibliographicEntity.getHoldingsEntities().size(), 1);
-
-        BibRecord bibRecord = dataDumpUtil.getBibRecord(fetchedBibliographicEntity);
-
-        String xmlContent = JAXBHandler.getInstance().marshal(bibRecord);
-        assertNotNull(xmlContent);
-
-        File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
-        FileUtils.writeStringToFile(file, xmlContent);
-        assertTrue(file.exists());
-    }
-
-    @Test
-    public void saveAndGenerateDumpForMultipleHoldings() throws Exception {
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
-        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
-        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
-        Mockito.when(collectionGroupMap.get("Shared")).thenReturn(1);
-        Mockito.when(collectionGroupMap.containsKey("Shared")).thenReturn(true);
-
-        Map<String, Integer> institution = new HashMap<>();
-        institution.put("NYPL", 3);
-        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
-
-        Map<String, Integer> collection = new HashMap<>();
-        collection.put("Shared", 1);
-        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
-
-        String xmlFileName = "BibMultipleHoldingsItems.xml";
-        BibliographicEntity bibliographicEntity = getBibliographicEntity(xmlFileName);
-
-        assertNotNull(bibliographicEntity);
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 2);
-        assertNotNull(savedBibliographicEntity.getItemEntities());
-        assertEquals(savedBibliographicEntity.getItemEntities().size(), 4);
-
-        BibliographicPK bibliographicPK = new BibliographicPK(3, ".b103167136");
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findOne(bibliographicPK);
-        assertNotNull(fetchedBibliographicEntity);
-        assertNotNull(fetchedBibliographicEntity.getInstitutionEntity());
-        assertNotNull(fetchedBibliographicEntity.getHoldingsEntities());
-        assertEquals(fetchedBibliographicEntity.getHoldingsEntities().size(), 2);
-
-        BibRecord bibRecord = dataDumpUtil.getBibRecord(fetchedBibliographicEntity);
-
-        String xmlContent = JAXBHandler.getInstance().marshal(bibRecord);
-        assertNotNull(xmlContent);
-
-        File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
-        FileUtils.writeStringToFile(file, xmlContent);
-        assertTrue(file.exists());
     }
 
     private BibliographicEntity getBibliographicEntity(String xmlFileName) throws URISyntaxException, IOException {
@@ -263,213 +277,6 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
             }
         }
         return bibliographicEntity;
-    }
-
-    @Test
-    public void saveAndGenerateDumpForMultipleRecords() throws Exception {
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
-        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
-        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
-        Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
-
-        Map<String, Integer> institution = new HashMap<>();
-        institution.put("NYPL", 3);
-        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
-
-        Map<String, Integer> collection = new HashMap<>();
-        collection.put("Open", 2);
-        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
-
-        BibliographicEntity bibliographicEntity1 = getBibliographicEntity("singleRecord.xml");
-        assertNotNull(bibliographicEntity1);
-        BibliographicEntity savedBibliographicEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
-        entityManager.refresh(savedBibliographicEntity1);
-        assertNotNull(savedBibliographicEntity1);
-
-        BibliographicEntity bibliographicEntity2 = getBibliographicEntity("BibHoldingsMultipleItems.xml");
-        assertNotNull(bibliographicEntity2);
-        BibliographicEntity savedBibliographicEntity2 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity2);
-        entityManager.refresh(savedBibliographicEntity2);
-        assertNotNull(savedBibliographicEntity2);
-
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(savedBibliographicEntity1, savedBibliographicEntity2));
-
-        String fileName = "Data-Dump.xml";
-        producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
-
-        Thread.sleep(1000);
-        File file = new File(dumpDirectoryPath + File.separator + fileName);
-        assertTrue(file.exists());
-    }
-
-    @Test
-    public void getFullDumpWithSingleThread()throws Exception{
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(1000);
-        dataDumpRequest.setFetchType(0);
-        exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.count();
-        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
-        Thread.sleep(100);
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-        }
-    }
-
-    @Test
-    public void getFullDumpWithMultipleThreads()throws Exception{
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
-        dataDumpRequest.setFetchType(0);
-        exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.count();
-        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
-        Thread.sleep(1000);
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-            Thread.sleep(2000);
-        }
-    }
-
-    @Test
-    public void getIncrementalDumpWithInstitutionCodesAndLastUpdatedDateAsInput() throws Exception{
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        String inputDate = "08-18-2016";
-        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
-        List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
-        dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setFetchType(1);
-        dataDumpRequest.setDate(inputDate);
-        boolean isExportSuccess = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        logger.info("isExportSuccess---->"+isExportSuccess);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
-        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
-        Thread.sleep(1000);
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-            Thread.sleep(1000);
-        }
-    }
-
-    @Test
-    public void getIncrementalDumpWithInstitutionCodesAsInput() throws Exception{
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
-        List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("NYPL");
-        institutionCodes.add("PUL");
-        dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setFetchType(1);
-        exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(institutionCodes);
-        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
-        Thread.sleep(1000);
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-            Thread.sleep(1000);
-        }
-    }
-
-    @Test
-    public void getIncrementalDumpWithLastUpdatedDateAsInput() throws Exception{
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        String inputDate = "08-18-2016";
-        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
-        List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
-        dataDumpRequest.setFetchType(1);
-        dataDumpRequest.setDate(inputDate);
-        exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByLastUpdatedDate(DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
-        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
-        Thread.sleep(1000);
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-            Thread.sleep(1000);
-        }
-    }
-
-    private int getLoopCount(Long totalRecordCount,int batchSize){
-        int quotient = Integer.valueOf(Long.toString(totalRecordCount)) / (batchSize);
-        int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
-        int loopCount = remainder == 0 ? quotient : quotient + 1;
-        return loopCount;
-    }
-
-    @Test
-    public void uploadDataDumpXmlToFTP()throws Exception{
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
-        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
-        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
-        Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
-
-        Map<String, Integer> institution = new HashMap<>();
-        institution.put("NYPL", 3);
-        Mockito.when(institutionMap.entrySet()).thenReturn(institution.entrySet());
-
-        Map<String, Integer> collection = new HashMap<>();
-        collection.put("Open", 2);
-        Mockito.when(collectionGroupMap.entrySet()).thenReturn(collection.entrySet());
-
-        BibliographicEntity bibliographicEntity1 = getBibliographicEntity("singleRecord.xml");
-        assertNotNull(bibliographicEntity1);
-        BibliographicEntity savedBibliographicEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
-        entityManager.refresh(savedBibliographicEntity1);
-        assertNotNull(savedBibliographicEntity1);
-        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
-        bibliographicEntityList.add(savedBibliographicEntity1);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
-        String fileName = "final-Generated-Data-Dump.xml";
-        producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
-        Thread.sleep(1000);
-        File file = new File(dumpDirectoryPath + File.separator + fileName);
-        assertTrue(file.exists());
-        Thread.sleep(1000);
-
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("seda:getUploadedDataDump")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=final-Generated-Data-Dump.xml");
-            }
-        });
-
-        String response = producer.requestBody("seda:getUploadedDataDump", "", String.class);
-        Thread.sleep(1000);
-        assertNotNull(response);
-
-
     }
 
 }

@@ -3,10 +3,10 @@ package org.recap.controller;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
+import org.recap.ReCAPConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -17,12 +17,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Created by premkb on 19/8/16.
  */
-public class DataDumpRestControllerUT extends BaseControllerUT{
+public class DataDumpRestControllerUT extends BaseControllerUT {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpRestControllerUT.class);
-
-    @Value("${etl.dump.directory}")
-    private String dumpDirectoryPath;
 
     @Autowired
     private DataDumpRestController dataDumpRestController;
@@ -34,15 +31,48 @@ public class DataDumpRestControllerUT extends BaseControllerUT{
     }
 
     @Test
-    public void exportDataDump() throws Exception {
-
+    public void invalidFetchTypeParameters()throws Exception{
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")
+                .param("fetchType","2"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 400);
+    }
+
+    @Test
+    public void invalidIncremenatlDumpParameters()throws Exception{
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("fetchType","1")
+                .param("institutionCodes","NYPL"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_INSTITUTIONCODE_DATE_ERR_MSG,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 400);
+    }
+
+    @Test
+    public void exportFullDataDump() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","NYPL,PUL")
+                .param("fetchType","0")
+                .param("collectionGroupIds","1,2"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 200);
+    }
+
+    @Test
+    public void exportIncrementalDataDump() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","NYPL,PUL")
                 .param("fetchType","1")
                 .param("date","08-18-2016"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals("There is no data to export",mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 }

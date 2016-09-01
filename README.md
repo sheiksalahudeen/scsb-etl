@@ -1,2 +1,2 @@
 # scsb-etl
-ETL
+ETL (Extract Load Transform)

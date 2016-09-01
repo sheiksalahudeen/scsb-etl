@@ -30,22 +30,16 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     @Query(value = "select count(owning_inst_bib_id) from bibliographic_holdings_t where owning_inst_id = ?1",  nativeQuery = true)
     Long findCountOfBibliographicHoldingsByInstId(Integer instId);
 
-    @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE INST.institutionCode IN ?1 ")
-    Long countByInstitutionCodes(Collection<String> institutionCodes);
+    @Query(value="SELECT COUNT(BIB) FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2)")
+    Long countByInstitutionCodes(Collection<Integer> cgIds, Collection<String> institutionCodes);
 
-    @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE BIB.lastUpdatedDate > ?1 ")
-    Long countByLastUpdatedDate(Date lastUpdatedDate);
+    @Query(value="SELECT COUNT(BIB) FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB.lastUpdatedDate > ?3 ")
+    Long countByInstitutionCodesAndLastUpdatedDate(Collection<Integer> cgIds, Collection<String> institutionIds, Date lastUpdatedDate);
 
-    @Query(value="SELECT COUNT(*) FROM BibliographicEntity as BIB INNER JOIN BIB.institutionEntity AS INST WHERE INST.institutionCode IN ?1 AND BIB.lastUpdatedDate > ?2 ")
-    Long countByInstitutionCodesAndLastUpdatedDate(Collection<String> institutionIds, Date lastUpdatedDate);
+    @Query(value="SELECT BIB FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB.lastUpdatedDate > ?3 ")
+    Page<BibliographicEntity> findByInstitutionCodeAndLastUpdatedDate(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes, Date lastUpdatedDate);
 
-    @Query(value="SELECT BIB FROM BibliographicEntity BIB INNER JOIN BIB.institutionEntity INST WHERE INST.institutionCode IN ?1 AND BIB.lastUpdatedDate > ?2 ORDER BY INST.institutionCode")
-    Page<BibliographicEntity> findByInstitutionCodeAndLastUpdatedDate(Pageable pageable, Collection<String> institutionCodes, Date lastUpdatedDate);
-
-    @Query(value="SELECT BIB FROM BibliographicEntity BIB INNER JOIN BIB.institutionEntity INST WHERE INST.institutionCode IN ?1 ORDER BY INST.institutionCode")
-    Page<BibliographicEntity> findByInstitutionCodes(Pageable pageable, Collection<String> institutionCodes);
-
-    Page<BibliographicEntity> findByLastUpdatedDateAfter(Pageable pageable, Date lastUpdatedDate);
-
+    @Query(value="SELECT BIB FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2)")
+    Page<BibliographicEntity> findByInstitutionCodes(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes);
 
 }
