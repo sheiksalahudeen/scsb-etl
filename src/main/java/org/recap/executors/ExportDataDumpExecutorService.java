@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import java.util.Date;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by premkb on 19/8/16.
@@ -102,16 +105,16 @@ public class ExportDataDumpExecutorService {
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYY);
         if(dataDumpRequest.getFetchType() != null){
             if(dataDumpRequest.getFetchType() == 0){
-                totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getInstitutionCodes());
+                totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
             }else if(dataDumpRequest.getFetchType() == 1 ){
-                totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getInstitutionCodes(), inputDate);
+                totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), inputDate);
             }
         }
         logger.info("totalRecordCount----->"+totalRecordCount);
         return totalRecordCount;
     }
 
-    private Callable getExportDataDumpCallable(int pageNum,int batchSize,DataDumpRequest dataDumpRequest,BibliographicDetailsRepository bibliographicDetailsRepository){
+    private Callable getExportDataDumpCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository){
         return new ExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
     }
 

@@ -87,4 +87,6 @@ public class ReCAPConstants {
     public static final String DATADUMP_EXPORT_FAILURE = "Data dump export failed.";
     public static final String DATADUMP_NO_RECORD = "There is no data to export.";
 
+    public static final String COLLECTION_GROUP_SHARED = "Shared";
+    public static final String COLLECTION_GROUP_OPEN = "Open";
 }
