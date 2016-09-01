@@ -28,7 +28,7 @@ public class DataDumpUtil {
         return bibRecords;
     }
 
-    public List<BibRecord> getBibRecordList(List<BibliographicEntity> bibliographicEntities) {
+    private List<BibRecord> getBibRecordList(List<BibliographicEntity> bibliographicEntities) {
         List<BibRecord> bibRecordList = new ArrayList<>();
         BibRecord bibRecord = null;
         if (!CollectionUtils.isEmpty(bibliographicEntities)) {
@@ -40,7 +40,7 @@ public class DataDumpUtil {
         return bibRecordList;
     }
 
-    public BibRecord getBibRecord(BibliographicEntity bibliographicEntity) {
+    private BibRecord getBibRecord(BibliographicEntity bibliographicEntity) {
         BibRecord bibRecord = new BibRecord();
         Bib bib = getBib(bibliographicEntity);
         bibRecord.setBib(bib);
