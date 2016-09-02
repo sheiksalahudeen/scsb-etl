@@ -204,8 +204,9 @@ public class BibPersisterCallable implements Callable {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
-        String owningInstituionHoldingsId = null;
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
+        holdingsEntity.setOwningInstitutionId(owningInstitutionId);
+        String owningInstituionHoldingsId = null;
         String owningInstitutionBibId = bibliographicEntity.getOwningInstitutionBibId();
         if (StringUtils.isNotBlank(holdingEnt.getOwningInstitutionHoldingsId())) {
             if (holdingEnt.getOwningInstitutionHoldingsId().length() > 45) {

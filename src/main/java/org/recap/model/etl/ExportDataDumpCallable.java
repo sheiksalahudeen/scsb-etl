@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,49 +25,39 @@ public class ExportDataDumpCallable implements Callable {
     private final List<String> institutionCodes;
     private final int fetchType;
     private final String date;
+    private final DataDumpRequest dataDumpRequest;
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
-    private List<BibliographicEntity> bibliographicEntityList;
-
-    public ExportDataDumpCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest,BibliographicDetailsRepository bibliographicDetailsRepository){
+    public ExportDataDumpCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository){
         this.pageNum = pageNum;
         this.batchSize = batchSize;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.institutionCodes = dataDumpRequest.getInstitutionCodes();
         this.fetchType = dataDumpRequest.getFetchType();
         this.date = dataDumpRequest.getDate();
+        this.dataDumpRequest = dataDumpRequest;
     }
 
     @Override
     public Object call() {
         DataDumpUtil dataDumpUtil = new DataDumpUtil();
-        bibliographicEntityList = getBibliographicEntities(pageNum,batchSize);
+        List<BibliographicEntity> bibliographicEntityList = getBibliographicEntities(pageNum,batchSize);
         return dataDumpUtil.getBibRecords(bibliographicEntityList);
     }
 
     private List<BibliographicEntity> getBibliographicEntities(int page, int size) {
         Page<BibliographicEntity> bibliographicEntities;
-        List<BibliographicEntity> bibliographicEntityList;
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
         if(fetchType==0){
-            bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(page, size));
+            bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodes(new PageRequest(page, size),dataDumpRequest.getCollectionGroupIds(),this.institutionCodes);
             bibliographicEntityList = bibliographicEntities.getContent();
-            return bibliographicEntityList;
-        }else{
+        }else if(fetchType==1){
             Date inputDate = DateUtil.getDateFromString(this.date, ReCAPConstants.DATE_FORMAT_MMDDYYY);
-            if (this.institutionCodes != null && inputDate == null) {
-                bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodes(new PageRequest(page, size),this.institutionCodes);
-                bibliographicEntityList = bibliographicEntities.getContent();
-            } else if(this.institutionCodes == null && inputDate != null){
-                bibliographicEntities = bibliographicDetailsRepository.findByLastUpdatedDateAfter(new PageRequest(page, size),inputDate);
-                bibliographicEntityList = bibliographicEntities.getContent();
-            } else{
-                bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodeAndLastUpdatedDate(new PageRequest(page, size),this.institutionCodes,inputDate);
-                bibliographicEntityList = bibliographicEntities.getContent();
-            }
-            return bibliographicEntityList;
+            bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodeAndLastUpdatedDate(new PageRequest(page, size),dataDumpRequest.getCollectionGroupIds(),this.institutionCodes,inputDate);
+            bibliographicEntityList = bibliographicEntities.getContent();
         }
-
+        return bibliographicEntityList;
     }
 
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
@@ -77,11 +68,5 @@ public class ExportDataDumpCallable implements Callable {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
-    public List<BibliographicEntity> getBibliographicEntityList() {
-        return bibliographicEntityList;
-    }
 
-    public void setBibliographicEntityList(List<BibliographicEntity> bibliographicEntityList) {
-        this.bibliographicEntityList = bibliographicEntityList;
-    }
 }

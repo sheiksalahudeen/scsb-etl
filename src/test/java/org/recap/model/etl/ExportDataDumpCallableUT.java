@@ -14,7 +14,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by premkb on 26/8/16.
  */
-public class ExportDataDumpCallableUT extends BaseTestCase{
+public class ExportDataDumpCallableUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -153,6 +156,10 @@ public class ExportDataDumpCallableUT extends BaseTestCase{
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setBatchSize(batchSize);
         dataDumpRequest.setFetchType(0);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
         try {
             saveAndGetBibliographicEntities();
         } catch (URISyntaxException | IOException e) {
