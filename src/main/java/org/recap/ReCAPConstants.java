@@ -75,6 +75,7 @@ public class ReCAPConstants {
 
     //Date Util
     public static final String DATE_FORMAT_MMDDYYY = "MM-dd-yyyy";
+    public static final String DATE_FORMAT_MMDDYYYHHMM = "yyyy-MM-dd HH:mm";
 
     //Data Dump
     public static final String DATADUMP_LIMIT_PAGE = "datadump.limit.page";;
@@ -82,11 +83,18 @@ public class ReCAPConstants {
     public static final String DATADUMP_BATCHSIZE = "datadump.batchsize";;
     public static final String DATADUMP_INSTITUTIONCODE_ERR_MSG = "Please enter the value for institutioncode parameter.";
     public static final String DATADUMP_INSTITUTIONCODE_DATE_ERR_MSG = "Please enter the value for both institutioncode and date parameter.";
+    public static final String DATADUMP_TRANS_TYPE_ERR_MSG = "Please enter valid transmission type.";
     public static final String DATADUMP_VALID_FETCHTYPE_ERR_MSG = "Please enter valid fetchType either 0 or 1.";
     public static final String DATADUMP_EXPORT_SUCCESS = "Data dump exported successfully.";
     public static final String DATADUMP_EXPORT_FAILURE = "Data dump export failed, please check with the support team.";
     public static final String DATADUMP_NO_RECORD = "There is no data to export.";
+    public static final String DATADUMP_PROCESS_STARTED = "Data dump process started, will take a while to complete the process.";
+    public static final int DATADUMP_FETCHTYPE_FULL = 0;
+    public static final int DATADUMP_FETCHTYPE_INCREMENTAL = 1;
+    public static final int DATADUMP_TRANSMISSION_TYPE_FTP = 0;
+    public static final int DATADUMP_TRANSMISSION_TYPE_HTTP = 1;
 
     public static final String COLLECTION_GROUP_SHARED = "Shared";
     public static final String COLLECTION_GROUP_OPEN = "Open";
+
 }

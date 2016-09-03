@@ -53,7 +53,7 @@ public class ExportDataDumpCallable implements Callable {
             bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodes(new PageRequest(page, size),dataDumpRequest.getCollectionGroupIds(),this.institutionCodes);
             bibliographicEntityList = bibliographicEntities.getContent();
         }else if(fetchType==1){
-            Date inputDate = DateUtil.getDateFromString(this.date, ReCAPConstants.DATE_FORMAT_MMDDYYY);
+            Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
             bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodeAndLastUpdatedDate(new PageRequest(page, size),dataDumpRequest.getCollectionGroupIds(),this.institutionCodes,inputDate);
             bibliographicEntityList = bibliographicEntities.getContent();
         }

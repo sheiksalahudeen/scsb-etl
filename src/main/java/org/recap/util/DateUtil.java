@@ -1,7 +1,14 @@
 package org.recap.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -9,16 +16,29 @@ import java.util.Date;
  */
 public class DateUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
     public static Date getDateFromString(String inputDateString,String dateFormat){
-        Date outPutDate=null;
+        Date outputDate=null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
             if(inputDateString != null) {
-                outPutDate = sdf.parse(inputDateString);
+                outputDate = sdf.parse(inputDateString);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
-        return outPutDate;
+        return outputDate;
+    }
+
+    public static Date getDateTimeFromString(String inputDateTimeString, String dateTimeFormat){
+        Date outputDateTime = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+        try{
+            LocalDateTime parsedDateTime = LocalDateTime.parse(inputDateTimeString, formatter);
+            outputDateTime = Date.from(parsedDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return outputDateTime;
     }
 }

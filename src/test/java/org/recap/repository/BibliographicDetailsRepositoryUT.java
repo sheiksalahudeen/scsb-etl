@@ -299,6 +299,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -329,7 +330,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
-        Date inputDate = DateUtil.getDateFromString("08-30-2016", ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
         Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodeAndLastUpdatedDate(new PageRequest(0, 10),cgIds,institutionCodes,inputDate);
         List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
         assertNotNull(bibliographicEntityList);
