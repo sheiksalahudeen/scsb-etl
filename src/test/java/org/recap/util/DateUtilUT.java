@@ -16,15 +16,21 @@ import static junit.framework.TestCase.assertEquals;
 public class DateUtilUT {
 
     @Test
-    public void getDateFromString(){
+    public void getDateFromString() {
         Calendar cal = Calendar.getInstance();
         System.out.print(cal);
         Date inputDate = cal.getTime();
         DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_MMDDYYY);
         String inputDateString = df.format(inputDate);
         Date outputDate = DateUtil.getDateFromString(inputDateString, ReCAPConstants.DATE_FORMAT_MMDDYYY);
-        assertEquals(inputDate.getDate(),outputDate.getDate());
-        assertEquals(inputDate.getMonth(),outputDate.getMonth());
-        assertEquals(inputDate.getYear(),outputDate.getYear());
+        assertEquals(inputDate.getDate(), outputDate.getDate());
+        assertEquals(inputDate.getMonth(), outputDate.getMonth());
+        assertEquals(inputDate.getYear(), outputDate.getYear());
+    }
+
+    @Test
+    public void getDateTimoutputDateeFromString() {
+        Date outputDate = DateUtil.getDateTimeFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
+        assertEquals("Tue Aug 30 11:20:00 IST 2016",outputDate.toString());
     }
 }

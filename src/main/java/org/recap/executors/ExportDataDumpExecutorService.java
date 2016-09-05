@@ -5,6 +5,7 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.model.etl.ExportDataDumpCallable;
 import org.recap.model.export.DataDumpRequest;
+import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DateUtil;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -40,8 +42,10 @@ public class ExportDataDumpExecutorService {
 
     private int limitPage;
 
-    public boolean exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
-        boolean successFlag = true;
+    public String exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
+        BibRecords bibRecordsForIncremental = new BibRecords();
+        bibRecordsForIncremental.setBibRecords(new ArrayList<>());
+        String outputString=null;
         try {
             startProcess();
             int noOfThreads = dataDumpRequest.getNoOfThreads();
@@ -74,12 +78,20 @@ public class ExportDataDumpExecutorService {
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
                 String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1) + ReCAPConstants.XML_FILE_FORMAT;
-                producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_Q, bibRecords, "fileName", fileName);
+
+                if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_Q, bibRecords, "fileName", fileName);
+                } else {
+                    bibRecordsForIncremental.getBibRecords().addAll(bibRecords.getBibRecords());
+                }
                 stopWatchPerFile.stop();
                 if(logger.isInfoEnabled()){
                     logger.info("Total time taken to export file no. "+(pageNum+1)+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
                     logger.info("File no. "+(pageNum+1)+" exported");
                 }
+            }
+            if(dataDumpRequest.getTransmissionType()==ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP && bibRecordsForIncremental.getBibRecords().size()>0){
+                outputString = JAXBHandler.getInstance().marshal(bibRecordsForIncremental);
             }
             getExecutorService().shutdownNow();
             getStopWatch().stop();
@@ -87,10 +99,9 @@ public class ExportDataDumpExecutorService {
                 logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
             }
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
-            e.printStackTrace();logger.error(e.getMessage());
-            successFlag =false;
+            logger.error(e.getMessage());
         }
-        return successFlag;
+        return outputString;
     }
 
     private int getLoopCount(Long totalRecordCount,int batchSize){

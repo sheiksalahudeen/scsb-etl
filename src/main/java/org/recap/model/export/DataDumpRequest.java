@@ -14,6 +14,7 @@ public class DataDumpRequest {
     private int batchSize;
     private boolean isRecordsAvailable;
     private List<Integer> collectionGroupIds;
+    private Integer transmissionType;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;
@@ -71,4 +72,11 @@ public class DataDumpRequest {
         this.collectionGroupIds = collectionGroupIds;
     }
 
+    public Integer getTransmissionType() {
+        return transmissionType;
+    }
+
+    public void setTransmissionType(Integer transmissionType) {
+        this.transmissionType = transmissionType;
+    }
 }
