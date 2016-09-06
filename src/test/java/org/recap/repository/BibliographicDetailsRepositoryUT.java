@@ -64,6 +64,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(owningInstitutionId);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -143,6 +144,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -192,6 +194,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(3);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -244,7 +247,9 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setOwningInstitutionId(3);
         holdingsEntity.setLastUpdatedBy("etl");
+
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -275,7 +280,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
-        Date inputDate = DateUtil.getDateFromString("08-30-2016", ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
         Long count = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(cgIds,institutionCodes,inputDate);
         assertEquals(new Long(1),count);
     }
@@ -361,6 +366,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();

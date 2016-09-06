@@ -159,7 +159,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getIncrementalDumpWithInstitutionCodesAndLastUpdatedDateAsInput() throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        String inputDate = "08-18-2016";
+        String inputDate = "2016-08-30 11:20";
         dataDumpRequest.setNoOfThreads(5);
         dataDumpRequest.setBatchSize(1000);
         List<Integer> cgIds = new ArrayList<>();
@@ -173,7 +173,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setDate(inputDate);
         dataDumpRequest.setTransmissionType(0);
         String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         File file;
@@ -204,7 +204,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setDate(inputDate);
         dataDumpRequest.setTransmissionType(0);
         String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         File file;

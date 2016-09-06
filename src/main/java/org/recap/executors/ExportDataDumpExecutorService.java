@@ -113,7 +113,7 @@ public class ExportDataDumpExecutorService {
 
     private Long getTotalRecordCount(DataDumpRequest dataDumpRequest){
         Long totalRecordCount = new Long(0);
-        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
         if(dataDumpRequest.getFetchType() != null){
             if(dataDumpRequest.getFetchType() == 0){
                 totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
