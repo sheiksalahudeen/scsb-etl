@@ -88,7 +88,7 @@ public class ReCAPConstants {
     public static final String DATADUMP_EXPORT_SUCCESS = "Data dump exported successfully.";
     public static final String DATADUMP_EXPORT_FAILURE = "Data dump export failed, please check with the support team.";
     public static final String DATADUMP_NO_RECORD = "There is no data to export.";
-    public static final String DATADUMP_PROCESS_STARTED = "Data dump process started, will take a while to complete the process.";
+    public static final String DATADUMP_PROCESS_STARTED = "Export process has started and we will send an email notification upon completion";
     public static final int DATADUMP_FETCHTYPE_FULL = 0;
     public static final int DATADUMP_FETCHTYPE_INCREMENTAL = 1;
     public static final int DATADUMP_TRANSMISSION_TYPE_FTP = 0;
