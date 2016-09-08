@@ -1,4 +1,4 @@
-package org.recap.controller;
+package org.recap.controller.swagger;
 
 import io.swagger.annotations.*;
 import org.recap.ReCAPConstants;
@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by premkb on 19/8/16.
  */
-@EnableSwagger2
+
 @RestController
 @RequestMapping("/dataDump")
 @Api(value="dataDump", description="Export data dump", position = 1)
