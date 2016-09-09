@@ -28,9 +28,4 @@ public class DateUtilUT {
         assertEquals(inputDate.getYear(), outputDate.getYear());
     }
 
-    @Test
-    public void getDateTimoutputDateeFromString() {
-        Date outputDate = DateUtil.getDateTimeFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
-        assertEquals("Tue Aug 30 11:20:00 IST 2016",outputDate.toString());
-    }
 }

@@ -48,6 +48,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -111,6 +112,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
         holdingsEntity1.setLastUpdatedBy("etl");
+        holdingsEntity1.setOwningInstitutionId(1);
         holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
@@ -118,6 +120,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity2.setCreatedDate(new Date());
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());
+        holdingsEntity2.setOwningInstitutionId(1);
         holdingsEntity2.setLastUpdatedBy("etl");
         holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
@@ -159,6 +162,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
@@ -194,6 +198,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -242,6 +247,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity1 = new ItemEntity();
@@ -308,6 +314,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
@@ -371,6 +378,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
         holdingsEntity1.setLastUpdatedBy("etl");
+        holdingsEntity1.setOwningInstitutionId(1);
         holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
@@ -408,6 +416,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());
         holdingsEntity2.setLastUpdatedBy("etl");
+        holdingsEntity2.setOwningInstitutionId(1);
         holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
@@ -577,6 +586,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity1.setCreatedBy("etl");
         holdingsEntity1.setLastUpdatedDate(new Date());
         holdingsEntity1.setLastUpdatedBy("etl");
+        holdingsEntity1.setOwningInstitutionId(1);
         holdingsEntity1.setOwningInstitutionHoldingsId("2");
 
         ItemEntity itemEntity1 = new ItemEntity();
@@ -611,6 +621,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity2.setCreatedBy("etl");
         holdingsEntity2.setLastUpdatedDate(new Date());
         holdingsEntity2.setLastUpdatedBy("etl");
+        holdingsEntity2.setOwningInstitutionId(1);
         holdingsEntity2.setOwningInstitutionHoldingsId("4");
 
         ItemEntity itemEntity2 = new ItemEntity();
