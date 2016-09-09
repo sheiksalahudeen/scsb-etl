@@ -148,7 +148,7 @@ public class JMSUT extends BaseTestCase {
         totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(22000));
         reportDataEntities.add(totalBiBItemsLoadedEntity);
 
-        reportEntity.setFileName("SampleRecord.xml");
+        reportEntity.setFileName("TestSuccessReport.xml");
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType(org.recap.ReCAPConstants.SUCCESS);
         reportEntity.setReportDataEntities(reportDataEntities);
@@ -156,7 +156,7 @@ public class JMSUT extends BaseTestCase {
         producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
         Thread.sleep(1000);
 
-        List<ReportEntity> byFileName = reportDetailRepository.findByFileName("SampleRecord.xml");
+        List<ReportEntity> byFileName = reportDetailRepository.findByFileName("TestSuccessReport.xml");
         assertNotNull(byFileName);
         assertNotNull(byFileName.get(0));
 

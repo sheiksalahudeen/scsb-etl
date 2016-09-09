@@ -57,6 +57,7 @@ public class HoldingsDetailsRepositoryUT extends BaseTestCase{
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(date);
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(owningInstitutionId);
         String owningInstitutionHoldingsId = String.valueOf(random.nextInt());
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
 

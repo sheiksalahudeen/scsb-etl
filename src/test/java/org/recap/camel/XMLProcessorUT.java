@@ -113,13 +113,13 @@ public class XMLProcessorUT extends BaseTestCase {
 
     @Test
     public void testLoadReport() throws Exception {
-        String fileName = "sampleRecordForEtlLoadTest.xml";
+        String fileName = "etlTestLoadReport.xml";
         File file = new File(getClass().getResource(fileName).toURI());
         FileUtils.copyFileToDirectory(file, new File(etlLoadDir));
 
         Thread.sleep(2000);
 
-        List<ReportEntity> reportEntities = reportDetailRepository.findByFileName("sampleRecordForEtlLoadTest.xml");
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndType("etlTestLoadReport.xml", ReCAPConstants.XML_LOAD);
         ReportEntity reportEntity = reportEntities.get(0);
         List<ReportDataEntity> reportDataEntities =
                 reportEntity.getReportDataEntities();
@@ -131,7 +131,7 @@ public class XMLProcessorUT extends BaseTestCase {
 
     @Test
     public void testDuplicateXMLFileProcessing() throws Exception {
-        String fileName = "sampleRecordForEtlLoadTest.xml";
+        String fileName = "etlTestLoadReport.xml";
         File file = new File(getClass().getResource(fileName).toURI());
         FileUtils.copyFileToDirectory(file, new File(etlLoadDir));
 

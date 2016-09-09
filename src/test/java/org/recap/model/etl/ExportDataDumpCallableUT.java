@@ -189,6 +189,7 @@ public class ExportDataDumpCallableUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId("3");
 
         ItemEntity itemEntity = new ItemEntity();
