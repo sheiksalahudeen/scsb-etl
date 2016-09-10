@@ -10,12 +10,11 @@ import org.recap.BaseTestCase;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.Holding;
+import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.BibliographicPK;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.XmlRecordEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,6 +159,21 @@ public class DataDumpUtilUT extends BaseTestCase {
             "                    <leader>01814cam a2200409 450000</leader>\n"+
             "                </record>\n"+
             "            </collection>";
+
+    private String holdingContent = "<collection>\n" +
+            "                    <record>\n" +
+            "                        <datafield ind1='0' ind2='1' tag='852'>\n" +
+            "                            <subfield code='b'>rcppa</subfield>\n" +
+            "                            <subfield code='t'>1</subfield>\n" +
+            "                            <subfield code='h'>DF802</subfield>\n" +
+            "                            <subfield code='i'>.xP45</subfield>\n" +
+            "                            <subfield code='x'>tr fr anxafst</subfield>\n" +
+            "                        </datafield>\n" +
+            "                        <datafield ind1=' ' ind2='0' tag='866'>\n" +
+            "                            <subfield code='x'>DESIGNATOR: t.</subfield>\n" +
+            "                        </datafield>\n" +
+            "                    </record>\n" +
+            "                </collection>";
 
     @Before
     public void setUp() {
@@ -346,6 +360,118 @@ public class DataDumpUtilUT extends BaseTestCase {
         File file = new File(dumpDirectoryPath + File.separator + xmlFileName);
         FileUtils.writeStringToFile(file, xmlContent);
         assertTrue(file.exists());
+    }
+
+    @Test
+    public void avoidPrivate()throws Exception{
+        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(bibContent.getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setOwningInstitutionBibId("12345");
+        bibliographicEntity.setOwningInstitutionId(1);
+
+        HoldingsEntity holdingsEntity1 = new HoldingsEntity();
+        holdingsEntity1.setContent(holdingContent.getBytes());
+        holdingsEntity1.setCreatedDate(new Date());
+        holdingsEntity1.setCreatedBy("etl");
+        holdingsEntity1.setLastUpdatedDate(new Date());
+        holdingsEntity1.setLastUpdatedBy("etl");
+        holdingsEntity1.setOwningInstitutionId(1);
+        holdingsEntity1.setOwningInstitutionHoldingsId("54321");
+
+        ItemEntity itemEntity1 = new ItemEntity();
+        itemEntity1.setCallNumberType("0");
+        itemEntity1.setCallNumber("callNum");
+        itemEntity1.setCreatedDate(new Date());
+        itemEntity1.setCreatedBy("etl");
+        itemEntity1.setLastUpdatedDate(new Date());
+        itemEntity1.setLastUpdatedBy("etl");
+        itemEntity1.setBarcode("1231");
+        itemEntity1.setOwningInstitutionItemId(".i1231");
+        itemEntity1.setOwningInstitutionId(1);
+        itemEntity1.setCollectionGroupId(1);
+        itemEntity1.setCustomerCode("PA");
+        itemEntity1.setCopyNumber(1);
+        itemEntity1.setItemAvailabilityStatusId(1);
+        itemEntity1.setHoldingsEntity(holdingsEntity1);
+
+        HoldingsEntity holdingsEntity2 = new HoldingsEntity();
+        holdingsEntity2.setContent(holdingContent.getBytes());
+        holdingsEntity2.setCreatedDate(new Date());
+        holdingsEntity2.setCreatedBy("etl");
+        holdingsEntity2.setLastUpdatedDate(new Date());
+        holdingsEntity2.setLastUpdatedBy("etl");
+        holdingsEntity2.setOwningInstitutionId(1);
+        holdingsEntity2.setOwningInstitutionHoldingsId("54322");
+
+        ItemEntity itemEntity2 = new ItemEntity();
+        itemEntity2.setCallNumberType("0");
+        itemEntity2.setCallNumber("callNum");
+        itemEntity2.setCreatedDate(new Date());
+        itemEntity2.setCreatedBy("etl");
+        itemEntity2.setLastUpdatedDate(new Date());
+        itemEntity2.setLastUpdatedBy("etl");
+        itemEntity2.setBarcode("1232");
+        itemEntity2.setOwningInstitutionItemId(".i1232");
+        itemEntity2.setOwningInstitutionId(1);
+        itemEntity2.setCollectionGroupId(2);
+        itemEntity2.setCustomerCode("NA");
+        itemEntity2.setCopyNumber(2);
+        itemEntity2.setItemAvailabilityStatusId(1);
+        itemEntity2.setHoldingsEntity(holdingsEntity2);
+
+        HoldingsEntity holdingsEntity3 = new HoldingsEntity();
+        holdingsEntity3.setContent(holdingContent.getBytes());
+        holdingsEntity3.setCreatedDate(new Date());
+        holdingsEntity3.setCreatedBy("etl");
+        holdingsEntity3.setLastUpdatedDate(new Date());
+        holdingsEntity3.setLastUpdatedBy("etl");
+        holdingsEntity3.setOwningInstitutionId(1);
+        holdingsEntity3.setOwningInstitutionHoldingsId("54323");
+
+        ItemEntity itemEntity3 = new ItemEntity();
+        itemEntity3.setCallNumberType("0");
+        itemEntity3.setCallNumber("callNum");
+        itemEntity3.setCreatedDate(new Date());
+        itemEntity3.setCreatedBy("etl");
+        itemEntity3.setLastUpdatedDate(new Date());
+        itemEntity3.setLastUpdatedBy("etl");
+        itemEntity3.setBarcode("1233");
+        itemEntity3.setOwningInstitutionItemId(".i1233");
+        itemEntity3.setOwningInstitutionId(1);
+        itemEntity3.setCollectionGroupId(3);
+        itemEntity3.setCustomerCode("PG");
+        itemEntity3.setCopyNumber(3);
+        itemEntity3.setItemAvailabilityStatusId(1);
+        itemEntity3.setHoldingsEntity(holdingsEntity3);
+
+        bibliographicEntity.setHoldingsEntities(new ArrayList<>());
+        bibliographicEntity.getHoldingsEntities().add(holdingsEntity1);
+        bibliographicEntity.getHoldingsEntities().add(holdingsEntity2);
+        bibliographicEntity.getHoldingsEntities().add(holdingsEntity3);
+        bibliographicEntity.setItemEntities(new ArrayList<>());
+        bibliographicEntity.getItemEntities().add(itemEntity1);
+        bibliographicEntity.getItemEntities().add(itemEntity2);
+        bibliographicEntity.getItemEntities().add(itemEntity3);
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
+
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(savedBibliographicEntity));
+        List<BibRecord> bibRecordList = bibRecords.getBibRecords();
+        assertEquals(2,bibRecordList.get(0).getHoldings().size());
     }
 
     private BibliographicEntity getBibliographicEntity(String xmlFileName) throws URISyntaxException, IOException {

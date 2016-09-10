@@ -100,6 +100,7 @@ public class ExportDataDumpExecutorService {
             }
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
             logger.error(e.getMessage());
+            stopWatch.stop();
         }
         return outputString;
     }

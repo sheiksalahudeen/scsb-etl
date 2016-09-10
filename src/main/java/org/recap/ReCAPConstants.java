@@ -96,5 +96,6 @@ public class ReCAPConstants {
 
     public static final String COLLECTION_GROUP_SHARED = "Shared";
     public static final String COLLECTION_GROUP_OPEN = "Open";
+    public static final String COLLECTION_GROUP_PRIVATE = "Private";
 
 }
