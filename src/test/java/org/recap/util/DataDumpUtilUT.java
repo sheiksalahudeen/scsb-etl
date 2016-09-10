@@ -10,8 +10,6 @@ import org.recap.BaseTestCase;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.BibRecord;
-import org.recap.model.jaxb.Holding;
-import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
