@@ -37,17 +37,17 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
 
     @Query(value="SELECT BIB FROM BibliographicEntity as BIB WHERE " +
             "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
-            "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2))")
+            "INNER JOIN BIB1.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2))")
     Page<BibliographicEntity> findByInstitutionCodes(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes);
 
     @Query(value="SELECT COUNT(BIB) FROM BibliographicEntity as BIB WHERE " +
         "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
-        "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB1.lastUpdatedDate >= ?3)")
+        "INNER JOIN BIB1.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB1.lastUpdatedDate >= ?3)")
     Long countByInstitutionCodesAndLastUpdatedDate(Collection<Integer> cgIds, Collection<String> institutionIds, Date lastUpdatedDate);
 
     @Query(value="SELECT BIB FROM BibliographicEntity as BIB WHERE " +
             "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
-            "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB1.lastUpdatedDate >= ?3)")
+            "INNER JOIN BIB1.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB1.lastUpdatedDate >= ?3)")
     Page<BibliographicEntity> findByInstitutionCodeAndLastUpdatedDate(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes, Date lastUpdatedDate);
 
 }
