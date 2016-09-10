@@ -30,16 +30,24 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     @Query(value = "select count(owning_inst_bib_id) from bibliographic_holdings_t where owning_inst_id = ?1",  nativeQuery = true)
     Long findCountOfBibliographicHoldingsByInstId(Integer instId);
 
-    @Query(value="SELECT COUNT(BIB) FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2)")
-    Long countByInstitutionCodes(Collection<Integer> cgIds, Collection<String> institutionCodes);
+    @Query(value="SELECT COUNT(BIB) FROM BibliographicEntity as BIB WHERE " +
+            "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
+            "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2))")
+    Long countByInstitutionCodes(Collection<Integer> cgIds,Collection<String> institutionCodes);
 
-    @Query(value="SELECT COUNT(BIB) FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB.lastUpdatedDate > ?3 ")
+    @Query(value="SELECT BIB FROM BibliographicEntity as BIB WHERE " +
+            "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
+            "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2))")
+    Page<BibliographicEntity> findByInstitutionCodes(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes);
+
+    @Query(value="SELECT COUNT(BIB) FROM BibliographicEntity as BIB WHERE " +
+        "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
+        "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB1.lastUpdatedDate >= ?3)")
     Long countByInstitutionCodesAndLastUpdatedDate(Collection<Integer> cgIds, Collection<String> institutionIds, Date lastUpdatedDate);
 
-    @Query(value="SELECT BIB FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB.lastUpdatedDate > ?3 ")
+    @Query(value="SELECT BIB FROM BibliographicEntity as BIB WHERE " +
+            "BIB.owningInstitutionBibId IN (SELECT DISTINCT BIB1.owningInstitutionBibId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.institutionEntity AS INST " +
+            "INNER JOIN BIB1.holdingsEntities AS HOLDING INNER JOIN HOLDING.itemEntities AS ITEMS WHERE ITEMS.collectionGroupId IN (?1) AND INST.institutionCode IN (?2) AND BIB1.lastUpdatedDate >= ?3)")
     Page<BibliographicEntity> findByInstitutionCodeAndLastUpdatedDate(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes, Date lastUpdatedDate);
-
-    @Query(value="SELECT BIB FROM ItemEntity ITEM INNER JOIN ITEM.bibliographicEntities BIB INNER JOIN BIB.institutionEntity INST WHERE ITEM.collectionGroupId IN (?1) AND INST.institutionCode IN (?2)")
-    Page<BibliographicEntity> findByInstitutionCodes(Pageable pageable, Collection<Integer> cgIds, Collection<String> institutionCodes);
 
 }
