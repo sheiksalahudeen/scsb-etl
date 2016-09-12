@@ -49,7 +49,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("institutionCodes","NYPL"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_INSTITUTIONCODE_DATE_ERR_MSG,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_DATE_ERR_MSG,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 400);
     }
 

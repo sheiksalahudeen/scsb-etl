@@ -1,5 +1,6 @@
 package org.recap.util;
 
+import org.recap.ReCAPConstants;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.*;
 import org.recap.model.jpa.BibliographicEntity;
@@ -67,15 +68,28 @@ public class DataDumpUtil {
                 holding.setOwningInstitutionHoldingsId(holdingsEntity.getOwningInstitutionHoldingsId());
                 ContentType contentType = getContentType(holdingsEntity.getContent());
                 holding.setContent(contentType);
-                if(holdingsEntity.getItemEntities()!=null) {
+                if(holdingsEntity.getItemEntities()!=null && !isHoldingSingleItemPrivate(holdingsEntity.getItemEntities())) {
                     Items items = getItems(holdingsEntity.getItemEntities());
                     holding.setItems(Arrays.asList(items));
+                    holdings.setHolding(Arrays.asList(holding));
+                    holdingsList.add(holdings);
                 }
-                holdings.setHolding(Arrays.asList(holding));
-                holdingsList.add(holdings);
             }
         }
         return holdingsList;
+    }
+
+    private boolean isHoldingSingleItemPrivate(List<ItemEntity> itemEntities){
+        if(itemEntities.size()==1 && itemEntities.get(0).getCollectionGroupEntity().getCollectionGroupCode().equals(ReCAPConstants.COLLECTION_GROUP_PRIVATE)){
+            return true;
+        }else{
+            for(ItemEntity itemEntity : itemEntities) {
+                if (itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(ReCAPConstants.COLLECTION_GROUP_PRIVATE)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Items getItems(List<ItemEntity> itemEntities) {
@@ -92,12 +106,14 @@ public class DataDumpUtil {
         List<RecordType> recordTypes = new ArrayList<>();
         if (itemEntities!=null) {
             for (ItemEntity itemEntity : itemEntities) {
-                RecordType recordType = new RecordType();
-                List<DataFieldType> dataFieldTypeList = new ArrayList<>();
-                dataFieldTypeList.add(build876DataField(itemEntity));
-                dataFieldTypeList.add(build900DataField(itemEntity));
-                recordType.setDatafield(dataFieldTypeList);
-                recordTypes.add(recordType);
+                if(!itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(ReCAPConstants.COLLECTION_GROUP_PRIVATE)) {
+                    RecordType recordType = new RecordType();
+                    List<DataFieldType> dataFieldTypeList = new ArrayList<>();
+                    dataFieldTypeList.add(build876DataField(itemEntity));
+                    dataFieldTypeList.add(build900DataField(itemEntity));
+                    recordType.setDatafield(dataFieldTypeList);
+                    recordTypes.add(recordType);
+                }
             }
         }
         return recordTypes;
