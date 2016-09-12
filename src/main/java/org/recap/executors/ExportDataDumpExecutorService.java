@@ -17,6 +17,8 @@ import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -45,12 +47,14 @@ public class ExportDataDumpExecutorService {
     public String exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
         BibRecords bibRecordsForIncremental = new BibRecords();
         bibRecordsForIncremental.setBibRecords(new ArrayList<>());
+        Map<String,String> routeMap = new HashMap<>();
+        Long totalRecordCount = null;
         String outputString=null;
         try {
             startProcess();
             int noOfThreads = dataDumpRequest.getNoOfThreads();
             int batchSize = dataDumpRequest.getBatchSize();
-            Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
+            totalRecordCount = getTotalRecordCount(dataDumpRequest);
             if(totalRecordCount == 0){
                 dataDumpRequest.setRecordsAvailable(false);
             }else{
@@ -77,10 +81,13 @@ public class ExportDataDumpExecutorService {
                 stopWatchPerFile.start();
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
-                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1) + ReCAPConstants.XML_FILE_FORMAT;
-
+                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1);
+                routeMap.put(ReCAPConstants.FTP_FILENAME,fileName);
+                routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
                 if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
-                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_Q, bibRecords, "fileName", fileName);
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FTP_Q, bibRecords, "routeMap",routeMap);
+                } else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)){
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FILE_SYSTEM_Q, bibRecords, "routeMap",routeMap);
                 } else {
                     bibRecordsForIncremental.getBibRecords().addAll(bibRecords.getBibRecords());
                 }

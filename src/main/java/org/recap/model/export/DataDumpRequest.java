@@ -15,6 +15,7 @@ public class DataDumpRequest {
     private boolean isRecordsAvailable;
     private List<Integer> collectionGroupIds;
     private Integer transmissionType;
+    private String requestingInstitutionCode;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;
@@ -78,5 +79,13 @@ public class DataDumpRequest {
 
     public void setTransmissionType(Integer transmissionType) {
         this.transmissionType = transmissionType;
+    }
+
+    public String getRequestingInstitutionCode() {
+        return requestingInstitutionCode;
+    }
+
+    public void setRequestingInstitutionCode(String requestingInstitutionCode) {
+        this.requestingInstitutionCode = requestingInstitutionCode;
     }
 }
