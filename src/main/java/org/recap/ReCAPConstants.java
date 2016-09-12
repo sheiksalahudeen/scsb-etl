@@ -7,7 +7,7 @@ public class ReCAPConstants {
 
     public static final String DATA_DUMP_FILE_NAME = "Data-Dump";
     public static final String XML_FILE_FORMAT = ".xml";
-    public static final String FTP_FILENAME = "fileName";
+    public static final String FILENAME = "fileName";
     public static final String REQUESTING_INST_CODE = "requestingInstitutionCode";
 
     public static final String COLUMBIA = "CUL";

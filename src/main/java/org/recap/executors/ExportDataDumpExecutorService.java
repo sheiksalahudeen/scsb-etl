@@ -82,7 +82,7 @@ public class ExportDataDumpExecutorService {
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
                 String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1);
-                routeMap.put(ReCAPConstants.FTP_FILENAME,fileName);
+                routeMap.put(ReCAPConstants.FILENAME,fileName);
                 routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
                 if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
                     producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FTP_Q, bibRecords, "routeMap",routeMap);
@@ -105,11 +105,24 @@ public class ExportDataDumpExecutorService {
             if(logger.isInfoEnabled()){
                 logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
             }
+            generateDataDumpReport(dataDumpRequest,totalRecordCount);
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
             logger.error(e.getMessage());
             stopWatch.stop();
         }
         return outputString;
+    }
+
+    private void generateDataDumpReport(DataDumpRequest dataDumpRequest,Long totalRecordCount){
+        Map<String,String> reportMap = new HashMap<>();
+        reportMap.put(ReCAPConstants.FILENAME,"Report");
+        reportMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
+        String reportString = "Total no. of Bibs exported : "+totalRecordCount;
+        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+            producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_REPORT_FTP_Q, reportString, "reportMap",reportMap);
+        }else{
+            producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_REPORT_FILE_SYSTEM_Q, reportString, "reportMap",reportMap);
+        }
     }
 
     private int getLoopCount(Long totalRecordCount,int batchSize){
