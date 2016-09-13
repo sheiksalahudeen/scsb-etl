@@ -69,7 +69,9 @@ public class DataDumpRestController {
         String outputString = null;
         try {
             if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL || (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL
-                    && dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+                    && dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                    ||(dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL
+                    && dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
                 new Thread(() -> {
                     try {
                         exportDataDumpExecutorService.exportDump(dataDumpRequest);
@@ -190,7 +192,9 @@ public class DataDumpRestController {
                 errorcount++;
             }
             if(dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP
-                    && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP){
+                    && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP
+                    && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM
+                    ){
                 erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
                 errorcount++;
             }
