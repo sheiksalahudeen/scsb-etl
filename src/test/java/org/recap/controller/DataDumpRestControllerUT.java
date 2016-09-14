@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.recap.ReCAPConstants;
+import org.recap.controller.swagger.DataDumpRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("institutionCodes","NYPL"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_INSTITUTIONCODE_DATE_ERR_MSG,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_DATE_ERR_MSG,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 400);
     }
 
@@ -60,7 +61,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("collectionGroupIds","1,2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 
@@ -69,10 +70,10 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL,PUL")
                 .param("fetchType","1")
-                .param("date","08-18-2016"))
+                .param("date","2016-08-30 11:20"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 }

@@ -5,6 +5,7 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.model.etl.ExportDataDumpCallable;
 import org.recap.model.export.DataDumpRequest;
+import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DateUtil;
@@ -14,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -40,13 +44,17 @@ public class ExportDataDumpExecutorService {
 
     private int limitPage;
 
-    public boolean exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
-        boolean successFlag = true;
+    public String exportDump(DataDumpRequest dataDumpRequest)throws InterruptedException,ExecutionException{
+        BibRecords bibRecordsForIncremental = new BibRecords();
+        bibRecordsForIncremental.setBibRecords(new ArrayList<>());
+        Map<String,String> routeMap = new HashMap<>();
+        Long totalRecordCount = null;
+        String outputString=null;
         try {
             startProcess();
             int noOfThreads = dataDumpRequest.getNoOfThreads();
             int batchSize = dataDumpRequest.getBatchSize();
-            Long totalRecordCount = getTotalRecordCount(dataDumpRequest);
+            totalRecordCount = getTotalRecordCount(dataDumpRequest);
             if(totalRecordCount == 0){
                 dataDumpRequest.setRecordsAvailable(false);
             }else{
@@ -73,24 +81,48 @@ public class ExportDataDumpExecutorService {
                 stopWatchPerFile.start();
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
-                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1) + ReCAPConstants.XML_FILE_FORMAT;
-                producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_Q, bibRecords, "fileName", fileName);
+                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1);
+                routeMap.put(ReCAPConstants.FILENAME,fileName);
+                routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
+                if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FTP_Q, bibRecords, "routeMap",routeMap);
+                } else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)){
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FILE_SYSTEM_Q, bibRecords, "routeMap",routeMap);
+                } else {
+                    bibRecordsForIncremental.getBibRecords().addAll(bibRecords.getBibRecords());
+                }
                 stopWatchPerFile.stop();
                 if(logger.isInfoEnabled()){
                     logger.info("Total time taken to export file no. "+(pageNum+1)+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
                     logger.info("File no. "+(pageNum+1)+" exported");
                 }
             }
+            if(dataDumpRequest.getTransmissionType()==ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP && bibRecordsForIncremental.getBibRecords().size()>0){
+                outputString = JAXBHandler.getInstance().marshal(bibRecordsForIncremental);
+            }
             getExecutorService().shutdownNow();
             getStopWatch().stop();
             if(logger.isInfoEnabled()){
                 logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
             }
+            generateDataDumpReport(dataDumpRequest,totalRecordCount);
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
-            e.printStackTrace();logger.error(e.getMessage());
-            successFlag =false;
+            logger.error(e.getMessage());
+            stopWatch.stop();
         }
-        return successFlag;
+        return outputString;
+    }
+
+    private void generateDataDumpReport(DataDumpRequest dataDumpRequest,Long totalRecordCount){
+        Map<String,String> reportMap = new HashMap<>();
+        reportMap.put(ReCAPConstants.FILENAME,"Report");
+        reportMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
+        String reportString = "Total no. of Bibs exported : "+totalRecordCount;
+        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+            producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_REPORT_FTP_Q, reportString, "reportMap",reportMap);
+        }else{
+            producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_REPORT_FILE_SYSTEM_Q, reportString, "reportMap",reportMap);
+        }
     }
 
     private int getLoopCount(Long totalRecordCount,int batchSize){
@@ -102,7 +134,7 @@ public class ExportDataDumpExecutorService {
 
     private Long getTotalRecordCount(DataDumpRequest dataDumpRequest){
         Long totalRecordCount = new Long(0);
-        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
         if(dataDumpRequest.getFetchType() != null){
             if(dataDumpRequest.getFetchType() == 0){
                 totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());

@@ -16,9 +16,9 @@ import java.io.File;
  * Created by chenchulakshmig on 10/8/16.
  */
 @Component
-public class FtpDataDumpRouteBuilder extends RouteBuilder {
+public class DataDumpFtpRouteBuilder extends RouteBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(FtpDataDumpRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpFtpRouteBuilder.class);
 
     @Value("${ftp.userName}")
     String ftpUserName;
@@ -35,21 +35,12 @@ public class FtpDataDumpRouteBuilder extends RouteBuilder {
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
-    public String getDumpDirectoryPath() {
-        return dumpDirectoryPath;
-    }
-
-    public void setDumpDirectoryPath(String dumpDirectoryPath) {
-        this.dumpDirectoryPath = dumpDirectoryPath;
-    }
-
     @Override
     public void configure() throws Exception {
         JAXBContext context = JAXBContext.newInstance(BibRecords.class);
         JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
         jaxbDataFormat.setContext(context);
-        from(ReCAPConstants.DATA_DUMP_Q).marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator + "?fileName=${in.header.fileName}")
-                .onCompletion().to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileName}")
+        from(ReCAPConstants.DATA_DUMP_FTP_Q).marshal(jaxbDataFormat).to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
                 .end();
     }
 }

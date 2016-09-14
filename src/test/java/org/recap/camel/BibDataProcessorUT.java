@@ -266,11 +266,6 @@ public class BibDataProcessorUT extends BaseTestCase {
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndInstitutionNameAndType(bibDataProcessor.getXmlFileName(), bibDataProcessor.getInstitutionName(), ReCAPConstants.FAILURE);
         assertNotNull(reportEntities);
-
-        /*DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
-        String fileName = FilenameUtils.removeExtension(bibDataProcessor.getXmlFileName()) + "-Failure-" + df.format(new Date());
-        file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
-        assertTrue(file.exists());*/
     }
 
 }

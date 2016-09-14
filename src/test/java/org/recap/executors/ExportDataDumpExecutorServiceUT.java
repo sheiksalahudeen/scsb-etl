@@ -111,6 +111,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setTransmissionType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
@@ -139,6 +140,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("PUL");
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setTransmissionType(0);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
@@ -157,7 +159,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getIncrementalDumpWithInstitutionCodesAndLastUpdatedDateAsInput() throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        String inputDate = "08-18-2016";
+        String inputDate = "2016-08-30 11:20";
         dataDumpRequest.setNoOfThreads(5);
         dataDumpRequest.setBatchSize(1000);
         List<Integer> cgIds = new ArrayList<>();
@@ -169,9 +171,9 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setFetchType(1);
         dataDumpRequest.setDate(inputDate);
-        boolean isExportSuccess = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        logger.info("isExportSuccess---->"+isExportSuccess);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYY));
+        dataDumpRequest.setTransmissionType(0);
+        String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         File file;
@@ -185,7 +187,36 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         }
     }
 
-
+    @Test
+    public void getIncrementalDumpWithXmlTransmissionType() throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        String inputDate = "2016-08-30 11:20";
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setFetchType(1);
+        dataDumpRequest.setDate(inputDate);
+        dataDumpRequest.setTransmissionType(0);
+        String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
+        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
+        Thread.sleep(1000);
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(1000);
+        }
+    }
     private int getLoopCount(Long totalRecordCount,int batchSize){
         int quotient = Integer.valueOf(Long.toString(totalRecordCount)) / (batchSize);
         int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
