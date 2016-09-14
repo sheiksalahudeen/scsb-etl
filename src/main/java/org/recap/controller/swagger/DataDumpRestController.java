@@ -51,10 +51,11 @@ public class DataDumpRestController {
                                          @ApiParam(value = "Type of export - Full (use 0) or Incremental (use 1)" , required = true , name = "fetchType") @RequestParam Integer fetchType,
                                          @ApiParam(value = "Get updates to middleware collection since the date provided. Default will be updates since the previous day. Date format will be a string (yyyy-MM-dd HH:mm)", name = "date") @RequestParam(required=false) String date,
                                          @ApiParam(value = "Collection group id will get the relevant info based on the id provided. Default will get both shared and open information - Shared (use 1), Open (use 2), Both (use 1,2)", name = "collectionGroupIds") @RequestParam(required=false) String collectionGroupIds,
-                                         @ApiParam(value = "Type of transmission - FTP (use 0), HTTP Response (use 1) this parameter is not considered for full dump, File system (use 2). Default will be ftp ", name = "transmissionType")@RequestParam(required=false) Integer transmissionType
+                                         @ApiParam(value = "Type of transmission - FTP (use 0), HTTP Response (use 1) this parameter is not considered for full dump, File system (use 2). Default will be ftp ", name = "transmissionType")@RequestParam(required=false) Integer transmissionType,
+                                         @ApiParam(value = "No. of records to be exported per file. Default will be 10000 records per file", name = "noOfRecordsPerFile")@RequestParam(required=false) String noOfRecordsPerFile
                                          ){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode);
+        setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,noOfRecordsPerFile);
 
         ResponseEntity responseEntity = validateIncomingRequest(dataDumpRequest);
         if(responseEntity!=null) {
@@ -109,7 +110,8 @@ public class DataDumpRestController {
         return integerList;
     }
 
-    private void setDataDumpRequest(DataDumpRequest dataDumpRequest, Integer fetchType, String institutionCodes, String date, String collectionGroupIds,Integer transmissionType,String requestingInstitutionCode){
+    private void setDataDumpRequest(DataDumpRequest dataDumpRequest, Integer fetchType, String institutionCodes, String date, String collectionGroupIds,
+                                    Integer transmissionType,String requestingInstitutionCode,String noOfRecordsPerFile){
         if (fetchType != null) {
             dataDumpRequest.setFetchType(fetchType);
         }
@@ -125,11 +127,11 @@ public class DataDumpRestController {
             noOfThreads = Integer.parseInt(noOfThreadString);
         }
         dataDumpRequest.setNoOfThreads(noOfThreads);
-        String batchSizeString = System.getProperty(ReCAPConstants.DATADUMP_BATCHSIZE);
-        if(batchSizeString!=null){
-            batchSize = Integer.parseInt(batchSizeString);
+        if(noOfRecordsPerFile!=null){
+            dataDumpRequest.setBatchSize(Integer.parseInt(noOfRecordsPerFile));
+        }else{
+            dataDumpRequest.setBatchSize(batchSize);
         }
-        dataDumpRequest.setBatchSize(batchSize);
         if(collectionGroupIds != null){
             List<Integer> collectionGroupIdList = splitStringAndGetIntegerList(collectionGroupIds);
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
@@ -142,11 +144,7 @@ public class DataDumpRestController {
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         }
         if(transmissionType != null){
-            if (fetchType == ReCAPConstants.DATADUMP_FETCHTYPE_FULL && transmissionType == 1) {
-                dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
-            } else {
-                dataDumpRequest.setTransmissionType(transmissionType);
-            }
+            dataDumpRequest.setTransmissionType(transmissionType);
         }else{
             dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         }
@@ -185,6 +183,11 @@ public class DataDumpRestController {
                 erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
             }
+        }
+        if(dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL
+                && dataDumpRequest.getTransmissionType()==ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP){
+            erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_FULL_VALID_TRANS_TYPE);
+            errorcount++;
         }
         if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) {
             if (dataDumpRequest.getDate() == null) {
