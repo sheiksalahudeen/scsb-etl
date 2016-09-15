@@ -1,5 +1,7 @@
 package org.recap.executors;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
@@ -33,10 +35,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -111,15 +112,17 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setTransmissionType(0);
+        dataDumpRequest.setTransmissionType(2);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(100);
+        Format formatter = new SimpleDateFormat("ddMMMyyyy");
+        String path = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -140,15 +143,17 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("PUL");
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setTransmissionType(0);
+        dataDumpRequest.setTransmissionType(2);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
+        Format formatter = new SimpleDateFormat("ddMMMyyyy");
+        String path = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -171,15 +176,17 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setFetchType(1);
         dataDumpRequest.setDate(inputDate);
-        dataDumpRequest.setTransmissionType(0);
+        dataDumpRequest.setTransmissionType(2);
         String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
+        Format formatter = new SimpleDateFormat("ddMMMyyyy");
+        String path = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -202,15 +209,17 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setFetchType(1);
         dataDumpRequest.setDate(inputDate);
-        dataDumpRequest.setTransmissionType(0);
+        dataDumpRequest.setTransmissionType(2);
         String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
+        Format formatter = new SimpleDateFormat("ddMMMyyyy");
+        String path = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -251,24 +260,31 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
+        dataDumpRequest.setRequestingInstitutionCode("NYPL");
+        dataDumpRequest.setFetchType(0);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
         BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
-        String fileName = "final-Generated-Data-Dump.xml";
-        producer.sendBodyAndHeader("seda:dataDumpQ", bibRecords, "fileName", fileName);
-        Thread.sleep(1000);
-        File file = new File(dumpDirectoryPath + File.separator + fileName);
-        assertTrue(file.exists());
-        Thread.sleep(1000);
+        String fileName = "final-Generated-Data-Dump";
+        Map<String,String> routeMap = new HashMap<>();
+        routeMap.put(ReCAPConstants.FILENAME,fileName);
+        String requestingInstitutionCode = dataDumpRequest.getRequestingInstitutionCode();
+        routeMap.put(ReCAPConstants.REQUESTING_INST_CODE, requestingInstitutionCode);
+        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FTP_Q, bibRecords, "routeMap", routeMap);
+        Thread.sleep(5000);
+        Format formatter = new SimpleDateFormat("ddMMMyyyy");
+        String path = formatter.format(new Date());
+        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+"/"+"NYPL"+"/"+path;
 
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("seda:getUploadedDataDump")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=final-Generated-Data-Dump.xml");
+                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=final-Generated-Data-Dump-${date:now:ddMMMyyyy}.xml");
             }
         });
-
         String response = producer.requestBody("seda:getUploadedDataDump", "", String.class);
-        Thread.sleep(1000);
         assertNotNull(response);
 
 
