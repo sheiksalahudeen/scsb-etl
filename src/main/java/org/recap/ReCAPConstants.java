@@ -36,6 +36,7 @@ public class ReCAPConstants {
     public static final String DATA_DUMP_FILE_SYSTEM_Q = "seda:dataDumpFileSystemQ";
     public static final String DATA_DUMP_REPORT_FTP_Q = "seda:dataDumpReportFtpQ";
     public static final String DATA_DUMP_REPORT_FILE_SYSTEM_Q = "seda:dataDumpReportFileSystemQ";
+    public static final String EMAIL_Q = "seda:emailQ";
 
     //Camel Route Ids
     public static final String REPORT_ROUTE_ID = "reportQRoute";
@@ -43,6 +44,7 @@ public class ReCAPConstants {
     public static final String CSV_FAILURE_ROUTE_ID = "csvFailureQ";
     public static final String FTP_SUCCESS_ROUTE_ID = "ftpFailureQ";
     public static final String FTP_FAILURE_ROUTE_ID = "ftpSuccessQ";
+    public static final String EMAIL_ROUTE_ID = "emailQ";
 
     public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";
     public static final String FAILURE = "Failure";

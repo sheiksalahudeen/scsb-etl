@@ -3,6 +3,7 @@ package org.recap.executors;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
+import org.recap.camel.EmailPayLoad;
 import org.recap.model.etl.ExportDataDumpCallable;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jaxb.JAXBHandler;
@@ -12,13 +13,13 @@ import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +40,21 @@ public class ExportDataDumpExecutorService {
 
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Value("${data.dump.email.nypl.to}")
+    String dataDumpEmailNyplTo;
+
+    @Value("${data.dump.email.pul.to}")
+    String dataDumpEmailPulTo;
+
+    @Value("${data.dump.email.cul.to}")
+    String dataDumpEmailCulTo;
+
+    @Value("${etl.dump.directory}")
+    String fileSystemDataDumpDirectory;
+
+    @Value("${ftp.datadump.remote.server}")
+    String ftpDataDumpDirectory;
 
     private StopWatch stopWatch;
 
@@ -106,11 +122,48 @@ public class ExportDataDumpExecutorService {
                 logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
             }
             generateDataDumpReport(dataDumpRequest,totalRecordCount);
+            if (dataDumpRequest.getTransmissionType().equals(0) || dataDumpRequest.getTransmissionType().equals(2)) {
+                sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType());
+            }
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
             logger.error(e.getMessage());
             stopWatch.stop();
         }
         return outputString;
+    }
+
+    private void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, Integer transmissionType) {
+        EmailPayLoad emailPayLoad = new EmailPayLoad();
+        emailPayLoad.setInstitutions(institutionCodes);
+        emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode));
+        emailPayLoad.setCount(totalRecordCount);
+        emailPayLoad.setTo(getEmailTo(requestingInstitutionCode));
+        producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
+    }
+
+    private String getLocation(Integer transmissionType, String requestingInstitutionCode) {
+        String location = null;
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy");
+        String day = sdf.format(date);
+        if (transmissionType.equals(0)) {
+            location = "FTP location - " + ftpDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + day;
+        } else if (transmissionType.equals(2)) {
+            location = "File System - " + fileSystemDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + day;
+        }
+        return location;
+    }
+
+    private String getEmailTo(String requestingInstitutionCode) {
+        String emailTo = null;
+        if (requestingInstitutionCode.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+            emailTo = dataDumpEmailCulTo;
+        } else if (requestingInstitutionCode.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+            emailTo = dataDumpEmailPulTo;
+        } else if (requestingInstitutionCode.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+            emailTo = dataDumpEmailNyplTo;
+        }
+        return emailTo;
     }
 
     private void generateDataDumpReport(DataDumpRequest dataDumpRequest,Long totalRecordCount){
