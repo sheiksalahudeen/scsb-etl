@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class DataDumpRestController {
     private static final Logger logger = LoggerFactory.getLogger(DataDumpRestController.class);
 
     @Autowired
-    private ExportDataDumpExecutorService exportDataDumpExecutorService;
+    ApplicationContext appContext;
 
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
@@ -66,7 +67,9 @@ public class DataDumpRestController {
         return responseEntity;
     }
 
-    private ResponseEntity startExportDumpProcess(DataDumpRequest dataDumpRequest,ResponseEntity responseEntity){
+    private ResponseEntity startExportDumpProcess(DataDumpRequest dataDumpRequest, ResponseEntity responseEntity){
+
+        ExportDataDumpExecutorService exportDataDumpExecutorService = appContext.getBean(ExportDataDumpExecutorService.class);
         String outputString = null;
         try {
             if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL || (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL
@@ -111,7 +114,7 @@ public class DataDumpRestController {
     }
 
     private void setDataDumpRequest(DataDumpRequest dataDumpRequest, Integer fetchType, String institutionCodes, String date, String collectionGroupIds,
-                                    Integer transmissionType,String requestingInstitutionCode,String noOfRecordsPerFile){
+                                    Integer transmissionType, String requestingInstitutionCode, String noOfRecordsPerFile){
         if (fetchType != null) {
             dataDumpRequest.setFetchType(fetchType);
         }
@@ -161,7 +164,7 @@ public class DataDumpRestController {
             for(String institutionCode : dataDumpRequest.getInstitutionCodes()){
                 if(!institutionCode.equals(ReCAPConstants.COLUMBIA) && !institutionCode.equals(ReCAPConstants.PRINCETON)
                         && !institutionCode.equals(ReCAPConstants.NYPL)){
-                    erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_VALID_INST_CODES_ERR_MSG);
+                    erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_INST_CODES_ERR_MSG);
                     errorcount++;
                 }
             }
@@ -169,36 +172,36 @@ public class DataDumpRestController {
         if(dataDumpRequest.getRequestingInstitutionCode() != null){
             if(!dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.COLUMBIA) && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.PRINCETON)
                     && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.NYPL)){
-                erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
+                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
                 errorcount++;
             }
         }
-        if (dataDumpRequest.getFetchType()!=ReCAPConstants.DATADUMP_FETCHTYPE_FULL &&
-                dataDumpRequest.getFetchType()!=ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL){
-            erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
+        if (dataDumpRequest.getFetchType()!= ReCAPConstants.DATADUMP_FETCHTYPE_FULL &&
+                dataDumpRequest.getFetchType()!= ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL){
+            erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
             errorcount++;
         }
         if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL ) {
             if (dataDumpRequest.getInstitutionCodes() == null) {
-                erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
+                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
             }
         }
         if(dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL
-                && dataDumpRequest.getTransmissionType()==ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP){
-            erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_FULL_VALID_TRANS_TYPE);
+                && dataDumpRequest.getTransmissionType()== ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP){
+            erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_FULL_VALID_TRANS_TYPE);
             errorcount++;
         }
         if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) {
             if (dataDumpRequest.getDate() == null) {
-                erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_DATE_ERR_MSG);
+                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
             }
             if(dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP
                     && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP
                     && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM
                     ){
-                erroMessageMap.put(errorcount,ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
+                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
                 errorcount++;
             }
         }
@@ -222,7 +225,7 @@ public class DataDumpRestController {
             return new ResponseEntity(ReCAPConstants.DATADUMP_PROCESS_STARTED, HttpStatus.OK);
         }else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null){
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("responseMessage",ReCAPConstants.DATADUMP_EXPORT_SUCCESS);
+            responseHeaders.add("responseMessage", ReCAPConstants.DATADUMP_EXPORT_SUCCESS);
             return new ResponseEntity(outputString,responseHeaders, HttpStatus.OK);
         }else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && !dataDumpRequest.isRecordsAvailable()){
             return new ResponseEntity(ReCAPConstants.DATADUMP_NO_RECORD, HttpStatus.OK);

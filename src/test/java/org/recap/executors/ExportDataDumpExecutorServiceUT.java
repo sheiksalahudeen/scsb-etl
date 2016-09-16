@@ -93,6 +93,8 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
 
     private int limitPage;
 
+    private String requestingInstitution = "CUL";
+
     @Before
     public void setUp() {
         limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
@@ -105,12 +107,13 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setNoOfThreads(1);
         dataDumpRequest.setBatchSize(1000);
         dataDumpRequest.setFetchType(0);
+        dataDumpRequest.setRequestingInstitutionCode(requestingInstitution);
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
+        institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType(2);
         exportDataDumpExecutorService.exportDump(dataDumpRequest);
@@ -118,11 +121,11 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(100);
         Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String path = formatter.format(new Date());
+        String day = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+File.separator+requestingInstitution+File.separator+day+ File.separator  +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitution+fileCount+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -135,12 +138,13 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setNoOfThreads(5);
         dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType(0);
+        dataDumpRequest.setRequestingInstitutionCode(requestingInstitution);
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
+        //institutionCodes.add("PUL");
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType(2);
@@ -149,11 +153,11 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String path = formatter.format(new Date());
+        String day = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+File.separator+requestingInstitution+File.separator+day+ File.separator  +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitution+fileCount+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
@@ -167,39 +171,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         String inputDate = "2016-08-30 11:20";
         dataDumpRequest.setNoOfThreads(5);
         dataDumpRequest.setBatchSize(1000);
-        List<Integer> cgIds = new ArrayList<>();
-        cgIds.add(1);
-        cgIds.add(2);
-        dataDumpRequest.setCollectionGroupIds(cgIds);
-        List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
-        dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setFetchType(1);
-        dataDumpRequest.setDate(inputDate);
-        dataDumpRequest.setTransmissionType(2);
-        String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
-        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
-        Thread.sleep(1000);
-        Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String path = formatter.format(new Date());
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-            Thread.sleep(1000);
-        }
-    }
-
-    @Test
-    public void getIncrementalDumpWithXmlTransmissionType() throws Exception{
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        String inputDate = "2016-08-30 11:20";
-        dataDumpRequest.setNoOfThreads(5);
-        dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setRequestingInstitutionCode(requestingInstitution);
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);
         cgIds.add(2);
@@ -215,11 +187,45 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String path = formatter.format(new Date());
+        String day = formatter.format(new Date());
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+"/"+path+ File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME+fileCount+"-"+path+ ReCAPConstants.XML_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+File.separator+requestingInstitution+File.separator+day+ File.separator  +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitution+fileCount+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
+            boolean fileExists = file.exists();
+            assertTrue(fileExists);
+            file.delete();
+            Thread.sleep(1000);
+        }
+    }
+
+    @Test
+    public void getIncrementalDumpWithXmlTransmissionType() throws Exception{
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        String inputDate = "2016-08-30 11:20";
+        dataDumpRequest.setNoOfThreads(5);
+        dataDumpRequest.setBatchSize(1000);
+        dataDumpRequest.setRequestingInstitutionCode(requestingInstitution);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setFetchType(1);
+        dataDumpRequest.setDate(inputDate);
+        dataDumpRequest.setTransmissionType(2);
+        String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
+        int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
+        Thread.sleep(1000);
+        Format formatter = new SimpleDateFormat("ddMMMyyyy");
+        String day = formatter.format(new Date());
+        File file;
+        logger.info("file count---->"+loopCount);
+        for(int fileCount=1;fileCount<=loopCount;fileCount++){
+            file = new File(dumpDirectoryPath+File.separator+requestingInstitution+File.separator+day+ File.separator  +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitution+fileCount+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();

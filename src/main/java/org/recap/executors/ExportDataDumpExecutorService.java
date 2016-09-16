@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -66,8 +67,9 @@ public class ExportDataDumpExecutorService {
         Map<String,String> routeMap = new HashMap<>();
         Long totalRecordCount = null;
         String outputString=null;
+        StopWatch stopWatch = new StopWatch();
         try {
-            startProcess();
+            stopWatch.start();
             int noOfThreads = dataDumpRequest.getNoOfThreads();
             int batchSize = dataDumpRequest.getBatchSize();
             totalRecordCount = getTotalRecordCount(dataDumpRequest);
@@ -97,13 +99,13 @@ public class ExportDataDumpExecutorService {
                 stopWatchPerFile.start();
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
-                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME + (pageNum+1);
-                routeMap.put(ReCAPConstants.FILENAME,fileName);
+                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode() + (pageNum+1);
+                routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
                 routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
                 if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
-                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FTP_Q, bibRecords, "routeMap",routeMap);
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q, bibRecords, "routeMap",routeMap);
                 } else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)){
-                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FILE_SYSTEM_Q, bibRecords, "routeMap",routeMap);
+                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q, bibRecords, "routeMap",routeMap);
                 } else {
                     bibRecordsForIncremental.getBibRecords().addAll(bibRecords.getBibRecords());
                 }
@@ -117,7 +119,7 @@ public class ExportDataDumpExecutorService {
                 outputString = JAXBHandler.getInstance().marshal(bibRecordsForIncremental);
             }
             getExecutorService().shutdownNow();
-            getStopWatch().stop();
+            stopWatch.stop();
             if(logger.isInfoEnabled()){
                 logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
             }
@@ -213,14 +215,4 @@ public class ExportDataDumpExecutorService {
         return executorService;
     }
 
-    private StopWatch getStopWatch() {
-        if (null == stopWatch) {
-            stopWatch = new StopWatch();
-        }
-        return stopWatch;
-    }
-
-    private void startProcess() {
-        getStopWatch().start();
-    }
 }
