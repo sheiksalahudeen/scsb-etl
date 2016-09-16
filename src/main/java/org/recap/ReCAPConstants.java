@@ -5,10 +5,12 @@ package org.recap;
  */
 public class ReCAPConstants {
 
-    public static final String DATA_DUMP_FILE_NAME = "Data-Dump";
-    public static final String XML_FILE_FORMAT = ".xml";
+    public static final String DATA_DUMP_FILE_NAME = "ReCAPCollectionFor";
     public static final String FILENAME = "fileName";
+    public static final String CAMELFILENAME = "CamelFileName";
     public static final String REQUESTING_INST_CODE = "requestingInstitutionCode";
+    public static final String XML_FILE_FORMAT = ".xml";
+    public static final String ZIP_FILE_FORMAT = ".zip";
 
     public static final String COLUMBIA = "CUL";
     public static final String PRINCETON = "PUL";
@@ -37,6 +39,8 @@ public class ReCAPConstants {
     public static final String DATA_DUMP_REPORT_FTP_Q = "seda:dataDumpReportFtpQ";
     public static final String DATA_DUMP_REPORT_FILE_SYSTEM_Q = "seda:dataDumpReportFileSystemQ";
     public static final String EMAIL_Q = "seda:emailQ";
+    public static final String DATA_DUMP_ZIP_FILE_Q = "direct:zipToFileQ";
+    public static final String DATA_DUMP_ZIP_FILE_TO_FTP_Q = "direct:zipFileToFtpQ";
 
     //Camel Route Ids
     public static final String REPORT_ROUTE_ID = "reportQRoute";
