@@ -230,6 +230,146 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
+    public void countByInstitutionCodesWithSameOwnInstBibForAll3Inst() throws Exception {
+        BibliographicEntity bibliographicEntityPUL = new BibliographicEntity();
+        bibliographicEntityPUL.setContent("Mock Bib Content".getBytes());
+        bibliographicEntityPUL.setCreatedDate(new Date());
+        bibliographicEntityPUL.setCreatedBy("etl");
+        bibliographicEntityPUL.setLastUpdatedBy("etl");
+        bibliographicEntityPUL.setLastUpdatedDate(new Date());
+        bibliographicEntityPUL.setOwningInstitutionBibId(String.valueOf(100));
+        bibliographicEntityPUL.setOwningInstitutionId(1);
+
+        HoldingsEntity holdingsEntityPUL = new HoldingsEntity();
+        holdingsEntityPUL.setContent("mock holdings".getBytes());
+        holdingsEntityPUL.setCreatedDate(new Date());
+        holdingsEntityPUL.setCreatedBy("etl");
+        holdingsEntityPUL.setLastUpdatedDate(new Date());
+        holdingsEntityPUL.setLastUpdatedBy("etl");
+        holdingsEntityPUL.setOwningInstitutionId(1);
+        holdingsEntityPUL.setOwningInstitutionHoldingsId(String.valueOf(10));
+
+        ItemEntity itemEntityPUL = new ItemEntity();
+        itemEntityPUL.setCallNumberType("0");
+        itemEntityPUL.setCallNumber("callNum");
+        itemEntityPUL.setCreatedDate(new Date());
+        itemEntityPUL.setCreatedBy("etl");
+        itemEntityPUL.setLastUpdatedDate(new Date());
+        itemEntityPUL.setLastUpdatedBy("etl");
+        itemEntityPUL.setBarcode("1231");
+        itemEntityPUL.setOwningInstitutionItemId(".i1231");
+        itemEntityPUL.setOwningInstitutionId(1);
+        itemEntityPUL.setCollectionGroupId(1);
+        itemEntityPUL.setCustomerCode("PA");
+        itemEntityPUL.setItemAvailabilityStatusId(1);
+        itemEntityPUL.setHoldingsEntity(holdingsEntityPUL);
+
+        bibliographicEntityPUL.setHoldingsEntities(Arrays.asList(holdingsEntityPUL));
+        bibliographicEntityPUL.setItemEntities(Arrays.asList(itemEntityPUL));
+
+        BibliographicEntity savedBibliographicEntityPUL = bibliographicDetailsRepository.saveAndFlush(bibliographicEntityPUL);
+        entityManager.refresh(savedBibliographicEntityPUL);
+
+        BibliographicEntity bibliographicEntityCUL = new BibliographicEntity();
+        bibliographicEntityCUL.setContent("Mock Bib Content".getBytes());
+        bibliographicEntityCUL.setCreatedDate(new Date());
+        bibliographicEntityCUL.setCreatedBy("etl");
+        bibliographicEntityCUL.setLastUpdatedBy("etl");
+        bibliographicEntityCUL.setLastUpdatedDate(new Date());
+        bibliographicEntityCUL.setOwningInstitutionBibId(String.valueOf(100));
+        bibliographicEntityCUL.setOwningInstitutionId(2);
+
+        HoldingsEntity holdingsEntityCUL = new HoldingsEntity();
+        holdingsEntityCUL.setContent("mock holdings".getBytes());
+        holdingsEntityCUL.setCreatedDate(new Date());
+        holdingsEntityCUL.setCreatedBy("etl");
+        holdingsEntityCUL.setLastUpdatedDate(new Date());
+        holdingsEntityCUL.setLastUpdatedBy("etl");
+        holdingsEntityCUL.setOwningInstitutionId(2);
+        holdingsEntityCUL.setOwningInstitutionHoldingsId(String.valueOf(10));
+
+        ItemEntity itemEntityCUL = new ItemEntity();
+        itemEntityCUL.setCallNumberType("0");
+        itemEntityCUL.setCallNumber("callNum");
+        itemEntityCUL.setCreatedDate(new Date());
+        itemEntityCUL.setCreatedBy("etl");
+        itemEntityCUL.setLastUpdatedDate(new Date());
+        itemEntityCUL.setLastUpdatedBy("etl");
+        itemEntityCUL.setBarcode("1231");
+        itemEntityCUL.setOwningInstitutionItemId(".i1231");
+        itemEntityCUL.setOwningInstitutionId(2);
+        itemEntityCUL.setCollectionGroupId(1);
+        itemEntityCUL.setCustomerCode("PA");
+        itemEntityCUL.setItemAvailabilityStatusId(1);
+        itemEntityCUL.setHoldingsEntity(holdingsEntityCUL);
+
+        bibliographicEntityCUL.setHoldingsEntities(Arrays.asList(holdingsEntityCUL));
+        bibliographicEntityCUL.setItemEntities(Arrays.asList(itemEntityCUL));
+
+        BibliographicEntity savedBibliographicEntityCUL = bibliographicDetailsRepository.saveAndFlush(bibliographicEntityCUL);
+        entityManager.refresh(savedBibliographicEntityCUL);
+
+        BibliographicEntity bibliographicEntityNYPL = new BibliographicEntity();
+        bibliographicEntityNYPL.setContent("Mock Bib Content".getBytes());
+        bibliographicEntityNYPL.setCreatedDate(new Date());
+        bibliographicEntityNYPL.setCreatedBy("etl");
+        bibliographicEntityNYPL.setLastUpdatedBy("etl");
+        bibliographicEntityNYPL.setLastUpdatedDate(new Date());
+        bibliographicEntityNYPL.setOwningInstitutionBibId(String.valueOf(100));
+        bibliographicEntityNYPL.setOwningInstitutionId(3);
+
+        HoldingsEntity holdingsEntityNYPL = new HoldingsEntity();
+        holdingsEntityNYPL.setContent("mock holdings".getBytes());
+        holdingsEntityNYPL.setCreatedDate(new Date());
+        holdingsEntityNYPL.setCreatedBy("etl");
+        holdingsEntityNYPL.setLastUpdatedDate(new Date());
+        holdingsEntityNYPL.setLastUpdatedBy("etl");
+        holdingsEntityNYPL.setOwningInstitutionId(3);
+        holdingsEntityNYPL.setOwningInstitutionHoldingsId(String.valueOf(10));
+
+        ItemEntity itemEntityNYPL = new ItemEntity();
+        itemEntityNYPL.setCallNumberType("0");
+        itemEntityNYPL.setCallNumber("callNum");
+        itemEntityNYPL.setCreatedDate(new Date());
+        itemEntityNYPL.setCreatedBy("etl");
+        itemEntityNYPL.setLastUpdatedDate(new Date());
+        itemEntityNYPL.setLastUpdatedBy("etl");
+        itemEntityNYPL.setBarcode("1231");
+        itemEntityNYPL.setOwningInstitutionItemId(".i1231");
+        itemEntityNYPL.setOwningInstitutionId(3);
+        itemEntityNYPL.setCollectionGroupId(1);
+        itemEntityNYPL.setCustomerCode("PA");
+        itemEntityNYPL.setItemAvailabilityStatusId(1);
+        itemEntityNYPL.setHoldingsEntity(holdingsEntityNYPL);
+
+        bibliographicEntityNYPL.setHoldingsEntities(Arrays.asList(holdingsEntityNYPL));
+        bibliographicEntityNYPL.setItemEntities(Arrays.asList(itemEntityNYPL));
+
+        BibliographicEntity savedBibliographicEntityNYPL = bibliographicDetailsRepository.saveAndFlush(bibliographicEntityNYPL);
+        entityManager.refresh(savedBibliographicEntityNYPL);
+
+        assertNotNull(savedBibliographicEntityNYPL);
+        assertNotNull(savedBibliographicEntityNYPL.getBibliographicId());
+
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        List<String> institutionCodesPUL = new ArrayList<>();
+        institutionCodesPUL.add("PUL");
+        Long countPUL = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodesPUL);
+        assertEquals(new Long(1),countPUL);
+
+        List<String> institutionCodesCUL = new ArrayList<>();
+        institutionCodesCUL.add("CUL");
+        Long countCUL = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodesCUL);
+        assertEquals(new Long(1),countCUL);
+
+        List<String> institutionCodesNYPL = new ArrayList<>();
+        institutionCodesNYPL.add("NYPL");
+        Long countNYPL = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodesNYPL);
+        assertEquals(new Long(1),countNYPL);
+    }
+
+    @Test
     public void countByInstitutionCodesAndLastUpdatedDate() throws Exception {
         Random random = new Random();
 

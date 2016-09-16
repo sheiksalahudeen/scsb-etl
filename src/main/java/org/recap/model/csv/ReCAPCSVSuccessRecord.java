@@ -14,19 +14,19 @@ import java.util.List;
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
 public class ReCAPCSVSuccessRecord {
 
-    @DataField(pos = 1)
+    @DataField(pos = 1, columnName = "File Name")
     private String fileName;
-    @DataField(pos = 2)
+    @DataField(pos = 2, columnName = "Total Records In File")
     private Integer totalRecordsInFile;
-    @DataField(pos = 3)
+    @DataField(pos = 3, columnName = "Total Bibs Loaded")
     private Integer totalBibsLoaded;
-    @DataField(pos = 4)
+    @DataField(pos = 4, columnName = "Total Holdings Loaded")
     private Integer totalHoldingsLoaded;
-    @DataField(pos = 5)
+    @DataField(pos = 5, columnName = "Total Bib-Holdings Loaded")
     private Integer totalBibHoldingsLoaded;
-    @DataField(pos = 6)
+    @DataField(pos = 6, columnName = "Total Items Loaded")
     private Integer totalItemsLoaded;
-    @DataField(pos = 7)
+    @DataField(pos = 7, columnName = "Total Bib-Items Loaded")
     private Integer totalBibItemsLoaded;
 
     @Ignore

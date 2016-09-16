@@ -35,10 +35,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     public void invalidFetchTypeParameters()throws Exception{
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")
+                .param("requestingInstitutionCode","NYPL")
                 .param("fetchType","2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG,mvcResult.getResponse().getContentAsString());
+        assertEquals("1. "+ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
         assertTrue(status == 400);
     }
 
@@ -46,10 +47,12 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     public void invalidIncremenatlDumpParameters()throws Exception{
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("fetchType","1")
+                .param("requestingInstitutionCode","NYPL")
                 .param("institutionCodes","NYPL"))
+
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_DATE_ERR_MSG,mvcResult.getResponse().getContentAsString());
+        assertEquals("1. "+ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
         assertTrue(status == 400);
     }
 
@@ -58,6 +61,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL,PUL")
                 .param("fetchType","0")
+                .param("requestingInstitutionCode","NYPL")
                 .param("collectionGroupIds","1,2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
@@ -70,6 +74,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL,PUL")
                 .param("fetchType","1")
+                .param("requestingInstitutionCode","NYPL")
                 .param("date","2016-08-30 11:20"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();

@@ -1,0 +1,46 @@
+package org.recap.camel;
+
+import org.apache.camel.ProducerTemplate;
+import org.junit.Test;
+import org.recap.BaseTestCase;
+import org.recap.ReCAPConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+
+/**
+ * Created by chenchulakshmig on 15/9/16.
+ */
+public class EmailRouteBuilderTest extends BaseTestCase {
+
+    @Autowired
+    private ProducerTemplate producer;
+
+    @Value("${data.dump.email.nypl.to}")
+    private String dataDumpEmailNyplTo;
+
+    @Value("${etl.dump.directory}")
+    String fileSystemDataDumpDirectory;
+
+    @Value("${ftp.datadump.remote.server}")
+    String ftpDataDumpDirectory;
+
+    @Test
+    public void testEmail() throws Exception {
+        EmailPayLoad emailPayLoad = new EmailPayLoad();
+        emailPayLoad.setInstitutions(Arrays.asList("PUL", "CUL"));
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy");
+        String day = sdf.format(date);
+        String  location = "File System - " + fileSystemDataDumpDirectory + "/" + "NYPL" + File.separator + day;
+        emailPayLoad.setLocation(location);
+        emailPayLoad.setCount(new Long(100));
+        emailPayLoad.setTo(dataDumpEmailNyplTo);
+        producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
+    }
+
+}
