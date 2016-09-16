@@ -80,7 +80,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -160,7 +160,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -210,8 +210,9 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
@@ -262,7 +263,8 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntityPUL.setCollectionGroupId(1);
         itemEntityPUL.setCustomerCode("PA");
         itemEntityPUL.setItemAvailabilityStatusId(1);
-        itemEntityPUL.setHoldingsEntity(holdingsEntityPUL);
+        itemEntityPUL.setHoldingsEntities(Arrays.asList(holdingsEntityPUL));
+        holdingsEntityPUL.setItemEntities(Arrays.asList(itemEntityPUL));
 
         bibliographicEntityPUL.setHoldingsEntities(Arrays.asList(holdingsEntityPUL));
         bibliographicEntityPUL.setItemEntities(Arrays.asList(itemEntityPUL));
@@ -301,7 +303,8 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntityCUL.setCollectionGroupId(1);
         itemEntityCUL.setCustomerCode("PA");
         itemEntityCUL.setItemAvailabilityStatusId(1);
-        itemEntityCUL.setHoldingsEntity(holdingsEntityCUL);
+        itemEntityCUL.setHoldingsEntities(Arrays.asList(holdingsEntityCUL));
+        holdingsEntityCUL.setItemEntities(Arrays.asList(itemEntityCUL));
 
         bibliographicEntityCUL.setHoldingsEntities(Arrays.asList(holdingsEntityCUL));
         bibliographicEntityCUL.setItemEntities(Arrays.asList(itemEntityCUL));
@@ -340,7 +343,8 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntityNYPL.setCollectionGroupId(1);
         itemEntityNYPL.setCustomerCode("PA");
         itemEntityNYPL.setItemAvailabilityStatusId(1);
-        itemEntityNYPL.setHoldingsEntity(holdingsEntityNYPL);
+        itemEntityNYPL.setHoldingsEntities(Arrays.asList(holdingsEntityNYPL));
+        holdingsEntityNYPL.setItemEntities(Arrays.asList(itemEntityNYPL));
 
         bibliographicEntityNYPL.setHoldingsEntities(Arrays.asList(holdingsEntityNYPL));
         bibliographicEntityNYPL.setItemEntities(Arrays.asList(itemEntityNYPL));
@@ -405,7 +409,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -460,7 +464,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -522,7 +526,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));

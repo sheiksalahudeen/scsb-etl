@@ -78,7 +78,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         itemEntity.setUseRestrictions("In Library Use");
         itemEntity.setVolumePartYear("X");
         itemEntity.setCopyNumber(1);
@@ -135,7 +135,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertEquals(itemEntityPK.getVolumePartYear(), itemEntity.getVolumePartYear());
         assertEquals(itemEntityPK.getUseRestrictions(), itemEntity.getUseRestrictions());
         assertEquals(itemEntityPK.getCustomerCode(), "PA");
-        assertNotNull(itemEntityPK.getHoldingsEntity());
+        assertNotNull(itemEntityPK.getHoldingsEntities());
         assertNotNull(itemEntityPK.getInstitutionEntity());
         assertNotNull(itemEntityPK.getCollectionGroupEntity());
         assertNotNull(itemEntityPK.getItemStatusEntity());
@@ -179,7 +179,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));

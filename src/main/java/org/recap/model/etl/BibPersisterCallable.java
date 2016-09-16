@@ -206,19 +206,11 @@ public class BibPersisterCallable implements Callable {
         holdingsEntity.setLastUpdatedBy("etl");
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
-        String owningInstituionHoldingsId = null;
-        String owningInstitutionBibId = bibliographicEntity.getOwningInstitutionBibId();
-        if (StringUtils.isNotBlank(holdingEnt.getOwningInstitutionHoldingsId())) {
-            if (holdingEnt.getOwningInstitutionHoldingsId().length() > 45) {
-                owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + UUID.randomUUID().toString();
-            } else {
-                owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + holdingEnt.getOwningInstitutionHoldingsId();
-            }
-        } else {
-            owningInstituionHoldingsId = owningInstitutionId + "-" + (StringUtils.isNotBlank(owningInstitutionBibId) ? owningInstitutionBibId + "-" : "") + UUID.randomUUID().toString();
+        String owningInstitutionHoldingsId = holdingEnt.getOwningInstitutionHoldingsId();
+        if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
+            owningInstitutionHoldingsId = UUID.randomUUID().toString();
         }
-
-        holdingsEntity.setOwningInstitutionHoldingsId(owningInstituionHoldingsId);
+        holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
             getDBReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
@@ -297,11 +289,11 @@ public class BibPersisterCallable implements Callable {
             errorMessage.append("\n");
             errorMessage.append("Item Owning Institution Id cannot be null");
         }
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            reportDataEntities = getDBReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, itemEntity.getHoldingsEntity(), itemEntity);
+            reportDataEntities = getDBReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());

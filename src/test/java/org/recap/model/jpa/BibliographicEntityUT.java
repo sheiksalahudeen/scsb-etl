@@ -13,6 +13,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by chenchulakshmig on 23/6/16.
@@ -42,14 +43,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
 
 
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings".getBytes());
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setCallNumberType("0");
@@ -64,7 +58,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -97,23 +91,9 @@ public class BibliographicEntityUT extends BaseTestCase {
     @Test
     public void saveBibMultipleHoldings() throws Exception {
         Random random = new Random();
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content".getBytes());
-        bibliographicEntity.setCreatedDate(new Date());
-        bibliographicEntity.setCreatedBy("etl");
-        bibliographicEntity.setLastUpdatedBy("etl");
-        bibliographicEntity.setLastUpdatedDate(new Date());
-        bibliographicEntity.setOwningInstitutionId(1);
-        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        BibliographicEntity bibliographicEntity = getBibliographicEntity(1, String.valueOf(random.nextInt()));
 
-        HoldingsEntity holdingsEntity1 = new HoldingsEntity();
-        holdingsEntity1.setContent("mock holdings".getBytes());
-        holdingsEntity1.setCreatedDate(new Date());
-        holdingsEntity1.setCreatedBy("etl");
-        holdingsEntity1.setLastUpdatedDate(new Date());
-        holdingsEntity1.setLastUpdatedBy("etl");
-        holdingsEntity1.setOwningInstitutionId(1);
-        holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity1 = getHoldingsEntity(random, 1);
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
         holdingsEntity2.setContent("mock holdings".getBytes());
@@ -138,32 +118,11 @@ public class BibliographicEntityUT extends BaseTestCase {
     @Test
     public void saveMultipleBibSingleHoldings() throws Exception {
         Random random = new Random();
-        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content".getBytes());
-        bibliographicEntity1.setCreatedDate(new Date());
-        bibliographicEntity1.setCreatedBy("etl");
-        bibliographicEntity1.setLastUpdatedBy("etl");
-        bibliographicEntity1.setLastUpdatedDate(new Date());
-        bibliographicEntity1.setOwningInstitutionId(1);
-        bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        BibliographicEntity bibliographicEntity1 = getBibliographicEntity(1, String.valueOf(random.nextInt()));
 
-        BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content".getBytes());
-        bibliographicEntity2.setCreatedDate(new Date());
-        bibliographicEntity2.setCreatedBy("etl");
-        bibliographicEntity2.setLastUpdatedBy("etl");
-        bibliographicEntity2.setLastUpdatedDate(new Date());
-        bibliographicEntity2.setOwningInstitutionId(1);
-        bibliographicEntity2.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        BibliographicEntity bibliographicEntity2 = getBibliographicEntity(1, String.valueOf(random.nextInt()));
 
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings".getBytes());
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
@@ -183,23 +142,9 @@ public class BibliographicEntityUT extends BaseTestCase {
     @Test
     public void saveBibSingleHoldingsSingleItem() throws Exception {
         Random random = new Random();
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content".getBytes());
-        bibliographicEntity.setCreatedDate(new Date());
-        bibliographicEntity.setCreatedBy("etl");
-        bibliographicEntity.setLastUpdatedBy("etl");
-        bibliographicEntity.setLastUpdatedDate(new Date());
-        bibliographicEntity.setOwningInstitutionId(1);
-        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        BibliographicEntity bibliographicEntity = getBibliographicEntity(1, String.valueOf(random.nextInt()));
 
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings".getBytes());
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setLastUpdatedDate(new Date());
@@ -215,7 +160,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity.setCallNumberType("1");
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -232,23 +177,9 @@ public class BibliographicEntityUT extends BaseTestCase {
     @Test
     public void saveBibSingleHoldingsMultipleItem() throws Exception {
         Random random = new Random();
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent("mock Content".getBytes());
-        bibliographicEntity.setCreatedDate(new Date());
-        bibliographicEntity.setCreatedBy("etl");
-        bibliographicEntity.setLastUpdatedBy("etl");
-        bibliographicEntity.setLastUpdatedDate(new Date());
-        bibliographicEntity.setOwningInstitutionId(1);
-        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        BibliographicEntity bibliographicEntity = getBibliographicEntity(1, String.valueOf(random.nextInt()));
 
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings".getBytes());
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity1 = new ItemEntity();
         itemEntity1.setCreatedDate(new Date());
@@ -263,7 +194,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
-        itemEntity1.setHoldingsEntity(holdingsEntity);
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         ItemEntity itemEntity2 = new ItemEntity();
         itemEntity2.setCreatedDate(new Date());
@@ -278,7 +209,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setCallNumber("x.12321");
         itemEntity2.setCollectionGroupId(1);
         itemEntity2.setCallNumberType("1");
-        itemEntity2.setHoldingsEntity(holdingsEntity);
+        itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2));
@@ -299,52 +230,20 @@ public class BibliographicEntityUT extends BaseTestCase {
     @Test
     public void boundWith() throws Exception {
         Random random = new Random();
-        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content".getBytes());
-        bibliographicEntity1.setCreatedDate(new Date());
-        bibliographicEntity1.setCreatedBy("etl");
-        bibliographicEntity1.setLastUpdatedBy("etl");
-        bibliographicEntity1.setLastUpdatedDate(new Date());
-        bibliographicEntity1.setOwningInstitutionId(1);
-        bibliographicEntity1.setOwningInstitutionBibId("10001");
 
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings".getBytes());
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        Integer institutionId = 1;
+        String owningInstitutionBibId1 = String.valueOf(random.nextInt());
+        String owningInstitutionBibId2 = String.valueOf(random.nextInt());
 
+        BibliographicEntity bibliographicEntity1 = getBibliographicEntity(institutionId, owningInstitutionBibId1);
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, institutionId);
+        ItemEntity itemEntity1 = getItemEntity(institutionId, holdingsEntity);
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity1));
+        bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
-        ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setCreatedDate(new Date());
-        itemEntity1.setCreatedBy("etl");
-        itemEntity1.setLastUpdatedDate(new Date());
-        itemEntity1.setLastUpdatedBy("etl");
-        itemEntity1.setCustomerCode("1");
-        itemEntity1.setItemAvailabilityStatusId(1);
-        itemEntity1.setOwningInstitutionItemId("101");
-        itemEntity1.setOwningInstitutionId(1);
-        itemEntity1.setBarcode("123");
-        itemEntity1.setCallNumber("x.12321");
-        itemEntity1.setCollectionGroupId(1);
-        itemEntity1.setCallNumberType("1");
-        itemEntity1.setHoldingsEntity(holdingsEntity);
-
-        bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
-
-        BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content".getBytes());
-        bibliographicEntity2.setCreatedDate(new Date());
-        bibliographicEntity2.setCreatedBy("etl");
-        bibliographicEntity2.setLastUpdatedBy("etl");
-        bibliographicEntity2.setLastUpdatedDate(new Date());
-        bibliographicEntity2.setOwningInstitutionId(1);
-        bibliographicEntity2.setOwningInstitutionBibId("10002");
-
+        BibliographicEntity bibliographicEntity2 = getBibliographicEntity(institutionId, owningInstitutionBibId2);
         bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity1));
 
@@ -358,28 +257,40 @@ public class BibliographicEntityUT extends BaseTestCase {
 
         assertNotNull(savedEntity2);
         assertNotNull(savedEntity2.getBibliographicId());
+
+        BibliographicEntity fetchedBibEntity1 = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(institutionId, owningInstitutionBibId1);
+        BibliographicEntity fetchedBibEntity2 = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(institutionId, owningInstitutionBibId2);
+
+        assertNotNull(fetchedBibEntity1);
+        assertNotNull(fetchedBibEntity2);
+        assertEquals(fetchedBibEntity1.getOwningInstitutionBibId(), owningInstitutionBibId1);
+        assertEquals(fetchedBibEntity2.getOwningInstitutionBibId(), owningInstitutionBibId2);
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().size() == 1);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().size() == 1);
+        assertEquals(fetchedBibEntity1.getHoldingsEntities().get(0).getHoldingsId(), fetchedBibEntity2.getHoldingsEntities().get(0).getHoldingsId());
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().size() == 1);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().size() == 1);
+        assertEquals(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().get(0).getItemId(), fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getItemId());
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities().get(0).getBibliographicEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities().get(0).getBibliographicEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().get(0).getBibliographicEntities().size() == 2);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getBibliographicEntities().size() == 2);
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities().size() == 2);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities().size() == 2);
     }
 
     @Test
     public void saveTwoItemsOneItemWithBadData() throws Exception {
         Random random = new Random();
-        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setContent("mock Content".getBytes());
-        bibliographicEntity1.setCreatedDate(new Date());
-        bibliographicEntity1.setCreatedBy("etl");
-        bibliographicEntity1.setLastUpdatedBy("etl");
-        bibliographicEntity1.setLastUpdatedDate(new Date());
-        bibliographicEntity1.setOwningInstitutionId(1);
-        bibliographicEntity1.setOwningInstitutionBibId("10001");
+        BibliographicEntity bibliographicEntity1 = getBibliographicEntity(1, "10001");
 
-        HoldingsEntity holdingsEntity1 = new HoldingsEntity();
-        holdingsEntity1.setContent("mock holdings".getBytes());
-        holdingsEntity1.setCreatedDate(new Date());
-        holdingsEntity1.setCreatedBy("etl");
-        holdingsEntity1.setLastUpdatedDate(new Date());
-        holdingsEntity1.setLastUpdatedBy("etl");
-        holdingsEntity1.setOwningInstitutionId(1);
-        holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity1 = getHoldingsEntity(random, 1);
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
 
@@ -397,27 +308,13 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
         itemEntity1.setCustomerCode("1");
-        itemEntity1.setHoldingsEntity(holdingsEntity1);
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
 
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
 
-        BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content".getBytes());
-        bibliographicEntity2.setCreatedDate(new Date());
-        bibliographicEntity2.setCreatedBy("etl");
-        bibliographicEntity2.setLastUpdatedBy("etl");
-        bibliographicEntity2.setLastUpdatedDate(new Date());
-        bibliographicEntity2.setOwningInstitutionId(1);
-        bibliographicEntity2.setOwningInstitutionBibId("10002");
+        BibliographicEntity bibliographicEntity2 = getBibliographicEntity(1, "10002");
 
-        HoldingsEntity holdingsEntity2 = new HoldingsEntity();
-        holdingsEntity2.setContent("mock holdings".getBytes());
-        holdingsEntity2.setCreatedDate(new Date());
-        holdingsEntity2.setCreatedBy("etl");
-        holdingsEntity2.setLastUpdatedDate(new Date());
-        holdingsEntity2.setLastUpdatedBy("etl");
-        holdingsEntity2.setOwningInstitutionId(1);
-        holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        HoldingsEntity holdingsEntity2 = getHoldingsEntity(random, 1);
 
         bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
 
@@ -434,7 +331,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setCollectionGroupId(1);
         itemEntity2.setCallNumberType("1");
         itemEntity2.setCustomerCode("1");
-        itemEntity2.setHoldingsEntity(holdingsEntity2);
+        itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
 
         bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity2));
 
@@ -508,7 +405,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setCallNumberType("1");
         itemEntity1.setCustomerCode("1");
         itemEntity1.setItemAvailabilityStatusId(1);
-        itemEntity1.setHoldingsEntity(holdingsEntity1);
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
@@ -516,14 +413,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         BibliographicEntity savedBibliographicEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
         entityManager.refresh(savedBibliographicEntity1);
 
-        BibliographicEntity bibliographicEntity2 = new BibliographicEntity();
-        bibliographicEntity2.setContent("mock Content".getBytes());
-        bibliographicEntity2.setCreatedDate(new Date());
-        bibliographicEntity2.setCreatedBy("etl");
-        bibliographicEntity2.setLastUpdatedBy("etl");
-        bibliographicEntity2.setLastUpdatedDate(new Date());
-        bibliographicEntity2.setOwningInstitutionId(1);
-        bibliographicEntity2.setOwningInstitutionBibId(owningInstitutionBibId);
+        BibliographicEntity bibliographicEntity2 = getBibliographicEntity(1, owningInstitutionBibId);
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
         holdingsEntity2.setContent("mock holdings".getBytes());
@@ -547,7 +437,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setCallNumberType("1");
         itemEntity2.setCustomerCode("1");
         itemEntity2.setItemAvailabilityStatusId(1);
-        itemEntity2.setHoldingsEntity(holdingsEntity2);
+        itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
 
         if (bibliographicEntity2.getHoldingsEntities()==null){
             bibliographicEntity2.setHoldingsEntities(new ArrayList<>());
@@ -603,7 +493,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setCallNumberType("1");
         itemEntity1.setCustomerCode("1");
         itemEntity1.setItemAvailabilityStatusId(1);
-        itemEntity1.setHoldingsEntity(holdingsEntity1);
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
@@ -638,7 +528,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setCallNumberType("1");
         itemEntity2.setCustomerCode("1");
         itemEntity2.setItemAvailabilityStatusId(1);
-        itemEntity2.setHoldingsEntity(holdingsEntity2);
+        itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
 
         matchedBib.getHoldingsEntities().add(holdingsEntity2);
         matchedBib.getItemEntities().add(itemEntity2);
@@ -650,6 +540,103 @@ public class BibliographicEntityUT extends BaseTestCase {
         assertNotNull(byOwningInstitutionBibId);
         assertEquals(byOwningInstitutionBibId.getHoldingsEntities().size(), 2);
         assertEquals(byOwningInstitutionBibId.getItemEntities().size(), 2);
+    }
+
+    @Test
+    public void boundWithRecordsTest() throws Exception {
+        Random random = new Random();
+
+        Integer institutionId = 1;
+        String owningInstitutionBibId1 = String.valueOf(random.nextInt());
+        String owningInstitutionBibId2 = String.valueOf(random.nextInt());
+
+        BibliographicEntity bibliographicEntity1 = getBibliographicEntity(institutionId, owningInstitutionBibId1);
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, institutionId);
+        ItemEntity itemEntity1 = getItemEntity(institutionId, holdingsEntity);
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity1));
+        bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
+        bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        BibliographicEntity bibliographicEntity2 = getBibliographicEntity(institutionId, owningInstitutionBibId2);
+        bibliographicEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity2.setItemEntities(Arrays.asList(itemEntity1));
+
+        BibliographicEntity savedEntity1 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity1);
+        entityManager.refresh(savedEntity1);
+        BibliographicEntity savedEntity2 = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity2);
+        entityManager.refresh(savedEntity2);
+
+        assertNotNull(savedEntity1);
+        assertNotNull(savedEntity2);
+
+        BibliographicEntity fetchedBibEntity1 = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(institutionId, owningInstitutionBibId1);
+        BibliographicEntity fetchedBibEntity2 = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(institutionId, owningInstitutionBibId2);
+
+        assertNotNull(fetchedBibEntity1);
+        assertNotNull(fetchedBibEntity2);
+        assertEquals(fetchedBibEntity1.getOwningInstitutionBibId(), owningInstitutionBibId1);
+        assertEquals(fetchedBibEntity2.getOwningInstitutionBibId(), owningInstitutionBibId2);
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().size() == 1);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().size() == 1);
+        assertEquals(fetchedBibEntity1.getHoldingsEntities().get(0).getHoldingsId(), fetchedBibEntity2.getHoldingsEntities().get(0).getHoldingsId());
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().size() == 1);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().size() == 1);
+        assertEquals(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().get(0).getItemId(), fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getItemId());
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities().get(0).getBibliographicEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities().get(0).getBibliographicEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().get(0).getBibliographicEntities().size() == 2);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getBibliographicEntities().size() == 2);
+        assertNotNull(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities());
+        assertNotNull(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities());
+        assertTrue(fetchedBibEntity1.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities().size() == 2);
+        assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities().size() == 2);
+    }
+
+    private ItemEntity getItemEntity(Integer institutionId, HoldingsEntity holdingsEntity) {
+        ItemEntity itemEntity1 = new ItemEntity();
+        itemEntity1.setCreatedDate(new Date());
+        itemEntity1.setCreatedBy("etl");
+        itemEntity1.setLastUpdatedDate(new Date());
+        itemEntity1.setLastUpdatedBy("etl");
+        itemEntity1.setCustomerCode("1");
+        itemEntity1.setItemAvailabilityStatusId(1);
+        itemEntity1.setOwningInstitutionItemId("101");
+        itemEntity1.setOwningInstitutionId(institutionId);
+        itemEntity1.setBarcode("123");
+        itemEntity1.setCallNumber("x.12321");
+        itemEntity1.setCollectionGroupId(1);
+        itemEntity1.setCallNumberType("1");
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        return itemEntity1;
+    }
+
+    private HoldingsEntity getHoldingsEntity(Random random, Integer institutionId) {
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(institutionId);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        return holdingsEntity;
+    }
+
+    private BibliographicEntity getBibliographicEntity(Integer institutionId, String owningInstitutionBibId1) {
+        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
+        bibliographicEntity1.setContent("mock Content".getBytes());
+        bibliographicEntity1.setCreatedDate(new Date());
+        bibliographicEntity1.setCreatedBy("etl");
+        bibliographicEntity1.setLastUpdatedBy("etl");
+        bibliographicEntity1.setLastUpdatedDate(new Date());
+        bibliographicEntity1.setOwningInstitutionId(institutionId);
+        bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId1);
+        return bibliographicEntity1;
     }
 
 }

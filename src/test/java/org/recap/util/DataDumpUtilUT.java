@@ -395,7 +395,8 @@ public class DataDumpUtilUT extends BaseTestCase {
         itemEntity1.setCustomerCode("PA");
         itemEntity1.setCopyNumber(1);
         itemEntity1.setItemAvailabilityStatusId(1);
-        itemEntity1.setHoldingsEntity(holdingsEntity1);
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity1));
+        holdingsEntity1.setItemEntities(Arrays.asList(itemEntity1));
 
         HoldingsEntity holdingsEntity2 = new HoldingsEntity();
         holdingsEntity2.setContent(holdingContent.getBytes());
@@ -420,7 +421,8 @@ public class DataDumpUtilUT extends BaseTestCase {
         itemEntity2.setCustomerCode("NA");
         itemEntity2.setCopyNumber(2);
         itemEntity2.setItemAvailabilityStatusId(1);
-        itemEntity2.setHoldingsEntity(holdingsEntity2);
+        itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity2));
+        holdingsEntity2.setItemEntities(Arrays.asList(itemEntity2));
 
         HoldingsEntity holdingsEntity3 = new HoldingsEntity();
         holdingsEntity3.setContent(holdingContent.getBytes());
@@ -445,7 +447,8 @@ public class DataDumpUtilUT extends BaseTestCase {
         itemEntity3.setCustomerCode("PG");
         itemEntity3.setCopyNumber(3);
         itemEntity3.setItemAvailabilityStatusId(1);
-        itemEntity3.setHoldingsEntity(holdingsEntity3);
+        itemEntity3.setHoldingsEntities(Arrays.asList(holdingsEntity3));
+        holdingsEntity3.setItemEntities(Arrays.asList(itemEntity3));
 
         bibliographicEntity.setHoldingsEntities(new ArrayList<>());
         bibliographicEntity.getHoldingsEntities().add(holdingsEntity1);
