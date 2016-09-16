@@ -75,8 +75,9 @@ public class HoldingsDetailsRepositoryUT extends BaseTestCase{
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
@@ -95,7 +96,7 @@ public class HoldingsDetailsRepositoryUT extends BaseTestCase{
         Long countAfterAdd = holdingsDetailsRepository.count();
         assertTrue(countAfterAdd > count);
 
-        HoldingsEntity holdingsEntityByPK = holdingsDetailsRepository.findOne(owningInstitutionHoldingsId);
+        HoldingsEntity holdingsEntityByPK = holdingsDetailsRepository.findByHoldingsId(savedHoldingsEntity.getHoldingsId());
         assertNotNull(holdingsEntityByPK.getContent());
         assertNotNull(holdingsEntityByPK.getCreatedDate());
         assertNotNull(holdingsEntityByPK.getLastUpdatedDate());

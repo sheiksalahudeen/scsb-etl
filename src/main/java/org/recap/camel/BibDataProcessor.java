@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public class BibDataProcessor {
                     savedHoldingsEntities.add(savedHoldingsEntity);
                     for (ItemEntity itemEntity : itemEntities) {
                         try {
-                            itemEntity.setHoldingsEntity(savedHoldingsEntity);
+                            itemEntity.setHoldingsEntities(Arrays.asList(savedHoldingsEntity));
                             ItemEntity savedItemEntity = itemDetailsRepository.save(itemEntity);
                             flushAndClearSession();
                             savedItemEntities.add(savedItemEntity);

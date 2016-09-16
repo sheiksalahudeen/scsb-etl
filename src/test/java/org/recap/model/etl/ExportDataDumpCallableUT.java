@@ -208,7 +208,7 @@ public class ExportDataDumpCallableUT extends BaseTestCase {
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setCopyNumber(123);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
