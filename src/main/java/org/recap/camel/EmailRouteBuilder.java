@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.*;
 
 /**
  * Created by chenchulakshmig on 13/9/16.
@@ -30,7 +27,8 @@ public class EmailRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    loadEmailBodyTemplateAndPassword();
+                    loadEmailBodyTemplate();
+                    loadEmailPassword();
 
                     from(ReCAPConstants.EMAIL_Q)
                             .routeId(ReCAPConstants.EMAIL_ROUTE_ID)
@@ -40,21 +38,38 @@ public class EmailRouteBuilder {
                             .setHeader("from", simple(from))
                             .setHeader("to", simple("${header.emailPayLoad.to}"))
                             .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                            .onCompletion().log("Email has been sent successfully.")
                             .end();
                 }
 
-                private void loadEmailBodyTemplateAndPassword() {
-                    URL resource = getClass().getResource("email_body.vm");
+                private void loadEmailBodyTemplate() {
+                    InputStream inputStream = getClass().getResourceAsStream("email_body.vm");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder out = new StringBuilder();
+                    String line;
                     try {
-                        emailBody = FileUtils.readFileToString(new File(resource.toURI()), "UTF-8");
-                        File file = new File(passwordDirectory);
-                        if (file.exists()) {
-                            emailPassword = FileUtils.readFileToString(file, "UTF-8").trim();
+                        while ((line = reader.readLine()) != null) {
+                            if (line.isEmpty()) {
+                                out.append("\n");
+                            } else {
+                                out.append(line);
+                                out.append("\n");
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
+                    }
+                    emailBody = out.toString();
+                }
+
+                private void loadEmailPassword() {
+                    File file = new File(passwordDirectory);
+                    if (file.exists()) {
+                        try {
+                            emailPassword = FileUtils.readFileToString(file, "UTF-8").trim();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
