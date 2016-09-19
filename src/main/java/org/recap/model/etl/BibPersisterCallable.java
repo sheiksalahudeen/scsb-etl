@@ -209,6 +209,8 @@ public class BibPersisterCallable implements Callable {
         String owningInstitutionHoldingsId = holdingEnt.getOwningInstitutionHoldingsId();
         if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
             owningInstitutionHoldingsId = UUID.randomUUID().toString();
+        } else if (owningInstitutionHoldingsId.length() > 100) {
+            owningInstitutionHoldingsId = UUID.randomUUID().toString();
         }
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
         List<ReportDataEntity> reportDataEntities = null;

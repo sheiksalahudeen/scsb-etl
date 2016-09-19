@@ -10,6 +10,7 @@ import org.recap.BaseTestCase;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.camel.BibDataProcessor;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -114,5 +116,42 @@ public class BibPersisterCallableUT extends BaseTestCase {
             }
         }
         assertTrue(failureReportReCAPCSVRecords.size() == 2);
+    }
+
+    @Test
+    public void processAndValidateHoldingsEntity() throws Exception {
+        Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
+        Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
+        Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
+        XmlRecordEntity xmlRecordEntity = new XmlRecordEntity();
+        xmlRecordEntity.setXmlFileName("BibRecord.xml");
+        URL resource = getClass().getResource("BibRecord.xml");
+        assertNotNull(resource);
+        File file = new File(resource.toURI());
+        assertNotNull(file);
+        assertTrue(file.exists());
+        BibRecord bibRecord = null;
+        bibRecord = (BibRecord) JAXBHandler.getInstance().unmarshal(FileUtils.readFileToString(file, "UTF-8"), BibRecord.class);
+        assertNotNull(bibRecord);
+
+        BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+        bibPersisterCallable.setItemStatusMap(itemStatusMap);
+        bibPersisterCallable.setInstitutionEntitiesMap(institutionMap);
+        bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
+        bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
+        bibPersisterCallable.setBibRecord(bibRecord);
+        bibPersisterCallable.setDBReportUtil(dbReportUtil);
+        assertNotNull(bibPersisterCallable.getItemStatusMap());
+        assertNotNull(bibPersisterCallable.getInstitutionEntitiesMap());
+        assertNotNull(bibPersisterCallable.getCollectionGroupMap());
+        assertNotNull(bibPersisterCallable.getXmlRecordEntity());
+        assertNotNull(bibPersisterCallable.getBibRecord());
+        Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
+        BibliographicEntity bibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
+        assertNotNull(bibliographicEntity);
+        assertTrue(bibliographicEntity.getHoldingsEntities().size() == 1);
+        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0));
+        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId());
+        assertNotEquals(bibliographicEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId(), ".c11316020.c11333133.c11349165.c11365225.c11304777.c10638106c11349165.c11365225.c11304777.c10638106c11349165.c11365225.c11304777.c10638106c11349165.c11365225.c11304777.c10638106");
     }
 }
