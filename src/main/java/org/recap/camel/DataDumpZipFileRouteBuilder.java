@@ -31,7 +31,7 @@ public class DataDumpZipFileRouteBuilder extends RouteBuilder {
         jaxbDataFormat.setContext(context);
         ZipFileDataFormat zip = new ZipFileDataFormat();
         from(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q).marshal(jaxbDataFormat).marshal(zip)
-                .to("file:"+dumpDirectoryPath + File.separator + "?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[CamelFileName]}-${date:now:ddMMMyyyy}.zip");
+                .to("file:"+dumpDirectoryPath + File.separator + "?fileName=${header.routeMap[requestingInstitutionCode]}/${header.routeMap[dateTimeFolder]}/${header.routeMap[CamelFileName]}${header.routeMap[requestingInstitutionCode]}-${date:now:ddMMMyyyyHHmm}.zip");
         ;
     }
 

@@ -7,6 +7,7 @@ public class ReCAPConstants {
 
     public static final String DATA_DUMP_FILE_NAME = "ReCAPCollectionFor";
     public static final String FILENAME = "fileName";
+    public static final String DATETIME_FOLDER = "dateTimeFolder";
     public static final String CAMELFILENAME = "CamelFileName";
     public static final String REQUESTING_INST_CODE = "requestingInstitutionCode";
     public static final String XML_FILE_FORMAT = ".xml";
@@ -91,6 +92,7 @@ public class ReCAPConstants {
     //Date Util
     public static final String DATE_FORMAT_MMDDYYY = "MM-dd-yyyy";
     public static final String DATE_FORMAT_MMDDYYYHHMM = "yyyy-MM-dd HH:mm";
+    public static final String DATE_FORMAT_DDMMMYYYYHHMM = "ddMMMyyyyHHmm";
 
     //Data Dump
     public static final String DATADUMP_LIMIT_PAGE = "datadump.limit.page";;

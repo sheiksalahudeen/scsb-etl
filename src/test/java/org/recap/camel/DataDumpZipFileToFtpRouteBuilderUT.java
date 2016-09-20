@@ -48,12 +48,11 @@ public class DataDumpZipFileToFtpRouteBuilderUT extends BaseTestCase {
         String requestingInstituionCode = "NYPL";
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,requestingInstituionCode);
         BibRecords bibRecords = new BibRecords();
+        String dateTimeString = getDateTimeString();
+        routeMap.put(ReCAPConstants.DATETIME_FOLDER,dateTimeString);
         producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q,bibRecords,"routeMap",routeMap);
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy");
-        String day = sdf.format(date);
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+day+ReCAPConstants.ZIP_FILE_FORMAT;
-        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+"NYPL"+File.separator+day;
+        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+dateTimeString+ReCAPConstants.ZIP_FILE_FORMAT;
+        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+"NYPL"+File.separator+dateTimeString;
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -64,5 +63,12 @@ public class DataDumpZipFileToFtpRouteBuilderUT extends BaseTestCase {
         String response = producer.requestBody("seda:testZipFtp", "", String.class);
         Thread.sleep(1000);
         assertNotNull(response);
+    }
+
+    private String getDateTimeString(){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        return sdf.format(date);
+
     }
 }
