@@ -219,18 +219,26 @@ public class DataDumpRestController {
         });
         return errorMessageBuilder.toString();
     }
-    private ResponseEntity getResponseEntity(String outputString, DataDumpRequest dataDumpRequest){
+    private ResponseEntity getResponseEntity(String outputString, DataDumpRequest dataDumpRequest) throws Exception{
+        HttpHeaders responseHeaders = new HttpHeaders();
         if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 ||dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)){
-            return new ResponseEntity(ReCAPConstants.DATADUMP_PROCESS_STARTED, HttpStatus.OK);
+            String date= new Date().toString();
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
+            return new ResponseEntity(ReCAPConstants.DATADUMP_PROCESS_STARTED,responseHeaders,HttpStatus.OK);
         }else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null){
-            HttpHeaders responseHeaders = new HttpHeaders();
+            String date= new Date().toString();
             responseHeaders.add("responseMessage", ReCAPConstants.DATADUMP_EXPORT_SUCCESS);
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
             return new ResponseEntity(outputString,responseHeaders, HttpStatus.OK);
         }else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && !dataDumpRequest.isRecordsAvailable()){
-            return new ResponseEntity(ReCAPConstants.DATADUMP_NO_RECORD, HttpStatus.OK);
+            String date= new Date().toString();
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
+            return new ResponseEntity(ReCAPConstants.DATADUMP_NO_RECORD,responseHeaders, HttpStatus.OK);
         }else{
-            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, HttpStatus.BAD_REQUEST);
+            String date= new Date().toString();
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
+            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE,responseHeaders, HttpStatus.BAD_REQUEST);
         }
     }
 }

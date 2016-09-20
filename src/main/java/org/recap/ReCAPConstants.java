@@ -119,4 +119,6 @@ public class ReCAPConstants {
     public static final String COLLECTION_GROUP_OPEN = "Open";
     public static final String COLLECTION_GROUP_PRIVATE = "Private";
 
+    public static final String RESPONSE_DATE = "Date";
+
 }
