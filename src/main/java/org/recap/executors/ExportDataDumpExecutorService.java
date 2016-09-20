@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -67,6 +66,7 @@ public class ExportDataDumpExecutorService {
         Map<String,String> routeMap = new HashMap<>();
         Long totalRecordCount = null;
         String outputString=null;
+        String dateTimeStringForFolder = getDateTimeString();
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
@@ -100,6 +100,7 @@ public class ExportDataDumpExecutorService {
                 Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
                 BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
                 String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode() + (pageNum+1);
+                routeMap.put(ReCAPConstants.DATETIME_FOLDER, dateTimeStringForFolder);
                 routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
                 routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
                 if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
@@ -124,8 +125,9 @@ public class ExportDataDumpExecutorService {
                 logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
             }
             generateDataDumpReport(dataDumpRequest,totalRecordCount);
-            if (dataDumpRequest.getTransmissionType().equals(0) || dataDumpRequest.getTransmissionType().equals(2)) {
-                sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType());
+            if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                    || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+                sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder);
             }
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
             logger.error(e.getMessage());
@@ -134,24 +136,27 @@ public class ExportDataDumpExecutorService {
         return outputString;
     }
 
-    private void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, Integer transmissionType) {
+    private String getDateTimeString(){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        return sdf.format(date);
+    }
+
+    private void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, Integer transmissionType,String dateTimeStringForFolder) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
-        emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode));
+        emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode,dateTimeStringForFolder));
         emailPayLoad.setCount(totalRecordCount);
         emailPayLoad.setTo(getEmailTo(requestingInstitutionCode));
         producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
     }
 
-    private String getLocation(Integer transmissionType, String requestingInstitutionCode) {
+    private String getLocation(Integer transmissionType, String requestingInstitutionCode,String dateTimeStringForFolder) {
         String location = null;
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy");
-        String day = sdf.format(date);
         if (transmissionType.equals(0)) {
-            location = "FTP location - " + ftpDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + day;
+            location = "FTP location - " + ftpDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + dateTimeStringForFolder;
         } else if (transmissionType.equals(2)) {
-            location = "File System - " + fileSystemDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + day;
+            location = "File System - " + fileSystemDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + dateTimeStringForFolder;
         }
         return location;
     }

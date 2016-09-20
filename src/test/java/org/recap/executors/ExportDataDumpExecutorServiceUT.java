@@ -120,8 +120,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(100);
-        Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String day = formatter.format(new Date());
+        String day = getDateTimeString();
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -152,8 +151,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
-        Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String day = formatter.format(new Date());
+        String day = getDateTimeString();
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -186,8 +184,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
-        Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String day = formatter.format(new Date());
+        String day = getDateTimeString();
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -220,8 +217,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
-        Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String day = formatter.format(new Date());
+        String day = getDateTimeString();
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
@@ -272,22 +268,26 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
-        String fileName = "final-Generated-Data-Dump";
+        String fileName = "ReCAPCollectionFor";
         Map<String,String> routeMap = new HashMap<>();
-        routeMap.put(ReCAPConstants.FILENAME,fileName);
+        routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
         String requestingInstitutionCode = dataDumpRequest.getRequestingInstitutionCode();
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE, requestingInstitutionCode);
-        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_FTP_Q, bibRecords, "routeMap", routeMap);
+        String dateTimeString = getDateTimeString();
+        routeMap.put(ReCAPConstants.DATETIME_FOLDER,dateTimeString);
+        //producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q, bibRecords, "routeMap", routeMap);
+        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q, bibRecords, "routeMap", routeMap);
         Thread.sleep(5000);
         Format formatter = new SimpleDateFormat("ddMMMyyyy");
         String path = formatter.format(new Date());
-        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+"/"+"NYPL"+"/"+path;
+        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+File.separator+requestingInstitutionCode+File.separator+dateTimeString;
+        System.out.println("ftpDataDumpRemoteServer------>"+ftpDataDumpRemoteServer);
 
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("seda:getUploadedDataDump")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=final-Generated-Data-Dump-${date:now:ddMMMyyyy}.xml");
+                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=ReCAPCollectionForNYPL-${date:now:ddMMMyyyyHHmm}.zip");
             }
         });
         String response = producer.requestBody("seda:getUploadedDataDump", "", String.class);
@@ -330,6 +330,12 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
             }
         }
         return bibliographicEntity;
+    }
+
+    private String getDateTimeString(){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        return sdf.format(date);
     }
 
 }

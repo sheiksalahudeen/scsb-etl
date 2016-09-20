@@ -34,14 +34,20 @@ public class DataDumpZipFileRouteBuilderUT extends BaseTestCase {
         String requestingInstituionCode = "NYPL";
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,requestingInstituionCode);
         BibRecords bibRecords = new BibRecords();
+        String dateTimeString = getDateTimeString();
+        routeMap.put(ReCAPConstants.DATETIME_FOLDER,dateTimeString);
         producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q,bibRecords,"routeMap",routeMap);
         Thread.sleep(2000);
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy");
-        String day = sdf.format(date);
-        File file = new File(dumpDirectoryPath + File.separator + requestingInstituionCode+ File.separator +day+ File.separator +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
+        String filename = dumpDirectoryPath + File.separator + requestingInstituionCode+ File.separator +dateTimeString+ File.separator +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+dateTimeString+ ReCAPConstants.ZIP_FILE_FORMAT;
+        File file = new File(filename);
         boolean fileExists = file.exists();
         assertTrue(fileExists);
         file.delete();
+    }
+
+    private String getDateTimeString(){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        return sdf.format(date);
     }
 }
