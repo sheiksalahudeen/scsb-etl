@@ -16,7 +16,7 @@ public class Main {
     String timeZone;
 
     @Bean
-    public TimeZone setEstTime() {
+    public TimeZone setTime() {
         TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
         return TimeZone.getDefault();
     }

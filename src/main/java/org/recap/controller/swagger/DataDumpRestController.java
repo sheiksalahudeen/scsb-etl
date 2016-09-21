@@ -68,7 +68,7 @@ public class DataDumpRestController {
     }
 
     private ResponseEntity startExportDumpProcess(DataDumpRequest dataDumpRequest, ResponseEntity responseEntity){
-
+        HttpHeaders responseHeaders = new HttpHeaders();
         ExportDataDumpExecutorService exportDataDumpExecutorService = appContext.getBean(ExportDataDumpExecutorService.class);
         String outputString = null;
         try {
@@ -89,7 +89,9 @@ public class DataDumpRestController {
             responseEntity = getResponseEntity(outputString,dataDumpRequest);
         }catch (Exception e) {
             logger.error(e.getMessage());
-            responseEntity = new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, HttpStatus.BAD_REQUEST);
+            String date= new Date().toString();
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
+            responseEntity = new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE,responseHeaders, HttpStatus.BAD_REQUEST);
         }
         return responseEntity;
     }
@@ -158,6 +160,7 @@ public class DataDumpRestController {
 
     private  ResponseEntity validateIncomingRequest(DataDumpRequest dataDumpRequest){
         ResponseEntity responseEntity = null;
+        HttpHeaders responseHeaders = new HttpHeaders();
         Map<Integer,String> erroMessageMap = new HashMap<>();
         Integer errorcount = 1;
         if(dataDumpRequest.getInstitutionCodes().size()>0){
@@ -206,7 +209,9 @@ public class DataDumpRestController {
             }
         }
         if(erroMessageMap.size()>0){
-            responseEntity = new ResponseEntity(buildErrorMessage(erroMessageMap),HttpStatus.BAD_REQUEST);
+            String date= new Date().toString();
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
+            responseEntity = new ResponseEntity(buildErrorMessage(erroMessageMap),responseHeaders,HttpStatus.BAD_REQUEST);
         }
         return responseEntity;
     }
