@@ -42,21 +42,22 @@ public class ExportDataDumpExecutorService {
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Value("${data.dump.email.nypl.to}")
-    String dataDumpEmailNyplTo;
+    private String dataDumpEmailNyplTo;
 
     @Value("${data.dump.email.pul.to}")
-    String dataDumpEmailPulTo;
+    private String dataDumpEmailPulTo;
 
     @Value("${data.dump.email.cul.to}")
-    String dataDumpEmailCulTo;
+    private String dataDumpEmailCulTo;
 
     @Value("${etl.dump.directory}")
-    String fileSystemDataDumpDirectory;
+    private String fileSystemDataDumpDirectory;
 
     @Value("${ftp.datadump.remote.server}")
-    String ftpDataDumpDirectory;
+    private String ftpDataDumpDirectory;
 
-    private StopWatch stopWatch;
+    @Value("${datadump.httpresponse.record.limit}")
+    private String httpResonseRecordLimit;
 
     private int limitPage;
 
@@ -81,59 +82,71 @@ public class ExportDataDumpExecutorService {
             String limitPageString = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE);
             limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
             int loopCount = limitPageString == null ? getLoopCount(totalRecordCount,batchSize):(Integer.parseInt(limitPageString));
-
-            if(logger.isInfoEnabled()){
-                logger.info("Total no. of records "+totalRecordCount);
-                int recordsToExport = 0;
-                if (limitPage == 0) {
-                    recordsToExport = totalRecordCount.intValue();
-                } else {
-                    recordsToExport = totalRecordCount > ((limitPage)*batchSize)?((limitPage)*batchSize) : totalRecordCount.intValue();
-                }
-                logger.info("Total no. of records to be exported based on page limit - "+recordsToExport);
-                logger.info("Records per file - "+batchSize);
-            }
-            setExecutorService(noOfThreads);
-            for(int pageNum = 0;pageNum < loopCount;pageNum++){
-                StopWatch stopWatchPerFile = new StopWatch();
-                stopWatchPerFile.start();
-                Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
-                BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
-                String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode() + (pageNum+1);
-                routeMap.put(ReCAPConstants.DATETIME_FOLDER, dateTimeStringForFolder);
-                routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
-                routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
-                if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
-                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q, bibRecords, "routeMap",routeMap);
-                } else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)){
-                    producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q, bibRecords, "routeMap",routeMap);
-                } else {
-                    bibRecordsForIncremental.getBibRecords().addAll(bibRecords.getBibRecords());
-                }
-                stopWatchPerFile.stop();
+            boolean canProcess = canProcessRecords(totalRecordCount,dataDumpRequest.getTransmissionType());
+            if (canProcess) {
                 if(logger.isInfoEnabled()){
-                    logger.info("Total time taken to export file no. "+(pageNum+1)+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
-                    logger.info("File no. "+(pageNum+1)+" exported");
+                    logger.info("Total no. of records "+totalRecordCount);
+                    int recordsToExport = 0;
+                    if (limitPage == 0) {
+                        recordsToExport = totalRecordCount.intValue();
+                    } else {
+                        recordsToExport = totalRecordCount > ((limitPage)*batchSize)?((limitPage)*batchSize) : totalRecordCount.intValue();
+                    }
+                    logger.info("Total no. of records to be exported based on page limit - "+recordsToExport);
+                    logger.info("Records per file - "+batchSize);
                 }
-            }
-            if(dataDumpRequest.getTransmissionType()==ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP && bibRecordsForIncremental.getBibRecords().size()>0){
-                outputString = JAXBHandler.getInstance().marshal(bibRecordsForIncremental);
-            }
-            getExecutorService().shutdownNow();
-            stopWatch.stop();
-            if(logger.isInfoEnabled()){
-                logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
-            }
-            generateDataDumpReport(dataDumpRequest,totalRecordCount);
-            if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
-                    || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
-                sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder);
+                setExecutorService(noOfThreads);
+                for(int pageNum = 0;pageNum < loopCount;pageNum++){
+                    StopWatch stopWatchPerFile = new StopWatch();
+                    stopWatchPerFile.start();
+                    Callable callable = getExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
+                    BibRecords bibRecords = getExecutorService().submit(callable) == null ? null : (BibRecords)getExecutorService().submit(callable).get();
+                    String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode() + (pageNum+1);
+                    routeMap.put(ReCAPConstants.DATETIME_FOLDER, dateTimeStringForFolder);
+                    routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
+                    routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
+                    if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+                        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q, bibRecords, "routeMap",routeMap);
+                    } else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)){
+                        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q, bibRecords, "routeMap",routeMap);
+                    } else {
+                        bibRecordsForIncremental.getBibRecords().addAll(bibRecords.getBibRecords());
+                    }
+                    stopWatchPerFile.stop();
+                    if(logger.isInfoEnabled()){
+                        logger.info("Total time taken to export file no. "+(pageNum+1)+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
+                        logger.info("File no. "+(pageNum+1)+" exported");
+                    }
+                }
+                if(dataDumpRequest.getTransmissionType()==ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP && bibRecordsForIncremental.getBibRecords().size()>0){
+                    outputString = JAXBHandler.getInstance().marshal(bibRecordsForIncremental);
+                }
+                getExecutorService().shutdownNow();
+                stopWatch.stop();
+                if(logger.isInfoEnabled()){
+                    logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
+                }
+                generateDataDumpReport(dataDumpRequest,totalRecordCount);
+                if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                        || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+                    sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder);
+                }
+            } else {
+                outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
             }
         } catch (IllegalStateException |InterruptedException | ExecutionException | CamelExecutionException e) {
             logger.error(e.getMessage());
             stopWatch.stop();
         }
         return outputString;
+    }
+
+    private boolean canProcessRecords(Long totalRecordCount, Integer transmissionType ){
+        boolean canProcess = true;
+        if(totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType == (ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)){
+            canProcess = false;
+        }
+        return canProcess;
     }
 
     private String getDateTimeString(){
