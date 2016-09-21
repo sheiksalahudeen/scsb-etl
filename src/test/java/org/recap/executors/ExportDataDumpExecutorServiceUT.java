@@ -268,18 +268,15 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
-        String fileName = "ReCAPCollectionFor";
+        String fileName = "ReCAPCollectionForNYPL";
         Map<String,String> routeMap = new HashMap<>();
         routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
         String requestingInstitutionCode = dataDumpRequest.getRequestingInstitutionCode();
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE, requestingInstitutionCode);
         String dateTimeString = getDateTimeString();
         routeMap.put(ReCAPConstants.DATETIME_FOLDER,dateTimeString);
-        //producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q, bibRecords, "routeMap", routeMap);
         producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q, bibRecords, "routeMap", routeMap);
         Thread.sleep(5000);
-        Format formatter = new SimpleDateFormat("ddMMMyyyy");
-        String path = formatter.format(new Date());
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+File.separator+requestingInstitutionCode+File.separator+dateTimeString;
         System.out.println("ftpDataDumpRemoteServer------>"+ftpDataDumpRemoteServer);
 

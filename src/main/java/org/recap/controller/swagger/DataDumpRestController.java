@@ -72,10 +72,7 @@ public class DataDumpRestController {
         ExportDataDumpExecutorService exportDataDumpExecutorService = appContext.getBean(ExportDataDumpExecutorService.class);
         String outputString = null;
         try {
-            if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL || (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL
-                    && dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
-                    ||(dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL
-                    && dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+            if ((dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)) {
                 new Thread(() -> {
                     try {
                         exportDataDumpExecutorService.exportDump(dataDumpRequest);
@@ -83,7 +80,7 @@ public class DataDumpRestController {
                         e.printStackTrace();
                     }
                 }).start();
-            } else if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL && dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) {
+            } else if (dataDumpRequest.getTransmissionType() == ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) {
                 outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
             }
             responseEntity = getResponseEntity(outputString,dataDumpRequest);
@@ -189,11 +186,6 @@ public class DataDumpRestController {
                 erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
             }
-        }
-        if(dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_FULL
-                && dataDumpRequest.getTransmissionType()== ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP){
-            erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_FULL_VALID_TRANS_TYPE);
-            errorcount++;
         }
         if (dataDumpRequest.getFetchType() == ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) {
             if (dataDumpRequest.getDate() == null) {

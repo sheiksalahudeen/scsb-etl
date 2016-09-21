@@ -44,8 +44,8 @@ public class DataDumpZipFileToFtpRouteBuilderUT extends BaseTestCase {
     @Test
     public void testZipAndFtp() throws Exception {
         Map<String,String> routeMap = new HashMap<>();
-        routeMap.put(ReCAPConstants.CAMELFILENAME,ReCAPConstants.DATA_DUMP_FILE_NAME);
         String requestingInstituionCode = "NYPL";
+        routeMap.put(ReCAPConstants.CAMELFILENAME,ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode);
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,requestingInstituionCode);
         BibRecords bibRecords = new BibRecords();
         String dateTimeString = getDateTimeString();
