@@ -225,7 +225,6 @@ public class DataDumpRestController {
             return new ResponseEntity(ReCAPConstants.DATADUMP_PROCESS_STARTED,responseHeaders,HttpStatus.OK);
         }else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null){
             String date= new Date().toString();
-            responseHeaders.add("responseMessage", ReCAPConstants.DATADUMP_EXPORT_SUCCESS);
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
             return new ResponseEntity(outputString,responseHeaders, HttpStatus.OK);
         }else if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && !dataDumpRequest.isRecordsAvailable()){
