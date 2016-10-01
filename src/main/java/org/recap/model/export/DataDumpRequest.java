@@ -8,14 +8,17 @@ import java.util.List;
 public class DataDumpRequest {
 
     private List<String> institutionCodes;
-    private Integer fetchType;
+    private String fetchType;
     private String date;
     private int noOfThreads;
     private int batchSize;
     private boolean isRecordsAvailable;
     private List<Integer> collectionGroupIds;
-    private Integer transmissionType;
+    private String transmissionType;
     private String requestingInstitutionCode;
+    private String outputFormat;
+    private String fileFormat;
+    private String dateTimeString;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;
@@ -25,11 +28,11 @@ public class DataDumpRequest {
         this.institutionCodes = institutionCodes;
     }
 
-    public Integer getFetchType() {
+    public String getFetchType() {
         return fetchType;
     }
 
-    public void setFetchType(Integer fetchType) {
+    public void setFetchType(String fetchType) {
         this.fetchType = fetchType;
     }
 
@@ -73,11 +76,11 @@ public class DataDumpRequest {
         this.collectionGroupIds = collectionGroupIds;
     }
 
-    public Integer getTransmissionType() {
+    public String getTransmissionType() {
         return transmissionType;
     }
 
-    public void setTransmissionType(Integer transmissionType) {
+    public void setTransmissionType(String transmissionType) {
         this.transmissionType = transmissionType;
     }
 
@@ -87,5 +90,29 @@ public class DataDumpRequest {
 
     public void setRequestingInstitutionCode(String requestingInstitutionCode) {
         this.requestingInstitutionCode = requestingInstitutionCode;
+    }
+
+    public String getOutputFormat() {
+        return outputFormat;
+    }
+
+    public void setOutputFormat(String outputFormat) {
+        this.outputFormat = outputFormat;
+    }
+
+    public String getFileFormat() {
+        return fileFormat;
+    }
+
+    public void setFileFormat(String fileFormat) {
+        this.fileFormat = fileFormat;
+    }
+
+    public String getDateTimeString() {
+        return dateTimeString;
+    }
+
+    public void setDateTimeString(String dateTimeString) {
+        this.dateTimeString = dateTimeString;
     }
 }

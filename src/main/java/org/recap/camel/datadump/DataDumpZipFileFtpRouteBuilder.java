@@ -1,4 +1,4 @@
-package org.recap.camel;
+package org.recap.camel.datadump;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
@@ -17,9 +17,9 @@ import java.io.File;
  * Created by premkb on 15/9/16.
  */
 @Component
-public class DataDumpZipFileToFtpRouteBuilder extends RouteBuilder {
+public class DataDumpZipFileFtpRouteBuilder extends RouteBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataDumpZipFileToFtpRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpZipFileFtpRouteBuilder.class);
 
     @Value("${ftp.userName}")
     String ftpUserName;
@@ -38,12 +38,9 @@ public class DataDumpZipFileToFtpRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        JAXBContext context = JAXBContext.newInstance(BibRecords.class);
-        JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
-        jaxbDataFormat.setContext(context);
         ZipFileDataFormat zip = new ZipFileDataFormat();
-        from(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q).marshal(jaxbDataFormat).marshal(zip)
-                .to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${header.routeMap[dateTimeFolder]}/${header.routeMap[CamelFileName]}-${date:now:ddMMMyyyyHHmm}.zip" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
+        from(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q)
+                .to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${header.routeMap[dateTimeFolder]}/${header.routeMap[fileName]}-${date:now:ddMMMyyyyHHmm}${header.routeMap[fileFormat]}" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
         ;
     }
 }

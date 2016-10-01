@@ -176,7 +176,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void countByInstitutionCodes() throws Exception {
+    public void countRecordsForFullDump() throws Exception {
         Random random = new Random();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -226,7 +226,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
-        Long count = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodes);
+        Long count = bibliographicDetailsRepository.countRecordsForFullDump(cgIds,institutionCodes,0);
         assertEquals(new Long(1),count);
     }
 
@@ -359,22 +359,22 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodesPUL = new ArrayList<>();
         institutionCodesPUL.add("PUL");
-        Long countPUL = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodesPUL);
+        Long countPUL = bibliographicDetailsRepository.countRecordsForFullDump(cgIds,institutionCodesPUL,0);
         assertEquals(new Long(1),countPUL);
 
         List<String> institutionCodesCUL = new ArrayList<>();
         institutionCodesCUL.add("CUL");
-        Long countCUL = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodesCUL);
+        Long countCUL = bibliographicDetailsRepository.countRecordsForFullDump(cgIds,institutionCodesCUL,0);
         assertEquals(new Long(1),countCUL);
 
         List<String> institutionCodesNYPL = new ArrayList<>();
         institutionCodesNYPL.add("NYPL");
-        Long countNYPL = bibliographicDetailsRepository.countByInstitutionCodes(cgIds,institutionCodesNYPL);
+        Long countNYPL = bibliographicDetailsRepository.countRecordsForFullDump(cgIds,institutionCodesNYPL,0);
         assertEquals(new Long(1),countNYPL);
     }
 
     @Test
-    public void countByInstitutionCodesAndLastUpdatedDate() throws Exception {
+    public void countRecordsForIncrementalDump() throws Exception {
         Random random = new Random();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -424,13 +424,13 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
-        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
-        Long count = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(cgIds,institutionCodes,inputDate);
+        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Long count = bibliographicDetailsRepository.countRecordsForIncrementalDump(cgIds,institutionCodes,inputDate,0);
         assertEquals(new Long(1),count);
     }
 
     @Test
-    public void findByInstitutionCodeAndLastUpdatedDate() throws Exception {
+    public void getRecordsForIncrementalDump() throws Exception {
         Random random = new Random();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -479,8 +479,8 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
-        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
-        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodeAndLastUpdatedDate(new PageRequest(0, 10),cgIds,institutionCodes,inputDate);
+        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.getRecordsForIncrementalDump(new PageRequest(0, 10),cgIds,institutionCodes,inputDate,0);
         List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
         assertNotNull(bibliographicEntityList);
         assertEquals(1,bibliographicEntityList.size());
@@ -492,7 +492,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void findByInstitutionCodes() throws Exception {
+    public void getRecordsForFullDump() throws Exception {
         Random random = new Random();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -541,7 +541,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
-        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByInstitutionCodes(new PageRequest(0, 10),cgIds,institutionCodes);
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.getRecordsForFullDump(new PageRequest(0, 10),cgIds,institutionCodes,0);
         List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
         assertNotNull(bibliographicEntityList);
         assertEquals(1,bibliographicEntityList.size());
@@ -549,5 +549,241 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         assertEquals("callNum",bibliographicEntityList.get(0).getItemEntities().get(0).getCallNumber());
         assertEquals("0",bibliographicEntityList.get(0).getItemEntities().get(0).getCallNumberType());
         assertEquals(new Integer(1),bibliographicEntityList.get(0).getItemEntities().get(0).getCollectionGroupId());
+    }
+
+    @Test
+    public void getDeletedRecordsForFullDump() throws Exception {
+        Random random = new Random();
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent("Mock Bib Content".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setOwningInstitutionId(1);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("1231");
+        itemEntity.setOwningInstitutionItemId(".i1231");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setIsDeleted(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
+
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.getDeletedRecordsForFullDump(new PageRequest(0, 10),cgIds,institutionCodes,1);
+        List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
+        assertNotNull(bibliographicEntityList);
+        assertEquals(1,bibliographicEntityList.size());
+        assertEquals(new Integer(1),bibliographicEntityList.get(0).getOwningInstitutionId());
+        assertEquals("callNum",bibliographicEntityList.get(0).getItemEntities().get(0).getCallNumber());
+        assertEquals("0",bibliographicEntityList.get(0).getItemEntities().get(0).getCallNumberType());
+        assertEquals(new Integer(1),bibliographicEntityList.get(0).getItemEntities().get(0).getCollectionGroupId());
+    }
+
+    @Test
+    public void getDeletedRecordsForIncrementalDump() throws Exception {
+        Random random = new Random();
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent("Mock Bib Content".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setOwningInstitutionId(1);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("1231");
+        itemEntity.setOwningInstitutionItemId(".i1231");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setIsDeleted(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
+
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("PUL");
+        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.getDeletedRecordsForIncrementalDump(new PageRequest(0, 10),cgIds,institutionCodes,inputDate,1);
+        List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
+        assertNotNull(bibliographicEntityList);
+        assertEquals(1,bibliographicEntityList.size());
+        assertEquals(new Integer(1),bibliographicEntityList.get(0).getOwningInstitutionId());
+        assertEquals("callNum",bibliographicEntityList.get(0).getItemEntities().get(0).getCallNumber());
+        assertEquals("0",bibliographicEntityList.get(0).getItemEntities().get(0).getCallNumberType());
+        assertEquals(new Integer(1),bibliographicEntityList.get(0).getItemEntities().get(0).getCollectionGroupId());
+    }
+
+    @Test
+    public void countDeletedRecordsForFullDump() throws Exception {
+        Random random = new Random();
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent("Mock Bib Content".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setOwningInstitutionId(3);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(3);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("1231");
+        itemEntity.setOwningInstitutionItemId(".i1231");
+        itemEntity.setOwningInstitutionId(3);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setIsDeleted(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
+
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
+        Long count = bibliographicDetailsRepository.countDeletedRecordsForFullDump(cgIds,institutionCodes,1);
+        assertEquals(new Long(1),count);
+    }
+
+    @Test
+    public void countDeletedRecordsForIncremental() throws Exception {
+        Random random = new Random();
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent("Mock Bib Content".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setOwningInstitutionId(3);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setOwningInstitutionId(3);
+        holdingsEntity.setLastUpdatedBy("etl");
+
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("1231");
+        itemEntity.setOwningInstitutionItemId(".i1231");
+        itemEntity.setOwningInstitutionId(3);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setIsDeleted(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
+
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("NYPL");
+        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Long count = bibliographicDetailsRepository.countDeletedRecordsForIncremental(cgIds,institutionCodes,inputDate,1);
+        assertEquals(new Long(1),count);
     }
 }

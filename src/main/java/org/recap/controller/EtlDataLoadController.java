@@ -152,7 +152,7 @@ public class EtlDataLoadController {
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         Date to = cal.getTime();
-        String generatedReportFileName = reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(),
+        String generatedReportFileName = reportGenerator.generateReport(etlLoadRequest.getReportFileName(), etlLoadRequest.getOperationType(),etlLoadRequest.getReportType(), etlLoadRequest.getReportInstitutionName(),
                 from, to, etlLoadRequest.getTransmissionType());
         if(StringUtils.isBlank(generatedReportFileName)){
             logger.error("Report wasn't generated! Please contact help desk!");

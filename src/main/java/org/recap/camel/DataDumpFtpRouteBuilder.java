@@ -40,7 +40,7 @@ public class DataDumpFtpRouteBuilder extends RouteBuilder {
         JAXBContext context = JAXBContext.newInstance(BibRecords.class);
         JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
         jaxbDataFormat.setContext(context);
-        from(ReCAPConstants.DATA_DUMP_FTP_Q).marshal(jaxbDataFormat).to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
+        from(ReCAPConstants.DATDUMP_FTP_Q).marshal(jaxbDataFormat).to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
                 .end();
     }
 }

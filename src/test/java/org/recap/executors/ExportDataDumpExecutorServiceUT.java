@@ -1,28 +1,13 @@
 package org.recap.executors;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.model.etl.BibPersisterCallable;
-import org.recap.model.export.DataDumpRequest;
-import org.recap.model.jaxb.BibRecord;
-import org.recap.model.jaxb.JAXBHandler;
-import org.recap.model.jaxb.marc.BibRecords;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.XmlRecordEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DBReportUtil;
-import org.recap.util.DataDumpUtil;
-import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
@@ -100,7 +78,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         limitPage = System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE)==null ? 0 : Integer.parseInt(System.getProperty(ReCAPConstants.DATADUMP_LIMIT_PAGE));
         MockitoAnnotations.initMocks(this);
     }
-
+/*
     @Test
     public void getFullDumpWithSingleThread()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
@@ -181,7 +159,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setDate(inputDate);
         dataDumpRequest.setTransmissionType(2);
         String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -214,7 +192,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setDate(inputDate);
         dataDumpRequest.setTransmissionType(2);
         String outputString = exportDataDumpExecutorService.exportDump(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM));
+        Long totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),institutionCodes, DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = limitPage == 0 ? getLoopCount(totalRecordCount,batchSize):(limitPage-1);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -237,7 +215,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
 
     @Test
     public void uploadDataDumpXmlToFTP()throws Exception{
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        SCSBSchemaDataDumpUtil SCSBSchemaDataDumpUtil = new SCSBSchemaDataDumpUtil();
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
@@ -267,7 +245,7 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(bibliographicEntityList);
+        BibRecords bibRecords = SCSBSchemaDataDumpUtil.getBibRecords(bibliographicEntityList);
         String fileName = "ReCAPCollectionForNYPL";
         Map<String,String> routeMap = new HashMap<>();
         routeMap.put(ReCAPConstants.CAMELFILENAME,fileName);
@@ -333,6 +311,6 @@ public class ExportDataDumpExecutorServiceUT extends BaseTestCase {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);
-    }
+    }*/
 
 }

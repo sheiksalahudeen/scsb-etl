@@ -1,4 +1,4 @@
-package org.recap.camel;
+package org.recap.camel.datadump;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
  * Created by premkb on 15/9/16.
  */
 
-public class DataDumpZipFileToFtpRouteBuilderUT extends BaseTestCase {
+public class DataDumpZipFileFtpRouteBuilderUT extends BaseTestCase {
 
     @Autowired
     ProducerTemplate producer;
@@ -45,12 +45,12 @@ public class DataDumpZipFileToFtpRouteBuilderUT extends BaseTestCase {
     public void testZipAndFtp() throws Exception {
         Map<String,String> routeMap = new HashMap<>();
         String requestingInstituionCode = "NYPL";
-        routeMap.put(ReCAPConstants.CAMELFILENAME,ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode);
+        routeMap.put(ReCAPConstants.FILENAME,ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode);
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,requestingInstituionCode);
         BibRecords bibRecords = new BibRecords();
         String dateTimeString = getDateTimeString();
         routeMap.put(ReCAPConstants.DATETIME_FOLDER,dateTimeString);
-        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_TO_FTP_Q,bibRecords,"routeMap",routeMap);
+        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q,bibRecords,"routeMap",routeMap);
         String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+dateTimeString+ReCAPConstants.ZIP_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+"NYPL"+File.separator+dateTimeString;
         camelContext.addRoutes(new RouteBuilder() {

@@ -14,6 +14,7 @@ import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.util.datadump.BibRecordConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,13 +181,13 @@ public class DataDumpUtilUT extends BaseTestCase {
 
     @Test
     public void getBibRecords() throws Exception{
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        BibRecordConverter BibRecordConverter = new BibRecordConverter();
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(getBibliographicEntity()));
+        BibRecords bibRecords = BibRecordConverter.getBibRecords(Arrays.asList(getBibliographicEntity()));
         assertNotNull(bibRecords);
         assertNotNull(bibRecords.getBibRecords());
         assertNotNull(bibRecords.getBibRecords().get(0).getBib());
@@ -213,7 +214,7 @@ public class DataDumpUtilUT extends BaseTestCase {
 
     @Test
     public void saveAndGenerateDump() throws Exception {
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        BibRecordConverter BibRecordConverter = new BibRecordConverter();
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Open")).thenReturn(2);
@@ -250,7 +251,7 @@ public class DataDumpUtilUT extends BaseTestCase {
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(getBibliographicEntity()));
+        BibRecords bibRecords = BibRecordConverter.getBibRecords(Arrays.asList(getBibliographicEntity()));
 
         String xmlContent = JAXBHandler.getInstance().marshal(bibRecords);
         assertNotNull(xmlContent);
@@ -262,7 +263,7 @@ public class DataDumpUtilUT extends BaseTestCase {
 
     @Test
     public void saveAndGenerateDumpForMultipleItems() throws Exception {
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        BibRecordConverter BibRecordConverter = new BibRecordConverter();
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Shared")).thenReturn(1);
@@ -300,7 +301,7 @@ public class DataDumpUtilUT extends BaseTestCase {
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(fetchedBibliographicEntity));
+        BibRecords bibRecords = BibRecordConverter.getBibRecords(Arrays.asList(fetchedBibliographicEntity));
 
         String xmlContent = JAXBHandler.getInstance().marshal(bibRecords);
         assertNotNull(xmlContent);
@@ -312,7 +313,7 @@ public class DataDumpUtilUT extends BaseTestCase {
 
     @Test
     public void saveAndGenerateDumpForMultipleHoldings() throws Exception {
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        BibRecordConverter BibRecordConverter = new BibRecordConverter();
         Mockito.when(institutionMap.get("NYPL")).thenReturn(3);
         Mockito.when(itemStatusMap.get("Available")).thenReturn(1);
         Mockito.when(collectionGroupMap.get("Shared")).thenReturn(1);
@@ -350,7 +351,7 @@ public class DataDumpUtilUT extends BaseTestCase {
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(fetchedBibliographicEntity));
+        BibRecords bibRecords = BibRecordConverter.getBibRecords(Arrays.asList(fetchedBibliographicEntity));
 
         String xmlContent = JAXBHandler.getInstance().marshal(bibRecords);
         assertNotNull(xmlContent);
@@ -362,7 +363,7 @@ public class DataDumpUtilUT extends BaseTestCase {
 
     @Test
     public void avoidPrivate()throws Exception{
-        DataDumpUtil dataDumpUtil = new DataDumpUtil();
+        BibRecordConverter BibRecordConverter = new BibRecordConverter();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent(bibContent.getBytes());
         bibliographicEntity.setCreatedDate(new Date());
@@ -470,7 +471,7 @@ public class DataDumpUtilUT extends BaseTestCase {
         cgIds.add(1);
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
-        BibRecords bibRecords = dataDumpUtil.getBibRecords(Arrays.asList(savedBibliographicEntity));
+        BibRecords bibRecords = BibRecordConverter.getBibRecords(Arrays.asList(savedBibliographicEntity));
         List<BibRecord> bibRecordList = bibRecords.getBibRecords();
         assertEquals(2,bibRecordList.get(0).getHoldings().size());
     }

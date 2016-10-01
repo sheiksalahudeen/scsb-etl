@@ -28,7 +28,7 @@ public class DataDumpFileSystemRouteBuilder extends RouteBuilder {
         JAXBContext context = JAXBContext.newInstance(BibRecords.class);
         JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
         jaxbDataFormat.setContext(context);
-        from(ReCAPConstants.DATA_DUMP_FILE_SYSTEM_Q).marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator +"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml")
+        from(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q).marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator +"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml")
                .end();
     }
 }

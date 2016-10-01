@@ -2,6 +2,8 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
+import org.recap.ReCAPConstants;
+import org.recap.camel.datadump.DataDumpFailureReportFtpRouteBuilder;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +43,26 @@ public class ReportGenerator {
     @Autowired
     FTPSuccessReportGenerator ftpSuccessReportGenerator;
 
+    @Autowired
+    CSVDataDumpSuccessReportGenreator csvDataDumpSuccessReportGenreator;
+
+    @Autowired
+    CSVDataDumpFailureReportGenreator csvDataDumpFailureReportGenreator;
+
+    @Autowired
+    FTPDataDumpSuccessReportGenerator ftpDataDumpSuccessReportGenerator;
+
+    @Autowired
+    FTPDataDumpFailureReportGenerator ftpDataDumpFailureReportGenerator;
+
     List<ReportGeneratorInterface> reportGenerators;
 
-    public String generateReport(String fileName, String reportType, String institutionName, Date from, Date to, String transmissionType) {
+    public String generateReport(String fileName, String operationType, String reportType, String institutionName, Date from, Date to, String transmissionType) {
 
         List<ReportEntity> reportEntities;
+        if(operationType.equals(ReCAPConstants.OPERATION_TYPE_DATADUMP)){
+            reportType = operationType+"-"+reportType;
+        }
         if(StringUtils.isNotBlank(fileName)) {
             reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         } else {
@@ -55,7 +72,8 @@ public class ReportGenerator {
 
         for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
-            if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
+            if(reportGeneratorInterface.isOperationType(operationType) && reportGeneratorInterface.isInterested(reportType)
+                    && reportGeneratorInterface.isTransmitted(transmissionType)){
                 String generatedFileName = reportGeneratorInterface.generateReport(reportEntities, fileName);
                 return generatedFileName;
             }
@@ -72,6 +90,10 @@ public class ReportGenerator {
             reportGenerators.add(csvSuccessReportGenerator);
             reportGenerators.add(ftpFailureReportGenerator);
             reportGenerators.add(ftpSuccessReportGenerator);
+            reportGenerators.add(csvDataDumpSuccessReportGenreator);
+            reportGenerators.add(csvDataDumpFailureReportGenreator);
+            reportGenerators.add(ftpDataDumpSuccessReportGenerator);
+            reportGenerators.add(ftpDataDumpFailureReportGenerator);
         }
         return reportGenerators;
     }

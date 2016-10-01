@@ -1,4 +1,4 @@
-package org.recap.util;
+package org.recap.util.datadump;
 
 import org.recap.ReCAPConstants;
 import org.recap.model.jaxb.*;
@@ -8,6 +8,8 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.xml.bind.JAXBException;
@@ -19,9 +21,11 @@ import java.util.List;
 /**
  * Created by chenchulakshmig on 5/8/16.
  */
-public class DataDumpUtil {
+@Service
+@Scope("prototype")
+public class BibRecordConverter {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataDumpUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibRecordConverter.class);
     public BibRecords getBibRecords(List<BibliographicEntity> bibliographicEntities) {
         BibRecords bibRecords = new BibRecords();
         List<BibRecord> bibRecordList = getBibRecordList(bibliographicEntities);

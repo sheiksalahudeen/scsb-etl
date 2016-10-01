@@ -5,7 +5,6 @@ import org.recap.ReCAPConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBContext;
 import java.io.File;
 
 /**
@@ -19,7 +18,7 @@ public class DataDumpReportFileSystemRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from(ReCAPConstants.DATA_DUMP_REPORT_FILE_SYSTEM_Q).marshal().string().to("file:" + dumpDirectoryPath + File.separator +"?fileName=${header.reportMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.reportMap[fileName]}-${date:now:ddMMMyyyy}.txt")
+        from(ReCAPConstants.DATADUMP_REPORT_FILE_SYSTEM_Q).marshal().string().to("file:" + dumpDirectoryPath + File.separator +"?fileName=${header.reportMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.reportMap[fileName]}-${date:now:ddMMMyyyy}.txt")
                 .end();
     }
 }

@@ -83,6 +83,9 @@ public class ItemEntity implements Serializable{
     @ManyToMany(mappedBy = "itemEntities")
     private List<BibliographicEntity> bibliographicEntities;
 
+    @Column(name = "IS_DELETED")
+    private Integer isDeleted;
+
     public ItemEntity() {
     }
 
@@ -253,6 +256,14 @@ public class ItemEntity implements Serializable{
 
     public void setLastUpdatedBy(String lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }
 

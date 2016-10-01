@@ -1,4 +1,4 @@
-package org.recap.camel;
+package org.recap.camel.datadump;
 
 import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
@@ -31,12 +31,12 @@ public class DataDumpZipFileRouteBuilderUT extends BaseTestCase {
     public void testZipFile() throws InterruptedException {
         Map<String,String> routeMap = new HashMap<>();
         String requestingInstituionCode = "NYPL";
-        routeMap.put(ReCAPConstants.CAMELFILENAME,ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode);
+        routeMap.put(ReCAPConstants.FILENAME,ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode);
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,requestingInstituionCode);
         BibRecords bibRecords = new BibRecords();
         String dateTimeString = getDateTimeString();
         routeMap.put(ReCAPConstants.DATETIME_FOLDER,dateTimeString);
-        producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_ZIP_FILE_Q,bibRecords,"routeMap",routeMap);
+        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_ZIPALLFILE_FILESYSTEM_Q,bibRecords,"routeMap",routeMap);;
         Thread.sleep(2000);
         String filename = dumpDirectoryPath + File.separator + requestingInstituionCode+ File.separator +dateTimeString+ File.separator +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+dateTimeString+ ReCAPConstants.ZIP_FILE_FORMAT;
         File file = new File(filename);

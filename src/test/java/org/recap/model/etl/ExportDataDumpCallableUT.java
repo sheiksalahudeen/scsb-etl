@@ -155,7 +155,7 @@ public class ExportDataDumpCallableUT extends BaseTestCase {
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setBatchSize(batchSize);
-        dataDumpRequest.setFetchType(0);
+        dataDumpRequest.setFetchType("0");
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);
         cgIds.add(2);

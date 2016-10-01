@@ -141,9 +141,9 @@ public class ExportDataDumpExecutorService {
         return outputString;
     }
 
-    private boolean canProcessRecords(Long totalRecordCount, Integer transmissionType ){
+    private boolean canProcessRecords(Long totalRecordCount, String transmissionType ){
         boolean canProcess = true;
-        if(totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType == (ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)){
+        if(totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)){
             canProcess = false;
         }
         return canProcess;
@@ -155,7 +155,7 @@ public class ExportDataDumpExecutorService {
         return sdf.format(date);
     }
 
-    private void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, Integer transmissionType,String dateTimeStringForFolder) {
+    private void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, String transmissionType, String dateTimeStringForFolder) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
         emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode,dateTimeStringForFolder));
@@ -164,7 +164,7 @@ public class ExportDataDumpExecutorService {
         producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
     }
 
-    private String getLocation(Integer transmissionType, String requestingInstitutionCode,String dateTimeStringForFolder) {
+    private String getLocation(String transmissionType, String requestingInstitutionCode, String dateTimeStringForFolder) {
         String location = null;
         if (transmissionType.equals(0)) {
             location = "FTP location - " + ftpDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + dateTimeStringForFolder;
@@ -192,9 +192,9 @@ public class ExportDataDumpExecutorService {
         reportMap.put(ReCAPConstants.REQUESTING_INST_CODE,dataDumpRequest.getRequestingInstitutionCode());
         String reportString = "Total no. of Bibs exported : "+totalRecordCount;
         if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
-            producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_REPORT_FTP_Q, reportString, "reportMap",reportMap);
+            producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_REPORT_FTP_Q, reportString, "reportMap",reportMap);
         }else{
-            producer.sendBodyAndHeader(ReCAPConstants.DATA_DUMP_REPORT_FILE_SYSTEM_Q, reportString, "reportMap",reportMap);
+            producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_REPORT_FILE_SYSTEM_Q, reportString, "reportMap",reportMap);
         }
     }
 
@@ -207,13 +207,13 @@ public class ExportDataDumpExecutorService {
 
     private Long getTotalRecordCount(DataDumpRequest dataDumpRequest){
         Long totalRecordCount = new Long(0);
-        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_MMDDYYYHHMM);
+        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
         if(dataDumpRequest.getFetchType() != null){
-            if(dataDumpRequest.getFetchType() == 0){
+/*            if(dataDumpRequest.getFetchType() == 0){
                 totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodes(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
             }else if(dataDumpRequest.getFetchType() == 1 ){
                 totalRecordCount = bibliographicDetailsRepository.countByInstitutionCodesAndLastUpdatedDate(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), inputDate);
-            }
+            }*/
         }
         logger.info("totalRecordCount----->"+totalRecordCount);
         return totalRecordCount;
