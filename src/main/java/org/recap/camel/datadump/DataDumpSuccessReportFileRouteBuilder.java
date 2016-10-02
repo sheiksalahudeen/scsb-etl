@@ -35,25 +35,4 @@ public class DataDumpSuccessReportFileRouteBuilder {
             e.printStackTrace();
         }
     }
-/*    @Value("${ftp.userName}")
-    String ftpUserName;
-
-    @Value("${ftp.knownHost}")
-    String ftpKnownHost;
-
-    @Value("${ftp.privateKey}")
-    String ftpPrivateKey;
-
-    @Value("${ftp.datadump.remote.server}")
-    String ftpDataDumpRemoteServer;
-
-    @Value("${etl.dump.directory}")
-    private String dumpDirectoryPath;
-
-    @Override
-    public void configure() throws Exception {
-        from(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
-                .to("file:"+dumpDirectoryPath + File.separator + "?fileName=${header.routeMap[fileName]}")
-        ;
-    }*/
 }
