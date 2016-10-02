@@ -1,4 +1,4 @@
-package org.recap.util;
+package org.recap.util.datadump;
 
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
@@ -17,7 +17,6 @@ import java.util.Map;
 public class DataDumpFailureReportUtil {
 
     public List<ReportDataEntity> generateDataDumpFailureReport(List<Map<String,Object>> successAndFailureFormattedFullList, DataDumpRequest dataDumpRequest){
-        //List<BibliographicEntity> failureList = (List<BibliographicEntity>)successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_FAILURELIST);
         int totalNoOfBibsFailedExported = 0;
         StringBuffer formatError = new StringBuffer();
         int count = 0;

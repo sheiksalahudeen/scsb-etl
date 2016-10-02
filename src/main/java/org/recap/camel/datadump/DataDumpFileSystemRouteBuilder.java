@@ -1,4 +1,4 @@
-package org.recap.camel;
+package org.recap.camel.datadump;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
@@ -28,7 +28,8 @@ public class DataDumpFileSystemRouteBuilder extends RouteBuilder {
         JAXBContext context = JAXBContext.newInstance(BibRecords.class);
         JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
         jaxbDataFormat.setContext(context);
-        from(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q).marshal(jaxbDataFormat).to("file:" + dumpDirectoryPath + File.separator +"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml")
-               .end();
+        from(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q)
+                .to("file:"+dumpDirectoryPath + File.separator + "?fileName=${header.routeMap[requestingInstitutionCode]}/${header.routeMap[dateTimeFolder]}/${header.routeMap[fileName]}-${date:now:ddMMMyyyyHHmm}${header.routeMap[fileFormat]}")
+        ;
     }
 }

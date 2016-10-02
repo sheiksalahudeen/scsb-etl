@@ -5,7 +5,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.recap.ReCAPConstants;
 import org.recap.model.csv.DataDumpFailureReport;
 import org.recap.model.jpa.ReportEntity;
-import org.recap.util.DataDumpFailureReportGenerator;
+import org.recap.util.datadump.DataDumpFailureReportGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

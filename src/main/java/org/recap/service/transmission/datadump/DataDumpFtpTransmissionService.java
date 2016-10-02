@@ -24,6 +24,6 @@ public class DataDumpFtpTransmissionService implements DataDumpTransmissionInter
 
     @Override
     public void transmitDataDump(Object object, Map<String, String> routeMap) {
-        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q,  object, "routeMap", routeMap);
+        producer.sendBodyAndHeader(ReCAPConstants.DATDUMP_FTP_Q,  object, "routeMap", routeMap);
     }
 }

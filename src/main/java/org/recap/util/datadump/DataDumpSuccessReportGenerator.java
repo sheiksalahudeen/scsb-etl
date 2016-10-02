@@ -1,7 +1,7 @@
-package org.recap.util;
+package org.recap.util.datadump;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.recap.model.csv.DataDumpFailureReport;
+import org.recap.model.csv.DataDumpSuccessReport;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 
@@ -15,13 +15,13 @@ import java.util.List;
 /**
  * Created by premkb on 30/9/16.
  */
-public class DataDumpFailureReportGenerator {
+public class DataDumpSuccessReportGenerator {
 
-    public DataDumpFailureReport prepareDataDumpCSVFailureRecord(ReportEntity reportEntity) {
+    public DataDumpSuccessReport prepareDataDumpCSVSuccessRecord(ReportEntity reportEntity) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
 
-        DataDumpFailureReport dataDumpFailureReport = new DataDumpFailureReport();
+        DataDumpSuccessReport dataDumpSuccessReport = new DataDumpSuccessReport();
 
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity report =  iterator.next();
@@ -30,7 +30,7 @@ public class DataDumpFailureReportGenerator {
             Method setterMethod = getSetterMethod(headerName);
             if(null != setterMethod){
                 try {
-                    setterMethod.invoke(dataDumpFailureReport, headerValue);
+                    setterMethod.invoke(dataDumpSuccessReport, headerValue);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
@@ -38,13 +38,13 @@ public class DataDumpFailureReportGenerator {
                 }
             }
         }
-        return dataDumpFailureReport;
+        return dataDumpSuccessReport;
     }
 
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
+            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DataDumpSuccessReport.class));
             return writeMethod;
         } catch (IntrospectionException e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class DataDumpFailureReportGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
+            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DataDumpSuccessReport.class));
             return writeMethod;
         } catch (IntrospectionException e) {
             e.printStackTrace();

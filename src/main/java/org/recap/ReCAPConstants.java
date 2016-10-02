@@ -47,10 +47,6 @@ public class ReCAPConstants {
     public static final String DATADUMP_REPORT_FTP_Q = "seda:dataDumpReportFtpQ";
     public static final String DATADUMP_REPORT_FILE_SYSTEM_Q = "seda:dataDumpReportFileSystemQ";
     public static final String EMAIL_Q = "seda:emailQ";
-    public static final String DATA_DUMP_ZIP_FILE_Q = "direct:zipToFileQ";
-    public static final String DATA_DUMP_ZIP_FILE_TO_FTP_Q = "direct:zipFileToFtpQ";
-    public static final String DATA_DUMP_MARC_ZIP_FILE_Q = "direct:marcXmlZipToFileQ";
-    public static final String DATA_DUMP_MARC_ZIP_FILE_TO_FTP_Q = "direct:marcXmlZipFileToFtpQ";
     public static final String DATADUMP_ZIPFILE_FILESYSTEM_Q = "direct:zipFileSystemQ";
     public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
     public static final String DATADUMP_ZIPFILE_FTP_Q = "direct:zipFileFtpQ";

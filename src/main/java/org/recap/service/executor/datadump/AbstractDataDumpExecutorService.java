@@ -7,10 +7,11 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.service.email.datadump.DataDumpEmailService;
 import org.recap.service.formatter.datadump.DataDumpFormatterService;
 import org.recap.service.transmission.datadump.DataDumpTransmissionService;
-import org.recap.util.DataDumpFailureReportUtil;
-import org.recap.util.DataDumpSuccessReportUtil;
+import org.recap.util.datadump.DataDumpFailureReportUtil;
+import org.recap.util.datadump.DataDumpSuccessReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,6 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    private ApplicationContext appContext;
-
-    @Autowired
     private ProducerTemplate producer;
 
     @Autowired
@@ -50,6 +48,9 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
     @Autowired
     private DataDumpFailureReportUtil dataDumpFailureReportUtil;
+
+    @Autowired
+    private DataDumpEmailService dataDumpEmailService;
 
     @Value("${datadump.httpresponse.record.limit}")
     private String httpResonseRecordLimit;
@@ -67,6 +68,9 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         List<Map<String,Object>> successAndFailureFormattedFullList = new ArrayList<>();
         List<Callable<List<BibliographicEntity>>> callables = new ArrayList<>();
         boolean canProcess = canProcessRecords(totalRecordCount,dataDumpRequest.getTransmissionType());
+        if(logger.isInfoEnabled()) {
+            logger.info("Total no. of records " + totalRecordCount);
+        }
         if (canProcess) {
             for(int pageNum = 0;pageNum < loopCount;pageNum++){
                 Callable callable = getCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
@@ -84,22 +88,40 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                       });
             int count=0;
             for(Future future:futureList){
+                StopWatch stopWatchPerFile = new StopWatch();
+                stopWatchPerFile.start();
                 List<BibliographicEntity> bibliographicEntityList = (List<BibliographicEntity>)future.get();
                 Object formattedObject = dataDumpFormatterService.getFormattedObject(bibliographicEntityList,dataDumpRequest.getOutputFormat());
                 Map<String,Object> successAndFailureFormattedList = (Map<String,Object>) formattedObject;
                 outputString = (String) successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_FORMATTEDSTRING);
                 dataDumpTransmissionService.starTranmission(outputString,dataDumpRequest,getRouteMap(dataDumpRequest, count));
-                //generateReport(successAndFailureFormattedList,dataDumpRequest);
                 successAndFailureFormattedFullList.add(successAndFailureFormattedList);
                 count++;
+                stopWatchPerFile.stop();
+                if(logger.isInfoEnabled()){
+                    logger.info("Total time taken to export file no. "+(count)+" is "+stopWatchPerFile.getTotalTimeMillis()/1000+" seconds");
+                    logger.info("File no. "+(count)+" exported");
+                }
             }
+            processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
+
         }else{
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
         }
         generateReport(successAndFailureFormattedFullList,dataDumpRequest);
         getExecutorService().shutdownNow();
         stopWatch.stop();
+        if(logger.isInfoEnabled()){
+            logger.info("Total time taken to export all data - "+stopWatch.getTotalTimeMillis()/1000+" seconds ("+stopWatch.getTotalTimeMillis()/60000+" minutes)");
+        }
         return outputString;
+    }
+
+    private void processEmail(DataDumpRequest dataDumpRequest,Long totalRecordCount,String dateTimeStringForFolder){
+        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+            dataDumpEmailService.sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder);
+        }
     }
 
     private void setRecordsAvailability(Long totalRecordCount,DataDumpRequest dataDumpRequest){

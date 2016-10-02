@@ -1,4 +1,4 @@
-package org.recap.util;
+package org.recap.util.datadump;
 
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;

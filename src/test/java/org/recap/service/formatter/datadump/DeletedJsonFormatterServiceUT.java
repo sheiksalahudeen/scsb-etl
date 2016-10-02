@@ -1,15 +1,20 @@
-package org.recap.service.formatter;
+package org.recap.service.formatter.datadump;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
+import org.recap.model.jaxb.JAXBContextHandler;
+import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -87,4 +92,5 @@ public class DeletedJsonFormatterServiceUT extends BaseTestCase{
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1,itemEntity));
         return Arrays.asList(bibliographicEntity);
     }
+
 }

@@ -69,10 +69,11 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
+        institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFormat("0");
+        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),0);
@@ -82,12 +83,13 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             file.delete();
         }
     }
+
 
     @Test
     public void getFullDumpForScsbXmlFileSystem()throws Exception{
@@ -101,10 +103,11 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
+        institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFormat("1");
+        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),0);
@@ -114,7 +117,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         File file;
         logger.info("file count---->"+loopCount);
         for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
+            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.XML_FILE_FORMAT);
             boolean fileExists = file.exists();
             assertTrue(fileExists);
             //file.delete();
@@ -137,6 +140,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFormat("0");
+        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),0);
@@ -144,7 +148,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();
         logger.info("file count---->"+loopCount);
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.ZIP_FILE_FORMAT;
+        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.XML_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
         camelContext.addRoutes(new RouteBuilder() {
             @Override

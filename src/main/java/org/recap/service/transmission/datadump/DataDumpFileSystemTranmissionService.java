@@ -24,6 +24,6 @@ public class DataDumpFileSystemTranmissionService implements DataDumpTransmissio
 
     @Override
     public void transmitDataDump(Object object, Map<String, String> routeMap) {
-        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_ZIPFILE_FILESYSTEM_Q,  object, "routeMap", routeMap);
+        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  object, "routeMap", routeMap);
     }
 }

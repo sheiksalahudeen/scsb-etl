@@ -32,9 +32,6 @@ public class DataDumpPreProcessorService {
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
-/*    @Autowired
-    private DataDumpExecutorInterface dataDumpExecutorInterface;*/
-
     @Autowired
     private DataDumpExecutorService dataDumpExecutorService;
 
@@ -180,9 +177,9 @@ public class DataDumpPreProcessorService {
                 erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
             }
-            if(dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP
-                    && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP
-                    && dataDumpRequest.getTransmissionType() != ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM
+            if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                    && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)
+                    && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)
                     ){
                 erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
                 errorcount++;

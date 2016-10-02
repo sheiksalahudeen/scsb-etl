@@ -1,15 +1,12 @@
-package org.recap.camel;
+package org.recap.camel.datadump;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.recap.ReCAPConstants;
-import org.recap.model.jaxb.marc.BibRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBContext;
 import java.io.File;
 
 /**
@@ -37,10 +34,8 @@ public class DataDumpFtpRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        JAXBContext context = JAXBContext.newInstance(BibRecords.class);
-        JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
-        jaxbDataFormat.setContext(context);
-        from(ReCAPConstants.DATDUMP_FTP_Q).marshal(jaxbDataFormat).to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${date:now:ddMMMyyyy}/${header.routeMap[fileName]}-${date:now:ddMMMyyyy}.xml" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
-                .end();
+        from(ReCAPConstants.DATDUMP_FTP_Q)
+                .to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName=${header.routeMap[requestingInstitutionCode]}/${header.routeMap[dateTimeFolder]}/${header.routeMap[fileName]}-${date:now:ddMMMyyyyHHmm}${header.routeMap[fileFormat]}" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
+        ;
     }
 }

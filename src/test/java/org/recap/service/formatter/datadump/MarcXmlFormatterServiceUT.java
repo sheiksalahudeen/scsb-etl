@@ -1,37 +1,33 @@
-package org.recap.model.etl;
+package org.recap.service.formatter.datadump;
 
 import org.junit.Test;
+import org.marc4j.MarcReader;
+import org.marc4j.MarcXmlReader;
+import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
-import org.recap.model.export.DataDumpRequest;
-import org.recap.model.jaxb.marc.BibRecords;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.ReCAPConstants;
+import org.recap.model.jpa.*;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Created by premkb on 26/8/16.
+ * Created by premkb on 2/10/16.
  */
-public class ExportDataDumpCallableUT extends BaseTestCase {
+public class MarcXmlFormatterServiceUT extends BaseTestCase {
+
+    private Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterServiceUT.class);
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private MarcXmlFormatterService marcXmlFormatterService;
 
     private String bibContent = "<collection>\n"+
             "                <record>\n"+
@@ -134,90 +130,90 @@ public class ExportDataDumpCallableUT extends BaseTestCase {
             "            </collection>";
 
     private String holdingContent = "<collection>\n" +
-            "            <record>\n" +
-            "              <datafield tag=\"852\" ind1=\"0\" ind2=\"1\">\n" +
-            "                <subfield code=\"b\">off,che</subfield>\n" +
-            "                <subfield code=\"h\">TA434 .S15</subfield>\n" +
-            "              </datafield>\n" +
-            "              <datafield tag=\"866\" ind1=\"0\" ind2=\"0\">\n" +
-            "                <subfield code=\"a\">v.1-16         </subfield>\n" +
-            "              </datafield>\n" +
-            "            </record>\n" +
-            "          </collection>";
-
+            "                    <record>\n" +
+            "                        <datafield ind1='0' ind2='1' tag='852'>\n" +
+            "                            <subfield code='b'>rcppa</subfield>\n" +
+            "                            <subfield code='t'>1</subfield>\n" +
+            "                            <subfield code='h'>DF802</subfield>\n" +
+            "                            <subfield code='i'>.xP45</subfield>\n" +
+            "                            <subfield code='x'>tr fr anxafst</subfield>\n" +
+            "                        </datafield>\n" +
+            "                        <datafield ind1=' ' ind2='0' tag='866'>\n" +
+            "                            <subfield code='x'>DESIGNATOR: t.</subfield>\n" +
+            "                        </datafield>\n" +
+            "                    </record>\n" +
+            "                </collection>";
 
     @Test
-    public void call(){
-        int pageNum = 0;
-        int batchSize = 1000;
-        DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
-        dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setBatchSize(batchSize);
-        dataDumpRequest.setFetchType("0");
-        List<Integer> cgIds = new ArrayList<>();
-        cgIds.add(1);
-        cgIds.add(2);
-        dataDumpRequest.setCollectionGroupIds(cgIds);
-        try {
-            saveAndGetBibliographicEntities();
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-        ExportDataDumpCallable exportDataDumpCallable = new ExportDataDumpCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
-        BibRecords bibRecords = (BibRecords) exportDataDumpCallable.call();
-        assertNotNull(bibRecords);
-        assertEquals("PUL",bibRecords.getBibRecords().get(0).getBib().getOwningInstitutionId());
-        assertEquals("2",bibRecords.getBibRecords().get(0).getBib().getOwningInstitutionBibId());
+    public void getMarcRecords() throws IOException, URISyntaxException {
+        BibliographicEntity bibliographicEntity = getBibliographicEntity();
+        Map<String,Object> successAndFailureFormattedList = (Map<String,Object>)marcXmlFormatterService.getFormattedOutput(Arrays.asList(bibliographicEntity));
+        List<Record> recordList = readMarcXml((String)successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_FORMATTEDSTRING));
+        assertNotNull(recordList);
+        assertEquals("SCSB-100",recordList.get(0).getControlFields().get(0).getData());
     }
 
-    private List<BibliographicEntity> saveAndGetBibliographicEntities() throws URISyntaxException, IOException {
-        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
+    private BibliographicEntity getBibliographicEntity() throws URISyntaxException, IOException {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setBibliographicId(100);
         bibliographicEntity.setContent(bibContent.getBytes());
-        bibliographicEntity.setOwningInstitutionId(1);
-        bibliographicEntity.setOwningInstitutionBibId("2");
         bibliographicEntity.setCreatedDate(new Date());
-        bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionBibId("1");
+        bibliographicEntity.setOwningInstitutionId(3);
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionId(1);
+        institutionEntity.setInstitutionCode("NYPL");
+        institutionEntity.setInstitutionName("New York Public Library");
+        bibliographicEntity.setInstitutionEntity(institutionEntity);
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setHoldingsId(345);
         holdingsEntity.setContent(holdingContent.getBytes());
         holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setCreatedBy("tst");
         holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setLastUpdatedBy("etl");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId("3");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(3);
+        holdingsEntity.setOwningInstitutionHoldingsId("54323");
+        holdingsEntity.setInstitutionEntity(institutionEntity);
 
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setLastUpdatedDate(new Date());
-        itemEntity.setOwningInstitutionItemId("4");
-        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
         itemEntity.setCreatedDate(new Date());
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("tst");
-        String barcode = "1234";
-        itemEntity.setBarcode(barcode);
-        itemEntity.setCallNumber("x.12321");
+        itemEntity.setBarcode("1231");
+        itemEntity.setOwningInstitutionItemId(".i1231");
+        itemEntity.setOwningInstitutionId(3);
         itemEntity.setCollectionGroupId(1);
-        itemEntity.setCallNumberType("1");
-        itemEntity.setCustomerCode("1");
+        CollectionGroupEntity collectionGroupEntity = new CollectionGroupEntity();
+        collectionGroupEntity.setCollectionGroupCode("Shared");
+        itemEntity.setCollectionGroupEntity(collectionGroupEntity);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setCopyNumber(1);
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCopyNumber(123);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-        itemEntity.setBibliographicEntities(bibliographicEntities);
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        bibliographicEntities.add(savedBibliographicEntity);
-        return bibliographicEntities;
+        return bibliographicEntity;
     }
 
+    private List<Record> readMarcXml(String marcXmlString){
+        List<Record> recordList = new ArrayList<>();
+        InputStream in = new ByteArrayInputStream(marcXmlString.getBytes());
+        MarcReader reader = new MarcXmlReader(in);
+        while (reader.hasNext()) {
+            Record record = reader.next();
+            recordList.add(record);
+            logger.info(record.toString());
+        }
+        return recordList;
+    }
 }
-
