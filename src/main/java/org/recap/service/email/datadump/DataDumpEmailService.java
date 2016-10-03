@@ -16,15 +16,6 @@ import java.util.List;
 @Service
 public class DataDumpEmailService {
 
-    @Value("${data.dump.email.nypl.to}")
-    private String dataDumpEmailNyplTo;
-
-    @Value("${data.dump.email.pul.to}")
-    private String dataDumpEmailPulTo;
-
-    @Value("${data.dump.email.cul.to}")
-    private String dataDumpEmailCulTo;
-
     @Value("${etl.dump.directory}")
     private String fileSystemDataDumpDirectory;
 
@@ -34,12 +25,12 @@ public class DataDumpEmailService {
     @Autowired
     private ProducerTemplate producer;
 
-    public void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, String transmissionType, String dateTimeStringForFolder) {
+    public void sendEmail(List<String> institutionCodes, Long totalRecordCount, String requestingInstitutionCode, String transmissionType, String dateTimeStringForFolder, String toEmailAddress) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
         emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode,dateTimeStringForFolder));
         emailPayLoad.setCount(totalRecordCount);
-        emailPayLoad.setTo(getEmailTo(requestingInstitutionCode));
+        emailPayLoad.setTo(toEmailAddress);
         producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
     }
 
@@ -53,15 +44,4 @@ public class DataDumpEmailService {
         return location;
     }
 
-    private String getEmailTo(String requestingInstitutionCode) {
-        String emailTo = null;
-        if (requestingInstitutionCode.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
-            emailTo = dataDumpEmailCulTo;
-        } else if (requestingInstitutionCode.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
-            emailTo = dataDumpEmailPulTo;
-        } else if (requestingInstitutionCode.equalsIgnoreCase(ReCAPConstants.NYPL)) {
-            emailTo = dataDumpEmailNyplTo;
-        }
-        return emailTo;
-    }
 }
