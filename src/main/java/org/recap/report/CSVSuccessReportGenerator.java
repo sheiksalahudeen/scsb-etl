@@ -38,6 +38,10 @@ public class CSVSuccessReportGenerator implements ReportGeneratorInterface{
     }
 
     @Override
+    public boolean isOperationType(String operationType) {
+        return operationType.equalsIgnoreCase(org.recap.ReCAPConstants.OPERATION_TYPE_ETL) ? true : false;
+    }
+    @Override
     public String generateReport(List<ReportEntity> reportEntities, String fileName) {
 
         if(!CollectionUtils.isEmpty(reportEntities)) {

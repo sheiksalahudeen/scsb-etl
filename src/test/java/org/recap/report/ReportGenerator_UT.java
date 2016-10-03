@@ -41,7 +41,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -57,7 +57,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveSuccessReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -73,7 +73,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         ReportEntity savedReportEntity1 = saveFailureReportEntity();
         ReportEntity savedReportEntity2 = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -89,7 +89,7 @@ public class ReportGenerator_UT extends BaseTestCase {
     public void uploadFailureReportToFTP() throws Exception {
         ReportEntity savedReportEntity = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), savedReportEntity.getType(), savedReportEntity.getInstitutionName(), ReCAPConstants.FTP);
+        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), "ETL",savedReportEntity.getType(), savedReportEntity.getInstitutionName(), ReCAPConstants.FTP);
 
         assertNotNull(generatedReportFileName);
     }
@@ -98,7 +98,7 @@ public class ReportGenerator_UT extends BaseTestCase {
     public void uploadSuccessReportToFTP() throws Exception {
         ReportEntity savedReportEntity = saveSuccessReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), savedReportEntity.getType(), savedReportEntity.getInstitutionName(), ReCAPConstants.FTP);
+        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), "ETL",savedReportEntity.getType(), savedReportEntity.getInstitutionName(), ReCAPConstants.FTP);
 
         assertNotNull(generatedReportFileName);
     }
@@ -108,7 +108,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         ReportEntity savedSuccessReportEntity1 = saveSuccessReportEntity();
         ReportEntity savedSuccessReportEntity2 = saveSuccessReportEntity();
         fileName = "";
-        String generatedReportFileName = generateReport(savedSuccessReportEntity1.getCreatedDate(), savedSuccessReportEntity1.getType(), savedSuccessReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedSuccessReportEntity1.getCreatedDate(), "ETL",savedSuccessReportEntity1.getType(), savedSuccessReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -202,7 +202,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         return savedReportEntity;
     }
 
-    private String generateReport(Date createdDate, String reportType, String institutionName, String transmissionType) throws InterruptedException {
+    private String generateReport(Date createdDate, String operationType, String reportType, String institutionName, String transmissionType) throws InterruptedException {
         Calendar cal = Calendar.getInstance();
         Date from = createdDate;
         cal.setTime(from);
@@ -217,7 +217,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-        String generatedFileName = reportGenerator.generateReport(fileName, reportType, institutionName, from, to, transmissionType);
+        String generatedFileName = reportGenerator.generateReport(fileName, operationType,reportType, institutionName, from, to, transmissionType);
 
         Thread.sleep(1000);
 

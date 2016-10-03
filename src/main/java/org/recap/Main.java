@@ -12,15 +12,6 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class Main {
 
-    @Value("${recap.timezone}")
-    String timeZone;
-
-    @Bean
-    public TimeZone setTime() {
-        TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
-        return TimeZone.getDefault();
-    }
-
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }

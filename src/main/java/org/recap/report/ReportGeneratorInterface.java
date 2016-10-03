@@ -13,5 +13,7 @@ public interface ReportGeneratorInterface {
 
     boolean isTransmitted(String transmissionType);
 
+    boolean isOperationType(String operationType);
+
     String generateReport(List<ReportEntity> reportEntities, String fileName);
 }

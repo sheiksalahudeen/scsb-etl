@@ -32,10 +32,54 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     }
 
     @Test
+    public void exportFullDataDumpMarcXmlFormat() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","NYPL")
+                .param("fetchType","0")
+                .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","0")
+                .param("collectionGroupIds","1,2"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 200);
+    }
+
+
+    @Test
+    public void exportFullDataDumpScsbXmlFormat() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","NYPL")
+                .param("fetchType","0")
+                .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","1")
+                .param("collectionGroupIds","1,2"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 200);
+    }
+
+    @Test
+    public void exportIncrementalDataDump() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","NYPL,PUL")
+                .param("fetchType","1")
+                .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","1")
+                .param("date","2016-08-30 11:20"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 200);
+    }
+
+    @Test
     public void invalidFetchTypeParameters()throws Exception{
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")
                 .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","1")
                 .param("fetchType","2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
@@ -56,29 +100,5 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         assertTrue(status == 400);
     }
 
-    @Test
-    public void exportFullDataDump() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL,PUL")
-                .param("fetchType","0")
-                .param("requestingInstitutionCode","NYPL")
-                .param("collectionGroupIds","1,2"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 200);
-    }
 
-    @Test
-    public void exportIncrementalDataDump() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL,PUL")
-                .param("fetchType","1")
-                .param("requestingInstitutionCode","NYPL")
-                .param("date","2016-08-30 11:20"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 200);
-    }
 }
