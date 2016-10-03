@@ -103,7 +103,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                     logger.info("File no. "+(count)+" exported");
                 }
             }
-            //processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
+            processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
 
         }else{
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
@@ -120,7 +120,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private void processEmail(DataDumpRequest dataDumpRequest,Long totalRecordCount,String dateTimeStringForFolder){
         if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
-            dataDumpEmailService.sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder);
+            dataDumpEmailService.sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder, dataDumpRequest.getToEmailAddress());
         }
     }
 

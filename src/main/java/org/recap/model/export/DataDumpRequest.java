@@ -16,6 +16,7 @@ public class DataDumpRequest {
     private List<Integer> collectionGroupIds;
     private String transmissionType;
     private String requestingInstitutionCode;
+    private String toEmailAddress;
     private String outputFormat;
     private String fileFormat;
     private String dateTimeString;
@@ -90,6 +91,14 @@ public class DataDumpRequest {
 
     public void setRequestingInstitutionCode(String requestingInstitutionCode) {
         this.requestingInstitutionCode = requestingInstitutionCode;
+    }
+
+    public String getToEmailAddress() {
+        return toEmailAddress;
+    }
+
+    public void setToEmailAddress(String toEmailAddress) {
+        this.toEmailAddress = toEmailAddress;
     }
 
     public String getOutputFormat() {

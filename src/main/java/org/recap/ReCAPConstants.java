@@ -126,6 +126,9 @@ public class ReCAPConstants {
     public static final String DATADUMP_VALID_REQ_INST_CODE_ERR_MSG = "Please enter valid institution code CUL or PUL or NYP for requestingInstitutionCode .";
     public static final String DATADUMP_FULL_VALID_TRANS_TYPE = "Transmission type 1 is not valid for full dump. Use transmission type 0 or 2";
     public static final String DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG = "There are more than 100 records. Use transmission type ftp or file system to dump the data";
+    public static final String DATADUMP_EMAIL_TO_ADDRESS_REQUIRED = "Please enter a valid e-mail address.";
+    public static final String INVALID_EMAIL_ADDRESS = "Email address is invalid.";
+    public static final String REGEX_FOR_EMAIL_ADDRESS = "^[A-Za-z0-9+_.-]+@(.+)$";
     public static final String DATADUMP_FETCHTYPE_FULL = "0";
     public static final String DATADUMP_FETCHTYPE_INCREMENTAL = "1";
     public static final String DATADUMP_FETCHTYPE_DELETED = "2";

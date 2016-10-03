@@ -14,9 +14,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by premkb on 27/9/16.
@@ -87,7 +90,7 @@ public class DataDumpPreProcessorService {
     }
 
     public void setDataDumpRequest(DataDumpRequest dataDumpRequest, String fetchType, String institutionCodes, String date, String collectionGroupIds,
-                                    String transmissionType, String requestingInstitutionCode, String noOfRecordsPerFile, String outputFormat){
+                                    String transmissionType, String requestingInstitutionCode, String noOfRecordsPerFile, String toEmailAddress, String outputFormat){
         if (fetchType != null) {
             dataDumpRequest.setFetchType(fetchType);
         }
@@ -126,6 +129,9 @@ public class DataDumpPreProcessorService {
         }
         if(requestingInstitutionCode != null){
             dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
+        }
+        if(!StringUtils.isEmpty(toEmailAddress)){
+            dataDumpRequest.setToEmailAddress(toEmailAddress);
         }
         if(outputFormat !=null){
             if(fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED)){
@@ -185,6 +191,16 @@ public class DataDumpPreProcessorService {
                 errorcount++;
             }
         }
+        if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP) || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+            if (StringUtils.isEmpty(dataDumpRequest.getToEmailAddress())) {
+                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
+            } else {
+                boolean isValid = validateEmailAddress(dataDumpRequest.getToEmailAddress());
+                if (!isValid) {
+                    erroMessageMap.put(errorcount, ReCAPConstants.INVALID_EMAIL_ADDRESS);
+                }
+            }
+        }
         if(erroMessageMap.size()>0){
             String date= new Date().toString();
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE , date);
@@ -199,6 +215,13 @@ public class DataDumpPreProcessorService {
             errorMessageBuilder.append(entry.getKey()).append(". ").append(entry.getValue()).append("\n");
         });
         return errorMessageBuilder.toString();
+    }
+
+    private boolean validateEmailAddress(String toEmailAddress){
+        String regex = ReCAPConstants.REGEX_FOR_EMAIL_ADDRESS;
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(toEmailAddress);
+        return matcher.matches();
     }
 
     private ResponseEntity getResponseEntity(String outputString, DataDumpRequest dataDumpRequest) throws Exception{
