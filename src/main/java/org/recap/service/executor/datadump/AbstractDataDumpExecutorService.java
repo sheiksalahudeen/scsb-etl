@@ -103,7 +103,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                     logger.info("File no. "+(count)+" exported");
                 }
             }
-            processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
+            //processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
 
         }else{
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
