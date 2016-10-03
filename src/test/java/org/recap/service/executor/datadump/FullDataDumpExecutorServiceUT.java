@@ -69,7 +69,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("NYPL");
+        institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFormat("0");
@@ -103,7 +103,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("NYPL");
+        institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFormat("1");

@@ -1,6 +1,5 @@
 package org.recap.service.formatter.datadump;
 
-import info.freelibrary.marc4j.converter.impl.AnselToUnicode;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlReader;
@@ -78,7 +77,6 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface{
             logger.error(e.getMessage());
             formatError = e.getMessage();
         }
-        formatError = "error occured";
         successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_SUCCESSLIST,successList);
         successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FAILURELIST,failureList);
         successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATTEDSTRING,formattedString);
@@ -218,9 +216,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface{
     private String covertToMarcXmlString(List<Record> recordList){
         OutputStream out = new ByteArrayOutputStream();
         MarcWriter writer = new MarcXmlWriter(out,"UTF-8", true);
-        AnselToUnicode converter = new AnselToUnicode();
         try {
-            writer.setConverter(converter);
             recordList.forEach(writer::write);
             writer.close();
         } catch (Exception e) {
