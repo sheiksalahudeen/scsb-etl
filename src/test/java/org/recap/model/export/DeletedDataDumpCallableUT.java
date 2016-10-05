@@ -98,7 +98,7 @@ public class DeletedDataDumpCallableUT extends BaseTestCase {
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setCopyNumber(123);
-        itemEntity.setIsDeleted(1);
+        itemEntity.setDeleted(true);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));

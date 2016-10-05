@@ -76,7 +76,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),0);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -110,7 +110,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),0);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -143,7 +143,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),0);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();

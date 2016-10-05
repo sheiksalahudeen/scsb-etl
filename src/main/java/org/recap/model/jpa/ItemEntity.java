@@ -84,7 +84,7 @@ public class ItemEntity implements Serializable{
     private List<BibliographicEntity> bibliographicEntities;
 
     @Column(name = "IS_DELETED")
-    private Integer isDeleted;
+    private boolean isDeleted;
 
     public ItemEntity() {
     }
@@ -258,12 +258,12 @@ public class ItemEntity implements Serializable{
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public Integer getIsDeleted() {
+    public boolean isDeleted() {
         return isDeleted;
     }
 
-    public void setIsDeleted(Integer isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
 

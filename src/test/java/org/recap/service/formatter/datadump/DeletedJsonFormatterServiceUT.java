@@ -70,7 +70,7 @@ public class DeletedJsonFormatterServiceUT extends BaseTestCase{
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setCopyNumber(123);
-        itemEntity.setIsDeleted(1);
+        itemEntity.setDeleted(true);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         ItemEntity itemEntity1 = new ItemEntity();
@@ -88,7 +88,7 @@ public class DeletedJsonFormatterServiceUT extends BaseTestCase{
         itemEntity1.setCustomerCode("1");
         itemEntity1.setItemAvailabilityStatusId(1);
         itemEntity1.setCopyNumber(123);
-        itemEntity1.setIsDeleted(1);
+        itemEntity1.setDeleted(true);
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1,itemEntity));
         return Arrays.asList(bibliographicEntity);
     }
