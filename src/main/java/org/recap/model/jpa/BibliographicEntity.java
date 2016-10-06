@@ -42,6 +42,9 @@ public class BibliographicEntity implements Serializable {
     @Column(name = "OWNING_INST_BIB_ID")
     private String owningInstitutionBibId;
 
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
@@ -113,6 +116,14 @@ public class BibliographicEntity implements Serializable {
 
     public void setOwningInstitutionBibId(String owningInstitutionBibId) {
         this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public InstitutionEntity getInstitutionEntity() {

@@ -79,7 +79,7 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         incrementalDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM),0);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -114,7 +114,7 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         incrementalDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM),0);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();

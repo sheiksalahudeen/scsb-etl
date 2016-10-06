@@ -138,7 +138,6 @@ public class ReCAPConstants {
     public static final String DATADUMP_XML_FORMAT_MARC = "0";
     public static final String DATADUMP_XML_FORMAT_SCSB = "1";
     public static final String DATADUMP_DELETED_JSON_FORMAT = "2";
-    public static final Integer IS_DELETED=1;
     public static final Integer IS_NOT_DELETED=0;
     public static final String DATADUMP_SUCCESSLIST = "successList";
     public static final String DATADUMP_FAILURELIST = "failureList";

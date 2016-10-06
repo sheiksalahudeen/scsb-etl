@@ -49,7 +49,7 @@ public class IncrementalDataDumpExecutorService  extends AbstractDataDumpExecuto
     @Override
     public Long getTotalRecordsCount(DataDumpRequest dataDumpRequest) {
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(),inputDate, ReCAPConstants.IS_NOT_DELETED);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(),inputDate);
         return totalRecordCount;
     }
 

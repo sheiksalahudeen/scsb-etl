@@ -23,7 +23,7 @@ public class DataDumpCallableHelperService {
             , BibliographicDetailsRepository bibliographicDetailsRepository) {
         Page<BibliographicEntity> bibliographicEntities;
         bibliographicEntities = bibliographicDetailsRepository.getRecordsForFullDump(new PageRequest(page, size)
-                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), ReCAPConstants.IS_NOT_DELETED);
+                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes());
         return bibliographicEntities.getContent();
     }
 
@@ -31,7 +31,7 @@ public class DataDumpCallableHelperService {
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Page<BibliographicEntity> bibliographicEntities;
         bibliographicEntities = bibliographicDetailsRepository.getRecordsForIncrementalDump(new PageRequest(page, size)
-                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), inputDate, ReCAPConstants.IS_NOT_DELETED);
+                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), inputDate);
         return bibliographicEntities.getContent();
     }
 
@@ -40,10 +40,10 @@ public class DataDumpCallableHelperService {
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
         if(dataDumpRequest.getDate()==null){
             bibliographicEntities = bibliographicDetailsRepository.getDeletedRecordsForFullDump(new PageRequest(page, size)
-                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), ReCAPConstants.IS_DELETED);
+                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes());
         }else{
             bibliographicEntities = bibliographicDetailsRepository.getDeletedRecordsForIncrementalDump(new PageRequest(page, size)
-                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), inputDate,ReCAPConstants.IS_DELETED);
+                    , dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), inputDate);
         }
         return bibliographicEntities.getContent();
     }

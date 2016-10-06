@@ -78,7 +78,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         deletedDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),1);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -113,7 +113,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         deletedDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM),1);
+        Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String day = getDateTimeString();
@@ -148,7 +148,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         deletedDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM),1);
+        Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();

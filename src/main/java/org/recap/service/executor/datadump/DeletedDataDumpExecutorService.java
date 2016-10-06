@@ -42,9 +42,9 @@ public class DeletedDataDumpExecutorService extends AbstractDataDumpExecutorServ
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Long totalRecordCount;
         if (dataDumpRequest.getDate()==null) {
-            totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), ReCAPConstants.IS_DELETED);
+            totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes());
         } else {
-            totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(),inputDate, ReCAPConstants.IS_DELETED);
+            totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(),inputDate);
         }
         return totalRecordCount;
     }

@@ -46,7 +46,7 @@ public class FullDataDumpExecutorService extends AbstractDataDumpExecutorService
 
     @Override
     public Long getTotalRecordsCount(DataDumpRequest dataDumpRequest) {
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(), ReCAPConstants.IS_NOT_DELETED);
+        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes());
         return totalRecordCount;
     }
 
