@@ -24,10 +24,14 @@ public class DataDumpTransmissionService {
     private DataDumpFtpTransmissionService dataDumpFtpTransmissionService;
 
 
-    public void starTranmission(Object formattedObject, DataDumpRequest dataDumpRequest, Map<String,String> routeMap){
+    public void startTranmission(DataDumpRequest dataDumpRequest, Map<String,String> routeMap){
         for(DataDumpTransmissionInterface dataDumpTransmissionInterface:getTransmissionService()){
             if(dataDumpTransmissionInterface.isInterested(dataDumpRequest)){
-                dataDumpTransmissionInterface.transmitDataDump(formattedObject,routeMap);
+                try {
+                    dataDumpTransmissionInterface.transmitDataDump(routeMap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

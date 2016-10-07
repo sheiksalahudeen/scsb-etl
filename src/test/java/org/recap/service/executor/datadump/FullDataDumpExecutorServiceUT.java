@@ -55,7 +55,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Autowired
     ProducerTemplate producer;
 
-    private String requestingInstitutionCode = "CUL";
+    private String requestingInstitutionCode = "PUL";
 
     @Test
     public void getFullDumpForMarcXmlFileSystem()throws Exception{
@@ -69,7 +69,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
+        institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFormat("0");
@@ -81,13 +81,10 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         Thread.sleep(1000);
         String day = getDateTimeString();
         File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-        }
+        file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
+        boolean fileExists = file.exists();
+        assertTrue(fileExists);
+        file.delete();
     }
 
 
@@ -103,7 +100,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("PUL");
+        institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFormat("1");
@@ -116,12 +113,10 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         String day = getDateTimeString();
         File file;
         logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            //file.delete();
-        }
+        file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
+        boolean fileExists = file.exists();
+        assertTrue(fileExists);
+        file.delete();
     }
 
     @Test
@@ -136,7 +131,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         cgIds.add(2);
         dataDumpRequest.setCollectionGroupIds(cgIds);
         List<String> institutionCodes = new ArrayList<>();
-        institutionCodes.add("NYPL");
+        institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFormat("0");
@@ -148,7 +143,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();
         logger.info("file count---->"+loopCount);
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.XML_FILE_FORMAT;
+        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"-"+dateTimeString+ReCAPConstants.ZIP_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
         camelContext.addRoutes(new RouteBuilder() {
             @Override
