@@ -1,11 +1,16 @@
 package org.recap.service.transmission.datadump;
 
-import org.apache.camel.ProducerTemplate;
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.processor.aggregate.zipfile.ZipAggregationStrategy;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,8 +19,11 @@ import java.util.Map;
 @Service
 public class DataDumpFileSystemTranmissionService implements DataDumpTransmissionInterface {
 
+    @Value("${etl.dump.directory}")
+    private String dumpDirectoryPath;
+
     @Autowired
-    private ProducerTemplate producer;
+    private CamelContext camelContext;
 
     @Override
     public boolean isInterested(DataDumpRequest dataDumpRequest) {
@@ -23,7 +31,22 @@ public class DataDumpFileSystemTranmissionService implements DataDumpTransmissio
     }
 
     @Override
-    public void transmitDataDump(Object object, Map<String, String> routeMap) {
-        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  object, "routeMap", routeMap);
+    public void transmitDataDump(Map<String, String> routeMap) throws Exception {
+        String requestingInstitutionCode = routeMap.get(ReCAPConstants.REQUESTING_INST_CODE);
+        String dateTimeFolder = routeMap.get(ReCAPConstants.DATETIME_FOLDER);
+        String fileName = routeMap.get(ReCAPConstants.FILENAME);
+        camelContext.addRoutes((new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("file:"+ dumpDirectoryPath + File.separator + requestingInstitutionCode + File.separator + dateTimeFolder + "?antInclude=*.xml")
+                        .routeId(ReCAPConstants.DATADUMP_ZIP_FILESYSTEM_ROUTE_ID)
+                        .aggregate(new ZipAggregationStrategy())
+                        .constant(true)
+                        .completionFromBatchConsumer()
+                        .eagerCheckCompletion()
+                        .to("file:"+ dumpDirectoryPath + File.separator+"?fileName="+ requestingInstitutionCode +File.separator + dateTimeFolder + File.separator + fileName + ".zip")
+                ;
+            }
+        }));
     }
 }

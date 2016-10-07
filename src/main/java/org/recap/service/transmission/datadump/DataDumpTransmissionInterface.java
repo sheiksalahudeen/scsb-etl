@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public interface DataDumpTransmissionInterface {
 
-    public boolean isInterested(DataDumpRequest dataDumpRequest);
+    boolean isInterested(DataDumpRequest dataDumpRequest);
 
-    public void transmitDataDump(Object object, Map<String,String> routeMap);
+    void transmitDataDump(Map<String,String> routeMap) throws Exception;
 
 }

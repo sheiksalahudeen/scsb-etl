@@ -62,6 +62,10 @@ public class ReCAPConstants {
     public static final String DATADUMP_SUCCESS_CSV_FTP_ROUTE_ID = "csvSuccessReportFtpQ";
     public static final String DATADUMP_FAILURE_CSV_FTP_ROUTE_ID = "csvFailureReportFtpQ";
     public static final String EMAIL_ROUTE_ID = "emailQ";
+    public static final String DATADUMP_ZIP_FILESYSTEM_ROUTE_ID = "zipDataDumpQ";
+    public static final String ZIP_DATADUMP_COMPLETED = "zipDataDumpCompleted";
+    public static final String DATADUMP_ZIPFTP_ROUTE_ID = "zipDataDumpRoute";
+
 
     public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";
     public static final String FAILURE = "Failure";

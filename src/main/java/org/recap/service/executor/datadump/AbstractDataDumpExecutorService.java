@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.util.StopWatch;
 
 import java.util.*;
@@ -94,7 +93,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 Object formattedObject = dataDumpFormatterService.getFormattedObject(bibliographicEntityList,dataDumpRequest.getOutputFormat());
                 Map<String,Object> successAndFailureFormattedList = (Map<String,Object>) formattedObject;
                 outputString = (String) successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_FORMATTEDSTRING);
-                dataDumpTransmissionService.starTranmission(outputString,dataDumpRequest,getRouteMap(dataDumpRequest, count));
+                producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  outputString, "routeMap", getRouteMap(dataDumpRequest, count));
                 successAndFailureFormattedFullList.add(successAndFailureFormattedList);
                 count++;
                 stopWatchPerFile.stop();
@@ -103,6 +102,10 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                     logger.info("File no. "+(count)+" exported");
                 }
             }
+            Map<String, String> routeMap = getRouteMap(dataDumpRequest, count);
+            String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode()+"-"+dataDumpRequest.getDateTimeString();
+            routeMap.put(ReCAPConstants.FILENAME,fileName);
+            dataDumpTransmissionService.startTranmission(dataDumpRequest, routeMap);
             processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
 
         }else{

@@ -1,12 +1,12 @@
 package org.recap.service.transmission.datadump;
 
-import info.freelibrary.util.LoggerFactory;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class DataDumpFtpTransmissionServiceUT extends BaseTestCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataDumpFileSystemTranmissionServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpFtpTransmissionServiceUT.class);
 
     @Autowired
     private ProducerTemplate producer;
@@ -48,14 +48,18 @@ public class DataDumpFtpTransmissionServiceUT extends BaseTestCase {
 
     private String requestingInstitutionCode = "NYPL";
 
+    private String dateTimeString;
+
     private String xmlString = "<marcxml:collection xmlns:marcxml=\"http://www.loc.gov/MARC21/slim\">\n" +
             "  <marcxml:record></marcxml:record>\n" +
             "</marcxml:collection>";
     @Test
     public void transmitFtpDataDump() throws Exception {
-        dataDumpFtpTransmissionService.transmitDataDump(xmlString,getRouteMap());
+        dateTimeString = getDateTimeString();
+        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  xmlString, "routeMap", getRouteMap());
+        dataDumpFtpTransmissionService.transmitDataDump(getRouteMap());
         String dateTimeString = getDateTimeString();
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+dateTimeString+ReCAPConstants.XML_FILE_FORMAT;
+        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +ReCAPConstants.ZIP_FILE_FORMAT;
         logger.info("ftpFileName---->"+ftpFileName);
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+ requestingInstitutionCode +File.separator+dateTimeString;
         System.out.println("ftpDataDumpRemoteServer--->"+ftpDataDumpRemoteServer);
@@ -75,7 +79,7 @@ public class DataDumpFtpTransmissionServiceUT extends BaseTestCase {
         Map<String,String> routeMap = new HashMap<>();
         String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode;
         routeMap.put(ReCAPConstants.FILENAME,fileName);
-        routeMap.put(ReCAPConstants.DATETIME_FOLDER, getDateTimeString());
+        routeMap.put(ReCAPConstants.DATETIME_FOLDER, dateTimeString);
         routeMap.put(ReCAPConstants.REQUESTING_INST_CODE, requestingInstitutionCode);
         routeMap.put(ReCAPConstants.FILE_FORMAT,ReCAPConstants.XML_FILE_FORMAT);
         return routeMap;

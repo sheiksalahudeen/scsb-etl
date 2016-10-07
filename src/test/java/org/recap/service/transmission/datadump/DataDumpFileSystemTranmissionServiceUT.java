@@ -1,11 +1,11 @@
 package org.recap.service.transmission.datadump;
 
-import info.freelibrary.util.LoggerFactory;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -28,6 +28,9 @@ public class DataDumpFileSystemTranmissionServiceUT extends BaseTestCase {
     private String dumpDirectoryPath;
 
     @Autowired
+    private ProducerTemplate producer;
+
+    @Autowired
     private DataDumpFileSystemTranmissionService dataDumpFileSystemTranmissionService;
 
     private String requestingInstitutionCode = "NYPL";
@@ -40,10 +43,11 @@ public class DataDumpFileSystemTranmissionServiceUT extends BaseTestCase {
     @Test
     public void transmitFileSystemDataDump() throws Exception {
         dateTimeString = getDateTimeString();
-        dataDumpFileSystemTranmissionService.transmitDataDump(xmlString,getRouteMap());
+        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  xmlString, "routeMap", getRouteMap());
+        dataDumpFileSystemTranmissionService.transmitDataDump(getRouteMap());
         Thread.sleep(2000);
         logger.info(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+dateTimeString+ ReCAPConstants.XML_FILE_FORMAT);
-        File file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+dateTimeString+ ReCAPConstants.XML_FILE_FORMAT);
+        File file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode + ReCAPConstants.ZIP_FILE_FORMAT);
         boolean fileExists = file.exists();
         assertTrue(fileExists);
         file.delete();
