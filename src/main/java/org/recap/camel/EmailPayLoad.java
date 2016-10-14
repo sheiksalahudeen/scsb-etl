@@ -1,11 +1,12 @@
 package org.recap.camel;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by chenchulakshmig on 15/9/16.
  */
-public class EmailPayLoad {
+public class EmailPayLoad implements Serializable{
 
     private List<String> institutions;
     private String location;
