@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * Created by chenchulakshmig on 15/9/16.
  */
-public class EmailRouteBuilderTest extends BaseTestCase {
+public class EmailRouteBuilderUT extends BaseTestCase {
 
     @Autowired
     private ProducerTemplate producer;

@@ -33,20 +33,20 @@ public class ReCAPConstants {
 
 
     //Camel Queue Constants
-    public static final String REPORT_Q= "seda:reportQ";
-    public static final String CSV_SUCCESS_Q = "seda:csvSuccessQ";
-    public static final String CSV_FAILURE_Q = "seda:csvFailureQ";
-    public static final String FTP_SUCCESS_Q = "seda:ftpFailureQ";
-    public static final String FTP_FAILURE_Q = "seda:ftpSuccessQ";
-    public static final String DATADUMP_SUCCESS_REPORT_Q = "seda:dataDumpSuccessReportFileQ";
-    public static final String DATADUMP_FAILURE_REPORT_Q = "seda:dataDumpFailureReportFileQ";
-    public static final String DATADUMP_SUCCESS_REPORT_FTP_Q = "seda:dataDumpSuccessReportFtpQ";
-    public static final String DATADUMP_FAILURE_REPORT_FTP_Q = "seda:dataDumpFailureReportFTPQ";
-    public static final String DATDUMP_FTP_Q = "seda:dataDumpQ";
-    public static final String DATADUMP_FILE_SYSTEM_Q = "seda:dataDumpFileSystemQ";
-    public static final String DATADUMP_REPORT_FTP_Q = "seda:dataDumpReportFtpQ";
-    public static final String DATADUMP_REPORT_FILE_SYSTEM_Q = "seda:dataDumpReportFileSystemQ";
-    public static final String EMAIL_Q = "seda:emailQ";
+    public static final String REPORT_Q= "scsbactivemq:queue:reportQ";
+    public static final String CSV_SUCCESS_Q = "scsbactivemq:queue:csvSuccessQ";
+    public static final String CSV_FAILURE_Q = "scsbactivemq:queue:csvFailureQ";
+    public static final String FTP_SUCCESS_Q = "scsbactivemq:queue:ftpFailureQ";
+    public static final String FTP_FAILURE_Q = "scsbactivemq:queue:ftpSuccessQ";
+    public static final String DATADUMP_SUCCESS_REPORT_Q = "scsbactivemq:queue:dataDumpSuccessReportFileQ";
+    public static final String DATADUMP_FAILURE_REPORT_Q = "scsbactivemq:queue:dataDumpFailureReportFileQ";
+    public static final String DATADUMP_SUCCESS_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpSuccessReportFtpQ";
+    public static final String DATADUMP_FAILURE_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpFailureReportFTPQ";
+    public static final String DATDUMP_FTP_Q = "scsbactivemq:queue:dataDumpQ";
+    public static final String DATADUMP_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpFileSystemQ";
+    public static final String DATADUMP_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpReportFtpQ";
+    public static final String DATADUMP_REPORT_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpReportFileSystemQ";
+    public static final String EMAIL_Q = "scsbactivemq:queue:emailQ";
     public static final String DATADUMP_ZIPFILE_FILESYSTEM_Q = "direct:zipFileSystemQ";
     public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
     public static final String DATADUMP_ZIPFILE_FTP_Q = "direct:zipFileFtpQ";
