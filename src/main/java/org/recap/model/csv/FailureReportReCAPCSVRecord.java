@@ -3,6 +3,7 @@ package org.recap.model.csv;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  */
 
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
-public class FailureReportReCAPCSVRecord  {
+public class FailureReportReCAPCSVRecord implements Serializable{
     @DataField(pos = 1)
     private String owningInstitution;
     @DataField(pos = 2)

@@ -5,6 +5,7 @@ import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.apache.camel.dataformat.bindy.annotation.OneToMany;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  */
 
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
-public class ReCAPCSVFailureRecord {
+public class ReCAPCSVFailureRecord implements Serializable{
     @DataField(pos = 1, columnName = "Owning Institution")
     private String owningInstitution;
     @DataField(pos = 2, columnName = "Owning Institution Bib Id")

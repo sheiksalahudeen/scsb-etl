@@ -5,13 +5,14 @@ import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.apache.camel.dataformat.bindy.annotation.OneToMany;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by premkb on 30/9/16.
  */
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
-public class DataDumpSuccessReport {
+public class DataDumpSuccessReport implements Serializable{
 
     @DataField(pos = 1, columnName = "Institution Code")
     private String institutionCodes;
