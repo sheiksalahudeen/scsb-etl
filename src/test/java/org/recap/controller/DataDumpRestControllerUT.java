@@ -5,14 +5,23 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.recap.ReCAPConstants;
 import org.recap.controller.swagger.DataDumpRestController;
+import org.recap.model.search.SearchRecordsRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
@@ -24,6 +33,9 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
 
     @Autowired
     private DataDumpRestController dataDumpRestController;
+
+    @Value("${solrclient.url}")
+    String solrClientUrl;
 
     @Before
     public void setUp() {
@@ -100,5 +112,32 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         assertTrue(status == 400);
     }
 
+    @Test
+    public void getBibsFromSolr() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
+        searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
+        searchRecordsRequest.setPageSize(10);
+        RestTemplate restTemplate = new RestTemplate();
+        String url = solrClientUrl + "searchService/searchRecords";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api_key","recap");
+        HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
+        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, requestEntity, Map.class);
+        assertTrue(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK"));
+        Map responseEntityBody = responseEntity.getBody();
+        Integer totalPageCount = (Integer) responseEntityBody.get("totalPageCount");
+        String totalBibsCount = (String) responseEntityBody.get("totalBibsCount");
+        String totalItemsCount = (String) responseEntityBody.get("totalItemsCount");
+        List searchResultRows = (List) responseEntityBody.get("searchResultRows");
+        assertNotNull(totalPageCount);
+        assertNotNull(totalBibsCount);
+        assertNotNull(totalItemsCount);
+        assertNotNull(searchResultRows);
+        System.out.println("Total Pages : " + totalPageCount);
+        System.out.println("Total Bibs : " + totalBibsCount);
+        System.out.println("Total Items : " + totalItemsCount);
+        System.out.println("Search Result Rows : " + searchResultRows);
+    }
 
 }
