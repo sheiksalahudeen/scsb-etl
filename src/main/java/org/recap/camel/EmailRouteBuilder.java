@@ -20,7 +20,7 @@ public class EmailRouteBuilder {
     private String emailPassword;
 
     @Autowired
-    public EmailRouteBuilder(CamelContext context, @Value("${data.dump.email.username}") String username, @Value("${data.dump.email.password.directory}") String passwordDirectory,
+    public EmailRouteBuilder(CamelContext context, @Value("${data.dump.email.username}") String username, @Value("${data.dump.email.password.file}") String passwordDirectory,
                              @Value("${data.dump.email.from}") String from, @Value("${data.dump.email.subject}") String subject,
                              @Value("${smtpServer}") String smtpServer) {
         try {

@@ -120,7 +120,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
-        searchRecordsRequest.setPageSize(10000);
+        searchRecordsRequest.setPageSize(10);
         RestTemplate restTemplate = new RestTemplate();
         String url = solrClientUrl + "searchService/searchRecords";
         HttpHeaders headers = new HttpHeaders();

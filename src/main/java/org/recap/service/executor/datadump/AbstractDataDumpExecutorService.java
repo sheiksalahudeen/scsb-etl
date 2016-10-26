@@ -4,9 +4,13 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.CollectionGroupDetailsRepository;
+import org.recap.service.DataDumpSolrService;
 import org.recap.service.email.datadump.DataDumpEmailService;
 import org.recap.service.formatter.datadump.DataDumpFormatterService;
 import org.recap.service.transmission.datadump.DataDumpTransmissionService;
@@ -16,7 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -31,7 +39,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private ExecutorService executorService;
 
     @Autowired
+    DataDumpSolrService dataDumpSolrService;
+
+    @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
     private ProducerTemplate producer;
@@ -54,27 +68,47 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     @Value("${datadump.httpresponse.record.limit}")
     private String httpResonseRecordLimit;
 
+    @Value("${solrclient.url}")
+    String solrClientUrl;
+
     @Override
     public String process(DataDumpRequest dataDumpRequest) throws ExecutionException, InterruptedException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         setExecutorService(dataDumpRequest.getNoOfThreads());
-        int batchSize = dataDumpRequest.getBatchSize();
-        Long totalRecordCount = getTotalRecordsCount(dataDumpRequest);
-        setRecordsAvailability(totalRecordCount,dataDumpRequest);
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
+
         String outputString = null;
         List<Map<String,Object>> successAndFailureFormattedFullList = new ArrayList<>();
         List<Callable<List<BibliographicEntity>>> callables = new ArrayList<>();
-        boolean canProcess = canProcessRecords(totalRecordCount,dataDumpRequest.getTransmissionType());
+
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setOwningInstitutions(dataDumpRequest.getInstitutionCodes());
+        searchRecordsRequest.setCollectionGroupDesignations(getCodesForIds(dataDumpRequest.getCollectionGroupIds()));
+        searchRecordsRequest.setPageSize(10000);
+
+        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        Integer totalPageCount = (Integer) results.get("totalPageCount");
+        Integer totalBibsCount = Integer.valueOf((String) results.get("totalBibsCount"));
+
+        boolean canProcess = canProcessRecords(totalBibsCount,dataDumpRequest.getTransmissionType());
         if(logger.isInfoEnabled()) {
-            logger.info("Total no. of records " + totalRecordCount);
+            logger.info("Total no. of Bibs to export" + totalBibsCount);
         }
+
         if (canProcess) {
-            for(int pageNum = 0;pageNum < loopCount;pageNum++){
-                Callable callable = getCallable(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
+
+            List<LinkedHashMap> dataDumpSearchResults = (List<LinkedHashMap>) results.get("dataDumpSearchResults");
+            callables.add(getImprovedFullDataDumpCallable(dataDumpSearchResults, bibliographicDetailsRepository));
+
+            for(int pageNum = 1; pageNum < totalPageCount; pageNum++){
+                searchRecordsRequest.setPageNumber(pageNum);
+                dataDumpSolrService.getResults(searchRecordsRequest);
+                dataDumpSearchResults = (List<LinkedHashMap>) results.get("dataDumpSearchResults");
+
+                Callable callable = getImprovedFullDataDumpCallable(dataDumpSearchResults,bibliographicDetailsRepository);
                 callables.add(callable);
             }
+
             List<Future<List<BibliographicEntity>>> futureList = getExecutorService().invokeAll(callables);
             futureList.stream()
                       .map(future -> {
@@ -106,7 +140,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode()+"-"+dataDumpRequest.getDateTimeString();
             routeMap.put(ReCAPConstants.FILENAME,fileName);
             dataDumpTransmissionService.startTranmission(dataDumpRequest, routeMap);
-            processEmail(dataDumpRequest,totalRecordCount,dataDumpRequest.getDateTimeString());
+            processEmail(dataDumpRequest,totalBibsCount,dataDumpRequest.getDateTimeString());
 
         }else{
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
@@ -120,7 +154,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return outputString;
     }
 
-    private void processEmail(DataDumpRequest dataDumpRequest,Long totalRecordCount,String dateTimeStringForFolder){
+    private void processEmail(DataDumpRequest dataDumpRequest,Integer totalRecordCount,String dateTimeStringForFolder){
         if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
             dataDumpEmailService.sendEmail(dataDumpRequest.getInstitutionCodes(), totalRecordCount, dataDumpRequest.getRequestingInstitutionCode(), dataDumpRequest.getTransmissionType(),dateTimeStringForFolder, dataDumpRequest.getToEmailAddress());
@@ -135,7 +169,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         }
     }
 
-    private boolean canProcessRecords(Long totalRecordCount, String transmissionType ){
+    private boolean canProcessRecords(Integer totalRecordCount, String transmissionType ){
         boolean canProcess = true;
         if(totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)){
             canProcess = false;
@@ -203,14 +237,23 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return routeMap;
     }
 
-    public int getLoopCount(Long totalRecordCount,int batchSize){
-        int quotient = Integer.valueOf(Long.toString(totalRecordCount)) / (batchSize);
-        int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
-        int loopCount = remainder == 0 ? quotient : quotient + 1;
-        return loopCount;
+    private List<String> getCodesForIds(List<Integer> collectionGroupIds) {
+        List codes = new ArrayList();
+        Iterable<CollectionGroupEntity> all =
+                collectionGroupDetailsRepository.findAll();
+
+        for (Iterator<CollectionGroupEntity> iterator = all.iterator(); iterator.hasNext(); ) {
+            CollectionGroupEntity collectionGroupEntity = iterator.next();
+            if(collectionGroupIds.contains(collectionGroupEntity.getCollectionGroupId())){
+                codes.add(collectionGroupEntity.getCollectionGroupCode());
+            }
+        }
+        return codes;
     }
 
-   public abstract Long getTotalRecordsCount(DataDumpRequest dataDumpRequest);
+    public abstract Long getTotalRecordsCount(DataDumpRequest dataDumpRequest);
 
     public abstract Callable getCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository);
+
+    protected abstract Callable<List<BibliographicEntity>> getImprovedFullDataDumpCallable(List<LinkedHashMap> dataDumpSearchResults, BibliographicDetailsRepository bibliographicDetailsRepository);
 }

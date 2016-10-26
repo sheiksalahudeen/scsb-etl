@@ -5,6 +5,7 @@ import org.recap.model.export.DataDumpRequest;
 import org.recap.model.export.FullDataDumpCallable;
 import org.recap.model.export.IncrementalDataDumpCallable;
 import org.recap.model.jaxb.marc.BibRecords;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DateUtil;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -44,6 +47,11 @@ public class IncrementalDataDumpExecutorService  extends AbstractDataDumpExecuto
     public Callable getCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository) {
         Callable callable = appContext.getBean(IncrementalDataDumpCallable.class,pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
         return callable;
+    }
+
+    @Override
+    protected Callable<List<BibliographicEntity>> getImprovedFullDataDumpCallable(List<LinkedHashMap> dataDumpSearchResults, BibliographicDetailsRepository bibliographicDetailsRepository) {
+        return null;
     }
 
     @Override

@@ -43,12 +43,12 @@ public class DataFieldType {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     protected String id;
-    @XmlAttribute(name = "tag", required = true)
-    protected String tag;
     @XmlAttribute(name = "ind1", required = true)
     protected String ind1;
     @XmlAttribute(name = "ind2", required = true)
     protected String ind2;
+    @XmlAttribute(name = "tag", required = true)
+    protected String tag;
 
     /**
      * Gets the value of the subfield property.

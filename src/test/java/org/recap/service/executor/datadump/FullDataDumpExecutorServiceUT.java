@@ -6,18 +6,25 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
+import org.recap.model.export.FullDataDumpCallable;
+import org.recap.model.export.ImprovedFullDataDumpCallable;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.search.DataDumpSearchResult;
+import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.service.DataDumpSolrService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -29,7 +36,15 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     private Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
 
     @Autowired
+    private ApplicationContext appContext;
+
+    @Autowired
+    DataDumpSolrService dataDumpSolrService;
+
+    @Autowired
     private FullDataDumpExecutorService fullDataDumpExecutorService;
+
+    ImprovedFullDataDumpCallable improvedFullDataDumpCallable;
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -57,12 +72,65 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
 
     private String requestingInstitutionCode = "PUL";
 
+
+    @Test
+    public void exportFullDumpForNYPLAndCUL() throws Exception {
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setNoOfThreads(1);
+        dataDumpRequest.setBatchSize(10000);
+        dataDumpRequest.setFetchType("0");
+        dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
+        List<Integer> cgIds = new ArrayList<>();
+        cgIds.add(1);
+        cgIds.add(2);
+        dataDumpRequest.setCollectionGroupIds(cgIds);
+        List<String> institutionCodes = new ArrayList<>();
+        institutionCodes.add("CUL");
+        institutionCodes.add("NYPL");
+        dataDumpRequest.setInstitutionCodes(institutionCodes);
+        dataDumpRequest.setTransmissionType("2");
+        dataDumpRequest.setOutputFormat("0");
+        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setDateTimeString(getDateTimeString());
+
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
+        searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
+        searchRecordsRequest.setPageSize(10);
+
+        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        List<LinkedHashMap> dataDumpSearchResults = (List<LinkedHashMap>) results.get("dataDumpSearchResults");
+
+        improvedFullDataDumpCallable = appContext.getBean(ImprovedFullDataDumpCallable.class,dataDumpSearchResults,bibliographicDetailsRepository);
+        assertNotNull(improvedFullDataDumpCallable);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+        Future future = executorService.submit(improvedFullDataDumpCallable);
+
+        List<BibliographicEntity> resultFromFuture = (List<BibliographicEntity>) future.get();
+
+        assertNotNull(resultFromFuture);
+        assertEquals(10, resultFromFuture.size());
+
+        for (Iterator<BibliographicEntity> iterator = resultFromFuture.iterator(); iterator.hasNext(); ) {
+            BibliographicEntity bibliographicEntity = iterator.next();
+            assertNotNull(bibliographicEntity);
+            assertNotNull(bibliographicEntity.getItemEntities());
+
+        }
+
+        executorService.shutdown();
+        Thread.sleep(4000);
+    }
+
     @Test
     public void getFullDumpForMarcXmlFileSystem()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setNoOfThreads(1);
         dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("0");
+        dataDumpRequest.setToEmailAddress("peri.subrahmanya@htcinc.com");
         dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);
@@ -76,8 +144,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
+
         Thread.sleep(1000);
         String day = getDateTimeString();
         File file;

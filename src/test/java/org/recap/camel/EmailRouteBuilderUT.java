@@ -38,7 +38,7 @@ public class EmailRouteBuilderUT extends BaseTestCase {
         String day = sdf.format(date);
         String  location = "File System - " + fileSystemDataDumpDirectory + "/" + "NYPL" + File.separator + day;
         emailPayLoad.setLocation(location);
-        emailPayLoad.setCount(new Long(100));
+        emailPayLoad.setCount(100);
         emailPayLoad.setTo(dataDumpEmailNyplTo);
         producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
     }

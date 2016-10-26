@@ -10,7 +10,7 @@ public class EmailPayLoad implements Serializable{
 
     private List<String> institutions;
     private String location;
-    private Long count;
+    private Integer count;
     private String to;
 
     public List<String> getInstitutions() {
@@ -29,11 +29,11 @@ public class EmailPayLoad implements Serializable{
         this.location = location;
     }
 
-    public Long getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(Long count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
 
