@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -114,10 +115,12 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
 
     @Test
     public void getBibsFromSolr() throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
-        searchRecordsRequest.setPageSize(10);
+        searchRecordsRequest.setPageSize(10000);
         RestTemplate restTemplate = new RestTemplate();
         String url = solrClientUrl + "searchService/searchRecords";
         HttpHeaders headers = new HttpHeaders();
@@ -128,16 +131,14 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         Map responseEntityBody = responseEntity.getBody();
         Integer totalPageCount = (Integer) responseEntityBody.get("totalPageCount");
         String totalBibsCount = (String) responseEntityBody.get("totalBibsCount");
-        String totalItemsCount = (String) responseEntityBody.get("totalItemsCount");
-        List searchResultRows = (List) responseEntityBody.get("searchResultRows");
+        List dataDumpSearchResults = (List) responseEntityBody.get("dataDumpSearchResults");
         assertNotNull(totalPageCount);
         assertNotNull(totalBibsCount);
-        assertNotNull(totalItemsCount);
-        assertNotNull(searchResultRows);
+        assertNotNull(dataDumpSearchResults);
         System.out.println("Total Pages : " + totalPageCount);
         System.out.println("Total Bibs : " + totalBibsCount);
-        System.out.println("Total Items : " + totalItemsCount);
-        System.out.println("Search Result Rows : " + searchResultRows);
+        stopWatch.stop();
+        System.out.println("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
     }
 
 }
