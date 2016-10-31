@@ -51,6 +51,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("fetchType","0")
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","0")
+                .param("emailToAddress","hemalatha.s@htcindia.com")
                 .param("collectionGroupIds","1,2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
@@ -66,6 +67,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("fetchType","0")
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","1")
+                .param("emailToAddress","hemalatha.s@htcindia.com")
                 .param("collectionGroupIds","1,2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
@@ -80,6 +82,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("fetchType","1")
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","1")
+                .param("emailToAddress","hemalatha.s@htcindia.com")
                 .param("date","2016-08-30 11:20"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
@@ -93,7 +96,8 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("institutionCodes","NYPL")
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","1")
-                .param("fetchType","2"))
+                .param("emailToAddress","hemalatha.s@htcindia.com")
+                .param("fetchType","3"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
         assertEquals("1. "+ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
@@ -105,8 +109,9 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("fetchType","1")
                 .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","1")
+                .param("emailToAddress","hemalatha.s@htcindia.com")
                 .param("institutionCodes","NYPL"))
-
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
         assertEquals("1. "+ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
