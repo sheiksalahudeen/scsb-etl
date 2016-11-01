@@ -37,8 +37,10 @@ public class ActiveMQRouteBuilderUT extends BaseTestCase{
         String dateTimeString = getDateTimeString();
         routeMap.put(ReCAPConstants.DATETIME_FOLDER, dateTimeString);
         routeMap.put("fileFormat",ReCAPConstants.XML_FILE_FORMAT);
-        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q, dummyXml, "routeMap", routeMap);
+
         String filename = dumpDirectoryPath + File.separator + requestingInstituionCode+ File.separator +dateTimeString+ File.separator +ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstituionCode+"-"+dateTimeString+ ReCAPConstants.XML_FILE_FORMAT;
+        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q, dummyXml, "fileName", "tst");
+
         File file = new File(filename);
         boolean fileExists = file.exists();
         assertTrue(fileExists);
