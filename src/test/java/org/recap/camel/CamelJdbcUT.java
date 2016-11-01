@@ -9,6 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
+import org.recap.ReCAPConstants;
 import org.recap.repository.XmlRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,4 +65,29 @@ public class CamelJdbcUT extends BaseTestCase {
             return FilenameUtils.getExtension(file.getAbsoluteFilePath()).equalsIgnoreCase("xml");
         }
     }
+
+
+
+//    @Test
+//    public void exportDataDump() throws Exception {
+//
+//        camelContext.addRoutes(new RouteBuilder() {
+//            @Override
+//            public void configure() throws Exception {
+//                from("scsbactivemq:queue:bibEntityForDataExportQ")
+//                        .marshal()
+//                        .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
+//
+//            }
+//        });
+//
+//        camelContext.addRoutes(new RouteBuilder() {
+//            @Override
+//            public void configure() throws Exception {
+//                from("scsbactivemq:queue:solrInputForDataExportQ")
+//                        .process(new SolrSearchResultsProcessorForExport())
+//                .to("scsbactivemq:queue:bibEntityForDataExportQ");
+//            }
+//        });
+//    }
 }
