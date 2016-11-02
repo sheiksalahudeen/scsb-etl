@@ -1,30 +1,36 @@
 package org.recap.camel;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import org.recap.ReCAPConstants;
+import org.recap.camel.datadump.SolrSearchResultsProcessorForExport;
+import org.recap.model.search.SearchRecordsRequest;
+import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
+import org.recap.service.DataDumpSolrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Created by peris on 7/17/16.
  */
 
-@Ignore
 public class CamelJdbcUT extends BaseTestCase {
 
     @Value("${etl.split.xml.tag.name}")
     String xmlTagName;
 
-    @Value("${etl.load.directory}")
+    @Value("${etl.pool.size}")
     Integer etlPoolSize;
 
     @Value("${etl.pool.size}")
@@ -35,6 +41,15 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Autowired
     XmlRecordRepository xmlRecordRepository;
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    DataDumpSolrService dataDumpSolrService;
+
+    @Autowired
+    private ProducerTemplate producer;
 
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
@@ -67,27 +82,35 @@ public class CamelJdbcUT extends BaseTestCase {
     }
 
 
+    @Test
+    public void exportDataDump() throws Exception {
 
-//    @Test
-//    public void exportDataDump() throws Exception {
-//
-//        camelContext.addRoutes(new RouteBuilder() {
-//            @Override
-//            public void configure() throws Exception {
-//                from("scsbactivemq:queue:bibEntityForDataExportQ")
-//                        .marshal()
-//                        .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
-//
-//            }
-//        });
-//
-//        camelContext.addRoutes(new RouteBuilder() {
-//            @Override
-//            public void configure() throws Exception {
-//                from("scsbactivemq:queue:solrInputForDataExportQ")
-//                        .process(new SolrSearchResultsProcessorForExport())
-//                .to("scsbactivemq:queue:bibEntityForDataExportQ");
-//            }
-//        });
-//    }
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("scsbactivemq:queue:bibEntityForDataExportQ")
+                        .process(new MarcXmlDataFormatProcessor())
+                        .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
+
+            }
+        });
+
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("scsbactivemq:queue:solrInputForDataExportQ")
+                        .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository))
+                        .to("scsbactivemq:queue:bibEntityForDataExportQ");
+            }
+        });
+
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
+        searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
+        searchRecordsRequest.setPageSize(100);
+        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        producer.sendBody("scsbactivemq:queue:solrInputForDataExportQ", results);
+
+        Thread.sleep(20000);
+    }
 }

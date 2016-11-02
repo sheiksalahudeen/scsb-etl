@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -102,7 +103,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
             for(int pageNum = 1; pageNum < totalPageCount; pageNum++){
                 searchRecordsRequest.setPageNumber(pageNum);
-                dataDumpSolrService.getResults(searchRecordsRequest);
+                results = dataDumpSolrService.getResults(searchRecordsRequest);
                 dataDumpSearchResults = (List<LinkedHashMap>) results.get("dataDumpSearchResults");
 
                 Callable callable = getImprovedFullDataDumpCallable(dataDumpSearchResults,bibliographicDetailsRepository);
@@ -127,7 +128,10 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 Object formattedObject = dataDumpFormatterService.getFormattedObject(bibliographicEntityList,dataDumpRequest.getOutputFormat());
                 Map<String,Object> successAndFailureFormattedList = (Map<String,Object>) formattedObject;
                 outputString = (String) successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_FORMATTEDSTRING);
-                producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  outputString, "routeMap", getRouteMap(dataDumpRequest, count));
+
+                String fileName = dataDumpRequest.getRequestingInstitutionCode()+ File.separator+dataDumpRequest.getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ dataDumpRequest.getRequestingInstitutionCode()+count;
+                logger.info("filename----->"+fileName);
+                producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  outputString, "fileName", fileName);
                 successAndFailureFormattedFullList.add(successAndFailureFormattedList);
                 count++;
                 stopWatchPerFile.stop();
