@@ -51,6 +51,9 @@ public class CamelJdbcUT extends BaseTestCase {
     @Autowired
     private ProducerTemplate producer;
 
+    @Autowired
+    private MarcXmlDataFormatProcessor marcXmlDataFormatProcessor;
+
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
@@ -89,7 +92,7 @@ public class CamelJdbcUT extends BaseTestCase {
             @Override
             public void configure() throws Exception {
                 from("scsbactivemq:queue:bibEntityForDataExportQ")
-                        .process(new MarcXmlDataFormatProcessor())
+                        .process(marcXmlDataFormatProcessor)
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
 
             }
