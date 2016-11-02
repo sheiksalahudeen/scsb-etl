@@ -30,6 +30,6 @@ public class DataDumpFileSystemRouteBuilder extends RouteBuilder {
                 .to("file:"+
                         dumpDirectoryPath +
                         File.separator +
-                        "?fileName=${header.fileName}-${date:now:ddMMMyyyyHHmm}.xml");
+                        "?fileName=${header.fileName}-${date:now:ddMMMyyyyHHmmss}.xml");
     }
 }

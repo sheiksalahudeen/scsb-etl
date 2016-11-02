@@ -7,6 +7,8 @@ import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -15,20 +17,15 @@ import java.util.Map;
  */
 
 @Component
-public class MarcXmlDataFormatProcessor implements Processor {
+public class MarcXmlDataFormatProcessor {
 
     @Autowired
     MarcXmlFormatterService marcXmlFormatterService;
 
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        Object body = exchange.getIn().getBody();
-        List<BibliographicEntity> bibliographicEntitys = (List<BibliographicEntity>) body;
-        Map results = (Map) marcXmlFormatterService.getFormattedOutput(bibliographicEntitys);
+    public String processEntities(List<BibliographicEntity> bibliographicEntities) throws Exception {
+        Map results = (Map) marcXmlFormatterService.getFormattedOutput(bibliographicEntities);
         String formattedString = (String) results.get("formattedString");
-        if (null!= formattedString) {
-            exchange.getOut().setBody(formattedString);
-        }
+        return formattedString;
     }
 }
 

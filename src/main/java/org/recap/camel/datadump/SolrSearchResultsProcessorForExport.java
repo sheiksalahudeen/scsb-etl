@@ -14,13 +14,10 @@ import java.util.*;
  */
 
 public class SolrSearchResultsProcessorForExport implements Processor {
-    private final ProducerTemplate producer;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
-    public SolrSearchResultsProcessorForExport(BibliographicDetailsRepository bibliographicDetailsRepository, ProducerTemplate producer) {
+    public SolrSearchResultsProcessorForExport(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
-        this.producer = producer;
-
     }
 
     @Override
@@ -28,6 +25,8 @@ public class SolrSearchResultsProcessorForExport implements Processor {
 
         Map results = (Map) exchange.getIn().getBody();
         List<HashMap> dataDumpSearchResults = (List<HashMap>) results.get("dataDumpSearchResults");
+
+        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
         for (Iterator<HashMap> iterator = dataDumpSearchResults.iterator(); iterator.hasNext(); ) {
             HashMap linkedHashMap = iterator.next();
@@ -49,9 +48,11 @@ public class SolrSearchResultsProcessorForExport implements Processor {
                 }
 
                 bibliographicEntity.setItemEntities(filteredItems);
-                producer.sendBody("scsbactivemq:queue:bibEntityForDataExportQ", bibliographicEntity);
+                bibliographicEntities.add(bibliographicEntity);
             }
         }
 
+        exchange.getOut().setBody(bibliographicEntities);
+        exchange.getOut().setHeader("fileName", exchange.getIn().getHeader("fileName"));
     }
 }

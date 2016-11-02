@@ -1,18 +1,22 @@
 package org.recap.camel;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
+import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
+import org.apache.camel.processor.aggregate.GroupedExchangeAggregationStrategy;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.SolrSearchResultsProcessorForExport;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
@@ -21,9 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by peris on 7/17/16.
@@ -91,22 +94,23 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDump() throws Exception {
-
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:bibEntityForDataExportQ?destination.consumer.prefetchSize=200")
-                        .process(marcXmlDataFormatProcessor)
-                        .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
-
+                from("scsbactivemq:queue:solrInputForDataExportQ")
+                        .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository))
+                        .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate())
+                        .to("scsbactivemq:queue:bibEntityForDataExportQ");
             }
         });
 
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:solrInputForDataExportQ")
-                        .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository, producer));
+                from("scsbactivemq:queue:bibEntityForDataExportQ")
+                        .bean(marcXmlDataFormatProcessor, "processEntities")
+                        .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
+
             }
         });
 
@@ -115,8 +119,75 @@ public class CamelJdbcUT extends BaseTestCase {
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(100);
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
-        producer.sendBody("scsbactivemq:queue:solrInputForDataExportQ", results);
+        String fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
+        producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
 
-        Thread.sleep(20000);
+        Integer totalPageCount = (Integer) results.get("totalPageCount");
+        for(int pageNum = 1; pageNum < totalPageCount; pageNum++){
+            searchRecordsRequest.setPageNumber(pageNum);
+            dataDumpSolrService.getResults(searchRecordsRequest);
+            fileName = "PUL"+ File.separator+new Date()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
+            producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
+        }
+
+        while (true) {
+
+        }
+    }
+
+    public class DataExportAggregator implements AggregationStrategy {
+
+        @Override
+        public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+            if (oldExchange == null) {
+                oldExchange = new DefaultExchange(newExchange);
+                oldExchange.getIn().setHeaders(newExchange.getIn().getHeaders());
+                List<Object> body = new ArrayList<>();
+                oldExchange.getIn().setBody(body);
+                oldExchange.getExchangeId();
+            }
+            List body = (List) newExchange.getIn().getBody();
+            oldExchange.getIn().getBody(List.class).addAll(body);
+
+            Object oldBatchSize = oldExchange.getIn().getHeader("batchSize");
+            Integer newBatchSize = 0;
+            if(null != oldBatchSize){
+                newBatchSize= body.size() + (Integer)oldBatchSize;
+            } else {
+                newBatchSize = body.size();
+            }
+            oldExchange.getIn().setHeader("batchSize", newBatchSize);
+
+            for (String key : newExchange.getProperties().keySet()) {
+                oldExchange.setProperty(key, newExchange.getProperty(key));
+            }
+
+            return oldExchange;
+        }
+    }
+
+    public class DataExportPredicate implements Predicate {
+
+        private Integer batchSize;
+
+        public DataExportPredicate(Integer batchSize) {
+            this.batchSize = batchSize;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+           Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
+           if(this.batchSize.equals(batchSize)){
+               exchange.getIn().setHeader("batchSize", 0);
+               return true;
+           }
+           return false;
+        }
+    }
+
+    private String getDateTimeString(){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        return sdf.format(date);
     }
 }
