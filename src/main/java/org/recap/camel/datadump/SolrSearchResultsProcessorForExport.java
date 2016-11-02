@@ -2,6 +2,7 @@ package org.recap.camel.datadump;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -13,10 +14,13 @@ import java.util.*;
  */
 
 public class SolrSearchResultsProcessorForExport implements Processor {
-    private final BibliographicDetailsRepository bibliographicDetailsRepository;
+    private final ProducerTemplate producer;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
-    public SolrSearchResultsProcessorForExport(BibliographicDetailsRepository bibliographicDetailsRepository) {
+    public SolrSearchResultsProcessorForExport(BibliographicDetailsRepository bibliographicDetailsRepository, ProducerTemplate producer) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+        this.producer = producer;
+
     }
 
     @Override
@@ -24,8 +28,6 @@ public class SolrSearchResultsProcessorForExport implements Processor {
 
         Map results = (Map) exchange.getIn().getBody();
         List<HashMap> dataDumpSearchResults = (List<HashMap>) results.get("dataDumpSearchResults");
-
-        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
         for (Iterator<HashMap> iterator = dataDumpSearchResults.iterator(); iterator.hasNext(); ) {
             HashMap linkedHashMap = iterator.next();
@@ -47,10 +49,9 @@ public class SolrSearchResultsProcessorForExport implements Processor {
                 }
 
                 bibliographicEntity.setItemEntities(filteredItems);
-                bibliographicEntities.add(bibliographicEntity);
+                producer.sendBody("scsbactivemq:queue:bibEntityForDataExportQ", bibliographicEntity);
             }
         }
 
-        exchange.getOut().setBody(bibliographicEntities);
     }
 }

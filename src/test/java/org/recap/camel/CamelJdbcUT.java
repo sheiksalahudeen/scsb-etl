@@ -1,10 +1,12 @@
 package org.recap.camel;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
+import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
@@ -18,7 +20,9 @@ import org.recap.service.DataDumpSolrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -91,7 +95,7 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:bibEntityForDataExportQ")
+                from("scsbactivemq:queue:bibEntityForDataExportQ?destination.consumer.prefetchSize=200")
                         .process(marcXmlDataFormatProcessor)
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
 
@@ -102,8 +106,7 @@ public class CamelJdbcUT extends BaseTestCase {
             @Override
             public void configure() throws Exception {
                 from("scsbactivemq:queue:solrInputForDataExportQ")
-                        .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository))
-                        .to("scsbactivemq:queue:bibEntityForDataExportQ");
+                        .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository, producer));
             }
         });
 
