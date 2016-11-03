@@ -62,9 +62,6 @@ public class CamelJdbcUT extends BaseTestCase {
     @Autowired
     private MarcRecordFormatProcessor marcRecordFormatProcessor;
 
-    @Autowired
-    private MarcXMLFormatProcessor marcXMLFormatProcessor;
-
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
@@ -122,7 +119,7 @@ public class CamelJdbcUT extends BaseTestCase {
             public void configure() throws Exception {
                 from("scsbactivemq:queue:MarcRecordForDataExportQ?concurrentConsumers=10")
                         .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
-                        .process(marcXMLFormatProcessor)
+                        .process(marcRecordFormatProcessor)
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
 
             }
