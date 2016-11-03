@@ -57,6 +57,9 @@ public class CamelJdbcUT extends BaseTestCase {
     private ProducerTemplate producer;
 
     @Autowired
+    private SolrSearchResultsProcessorForExport solrSearchResultsProcessorForExport;
+
+    @Autowired
     private MarcRecordFormatProcessor marcRecordFormatProcessor;
 
     @Autowired
@@ -99,7 +102,7 @@ public class CamelJdbcUT extends BaseTestCase {
             @Override
             public void configure() throws Exception {
                 from("scsbactivemq:queue:solrInputForDataExportQ?concurrentConsumers=10")
-                        .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository))
+                        .process(solrSearchResultsProcessorForExport)
                         .to("scsbactivemq:queue:bibEntityForDataExportQ");
             }
         });
@@ -129,14 +132,21 @@ public class CamelJdbcUT extends BaseTestCase {
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(10000);
+
+        long startTime = System.currentTimeMillis();
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken to fetch 10K results for page 0 is : " + (endTime-startTime)/1000 + " ms " );
         String fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
         producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
 
         Integer totalPageCount = (Integer) results.get("totalPageCount");
         for(int pageNum = 1; pageNum < totalPageCount; pageNum++){
             searchRecordsRequest.setPageNumber(pageNum);
+            startTime = System.currentTimeMillis();
             Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
+            endTime = System.currentTimeMillis();
+            System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime-startTime)/1000 + " ms " );
             fileName = "PUL"+ File.separator+new Date()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
             producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results1, "fileName", fileName);
         }

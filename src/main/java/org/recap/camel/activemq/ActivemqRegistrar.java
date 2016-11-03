@@ -29,7 +29,7 @@ public class ActivemqRegistrar {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(defaultBrokerURL);
         ActiveMQComponent activeMQComponent = new ActiveMQComponent();
         activeMQComponent.setConnectionFactory(connectionFactory);
+        activeMQComponent.setTrustAllPackages(true);
         camelContext.addComponent("scsbactivemq", activeMQComponent);
     }
-
 }
