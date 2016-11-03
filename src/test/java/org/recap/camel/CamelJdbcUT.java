@@ -98,7 +98,7 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:solrInputForDataExportQ")
+                from("scsbactivemq:queue:solrInputForDataExportQ?concurrentConsumers=10")
                         .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository))
                         .to("scsbactivemq:queue:bibEntityForDataExportQ");
             }
@@ -107,7 +107,7 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:bibEntityForDataExportQ")
+                from("scsbactivemq:queue:bibEntityForDataExportQ?concurrentConsumers=10")
                         .process(marcRecordFormatProcessor)
                         .to("scsbactivemq:queue:MarcRecordForDataExportQ");
 
@@ -117,8 +117,8 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:MarcRecordForDataExportQ")
-                        .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(10000))
+                from("scsbactivemq:queue:MarcRecordForDataExportQ?concurrentConsumers=10")
+                        .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
                         .process(marcXMLFormatProcessor)
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
 
@@ -128,7 +128,7 @@ public class CamelJdbcUT extends BaseTestCase {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
-        searchRecordsRequest.setPageSize(1000);
+        searchRecordsRequest.setPageSize(10000);
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         String fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
         producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
@@ -140,6 +140,8 @@ public class CamelJdbcUT extends BaseTestCase {
             fileName = "PUL"+ File.separator+new Date()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
             producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
         }
+
+        producer.sendBodyAndHeader("scsbactivemq:queue:MarcRecordForDataExportQ", null, "batchComplete", true);
 
         while (true) {
 
@@ -158,20 +160,24 @@ public class CamelJdbcUT extends BaseTestCase {
                 oldExchange.getExchangeId();
             }
             List body = (List) newExchange.getIn().getBody();
-            oldExchange.getIn().getBody(List.class).addAll(body);
+            List oldBody = oldExchange.getIn().getBody(List.class);
+            if (null!= oldBody && null!= body) {
+                oldBody.addAll(body);
+                Object oldBatchSize = oldExchange.getIn().getHeader("batchSize");
+                Integer newBatchSize = 0;
+                if(null != oldBatchSize){
+                    newBatchSize= body.size() + (Integer)oldBatchSize;
+                } else {
+                    newBatchSize = body.size();
+                }
+                oldExchange.getIn().setHeader("batchSize", newBatchSize);
 
-            Object oldBatchSize = oldExchange.getIn().getHeader("batchSize");
-            Integer newBatchSize = 0;
-            if(null != oldBatchSize){
-                newBatchSize= body.size() + (Integer)oldBatchSize;
-            } else {
-                newBatchSize = body.size();
+                for (String key : newExchange.getProperties().keySet()) {
+                    oldExchange.setProperty(key, newExchange.getProperty(key));
+                }
             }
-            oldExchange.getIn().setHeader("batchSize", newBatchSize);
 
-            for (String key : newExchange.getProperties().keySet()) {
-                oldExchange.setProperty(key, newExchange.getProperty(key));
-            }
+
 
             return oldExchange;
         }
@@ -188,7 +194,8 @@ public class CamelJdbcUT extends BaseTestCase {
         @Override
         public boolean matches(Exchange exchange) {
            Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
-           if(this.batchSize.equals(batchSize)){
+            boolean batchComplete = null!= exchange.getIn().getHeader("batchComplete") ? exchange.getIn().getHeader("batchComplete").equals(true) : false;
+            if(this.batchSize.equals(batchSize) || batchComplete){
                exchange.getIn().setHeader("batchSize", 0);
                return true;
            }
