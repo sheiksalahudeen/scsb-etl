@@ -188,7 +188,7 @@ public class CamelJdbcUT extends BaseTestCase {
         @Override
         public boolean matches(Exchange exchange) {
            Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
-           if(this.batchSize.equals(batchSize) || this.batchSize % batchSize != 0){
+           if(this.batchSize.equals(batchSize)){
                exchange.getIn().setHeader("batchSize", 0);
                return true;
            }
