@@ -58,18 +58,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface{
         String formatError = null;
         List<Record> recordList = new ArrayList<>();
         for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
-            try {
-                Record record = getRecordFromContent(bibliographicEntity.getContent());
-                update001Field(record,bibliographicEntity);
-                record = addHoldingInfo(record,bibliographicEntity.getHoldingsEntities());
-                record = addItemInfo(record,bibliographicEntity.getItemEntities());
-                recordList.add(record);
-                successList.add(bibliographicEntity);
-                failureList.add(bibliographicEntity);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                failureList.add(bibliographicEntity);
-            }
+            prepareBibEntity(successList, failureList, recordList, bibliographicEntity);
         }
         try {
             formattedString = covertToMarcXmlString(recordList);
@@ -82,6 +71,21 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface{
         successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATTEDSTRING,formattedString);
         successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATERROR,formatError);
         return successAndFailureFormattedList;
+    }
+
+    public void prepareBibEntity(List<BibliographicEntity> successList, List<BibliographicEntity> failureList, List<Record> recordList, BibliographicEntity bibliographicEntity) {
+        try {
+            Record record = getRecordFromContent(bibliographicEntity.getContent());
+            update001Field(record,bibliographicEntity);
+            record = addHoldingInfo(record,bibliographicEntity.getHoldingsEntities());
+            record = addItemInfo(record,bibliographicEntity.getItemEntities());
+            recordList.add(record);
+            successList.add(bibliographicEntity);
+            failureList.add(bibliographicEntity);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            failureList.add(bibliographicEntity);
+        }
     }
 
     private Record getRecordFromContent(byte[] content){
@@ -213,7 +217,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface{
         return record;
     }
 
-    private String covertToMarcXmlString(List<Record> recordList){
+    public String covertToMarcXmlString(List<Record> recordList){
         OutputStream out = new ByteArrayOutputStream();
         MarcWriter writer = new MarcXmlWriter(out,"UTF-8", true);
         try {

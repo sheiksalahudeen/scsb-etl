@@ -9,14 +9,12 @@ import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
-import org.apache.camel.processor.aggregate.GroupedExchangeAggregationStrategy;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.SolrSearchResultsProcessorForExport;
-import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
@@ -59,7 +57,10 @@ public class CamelJdbcUT extends BaseTestCase {
     private ProducerTemplate producer;
 
     @Autowired
-    private MarcXmlDataFormatProcessor marcXmlDataFormatProcessor;
+    private MarcRecordFormatProcessor marcRecordFormatProcessor;
+
+    @Autowired
+    private MarcXMLFormatProcessor marcXMLFormatProcessor;
 
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
@@ -99,7 +100,6 @@ public class CamelJdbcUT extends BaseTestCase {
             public void configure() throws Exception {
                 from("scsbactivemq:queue:solrInputForDataExportQ")
                         .process(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository))
-                        .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate())
                         .to("scsbactivemq:queue:bibEntityForDataExportQ");
             }
         });
@@ -108,7 +108,18 @@ public class CamelJdbcUT extends BaseTestCase {
             @Override
             public void configure() throws Exception {
                 from("scsbactivemq:queue:bibEntityForDataExportQ")
-                        .bean(marcXmlDataFormatProcessor, "processEntities")
+                        .process(marcRecordFormatProcessor)
+                        .to("scsbactivemq:queue:MarcRecordForDataExportQ");
+
+            }
+        });
+
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("scsbactivemq:queue:MarcRecordForDataExportQ")
+                        .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(10000))
+                        .process(marcXMLFormatProcessor)
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
 
             }
@@ -117,7 +128,7 @@ public class CamelJdbcUT extends BaseTestCase {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
-        searchRecordsRequest.setPageSize(100);
+        searchRecordsRequest.setPageSize(1000);
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         String fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
         producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
@@ -177,7 +188,7 @@ public class CamelJdbcUT extends BaseTestCase {
         @Override
         public boolean matches(Exchange exchange) {
            Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
-           if(this.batchSize.equals(batchSize)){
+           if(this.batchSize.equals(batchSize) || this.batchSize % batchSize == 0){
                exchange.getIn().setHeader("batchSize", 0);
                return true;
            }
