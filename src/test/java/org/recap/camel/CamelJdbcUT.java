@@ -136,9 +136,9 @@ public class CamelJdbcUT extends BaseTestCase {
         Integer totalPageCount = (Integer) results.get("totalPageCount");
         for(int pageNum = 1; pageNum < totalPageCount; pageNum++){
             searchRecordsRequest.setPageNumber(pageNum);
-            dataDumpSolrService.getResults(searchRecordsRequest);
+            Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
             fileName = "PUL"+ File.separator+new Date()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
-            producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
+            producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results1, "fileName", fileName);
         }
 
         producer.sendBodyAndHeader("scsbactivemq:queue:MarcRecordForDataExportQ", null, "batchComplete", true);
