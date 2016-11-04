@@ -19,6 +19,7 @@ import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
 import org.recap.service.DataDumpSolrService;
+import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -54,15 +55,15 @@ public class CamelJdbcUT extends BaseTestCase {
     DataDumpSolrService dataDumpSolrService;
 
     @Autowired
+    MarcXmlFormatterService marcXmlFormatterService;
+
+    @Autowired
     private ProducerTemplate producer;
 
-    @Autowired
     private SolrSearchResultsProcessorForExport solrSearchResultsProcessorForExport;
 
-    @Autowired
     private MarcRecordFormatProcessor marcRecordFormatProcessor;
 
-    @Autowired
     private MarcXMLFormatProcessor marcXMLFormatProcessor;
 
     @Test
@@ -102,7 +103,7 @@ public class CamelJdbcUT extends BaseTestCase {
             @Override
             public void configure() throws Exception {
                 from("scsbactivemq:queue:solrInputForDataExportQ?concurrentConsumers=10")
-                        .process(solrSearchResultsProcessorForExport)
+                        .bean(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository), "processBibEntities")
                         .to("scsbactivemq:queue:bibEntityForDataExportQ");
             }
         });
@@ -111,7 +112,7 @@ public class CamelJdbcUT extends BaseTestCase {
             @Override
             public void configure() throws Exception {
                 from("scsbactivemq:queue:bibEntityForDataExportQ?concurrentConsumers=10")
-                        .process(marcRecordFormatProcessor)
+                        .bean(new MarcRecordFormatProcessor(marcXmlFormatterService), "processRecords")
                         .to("scsbactivemq:queue:MarcRecordForDataExportQ");
 
             }
@@ -122,7 +123,7 @@ public class CamelJdbcUT extends BaseTestCase {
             public void configure() throws Exception {
                 from("scsbactivemq:queue:MarcRecordForDataExportQ?concurrentConsumers=10")
                         .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
-                        .process(marcXMLFormatProcessor)
+                        .bean(new MarcXMLFormatProcessor(marcXmlFormatterService),"processMarcXmlString")
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
 
             }
@@ -136,7 +137,7 @@ public class CamelJdbcUT extends BaseTestCase {
         long startTime = System.currentTimeMillis();
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to fetch 10K results for page 0 is : " + (endTime-startTime)/1000 + " ms " );
+        System.out.println("Time taken to fetch 10K results for page 0 is : " + (endTime-startTime)/1000 + " seconds " );
         String fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
         producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
 
@@ -146,8 +147,8 @@ public class CamelJdbcUT extends BaseTestCase {
             startTime = System.currentTimeMillis();
             Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
-            System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime-startTime)/1000 + " ms " );
-            fileName = "PUL"+ File.separator+new Date()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
+            System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime-startTime)/1000 + " seconds " );
+            fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
             producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results1, "fileName", fileName);
         }
 

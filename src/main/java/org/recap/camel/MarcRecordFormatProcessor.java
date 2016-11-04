@@ -12,6 +12,7 @@ import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -21,18 +22,19 @@ import java.util.concurrent.*;
  * Created by peris on 11/1/16.
  */
 
-@Component
-public class MarcRecordFormatProcessor implements Processor {
+public class MarcRecordFormatProcessor {
 
     Logger logger = LoggerFactory.getLogger(MarcRecordFormatProcessor.class);
 
-    @Autowired
     MarcXmlFormatterService marcXmlFormatterService;
 
     private ExecutorService executorService;
 
-    @Override
-    public void process(Exchange exchange) throws Exception {
+    public MarcRecordFormatProcessor(MarcXmlFormatterService marcXmlFormatterService) {
+        this.marcXmlFormatterService = marcXmlFormatterService;
+    }
+
+    public List<Record> processRecords(Exchange exchange) throws Exception {
         List<Record> records = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
@@ -68,9 +70,11 @@ public class MarcRecordFormatProcessor implements Processor {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " ms ");
+        logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
 
-        exchange.getOut().setBody(records);
+//        exchange.getOut().setBody(records);
+
+        return records;
     }
 
 
