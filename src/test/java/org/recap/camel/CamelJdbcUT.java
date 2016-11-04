@@ -1,5 +1,9 @@
 package org.recap.camel;
 
+import org.apache.activemq.ActiveMQQueueBrowser;
+import org.apache.activemq.broker.jmx.DestinationViewMBean;
+import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.apache.camel.Component;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.ProducerTemplate;
@@ -7,6 +11,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
+import org.apache.camel.component.jms.JmsQueueEndpoint;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.apache.commons.io.FilenameUtils;
@@ -14,6 +19,7 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import org.recap.ReCAPConstants;
+import org.recap.camel.activemq.JmxHelper;
 import org.recap.camel.datadump.SolrSearchResultsProcessorForExport;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -23,6 +29,13 @@ import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.jms.QueueBrowser;
+import javax.management.MBeanServerConnection;
+import javax.management.MBeanServerInvocationHandler;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,6 +57,12 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Value("${etl.max.pool.size}")
     String inputDirectoryPath;
+
+    @Value("${activemq.broker.url}")
+    String brokerUrl;
+
+    @Autowired
+    JmxHelper jmxHelper;
 
     @Autowired
     XmlRecordRepository xmlRecordRepository;
@@ -102,7 +121,7 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:solrInputForDataExportQ?concurrentConsumers=10")
+                from("scsbactivemq:queue:solrInputForDataExportQ")
                         .bean(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository), "processBibEntities")
                         .to("scsbactivemq:queue:bibEntityForDataExportQ");
             }
@@ -111,7 +130,7 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:bibEntityForDataExportQ?concurrentConsumers=10")
+                from("scsbactivemq:queue:bibEntityForDataExportQ")
                         .bean(new MarcRecordFormatProcessor(marcXmlFormatterService), "processRecords")
                         .to("scsbactivemq:queue:MarcRecordForDataExportQ");
 
@@ -121,7 +140,7 @@ public class CamelJdbcUT extends BaseTestCase {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("scsbactivemq:queue:MarcRecordForDataExportQ?concurrentConsumers=10")
+                from("scsbactivemq:queue:MarcRecordForDataExportQ")
                         .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
                         .bean(new MarcXMLFormatProcessor(marcXmlFormatterService),"processMarcXmlString")
                         .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
@@ -138,7 +157,8 @@ public class CamelJdbcUT extends BaseTestCase {
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 0 is : " + (endTime-startTime)/1000 + " seconds " );
-        String fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
+        String dateTimeString = getDateTimeString();
+        String fileName = "PUL"+ File.separator+ dateTimeString +File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
         producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
 
         Integer totalPageCount = (Integer) results.get("totalPageCount");
@@ -148,11 +168,9 @@ public class CamelJdbcUT extends BaseTestCase {
             Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime-startTime)/1000 + " seconds " );
-            fileName = "PUL"+ File.separator+getDateTimeString()+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
+            fileName = "PUL"+ File.separator+dateTimeString+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
             producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results1, "fileName", fileName);
         }
-
-        producer.sendBodyAndHeader("scsbactivemq:queue:MarcRecordForDataExportQ", null, "batchComplete", true);
 
         while (true) {
 
@@ -205,8 +223,14 @@ public class CamelJdbcUT extends BaseTestCase {
         @Override
         public boolean matches(Exchange exchange) {
            Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
-            boolean batchComplete = null!= exchange.getIn().getHeader("batchComplete") ? exchange.getIn().getHeader("batchComplete").equals(true) : false;
-            if(this.batchSize.equals(batchSize) || batchComplete){
+
+            DestinationViewMBean solrInputForDataExportQ = jmxHelper.getBeanForQueueName("solrInputForDataExportQ");
+            DestinationViewMBean bibEntityForDataExportQ = jmxHelper.getBeanForQueueName("bibEntityForDataExportQ");
+            DestinationViewMBean marcRecordForDataExportQ = jmxHelper.getBeanForQueueName("MarcRecordForDataExportQ");
+
+            boolean qEmpty = solrInputForDataExportQ.getQueueSize()==0 && bibEntityForDataExportQ.getQueueSize()==0 && marcRecordForDataExportQ.getQueueSize()==0;
+
+            if(this.batchSize.equals(batchSize) || qEmpty){
                exchange.getIn().setHeader("batchSize", 0);
                return true;
            }
