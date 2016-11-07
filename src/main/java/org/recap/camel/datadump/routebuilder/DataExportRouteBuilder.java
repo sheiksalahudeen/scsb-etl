@@ -3,7 +3,6 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.ReCAPConstants;
-import org.recap.camel.DataDumpReportFtpRouteBuilder;
 import org.recap.camel.datadump.consumer.MarcRecordFormatActiveMQConsumer;
 import org.recap.camel.datadump.consumer.MarcXMLFormatActiveMQConsumer;
 import org.recap.camel.datadump.DataExportAggregator;
@@ -49,7 +48,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
-                            .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(4))
+                            .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
                             .bean(new MarcXMLFormatActiveMQConsumer(marcXmlFormatterService), "processMarcXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }

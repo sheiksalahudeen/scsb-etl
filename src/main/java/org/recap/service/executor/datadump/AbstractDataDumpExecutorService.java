@@ -3,33 +3,21 @@ package org.recap.service.executor.datadump;
 import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
-import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.ReportDataEntity;
-import org.recap.model.jpa.ReportEntity;
 import org.recap.model.search.SearchRecordsRequest;
-import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.service.DataDumpSolrService;
-import org.recap.service.email.datadump.DataDumpEmailService;
-import org.recap.service.formatter.datadump.DataDumpFormatterService;
-import org.recap.service.transmission.datadump.DataDumpTransmissionService;
-import org.recap.util.datadump.DataDumpFailureReportUtil;
-import org.recap.util.datadump.DataDumpSuccessReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by premkb on 27/9/16.
@@ -69,14 +57,15 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         boolean canProcess = canProcessRecords(totalBibsCount, dataDumpRequest.getTransmissionType());
         if (canProcess) {
             String fileName = getFileName(dataDumpRequest, 0);
-            String headerString = getBatchHeaderString(totalPageCount, 1, fileName);
+            String folderName = getFolderName(dataDumpRequest);
+            String headerString = getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
             producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
 
             for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
                 searchRecordsRequest.setPageNumber(pageNum);
                 Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
                 fileName = getFileName(dataDumpRequest, pageNum + 1);
-                headerString = getBatchHeaderString(totalPageCount, pageNum + 1, fileName);
+                headerString = getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
                 producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
             }
             return "Success";
@@ -93,6 +82,12 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 + dataDumpRequest.getDateTimeString()
                 + File.separator
                 + pageNum;
+    }
+
+    private String getFolderName(DataDumpRequest dataDumpRequest) {
+        return dataDumpRequest.getRequestingInstitutionCode()
+                + File.separator
+                + dataDumpRequest.getDateTimeString();
     }
 
     private boolean canProcessRecords(Integer totalRecordCount, String transmissionType) {
@@ -117,21 +112,62 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return codes;
     }
 
-    private String getBatchHeaderString(Integer totalPageCount, Integer currentPageCount, String fileName) {
+    private String getBatchHeaderString(Integer totalPageCount, Integer currentPageCount, String folderName, String fileName, DataDumpRequest dataDumpRequest) {
         StringBuilder headerString = new StringBuilder();
         headerString.append("totalPageCount")
-                .append("-")
+                .append("#")
                 .append(totalPageCount)
                 .append(";")
                 .append("currentPageCount")
-                .append("-")
+                .append("#")
                 .append(currentPageCount)
                 .append(";")
+                .append("folderName")
+                .append("#")
+                .append(folderName)
+                .append(";")
                 .append("fileName")
-                .append("-")
-                .append(fileName);
+                .append("#")
+                .append(fileName)
+                .append(";")
+                .append("institutionCodes")
+                .append("#")
+                .append(getInstitutionCodes(dataDumpRequest))
+                .append(";")
+                .append("fileFormat")
+                .append("#")
+                .append(dataDumpRequest.getFileFormat())
+                .append(";")
+                .append("transmissionType")
+                .append("#")
+                .append(dataDumpRequest.getTransmissionType())
+                .append(";")
+                .append("toEmailId")
+                .append("#")
+                .append(dataDumpRequest.getToEmailAddress())
+                .append(";")
+                .append("dateTimeString")
+                .append("#")
+                .append(dataDumpRequest.getDateTimeString())
+                .append(";")
+                .append("requestingInstitutionCode")
+                .append("#")
+                .append(dataDumpRequest.getRequestingInstitutionCode());
 
         return headerString.toString();
+    }
+
+    private String getInstitutionCodes(DataDumpRequest dataDumpRequest) {
+        List<String> institutionCodes = dataDumpRequest.getInstitutionCodes();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Iterator<String> iterator = institutionCodes.iterator(); iterator.hasNext(); ) {
+            String code = iterator.next();
+            stringBuilder.append(code);
+            if(iterator.hasNext()){
+                stringBuilder.append("*");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
