@@ -1,5 +1,6 @@
 package org.recap.camel;
 
+import io.swagger.models.auth.In;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.ProducerTemplate;
@@ -73,6 +74,9 @@ public class CamelJdbcUT extends BaseTestCase {
     @Autowired
     private ProducerTemplate producer;
 
+    @Value("${datadump.batch.size}")
+    String dataDumpBatchSize;
+
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
@@ -109,7 +113,7 @@ public class CamelJdbcUT extends BaseTestCase {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
-        searchRecordsRequest.setPageSize(2);
+        searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
 
         long startTime = System.currentTimeMillis();
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
@@ -126,8 +130,7 @@ public class CamelJdbcUT extends BaseTestCase {
         String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
         String folderName = "PUL" + File.separator + dateTimeString;
 
-//        Integer totalPageCount = (Integer) results.get("totalPageCount");
-        Integer totalPageCount = 3;
+        Integer totalPageCount = (Integer) results.get("totalPageCount");
 
         String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
 
