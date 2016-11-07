@@ -66,22 +66,22 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         Integer totalPageCount = (Integer) results.get("totalPageCount");
         Integer totalBibsCount = Integer.valueOf((String) results.get("totalBibsCount"));
 
-        boolean canProcess = canProcessRecords(totalBibsCount,dataDumpRequest.getTransmissionType());
+        boolean canProcess = canProcessRecords(totalBibsCount, dataDumpRequest.getTransmissionType());
         if (canProcess) {
             String fileName = getFileName(dataDumpRequest, 0);
             String headerString = getBatchHeaderString(totalPageCount, 1, fileName);
-            producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "batchHeaders", headerString.toString());
+            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
 
             for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
                 searchRecordsRequest.setPageNumber(pageNum);
                 Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
-                fileName = getFileName(dataDumpRequest, pageNum+1);
-                headerString = getBatchHeaderString(totalPageCount, pageNum+1, fileName);
-                producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results1, "batchHeaders", headerString.toString());
+                fileName = getFileName(dataDumpRequest, pageNum + 1);
+                headerString = getBatchHeaderString(totalPageCount, pageNum + 1, fileName);
+                producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
             }
             return "Success";
 
-        }else{
+        } else {
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
         }
         return outputString;
@@ -92,10 +92,10 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 + File.separator
                 + dataDumpRequest.getDateTimeString()
                 + File.separator
-                + ReCAPConstants.DATA_DUMP_FILE_NAME + dataDumpRequest.getRequestingInstitutionCode() + pageNum;
+                + pageNum;
     }
 
-    private boolean canProcessRecords(Integer totalRecordCount, String transmissionType ) {
+    private boolean canProcessRecords(Integer totalRecordCount, String transmissionType) {
         boolean canProcess = true;
         if (totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)) {
             canProcess = false;
@@ -110,7 +110,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
         for (Iterator<CollectionGroupEntity> iterator = all.iterator(); iterator.hasNext(); ) {
             CollectionGroupEntity collectionGroupEntity = iterator.next();
-            if(collectionGroupIds.contains(collectionGroupEntity.getCollectionGroupId())){
+            if (collectionGroupIds.contains(collectionGroupEntity.getCollectionGroupId())) {
                 codes.add(collectionGroupEntity.getCollectionGroupCode());
             }
         }
