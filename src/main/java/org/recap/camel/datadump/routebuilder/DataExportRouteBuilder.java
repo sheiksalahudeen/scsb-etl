@@ -11,6 +11,7 @@ import org.recap.camel.datadump.consumer.SolrSearchResultsProcessorActiveMQConsu
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,7 +23,7 @@ public class DataExportRouteBuilder {
     @Autowired
     public DataExportRouteBuilder(CamelContext camelContext,
                                   BibliographicDetailsRepository bibliographicDetailsRepository,
-                                  MarcXmlFormatterService marcXmlFormatterService) {
+                                  MarcXmlFormatterService marcXmlFormatterService, @Value("${datadump.records.per.file}") String dataDumpRecordsPerFile) {
         try {
 
             camelContext.addRoutes(new RouteBuilder() {
@@ -48,7 +49,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
-                            .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
+                            .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
                             .bean(new MarcXMLFormatActiveMQConsumer(marcXmlFormatterService), "processMarcXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }

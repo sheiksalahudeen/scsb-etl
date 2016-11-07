@@ -41,6 +41,9 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     @Value("${solrclient.url}")
     String solrClientUrl;
 
+    @Value("${datadump.batch.size}")
+    String dataDumpBatchSize;
+
     @Override
     public String process(DataDumpRequest dataDumpRequest) throws ExecutionException, InterruptedException {
         String outputString = null;
@@ -48,7 +51,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(dataDumpRequest.getInstitutionCodes());
         searchRecordsRequest.setCollectionGroupDesignations(getCodesForIds(dataDumpRequest.getCollectionGroupIds()));
-        searchRecordsRequest.setPageSize(10000);
+        searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
 
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         Integer totalPageCount = (Integer) results.get("totalPageCount");
