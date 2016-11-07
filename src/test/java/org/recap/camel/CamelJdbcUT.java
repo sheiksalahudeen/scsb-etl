@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.camel.activemq.JmxHelper;
+import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.consumer.SolrSearchResultsProcessorActiveMQConsumer;
 import org.recap.camel.datadump.consumer.MarcRecordFormatActiveMQConsumer;
 import org.recap.camel.datadump.consumer.MarcXMLFormatActiveMQConsumer;
@@ -54,6 +55,9 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Autowired
     JmxHelper jmxHelper;
+
+    @Autowired
+    DataExportHeaderUtil dataExportHeaderUtil;
 
     @Autowired
     XmlRecordRepository xmlRecordRepository;
@@ -128,7 +132,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
         Integer totalPageCount = (Integer) results.get("totalPageCount");
 
-        String headerString = getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
+        String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
 
         producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
 
@@ -139,58 +143,13 @@ public class CamelJdbcUT extends BaseTestCase {
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
             fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
-            headerString = getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
+            headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
             producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
         while (true) {
 
         }
-    }
-
-    private String getBatchHeaderString(Integer totalPageCount, Integer currentPageCount, String folderName, String fileName, DataDumpRequest dataDumpRequest) {
-        StringBuilder headerString = new StringBuilder();
-        headerString.append("totalPageCount")
-                .append("#")
-                .append(totalPageCount)
-                .append(";")
-                .append("currentPageCount")
-                .append("#")
-                .append(currentPageCount)
-                .append(";")
-                .append("folderName")
-                .append("#")
-                .append(folderName)
-                .append(";")
-                .append("fileName")
-                .append("#")
-                .append(fileName)
-                .append(";")
-                .append("institutionCodes")
-                .append("#")
-                .append(getInstitutionCodes(dataDumpRequest))
-                .append(";")
-                .append("fileFormat")
-                .append("#")
-                .append(dataDumpRequest.getFileFormat())
-                .append(";")
-                .append("transmissionType")
-                .append("#")
-                .append(dataDumpRequest.getTransmissionType())
-                .append(";")
-                .append("toEmailId")
-                .append("#")
-                .append(dataDumpRequest.getToEmailAddress())
-                .append(";")
-                .append("dateTimeString")
-                .append("#")
-                .append(dataDumpRequest.getDateTimeString())
-                .append(";")
-                .append("requestingInstitutionCode")
-                .append("#")
-                .append(dataDumpRequest.getRequestingInstitutionCode());
-
-        return headerString.toString();
     }
 
     private String getInstitutionCodes(DataDumpRequest dataDumpRequest) {

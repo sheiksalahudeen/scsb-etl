@@ -5,8 +5,6 @@ import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.zipfile.ZipAggregationStrategy;
-import org.recap.camel.datadump.DataExportEmailProcessor;
-import org.recap.camel.datadump.DataExportHeaderValueEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -87,7 +85,7 @@ public class ZipFileProcessor implements Processor {
     }
 
     private String getValueFor(String batchHeaderString, String key) {
-        String valueFor = new DataExportHeaderValueEvaluator().getValueFor(batchHeaderString, key);
+        String valueFor = new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
         return valueFor;
     }
 
