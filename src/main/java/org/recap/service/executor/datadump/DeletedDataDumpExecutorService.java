@@ -5,6 +5,7 @@ import org.recap.model.export.DataDumpRequest;
 import org.recap.model.export.DeletedDataDumpCallable;
 import org.recap.model.export.FullDataDumpCallable;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,5 +27,11 @@ public class DeletedDataDumpExecutorService extends AbstractDataDumpExecutorServ
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED) ? true:false;
+    }
+
+    @Override
+    public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
+        searchRecordsRequest.setFieldName("IsDeletedBib");
+        searchRecordsRequest.setFieldValue("true");
     }
 }

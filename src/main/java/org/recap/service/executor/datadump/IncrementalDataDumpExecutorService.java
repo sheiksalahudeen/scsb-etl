@@ -6,6 +6,7 @@ import org.recap.model.export.FullDataDumpCallable;
 import org.recap.model.export.IncrementalDataDumpCallable;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.util.DateUtil;
 import org.slf4j.Logger;
@@ -31,14 +32,14 @@ public class IncrementalDataDumpExecutorService  extends AbstractDataDumpExecuto
 
     private static final Logger logger = LoggerFactory.getLogger(IncrementalDataDumpExecutorService.class);
 
-    @Autowired
-    private ApplicationContext appContext;
-
-    @Autowired
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
-
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) ? true:false;
+    }
+
+    @Override
+    public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
+        searchRecordsRequest.setFieldName("BibLastUpdatedDate");
+        searchRecordsRequest.setFieldValue(dataDumpRequest.getDate());
     }
 }

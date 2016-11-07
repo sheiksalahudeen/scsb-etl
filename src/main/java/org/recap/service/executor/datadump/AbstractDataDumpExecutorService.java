@@ -134,4 +134,6 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return headerString.toString();
     }
 
+    public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
+
 }

@@ -7,6 +7,7 @@ import org.recap.model.export.FullDataDumpCallable;
 import org.recap.model.export.ImprovedFullDataDumpCallable;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ public class FullDataDumpExecutorService extends AbstractDataDumpExecutorService
         return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) ? true:false;
     }
 
+    @Override
+    public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
 
-
+    }
 }
