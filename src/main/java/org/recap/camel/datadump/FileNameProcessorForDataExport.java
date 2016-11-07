@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Created by peris on 11/4/16.
@@ -30,7 +29,7 @@ public class FileNameProcessorForDataExport implements Processor {
     }
 
     private String getValueFor(String batchHeaderString, String key) {
-        String valueFor = new DataExportHeaderValueEvaluator().getValueFor(batchHeaderString, key);
+        String valueFor = new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
         return valueFor;
     }
 }

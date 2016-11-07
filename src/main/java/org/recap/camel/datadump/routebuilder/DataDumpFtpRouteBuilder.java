@@ -3,7 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.ReCAPConstants;
-import org.recap.camel.datadump.DataExportHeaderValueEvaluator;
+import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.FileNameProcessorForDataExport;
 import org.recap.camel.datadump.ZipFileProcessor;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class DataDumpFtpRouteBuilder extends RouteBuilder {
     }
 
     private String getValueFor(String batchHeaderString, String key) {
-        String valueFor = new DataExportHeaderValueEvaluator().getValueFor(batchHeaderString, key);
+        String valueFor = new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
         return valueFor;
     }
 

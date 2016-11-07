@@ -9,7 +9,7 @@ import org.apache.camel.Predicate;
 public class DataExportPredicate implements Predicate {
 
     private Integer batchSize;
-    DataExportHeaderValueEvaluator dataExportHeaderValueEvaluator;
+    DataExportHeaderUtil dataExportHeaderUtil;
 
     public DataExportPredicate(Integer batchSize) {
         this.batchSize = batchSize;
@@ -21,8 +21,8 @@ public class DataExportPredicate implements Predicate {
 
         String batchHeaderString = (String) exchange.getIn().getHeader("batchHeaders");
 
-        Integer totalPageCount = Integer.valueOf(getDataExportHeaderValueEvaluator().getValueFor(batchHeaderString, "totalPageCount"));
-        Integer currentPageCount = Integer.valueOf(getDataExportHeaderValueEvaluator().getValueFor(batchHeaderString, "currentPageCount"));
+        Integer totalPageCount = Integer.valueOf(getDataExportHeaderUtil().getValueFor(batchHeaderString, "totalPageCount"));
+        Integer currentPageCount = Integer.valueOf(getDataExportHeaderUtil().getValueFor(batchHeaderString, "currentPageCount"));
 
         System.out.println("Total page count: " + totalPageCount + " and Current page count: " + currentPageCount);
 
@@ -40,10 +40,10 @@ public class DataExportPredicate implements Predicate {
         return false;
     }
 
-    public DataExportHeaderValueEvaluator getDataExportHeaderValueEvaluator() {
-        if (null == dataExportHeaderValueEvaluator) {
-            dataExportHeaderValueEvaluator = new DataExportHeaderValueEvaluator();
+    public DataExportHeaderUtil getDataExportHeaderUtil() {
+        if (null == dataExportHeaderUtil) {
+            dataExportHeaderUtil = new DataExportHeaderUtil();
         }
-        return dataExportHeaderValueEvaluator;
+        return dataExportHeaderUtil;
     }
 }
