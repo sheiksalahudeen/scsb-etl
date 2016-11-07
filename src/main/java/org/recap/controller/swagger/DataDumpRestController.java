@@ -3,7 +3,7 @@ package org.recap.controller.swagger;
 import io.swagger.annotations.*;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
-import org.recap.service.preprocessor.DataDumpPreProcessorService;
+import org.recap.service.preprocessor.DataDumpExportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class DataDumpRestController {
     private static final Logger logger = LoggerFactory.getLogger(DataDumpRestController.class);
 
     @Autowired
-    private DataDumpPreProcessorService dataDumpPreProcessorService;
+    private DataDumpExportService dataDumpExportService;
 
 
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
@@ -37,16 +37,15 @@ public class DataDumpRestController {
                                          @ApiParam(value = "Get updates to middleware collection since the date provided. Default will be updates since the previous day. Date format will be a string (yyyy-MM-dd HH:mm)", name = "date") @RequestParam(required=false) String date,
                                          @ApiParam(value = "Collection group id will get the relevant info based on the id provided. Default will get both shared and open information - Shared (use 1), Open (use 2), Both (use 1,2)", name = "collectionGroupIds") @RequestParam(required=false) String collectionGroupIds,
                                          @ApiParam(value = "Type of transmission - FTP (use 0), HTTP Response (use 1) this parameter is not considered for full dump, File system (use 2). Default will be ftp ", name = "transmissionType")@RequestParam(required=false) String transmissionType,
-                                         @ApiParam(value = "No. of records to be exported per file. Default will be 10000 records per file", name = "noOfRecordsPerFile")@RequestParam(required=false) String noOfRecordsPerFile,
                                          @ApiParam(value = "Email address to whom we need to send an email" , name = "emailToAddress")@RequestParam(required=false) String emailToAddress
     ){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpPreProcessorService.setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,noOfRecordsPerFile,emailToAddress,outputFormat);
-        ResponseEntity responseEntity = dataDumpPreProcessorService.validateIncomingRequest(dataDumpRequest);
+        dataDumpExportService.setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,emailToAddress,outputFormat);
+        ResponseEntity responseEntity = dataDumpExportService.validateIncomingRequest(dataDumpRequest);
         if(responseEntity!=null) {
             return responseEntity;
         }
-        responseEntity = dataDumpPreProcessorService.startDataDumpProcess(dataDumpRequest);
+        responseEntity = dataDumpExportService.startDataDumpProcess(dataDumpRequest);
         return responseEntity;
     }
 }

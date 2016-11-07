@@ -1,9 +1,5 @@
 package org.recap.camel;
 
-import org.apache.activemq.ActiveMQQueueBrowser;
-import org.apache.activemq.broker.jmx.DestinationViewMBean;
-import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.camel.Component;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.ProducerTemplate;
@@ -11,16 +7,17 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
-import org.apache.camel.component.jms.JmsQueueEndpoint;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-
 import org.recap.ReCAPConstants;
 import org.recap.camel.activemq.JmxHelper;
-import org.recap.camel.datadump.SolrSearchResultsProcessorForExport;
+import org.recap.camel.datadump.consumer.SolrSearchResultsProcessorActiveMQConsumer;
+import org.recap.camel.datadump.consumer.MarcRecordFormatActiveMQConsumer;
+import org.recap.camel.datadump.consumer.MarcXMLFormatActiveMQConsumer;
+import org.recap.model.export.DataDumpRequest;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.XmlRecordRepository;
@@ -29,13 +26,6 @@ import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.jms.QueueBrowser;
-import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerInvocationHandler;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -79,12 +69,6 @@ public class CamelJdbcUT extends BaseTestCase {
     @Autowired
     private ProducerTemplate producer;
 
-    private SolrSearchResultsProcessorForExport solrSearchResultsProcessorForExport;
-
-    private MarcRecordFormatProcessor marcRecordFormatProcessor;
-
-    private MarcXMLFormatProcessor marcXMLFormatProcessor;
-
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
@@ -118,58 +102,42 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDump() throws Exception {
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("scsbactivemq:queue:solrInputForDataExportQ")
-                        .bean(new SolrSearchResultsProcessorForExport(bibliographicDetailsRepository), "processBibEntities")
-                        .to("scsbactivemq:queue:bibEntityForDataExportQ");
-            }
-        });
-
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("scsbactivemq:queue:bibEntityForDataExportQ")
-                        .bean(new MarcRecordFormatProcessor(marcXmlFormatterService), "processRecords")
-                        .to("scsbactivemq:queue:MarcRecordForDataExportQ");
-
-            }
-        });
-
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("scsbactivemq:queue:MarcRecordForDataExportQ")
-                        .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(50000))
-                        .bean(new MarcXMLFormatProcessor(marcXmlFormatterService),"processMarcXmlString")
-                        .to(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q);
-
-            }
-        });
-
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
-        searchRecordsRequest.setPageSize(10000);
+        searchRecordsRequest.setPageSize(2);
 
         long startTime = System.currentTimeMillis();
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
-        long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to fetch 10K results for page 0 is : " + (endTime-startTime)/1000 + " seconds " );
-        String dateTimeString = getDateTimeString();
-        String fileName = "PUL"+ File.separator+ dateTimeString +File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+0;
-        producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results, "fileName", fileName);
 
-        Integer totalPageCount = (Integer) results.get("totalPageCount");
-        for(int pageNum = 1; pageNum < totalPageCount; pageNum++){
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
+        String dateTimeString = getDateTimeString();
+        dataDumpRequest.setDateTimeString(dateTimeString);
+        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
+        dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
+        String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
+        String folderName = "PUL" + File.separator + dateTimeString;
+
+//        Integer totalPageCount = (Integer) results.get("totalPageCount");
+        Integer totalPageCount = 3;
+
+        String headerString = getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
+
+        producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
+
+        for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
             startTime = System.currentTimeMillis();
             Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
-            System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime-startTime)/1000 + " seconds " );
-            fileName = "PUL"+ File.separator+dateTimeString+File.separator+ReCAPConstants.DATA_DUMP_FILE_NAME+ "PUL"+pageNum;
-            producer.sendBodyAndHeader("scsbactivemq:queue:solrInputForDataExportQ", results1, "fileName", fileName);
+            System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
+            fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
+            headerString = getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
+            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
         while (true) {
@@ -177,70 +145,67 @@ public class CamelJdbcUT extends BaseTestCase {
         }
     }
 
-    public class DataExportAggregator implements AggregationStrategy {
+    private String getBatchHeaderString(Integer totalPageCount, Integer currentPageCount, String folderName, String fileName, DataDumpRequest dataDumpRequest) {
+        StringBuilder headerString = new StringBuilder();
+        headerString.append("totalPageCount")
+                .append("#")
+                .append(totalPageCount)
+                .append(";")
+                .append("currentPageCount")
+                .append("#")
+                .append(currentPageCount)
+                .append(";")
+                .append("folderName")
+                .append("#")
+                .append(folderName)
+                .append(";")
+                .append("fileName")
+                .append("#")
+                .append(fileName)
+                .append(";")
+                .append("institutionCodes")
+                .append("#")
+                .append(getInstitutionCodes(dataDumpRequest))
+                .append(";")
+                .append("fileFormat")
+                .append("#")
+                .append(dataDumpRequest.getFileFormat())
+                .append(";")
+                .append("transmissionType")
+                .append("#")
+                .append(dataDumpRequest.getTransmissionType())
+                .append(";")
+                .append("toEmailId")
+                .append("#")
+                .append(dataDumpRequest.getToEmailAddress())
+                .append(";")
+                .append("dateTimeString")
+                .append("#")
+                .append(dataDumpRequest.getDateTimeString())
+                .append(";")
+                .append("requestingInstitutionCode")
+                .append("#")
+                .append(dataDumpRequest.getRequestingInstitutionCode());
 
-        @Override
-        public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
-            if (oldExchange == null) {
-                oldExchange = new DefaultExchange(newExchange);
-                oldExchange.getIn().setHeaders(newExchange.getIn().getHeaders());
-                List<Object> body = new ArrayList<>();
-                oldExchange.getIn().setBody(body);
-                oldExchange.getExchangeId();
-            }
-            List body = (List) newExchange.getIn().getBody();
-            List oldBody = oldExchange.getIn().getBody(List.class);
-            if (null!= oldBody && null!= body) {
-                oldBody.addAll(body);
-                Object oldBatchSize = oldExchange.getIn().getHeader("batchSize");
-                Integer newBatchSize = 0;
-                if(null != oldBatchSize){
-                    newBatchSize= body.size() + (Integer)oldBatchSize;
-                } else {
-                    newBatchSize = body.size();
-                }
-                oldExchange.getIn().setHeader("batchSize", newBatchSize);
-
-                for (String key : newExchange.getProperties().keySet()) {
-                    oldExchange.setProperty(key, newExchange.getProperty(key));
-                }
-            }
-
-
-
-            return oldExchange;
-        }
+        return headerString.toString();
     }
 
-    public class DataExportPredicate implements Predicate {
-
-        private Integer batchSize;
-
-        public DataExportPredicate(Integer batchSize) {
-            this.batchSize = batchSize;
+    private String getInstitutionCodes(DataDumpRequest dataDumpRequest) {
+        List<String> institutionCodes = dataDumpRequest.getInstitutionCodes();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Iterator<String> iterator = institutionCodes.iterator(); iterator.hasNext(); ) {
+            String code = iterator.next();
+            stringBuilder.append(code);
+            if(iterator.hasNext()){
+                stringBuilder.append("*");
+            }
         }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-           Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
-
-            DestinationViewMBean solrInputForDataExportQ = jmxHelper.getBeanForQueueName("solrInputForDataExportQ");
-            DestinationViewMBean bibEntityForDataExportQ = jmxHelper.getBeanForQueueName("bibEntityForDataExportQ");
-            DestinationViewMBean marcRecordForDataExportQ = jmxHelper.getBeanForQueueName("MarcRecordForDataExportQ");
-
-            boolean qEmpty = solrInputForDataExportQ.getQueueSize()==0 && bibEntityForDataExportQ.getQueueSize()==0 && marcRecordForDataExportQ.getQueueSize()==0;
-
-            if(this.batchSize.equals(batchSize) || qEmpty){
-               exchange.getIn().setHeader("batchSize", 0);
-               return true;
-           }
-           return false;
-        }
+        return stringBuilder.toString();
     }
 
-    private String getDateTimeString(){
+    private String getDateTimeString() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_MMDDYYY);
         return sdf.format(date);
     }
 }

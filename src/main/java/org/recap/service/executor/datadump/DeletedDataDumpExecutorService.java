@@ -23,37 +23,8 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class DeletedDataDumpExecutorService extends AbstractDataDumpExecutorService {
 
-    @Autowired
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @Autowired
-    private ApplicationContext appContext;
-
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED) ? true:false;
-    }
-
-    @Override
-    public Callable getCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository) {
-        Callable callable = appContext.getBean(DeletedDataDumpCallable.class,pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
-        return callable;
-    }
-
-    @Override
-    protected Callable<List<BibliographicEntity>> getImprovedFullDataDumpCallable(List<LinkedHashMap> dataDumpSearchResults, BibliographicDetailsRepository bibliographicDetailsRepository) {
-        return null;
-    }
-
-    @Override
-    public Long getTotalRecordsCount(DataDumpRequest dataDumpRequest) {
-        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
-        Long totalRecordCount;
-        if (dataDumpRequest.getDate()==null) {
-            totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes());
-        } else {
-            totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(),inputDate);
-        }
-        return totalRecordCount;
     }
 }

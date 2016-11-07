@@ -1,18 +1,11 @@
-package org.recap.camel.datadump;
+package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
-import org.apache.tomcat.util.log.SystemLogHandler;
-import org.recap.camel.FileNameProcessorForFailureRecord;
+import org.recap.camel.datadump.callable.BibEntityPreparerCallable;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -21,14 +14,14 @@ import java.util.concurrent.*;
  * Created by peris on 11/1/16.
  */
 
-public class SolrSearchResultsProcessorForExport {
+public class SolrSearchResultsProcessorActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(SolrSearchResultsProcessorForExport.class);
+    Logger logger = LoggerFactory.getLogger(SolrSearchResultsProcessorActiveMQConsumer.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ExecutorService executorService;
 
-    public SolrSearchResultsProcessorForExport(BibliographicDetailsRepository bibliographicDetailsRepository) {
+    public SolrSearchResultsProcessorActiveMQConsumer(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
@@ -38,6 +31,8 @@ public class SolrSearchResultsProcessorForExport {
 
         Map results = (Map) exchange.getIn().getBody();
         List<HashMap> dataDumpSearchResults = (List<HashMap>) results.get("dataDumpSearchResults");
+
+
 
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
 
@@ -83,18 +78,15 @@ public class SolrSearchResultsProcessorForExport {
 
         getExecutorService().shutdown();
 
-
         return bibliographicEntities;
-//        exchange.getOut().setBody(bibliographicEntities);
-        //exchange.getOut().setHeader("fileName", exchange.getIn().getHeader("fileName"));
     }
 
     public ExecutorService getExecutorService() {
         if (null == executorService) {
-            executorService = Executors.newFixedThreadPool(50);
+            executorService = Executors.newFixedThreadPool(500);
         }
         if (executorService.isShutdown()) {
-            executorService = Executors.newFixedThreadPool(50);
+            executorService = Executors.newFixedThreadPool(500);
         }
         return executorService;
     }

@@ -31,34 +31,10 @@ public class FullDataDumpExecutorService extends AbstractDataDumpExecutorService
 
     private static final Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorService.class);
 
-    @Autowired
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @Autowired
-    private ApplicationContext appContext;
-
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) ? true:false;
     }
-
-    @Override
-    public Callable getCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository) {
-        Callable callable = appContext.getBean(FullDataDumpCallable.class,pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
-        return callable;
-    }
-
-    @Override
-    protected Callable<List<BibliographicEntity>> getImprovedFullDataDumpCallable(List<LinkedHashMap> dataDumpSearchResults, BibliographicDetailsRepository bibliographicDetailsRepository) {
-        return appContext.getBean(ImprovedFullDataDumpCallable.class,dataDumpSearchResults,bibliographicDetailsRepository);
-    }
-
-    @Override
-    public Long getTotalRecordsCount(DataDumpRequest dataDumpRequest) {
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes());
-        return totalRecordCount;
-    }
-
 
 
 

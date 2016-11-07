@@ -1,4 +1,4 @@
-package org.recap.camel.datadump;
+package org.recap.camel.datadump.callable;
 
 import org.marc4j.marc.Record;
 import org.recap.model.jpa.BibliographicEntity;

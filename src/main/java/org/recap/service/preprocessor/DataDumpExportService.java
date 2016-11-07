@@ -8,7 +8,6 @@ import org.recap.service.executor.datadump.DataDumpExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,9 +24,9 @@ import java.util.regex.Pattern;
  * Created by premkb on 27/9/16.
  */
 @Service
-public class DataDumpPreProcessorService {
+public class DataDumpExportService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataDumpPreProcessorService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpExportService.class);
 
     @Autowired
     ApplicationContext appContext;
@@ -37,12 +36,6 @@ public class DataDumpPreProcessorService {
 
     @Autowired
     private DataDumpExecutorService dataDumpExecutorService;
-
-    @Value("${datadump.threads}")
-    private int noOfThreads;
-
-    @Value("${datadump.batchsize}")
-    private int batchSize;
 
     public ResponseEntity startDataDumpProcess(DataDumpRequest dataDumpRequest){
         ResponseEntity responseEntity;
@@ -90,7 +83,7 @@ public class DataDumpPreProcessorService {
     }
 
     public void setDataDumpRequest(DataDumpRequest dataDumpRequest, String fetchType, String institutionCodes, String date, String collectionGroupIds,
-                                    String transmissionType, String requestingInstitutionCode, String noOfRecordsPerFile, String toEmailAddress, String outputFormat){
+                                    String transmissionType, String requestingInstitutionCode, String toEmailAddress, String outputFormat){
         if (fetchType != null) {
             dataDumpRequest.setFetchType(fetchType);
         }
@@ -101,16 +94,7 @@ public class DataDumpPreProcessorService {
         if(date != null) {
             dataDumpRequest.setDate(date);
         }
-        String noOfThreadString = System.getProperty(ReCAPConstants.DATADUMP_THREADS);
-        if(noOfThreadString!=null){
-            noOfThreads = Integer.parseInt(noOfThreadString);
-        }
-        dataDumpRequest.setNoOfThreads(noOfThreads);
-        if(noOfRecordsPerFile!=null){
-            dataDumpRequest.setBatchSize(Integer.parseInt(noOfRecordsPerFile));
-        }else{
-            dataDumpRequest.setBatchSize(batchSize);
-        }
+
         if(collectionGroupIds != null){
             List<Integer> collectionGroupIdList = splitStringAndGetIntegerList(collectionGroupIds);
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);

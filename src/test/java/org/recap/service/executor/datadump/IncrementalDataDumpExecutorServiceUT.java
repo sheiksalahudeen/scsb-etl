@@ -61,8 +61,6 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
     @Test
     public void getIncrementalDumpForMarcXmlFileSystem()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("1");
         String inputDate = "2016-08-30 11:20";
         dataDumpRequest.setDate(inputDate);
@@ -96,8 +94,6 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
     @Test
     public void getIncrementalDumpForMarcXmlFtp()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("0");
         String inputDate = "2016-08-30 11:20";
         dataDumpRequest.setDate(inputDate);

@@ -76,8 +76,6 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void exportFullDumpForNYPLAndCUL() throws Exception {
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("0");
         dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
         List<Integer> cgIds = new ArrayList<>();
@@ -127,8 +125,6 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getFullDumpForMarcXmlFileSystem()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("0");
         dataDumpRequest.setToEmailAddress("peri.subrahmanya@htcinc.com");
         dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
@@ -158,8 +154,6 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getFullDumpForScsbXmlFileSystem()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("0");
         dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
         List<Integer> cgIds = new ArrayList<>();
@@ -189,8 +183,6 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Test
     public void getFullDumpForMarcXmlFtp()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setNoOfThreads(1);
-        dataDumpRequest.setBatchSize(10000);
         dataDumpRequest.setFetchType("0");
         dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
         List<Integer> cgIds = new ArrayList<>();

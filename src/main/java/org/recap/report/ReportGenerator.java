@@ -3,7 +3,6 @@ package org.recap.report;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
-import org.recap.camel.datadump.DataDumpFailureReportFtpRouteBuilder;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;

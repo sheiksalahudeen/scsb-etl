@@ -10,8 +10,6 @@ public class DataDumpRequest {
     private List<String> institutionCodes;
     private String fetchType;
     private String date;
-    private int noOfThreads;
-    private int batchSize;
     private boolean isRecordsAvailable;
     private List<Integer> collectionGroupIds;
     private String transmissionType;
@@ -43,22 +41,6 @@ public class DataDumpRequest {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public int getNoOfThreads() {
-        return noOfThreads;
-    }
-
-    public void setNoOfThreads(int noOfThreads) {
-        this.noOfThreads = noOfThreads;
-    }
-
-    public int getBatchSize() {
-        return batchSize;
-    }
-
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
     }
 
     public boolean isRecordsAvailable() {

@@ -42,7 +42,6 @@ public class DeletedDataDumpCallableUT extends BaseTestCase {
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
-        dataDumpRequest.setBatchSize(batchSize);
         dataDumpRequest.setFetchType("1");
         List<Integer> cgIds = new ArrayList<>();
         cgIds.add(1);

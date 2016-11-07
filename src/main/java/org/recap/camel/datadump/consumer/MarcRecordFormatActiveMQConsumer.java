@@ -1,19 +1,13 @@
-package org.recap.camel;
+package org.recap.camel.datadump.consumer;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.marc4j.marc.Record;
-import org.recap.camel.datadump.BibEntityPreparerCallable;
-import org.recap.camel.datadump.MarcRecordPreparerCallable;
-import org.recap.camel.datadump.SolrSearchResultsProcessorForExport;
+import org.recap.camel.datadump.callable.MarcRecordPreparerCallable;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -22,15 +16,15 @@ import java.util.concurrent.*;
  * Created by peris on 11/1/16.
  */
 
-public class MarcRecordFormatProcessor {
+public class MarcRecordFormatActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(MarcRecordFormatProcessor.class);
+    Logger logger = LoggerFactory.getLogger(MarcRecordFormatActiveMQConsumer.class);
 
     MarcXmlFormatterService marcXmlFormatterService;
 
     private ExecutorService executorService;
 
-    public MarcRecordFormatProcessor(MarcXmlFormatterService marcXmlFormatterService) {
+    public MarcRecordFormatActiveMQConsumer(MarcXmlFormatterService marcXmlFormatterService) {
         this.marcXmlFormatterService = marcXmlFormatterService;
     }
 
@@ -72,18 +66,16 @@ public class MarcRecordFormatProcessor {
 
         logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
 
-//        exchange.getOut().setBody(records);
-
         return records;
     }
 
 
     public ExecutorService getExecutorService() {
         if (null == executorService) {
-            executorService = Executors.newFixedThreadPool(50);
+            executorService = Executors.newFixedThreadPool(500);
         }
         if (executorService.isShutdown()) {
-            executorService = Executors.newFixedThreadPool(50);
+            executorService = Executors.newFixedThreadPool(500);
         }
         return executorService;
     }

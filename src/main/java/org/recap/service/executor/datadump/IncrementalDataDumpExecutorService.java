@@ -41,24 +41,4 @@ public class IncrementalDataDumpExecutorService  extends AbstractDataDumpExecuto
     public boolean isInterested(String fetchType) {
         return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) ? true:false;
     }
-
-
-    @Override
-    public Callable getCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository) {
-        Callable callable = appContext.getBean(IncrementalDataDumpCallable.class,pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
-        return callable;
-    }
-
-    @Override
-    protected Callable<List<BibliographicEntity>> getImprovedFullDataDumpCallable(List<LinkedHashMap> dataDumpSearchResults, BibliographicDetailsRepository bibliographicDetailsRepository) {
-        return null;
-    }
-
-    @Override
-    public Long getTotalRecordsCount(DataDumpRequest dataDumpRequest) {
-        Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(), dataDumpRequest.getInstitutionCodes(),inputDate);
-        return totalRecordCount;
-    }
-
 }

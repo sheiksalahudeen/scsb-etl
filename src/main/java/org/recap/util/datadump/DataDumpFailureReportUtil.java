@@ -68,12 +68,6 @@ public class DataDumpFailureReportUtil {
             reportDataEntity.setHeaderValue(dataDumpRequest.getTransmissionType());
             reportEntities.add(reportDataEntity);
         }
-        if (String.valueOf(dataDumpRequest.getBatchSize())!=null) {
-            ReportDataEntity reportDataEntity = new ReportDataEntity();
-            reportDataEntity.setHeaderName("NoOfRecordsPerFile");
-            reportDataEntity.setHeaderValue(String.valueOf(dataDumpRequest.getBatchSize()));
-            reportEntities.add(reportDataEntity);
-        }
         if (successAndFailureFormattedFullList!=null) {
             ReportDataEntity reportDataEntity = new ReportDataEntity();
             reportDataEntity.setHeaderName("NoOfBibsFailedToExport");

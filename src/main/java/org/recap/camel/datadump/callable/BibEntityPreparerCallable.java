@@ -1,4 +1,4 @@
-package org.recap.camel.datadump;
+package org.recap.camel.datadump.callable;
 
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ItemEntity;
