@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import java.util.List;
 })
 
 @XmlRootElement(name = "collection")
-public class CollectionType {
+public class CollectionType implements Serializable {
 
     private static final Logger LOG = Logger.getLogger(CollectionType.class);
 

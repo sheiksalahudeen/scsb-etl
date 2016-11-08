@@ -1,6 +1,7 @@
 package org.recap.model.jaxb.marc;
 
 import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 
 /**
  * Created by SheikS on 6/22/2016.
@@ -11,7 +12,7 @@ import javax.xml.bind.annotation.*;
 })
 
 @XmlRootElement(name = "content")
-public class ContentType {
+public class ContentType implements Serializable {
     @XmlElement(required = true, nillable = true)
     protected CollectionType collection;
 

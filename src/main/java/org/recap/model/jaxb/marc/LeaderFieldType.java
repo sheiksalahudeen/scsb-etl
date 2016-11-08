@@ -4,6 +4,7 @@ package org.recap.model.jaxb.marc;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
 
 
 /**
@@ -27,7 +28,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlType(name = "leaderFieldType", propOrder = {
         "value"
 })
-public class LeaderFieldType {
+public class LeaderFieldType implements Serializable {
 
     @XmlValue
     protected String value;

@@ -4,6 +4,7 @@ package org.recap.model.jaxb.marc;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
 
 
 /**
@@ -28,7 +29,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlType(name = "controlFieldType", propOrder = {
         "value"
 })
-public class ControlFieldType {
+public class ControlFieldType implements Serializable {
 
     @XmlValue
     protected String value;
