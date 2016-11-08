@@ -121,4 +121,8 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
     public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
 
+    public String getFormattedDateString(String inputDateString){
+        String formattedDateString = inputDateString.substring(0,10)+"T"+inputDateString.substring(11,16)+":00Z";
+        return formattedDateString;
+    }
 }

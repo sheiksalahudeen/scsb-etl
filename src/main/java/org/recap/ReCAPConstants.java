@@ -148,6 +148,8 @@ public class ReCAPConstants {
     public static final String DATADUMP_FORMATTEDSTRING = "formattedString";
     public static final String DATADUMP_FORMATERROR = "formatError";
 
+    public static final String  BIB_LASTUPDATED_DATE = "BibLastUpdatedDate";
+
     public static final String COLLECTION_GROUP_SHARED = "Shared";
     public static final String COLLECTION_GROUP_OPEN = "Open";
     public static final String COLLECTION_GROUP_PRIVATE = "Private";
