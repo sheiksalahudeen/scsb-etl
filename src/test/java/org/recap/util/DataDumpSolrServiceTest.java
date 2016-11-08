@@ -61,7 +61,7 @@ public class DataDumpSolrServiceTest extends BaseTestCase {
     }
 
     public String getFormattedString(String dateStr){
-        String formattedString = dateStr.substring(0,10)+"T"+dateStr.substring(11,16)+":00Z";
+        String formattedString = dateStr.substring(0,10)+"T"+dateStr.substring(11,16)+":00Z TO NOW";
         return formattedString;
     }
 }
