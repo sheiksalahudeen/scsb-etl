@@ -71,7 +71,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
                     from(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
-                            .bean(new SCSBXMLFormatActiveMQConsumer(scsbXmlFormatterService), "processMarcXmlString")
+                            .bean(new SCSBXMLFormatActiveMQConsumer(scsbXmlFormatterService), "processSCSBXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }
             });
