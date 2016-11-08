@@ -6,13 +6,14 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * Created by pvsubrah on 6/21/16.
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Items {
+public class Items implements Serializable {
 
     @XmlElement(required = true, nillable = true)
     protected ContentType content;

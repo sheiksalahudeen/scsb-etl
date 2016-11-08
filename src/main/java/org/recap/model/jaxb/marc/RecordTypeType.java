@@ -4,6 +4,7 @@ package org.recap.model.jaxb.marc;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 
 
 /**
@@ -25,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "recordTypeType")
 @XmlEnum
-public enum RecordTypeType {
+public enum RecordTypeType implements Serializable {
 
     @XmlEnumValue("Bibliographic")
     BIBLIOGRAPHIC("Bibliographic"),

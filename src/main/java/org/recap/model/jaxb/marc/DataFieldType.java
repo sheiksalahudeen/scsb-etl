@@ -4,6 +4,7 @@ package org.recap.model.jaxb.marc;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ import java.util.List;
 @XmlType(name = "dataFieldType", propOrder = {
         "subfield"
 })
-public class DataFieldType {
+public class DataFieldType implements Serializable {
 
     @XmlElement(required = true)
     protected List<SubfieldatafieldType> subfield;

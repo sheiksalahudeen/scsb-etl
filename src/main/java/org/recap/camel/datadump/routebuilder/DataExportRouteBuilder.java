@@ -3,6 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.ReCAPConstants;
+import org.recap.camel.datadump.FileFormatProcessorForDataExport;
 import org.recap.camel.datadump.consumer.*;
 import org.recap.camel.datadump.DataExportAggregator;
 import org.recap.camel.datadump.DataExportPredicate;
@@ -39,9 +40,18 @@ public class DataExportRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
+
+                    interceptFrom(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
+                            .process(new FileFormatProcessorForDataExport());
+
                     from(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
-                            .choice().when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC)).bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), "processRecords").to(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
-                            .choice().when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB)).bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), "processRecords").to(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q);
+                            .choice()
+                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC))
+                                    .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), "processRecords")
+                                        .to(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
+                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB))
+                                    .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), "processRecords")
+                                        .to(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q);
 
                 }
             });
@@ -50,7 +60,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
-                            .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
+                            .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(4)))
                             .bean(new MarcXMLFormatActiveMQConsumer(marcXmlFormatterService), "processMarcXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }

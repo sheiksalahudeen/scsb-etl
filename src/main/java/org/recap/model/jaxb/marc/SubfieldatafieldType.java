@@ -4,6 +4,7 @@ package org.recap.model.jaxb.marc;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
 
 
 /**
@@ -26,7 +27,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlType(name = "subfieldatafieldType", propOrder = {
         "value"
 })
-public class SubfieldatafieldType {
+public class SubfieldatafieldType implements Serializable {
 
     @XmlValue
     protected String value;
