@@ -48,7 +48,7 @@ public class DataExportHeaderUtil {
                 .append(";")
                 .append("fileFormat")
                 .append("#")
-                .append(dataDumpRequest.getFileFormat())
+                .append(dataDumpRequest.getOutputFileFormat())
                 .append(";")
                 .append("transmissionType")
                 .append("#")
@@ -64,7 +64,11 @@ public class DataExportHeaderUtil {
                 .append(";")
                 .append("requestingInstitutionCode")
                 .append("#")
-                .append(dataDumpRequest.getRequestingInstitutionCode());
+                .append(dataDumpRequest.getRequestingInstitutionCode())
+                .append(";")
+                .append("exportFormat")
+                .append("#")
+                .append(dataDumpRequest.getOutputFileFormat());
 
         return headerString.toString();
     }

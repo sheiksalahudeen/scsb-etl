@@ -72,8 +72,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFormat("2");
-        dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         deletedDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
@@ -105,8 +104,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFormat("2");
-        dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         deletedDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
@@ -138,8 +136,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
-        dataDumpRequest.setOutputFormat("2");
-        dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         deletedDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));

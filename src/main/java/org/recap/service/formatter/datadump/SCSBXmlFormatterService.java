@@ -64,6 +64,19 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return successAndFailureFormattedList;
     }
 
+    public String getFormattedOutputForBibRecords(List<BibRecord> bibRecords){
+        String formattedString = null;
+        try {
+            BibRecords bibRecords1 = new BibRecords();
+            bibRecords1.setBibRecords(bibRecords);
+            formattedString = convertToXml(bibRecords1);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return formattedString;
+    }
+
     private String convertToXml(BibRecords bibRecords){
         StringWriter stringWriter = new StringWriter();
         try {
@@ -204,4 +217,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return contentType;
     }
 
+    public void prepareBibRecords(List<BibliographicEntity> successList, List<BibliographicEntity> failureList, List<BibRecord> records, List<BibliographicEntity> bibliographicEntities) {
+        for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
+            BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
+            BibRecord bibRecord = getBibRecord(bibliographicEntity);
+            records.add(bibRecord);
+        }
+    }
 }

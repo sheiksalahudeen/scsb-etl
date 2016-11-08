@@ -6,10 +6,8 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
-import org.recap.model.export.FullDataDumpCallable;
 import org.recap.model.export.ImprovedFullDataDumpCallable;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.service.DataDumpSolrService;
@@ -87,8 +85,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFormat("0");
-        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
 
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
@@ -136,8 +133,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFormat("0");
-        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
 
@@ -164,8 +160,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFormat("1");
-        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
@@ -193,8 +188,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
-        dataDumpRequest.setOutputFormat("0");
-        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
