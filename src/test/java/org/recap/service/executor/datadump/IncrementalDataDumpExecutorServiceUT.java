@@ -73,8 +73,7 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFormat("0");
-        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         incrementalDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
@@ -106,8 +105,7 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
-        dataDumpRequest.setOutputFormat("0");
-        dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         incrementalDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));

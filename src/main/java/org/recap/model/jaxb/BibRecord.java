@@ -2,6 +2,7 @@ package org.recap.model.jaxb;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  */
 
 @XmlRootElement
-public class BibRecord {
+public class BibRecord implements Serializable{
 
     private Bib bib;
     private List<Holdings> holdings;

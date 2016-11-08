@@ -15,8 +15,7 @@ public class DataDumpRequest {
     private String transmissionType;
     private String requestingInstitutionCode;
     private String toEmailAddress;
-    private String outputFormat;
-    private String fileFormat;
+    private String outputFileFormat;
     private String dateTimeString;
 
     public List<String> getInstitutionCodes() {
@@ -83,20 +82,12 @@ public class DataDumpRequest {
         this.toEmailAddress = toEmailAddress;
     }
 
-    public String getOutputFormat() {
-        return outputFormat;
+    public String getOutputFileFormat() {
+        return outputFileFormat;
     }
 
-    public void setOutputFormat(String outputFormat) {
-        this.outputFormat = outputFormat;
-    }
-
-    public String getFileFormat() {
-        return fileFormat;
-    }
-
-    public void setFileFormat(String fileFormat) {
-        this.fileFormat = fileFormat;
+    public void setOutputFileFormat(String outputFileFormat) {
+        this.outputFileFormat = outputFileFormat;
     }
 
     public String getDateTimeString() {

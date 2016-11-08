@@ -1,5 +1,6 @@
 package org.recap.service.preprocessor;
 
+import org.codehaus.groovy.util.StringUtil;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.CollectionGroupEntity;
@@ -118,14 +119,13 @@ public class DataDumpExportService {
             dataDumpRequest.setToEmailAddress(toEmailAddress);
         }
         if(outputFormat !=null){
-            if(fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED)){
-                dataDumpRequest.setOutputFormat(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT);
-                dataDumpRequest.setFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
-            }else{
-                dataDumpRequest.setOutputFormat(outputFormat);
-                dataDumpRequest.setFileFormat(ReCAPConstants.XML_FILE_FORMAT);
-            }
+            dataDumpRequest.setFetchType(fetchType);
         }
+
+        if(!StringUtils.isEmpty(outputFormat)){
+            dataDumpRequest.setOutputFileFormat(outputFormat);
+        }
+
         dataDumpRequest.setDateTimeString(getDateTimeString());
     }
 

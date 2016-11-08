@@ -14,14 +14,14 @@ import java.util.concurrent.*;
  * Created by peris on 11/1/16.
  */
 
-public class SolrSearchResultsProcessorActiveMQConsumer {
+public class BibEntityGeneratorActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(SolrSearchResultsProcessorActiveMQConsumer.class);
+    Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ExecutorService executorService;
 
-    public SolrSearchResultsProcessorActiveMQConsumer(BibliographicDetailsRepository bibliographicDetailsRepository) {
+    public BibEntityGeneratorActiveMQConsumer(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
