@@ -1,10 +1,9 @@
 package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
-import org.marc4j.marc.Record;
 import org.recap.model.jaxb.BibRecord;
-import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
+import org.recap.util.XmlFormatter;
 
 import java.util.List;
 
@@ -15,9 +14,11 @@ import java.util.List;
 public class SCSBXMLFormatActiveMQConsumer {
 
     SCSBXmlFormatterService scsbXmlFormatterService;
+    XmlFormatter xmlFormatter;
 
-    public SCSBXMLFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService) {
+    public SCSBXMLFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService, XmlFormatter xmlFormatter) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
+        this.xmlFormatter = xmlFormatter;
     }
 
     public String processSCSBXmlString(Exchange exchange) throws Exception {
@@ -25,7 +26,8 @@ public class SCSBXMLFormatActiveMQConsumer {
         System.out.println("Num records to generate XMl for: " + records.size());
         long startTime = System.currentTimeMillis();
 
-        String toSCSBXmlString = scsbXmlFormatterService.getFormattedOutputForBibRecords(records);
+        String formattedOutputForBibRecords = scsbXmlFormatterService.getSCSBXmlForBibRecords(records);
+        String toSCSBXmlString = xmlFormatter.format(formattedOutputForBibRecords);
 
         long endTime = System.currentTimeMillis();
 

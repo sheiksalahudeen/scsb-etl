@@ -64,7 +64,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return successAndFailureFormattedList;
     }
 
-    public String getFormattedOutputForBibRecords(List<BibRecord> bibRecords){
+    public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords){
         String formattedString = null;
         try {
             BibRecords bibRecords1 = new BibRecords();

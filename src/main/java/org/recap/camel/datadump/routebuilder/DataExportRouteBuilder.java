@@ -10,6 +10,7 @@ import org.recap.camel.datadump.DataExportPredicate;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
+import org.recap.util.XmlFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ public class DataExportRouteBuilder {
                                   BibliographicDetailsRepository bibliographicDetailsRepository,
                                   MarcXmlFormatterService marcXmlFormatterService,
                                   SCSBXmlFormatterService scsbXmlFormatterService,
+                                  XmlFormatter xmlFormatter,
                                   @Value("${datadump.records.per.file}") String dataDumpRecordsPerFile) {
         try {
 
@@ -71,7 +73,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
                     from(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
-                            .bean(new SCSBXMLFormatActiveMQConsumer(scsbXmlFormatterService), "processSCSBXmlString")
+                            .bean(new SCSBXMLFormatActiveMQConsumer(scsbXmlFormatterService, xmlFormatter), "processSCSBXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }
             });
