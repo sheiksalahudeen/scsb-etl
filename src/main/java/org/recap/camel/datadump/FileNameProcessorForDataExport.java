@@ -2,6 +2,7 @@ package org.recap.camel.datadump;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.recap.ReCAPConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
@@ -17,7 +18,12 @@ public class FileNameProcessorForDataExport implements Processor {
     public void process(Exchange exchange) throws Exception {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String fileName = getValueFor(batchHeaders, "fileName");
-        exchange.getOut().setHeader(Exchange.FILE_NAME, fileName+".xml");
+        String exportFormat = getValueFor(batchHeaders,"exportFormat");
+        if (exportFormat.equals(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT)) {
+            exchange.getOut().setHeader(Exchange.FILE_NAME, fileName+".json");
+        } else {
+            exchange.getOut().setHeader(Exchange.FILE_NAME, fileName+".xml");
+        }
         Object body = exchange.getIn().getBody();
         exchange.getOut().setBody(body);
 

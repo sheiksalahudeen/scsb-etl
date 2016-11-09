@@ -111,7 +111,7 @@ public class CamelJdbcUT extends BaseTestCase {
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
+        dataDumpRequest.setToEmailAddress("premlovesindia@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
@@ -148,7 +148,7 @@ public class CamelJdbcUT extends BaseTestCase {
     @Test
     public void exportDataDumpForSCSBXML() throws Exception {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(Integer.valueOf(2));
 
@@ -156,7 +156,7 @@ public class CamelJdbcUT extends BaseTestCase {
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
+        dataDumpRequest.setToEmailAddress("premlovesindia@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
@@ -174,6 +174,51 @@ public class CamelJdbcUT extends BaseTestCase {
         String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
 
         producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
+
+        for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
+            searchRecordsRequest.setPageNumber(pageNum);
+            startTime = System.currentTimeMillis();
+            Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
+            endTime = System.currentTimeMillis();
+            System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
+            fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
+            headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
+            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
+        }
+
+        while (true) {
+
+        }
+    }
+
+    @Test
+    public void exportDataDumpForDeletedJson() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
+        searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
+        searchRecordsRequest.setDeleted(true);
+        searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
+
+        long startTime = System.currentTimeMillis();
+        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+
+        DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dataDumpRequest.setToEmailAddress("premlovesindia@gmail.com");
+        String dateTimeString = getDateTimeString();
+        dataDumpRequest.setDateTimeString(dateTimeString);
+        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
+        dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
+        dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT);
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
+        String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
+        String folderName = "PUL" + File.separator + dateTimeString;
+
+        Integer totalPageCount = (Integer) results.get("totalPageCount");
+
+        String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
+        producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString);
 
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);

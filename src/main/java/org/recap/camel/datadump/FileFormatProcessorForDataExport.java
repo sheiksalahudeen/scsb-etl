@@ -13,8 +13,7 @@ public class FileFormatProcessorForDataExport implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
-        String exportFormat = getValueFor(batchHeaders, "exportFormat");
-        exchange.getOut().setHeader("exportFormat", exportFormat);
+        String exportFormat = getValueFor(batchHeaders, "exportFormat");exchange.getOut().setHeader("exportFormat", exportFormat);
         Object body = exchange.getIn().getBody();
         exchange.getOut().setBody(body);
 
