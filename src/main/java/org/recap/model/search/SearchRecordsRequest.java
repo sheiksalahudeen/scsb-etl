@@ -74,6 +74,9 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "errorMessage", value= "Error Message",position = 20)
     private String errorMessage;
 
+    @ApiModelProperty(name= "isDeleted", value= "Is Deleted",position = 21)
+    private boolean isDeleted = false;
+
     public String getFieldValue() {
         return fieldValue;
     }
@@ -254,6 +257,14 @@ public class SearchRecordsRequest implements Serializable {
 
     public void resetPageNumber() {
         this.pageNumber = 0;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public void reset() {

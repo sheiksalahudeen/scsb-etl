@@ -20,7 +20,7 @@ public class MarcXMLFormatActiveMQConsumer {
 
     public String processMarcXmlString(Exchange exchange) throws Exception {
         List<Record> records = (List<Record>) exchange.getIn().getBody();
-        System.out.println("Num records to generate XMl for: " + records.size());
+        System.out.println("Num records to generate marc XMl for: " + records.size());
         long startTime = System.currentTimeMillis();
 
         String toMarcXmlString = marcXmlFormatterService.covertToMarcXmlString(records);

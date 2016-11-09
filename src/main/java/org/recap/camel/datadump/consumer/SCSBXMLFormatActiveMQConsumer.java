@@ -23,7 +23,7 @@ public class SCSBXMLFormatActiveMQConsumer {
 
     public String processSCSBXmlString(Exchange exchange) throws Exception {
         List<BibRecord> records = (List<BibRecord>) exchange.getIn().getBody();
-        System.out.println("Num records to generate XMl for: " + records.size());
+        System.out.println("Num records to generate scsb XMl for: " + records.size());
         long startTime = System.currentTimeMillis();
 
         String formattedOutputForBibRecords = scsbXmlFormatterService.getSCSBXmlForBibRecords(records);
@@ -31,7 +31,7 @@ public class SCSBXMLFormatActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Time taken to generate marc xml for :"  + records.size() + " is : " + (endTime-startTime)/1000 + " seconds ");
+        System.out.println("Time taken to generate scsb xml for :"  + records.size() + " is : " + (endTime-startTime)/1000 + " seconds ");
 
         return toSCSBXmlString;
     }

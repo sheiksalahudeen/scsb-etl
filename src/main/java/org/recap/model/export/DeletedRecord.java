@@ -1,13 +1,16 @@
 package org.recap.model.export;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * Created by premkb on 29/9/16.
  */
-public class DeletedRecord {
+public class DeletedRecord implements Serializable{
 
     private String bibId;
 
-    private String itemId;
+    private List<String> itemIds;
 
     public String getBibId() {
         return bibId;
@@ -17,11 +20,11 @@ public class DeletedRecord {
         this.bibId = bibId;
     }
 
-    public String getItemId() {
-        return itemId;
+    public List<String> getItemIds() {
+        return itemIds;
     }
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
+    public void setItemIds(List<String> itemIds) {
+        this.itemIds = itemIds;
     }
 }

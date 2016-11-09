@@ -3,6 +3,8 @@ package org.recap.service.formatter.datadump;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DeletedRecord;
+import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.slf4j.Logger;
@@ -38,14 +40,14 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
         List<DeletedRecord> deletedRecordList = new ArrayList<>();
         for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
             try {
+                DeletedRecord deletedRecord = new DeletedRecord();
+                List<String> itemIds = new ArrayList<>();
+                deletedRecord.setBibId(bibliographicEntity.getBibliographicId().toString());
                 for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
-                    if (itemEntity.isDeleted()) {
-                        DeletedRecord deletedRecord = new DeletedRecord();
-                        deletedRecord.setBibId(bibliographicEntity.getBibliographicId().toString());
-                        deletedRecord.setItemId(itemEntity.getBarcode().toString());
-                        deletedRecordList.add(deletedRecord);
-                    }
+                    itemIds.add(itemEntity.getBarcode().toString());
                 }
+                deletedRecord.setItemIds(itemIds);
+                deletedRecordList.add(deletedRecord);
                 successList.add(bibliographicEntity);
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -66,5 +68,34 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
         return successAndFailureFormattedList;
     }
 
+    public void prepareDeletedRecords(List<BibliographicEntity> successList,List<BibliographicEntity> failureList,List<DeletedRecord> deletedRecordList,List<BibliographicEntity> bibliographicEntityList){
+        for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
+            try {
+                DeletedRecord deletedRecord = new DeletedRecord();
+                List<String> itemIds = new ArrayList<>();
+                deletedRecord.setBibId(bibliographicEntity.getBibliographicId().toString());
+                for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
+                    itemIds.add(itemEntity.getBarcode().toString());
+                }
+                deletedRecord.setItemIds(itemIds);
+                deletedRecordList.add(deletedRecord);
+                successList.add(bibliographicEntity);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                failureList.add(bibliographicEntity);
+            }
+        }
+    }
 
+    public String getJsonForDeletedRecords(List<DeletedRecord> deletedRecordList){
+        String formattedString = null;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            formattedString = mapper.writeValueAsString(deletedRecordList);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return formattedString;
+    }
 }

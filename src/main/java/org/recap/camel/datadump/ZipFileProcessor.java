@@ -59,7 +59,7 @@ public class ZipFileProcessor implements Processor {
         exchange.getContext().addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("file:" + ftpStagingDir + File.separator + folderName + "?noop=true&antInclude=*.xml")
+                from("file:" + ftpStagingDir + File.separator + folderName + "?noop=true&antInclude=*.*")
                         .routeId("ftpRoute")
                         .onCompletion()
                         .process(dataExportEmailProcessor)
