@@ -118,9 +118,6 @@ public class DataDumpExportService {
         if(!StringUtils.isEmpty(toEmailAddress)){
             dataDumpRequest.setToEmailAddress(toEmailAddress);
         }
-        if(outputFormat !=null){
-            dataDumpRequest.setFetchType(fetchType);
-        }
 
         if(!StringUtils.isEmpty(outputFormat)){
             dataDumpRequest.setOutputFileFormat(outputFormat);
