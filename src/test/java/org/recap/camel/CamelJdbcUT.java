@@ -156,7 +156,7 @@ public class CamelJdbcUT extends BaseTestCase {
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setToEmailAddress("premlovesindia@gmail.com");
+        dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
@@ -203,7 +203,7 @@ public class CamelJdbcUT extends BaseTestCase {
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setToEmailAddress("premlovesindia@gmail.com");
+        dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
