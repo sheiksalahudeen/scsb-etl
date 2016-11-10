@@ -4,14 +4,14 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
+import org.recap.repository.ReportDetailRepository;
 import org.recap.service.email.datadump.DataDumpEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Created by peris on 11/5/16.
@@ -22,9 +22,15 @@ public class DataExportEmailProcessor implements Processor {
 
     @Autowired
     DataDumpEmailService dataDumpEmailService;
+
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
+
+    @Autowired
+    DataExportHeaderUtil dataExportHeaderUtil;
+
     private String transmissionType;
     private List<String> institutionCodes;
-    private Integer totalRecordCount;
     private String requestingInstitutionCode;
     private String dateTimeStringForFolder;
     private String toEmailId;
@@ -32,14 +38,23 @@ public class DataExportEmailProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        processEmail();
+        String totalRecordCount = null;
+        List<ReportEntity> byFileName = reportDetailRepository.findByFileName(dataExportHeaderUtil.getValueFor((String) exchange.getIn().getHeader("batchHeaders"), "requestId"));
+        List<ReportDataEntity> reportDataEntities = byFileName.get(0).getReportDataEntities();
+        for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
+            ReportDataEntity reportDataEntity = iterator.next();
+            if(reportDataEntity.getHeaderName().equals("Num Bibs Exported")){
+                totalRecordCount = reportDataEntity.getHeaderValue();
+            }
+        }
+        processEmail(totalRecordCount);
     }
 
-    private void processEmail(){
+    private void processEmail(String totalRecordCount){
         if (transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 ||transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
             dataDumpEmailService.sendEmail(institutionCodes,
-                    this.totalRecordCount,
+                    Integer.valueOf(totalRecordCount),
                     requestingInstitutionCode,
                     transmissionType,
                     this.dateTimeStringForFolder,
@@ -69,14 +84,6 @@ public class DataExportEmailProcessor implements Processor {
 
     public void setInstitutionCodes(List<String> institutionCodes) {
         this.institutionCodes = institutionCodes;
-    }
-
-    public Integer getTotalRecordCount() {
-        return totalRecordCount;
-    }
-
-    public void setTotalRecordCount(Integer totalRecordCount) {
-        this.totalRecordCount = totalRecordCount;
     }
 
     public String getRequestingInstitutionCode() {

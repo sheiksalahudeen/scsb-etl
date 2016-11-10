@@ -28,13 +28,6 @@ public class DataExportPredicate implements Predicate {
 
         if (this.batchSize.equals(batchSize) || (totalPageCount == currentPageCount)) {
             exchange.getIn().setHeader("batchSize", 0);
-            Integer totalRecordsExported = (Integer) exchange.getIn().getHeader("totalRecordsExported");
-            if (null == totalRecordsExported) {
-                exchange.getIn().setHeader("totalRecordsExported", batchSize);
-            } else {
-                exchange.getIn().setHeader("totalRecordsExported", batchSize);
-            }
-
             return true;
         }
         return false;
