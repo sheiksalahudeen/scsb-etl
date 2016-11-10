@@ -236,16 +236,13 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return record;
     }
 
-    public String covertToMarcXmlString(List<Record> recordList) {
+    public String covertToMarcXmlString(List<Record> recordList) throws Exception {
         OutputStream out = new ByteArrayOutputStream();
         MarcWriter writer = new MarcXmlWriter(out, "UTF-8", true);
-        try {
-            recordList.forEach(writer::write);
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+
+        recordList.forEach(writer::write);
+        writer.close();
+
         return out.toString();
     }
 }

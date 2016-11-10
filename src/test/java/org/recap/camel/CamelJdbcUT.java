@@ -111,19 +111,22 @@ public class CamelJdbcUT extends BaseTestCase {
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dataDumpRequest.setToEmailAddress("premlovesindia@gmail.com");
+        dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
+        dataDumpRequest.setRequestingInstitutionCode("PUL");
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_MARC);
+        dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
         String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
         String folderName = "PUL" + File.separator + dateTimeString;
 
-        Integer totalPageCount = (Integer) results.get("totalPageCount");
+//        Integer totalPageCount = (Integer) results.get("totalPageCount");
+        Integer totalPageCount = 4;
 
         String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
 

@@ -8,6 +8,7 @@ import org.recap.camel.datadump.consumer.*;
 import org.recap.camel.datadump.DataExportAggregator;
 import org.recap.camel.datadump.DataExportPredicate;
 import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.repository.ReportDetailRepository;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
@@ -28,6 +29,7 @@ public class DataExportRouteBuilder {
                                   MarcXmlFormatterService marcXmlFormatterService,
                                   SCSBXmlFormatterService scsbXmlFormatterService,
                                   DeletedJsonFormatterService deletedJsonFormatterService,
+                                  ReportDetailRepository reportDetailRepository,
                                   XmlFormatter xmlFormatter,
                                   @Value("${datadump.records.per.file}") String dataDumpRecordsPerFile) {
         try {
@@ -69,7 +71,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
                     from(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
-                            .bean(new MarcXMLFormatActiveMQConsumer(marcXmlFormatterService), "processMarcXmlString")
+                            .bean(new MarcXMLFormatActiveMQConsumer(marcXmlFormatterService, reportDetailRepository), "processMarcXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }
             });

@@ -17,6 +17,7 @@ public class DataDumpRequest {
     private String toEmailAddress;
     private String outputFileFormat;
     private String dateTimeString;
+    private String requestId;
 
     public List<String> getInstitutionCodes() {
         return institutionCodes;
@@ -96,5 +97,13 @@ public class DataDumpRequest {
 
     public void setDateTimeString(String dateTimeString) {
         this.dateTimeString = dateTimeString;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

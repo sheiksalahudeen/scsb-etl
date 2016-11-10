@@ -68,7 +68,11 @@ public class DataExportHeaderUtil {
                 .append(";")
                 .append("exportFormat")
                 .append("#")
-                .append(dataDumpRequest.getOutputFileFormat());
+                .append(dataDumpRequest.getOutputFileFormat())
+                .append(";")
+                .append("requestId")
+                .append("#")
+                .append(dataDumpRequest.getRequestId());
 
         return headerString.toString();
     }
