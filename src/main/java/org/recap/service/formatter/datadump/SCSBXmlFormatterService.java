@@ -1,8 +1,5 @@
 package org.recap.service.formatter.datadump;
 
-import org.marc4j.MarcReader;
-import org.marc4j.MarcXmlReader;
-import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.*;
@@ -15,8 +12,6 @@ import org.springframework.util.CollectionUtils;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.*;
