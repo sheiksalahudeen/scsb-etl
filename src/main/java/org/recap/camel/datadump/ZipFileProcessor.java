@@ -49,6 +49,7 @@ public class ZipFileProcessor implements Processor {
         dataExportEmailProcessor.setRequestingInstitutionCode(getValueFor(batchHeaders, "requestingInstitutionCode"));
         dataExportEmailProcessor.setDateTimeStringForFolder(getValueFor(batchHeaders, "dateTimeString"));
         dataExportEmailProcessor.setToEmailId(getValueFor(batchHeaders, "toEmailId"));
+        dataExportEmailProcessor.setRequestId(getValueFor(batchHeaders, "requestId"));
 
         Route ftpRoute = exchange.getContext().getRoute("ftpRoute");
         if (null != ftpRoute) {

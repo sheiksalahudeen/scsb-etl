@@ -103,7 +103,7 @@ public class CamelJdbcUT extends BaseTestCase {
     @Test
     public void exportDataDumpForMarcXML() throws Exception {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
 
@@ -162,9 +162,11 @@ public class CamelJdbcUT extends BaseTestCase {
         dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
+        dataDumpRequest.setRequestingInstitutionCode("PUL");
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB);
+        dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
@@ -209,9 +211,11 @@ public class CamelJdbcUT extends BaseTestCase {
         dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
+        dataDumpRequest.setRequestingInstitutionCode("PUL");
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT);
+        dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");

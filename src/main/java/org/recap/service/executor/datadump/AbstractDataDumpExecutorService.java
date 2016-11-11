@@ -56,6 +56,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         searchRecordsRequest.setOwningInstitutions(dataDumpRequest.getInstitutionCodes());
         searchRecordsRequest.setCollectionGroupDesignations(getCodesForIds(dataDumpRequest.getCollectionGroupIds()));
         searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
+        populateSearchRequest(searchRecordsRequest,dataDumpRequest);
 
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         Integer totalPageCount = (Integer) results.get("totalPageCount");

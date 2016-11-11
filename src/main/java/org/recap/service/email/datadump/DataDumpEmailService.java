@@ -25,11 +25,12 @@ public class DataDumpEmailService {
     @Autowired
     private ProducerTemplate producer;
 
-    public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, String requestingInstitutionCode, String transmissionType, String dateTimeStringForFolder, String toEmailAddress) {
+    public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, Integer failedRecordCount, String requestingInstitutionCode, String transmissionType, String dateTimeStringForFolder, String toEmailAddress) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
         emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode,dateTimeStringForFolder));
         emailPayLoad.setCount(totalRecordCount);
+        emailPayLoad.setFailedCount(failedRecordCount);
         emailPayLoad.setTo(toEmailAddress);
         producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
     }
