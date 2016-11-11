@@ -161,4 +161,10 @@ public class ReCAPConstants {
     public static final String MARC_RECORD_FOR_DATA_EXPORT_Q = "scsbactivemq:queue:MarcRecordForDataExportQ";
     public static final String SCSB_RECORD_FOR_DATA_EXPORT_Q = "scsbactivemq:queue:SCSBRecordForDataExportQ";
     public static final String DELETED_JSON_RECORD_FOR_DATA_EXPORT_Q = "scsbactivemq:queue:DeletedJsonRecordForDataExportQ";
+    public static final String NUM_RECORDS = "Num Records";
+    public static final String NUM_BIBS_EXPORTED = "Num Bibs Exported";
+    public static final String BATCH_EXPORT = "Batch Export";
+    public static final String REQUEST_ID = "requestId";
+    public static final String FAILURE_CAUSE = "Failure Cause";
+    public static final String FAILED_BIBS = "Failed Bibs";
 }

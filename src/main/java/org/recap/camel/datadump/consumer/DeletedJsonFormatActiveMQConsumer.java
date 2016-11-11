@@ -93,8 +93,6 @@ public class DeletedJsonFormatActiveMQConsumer {
                     ReportDataEntity reportDataEntity = iterator.next();
                     if(reportDataEntity.getHeaderName().equals("Failed Bibs")){
                         reportDataEntity.setHeaderValue(String.valueOf(Integer.valueOf(reportDataEntity.getHeaderValue())+deletedRecordList.size()));
-                        reportDataEntity.setHeaderName("Failed Bibs cause");
-                        reportDataEntity.setHeaderValue(e.getMessage());
                     }
                 }
                 reportDetailRepository.save(reportEntity);
