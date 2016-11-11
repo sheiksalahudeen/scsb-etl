@@ -11,6 +11,7 @@ public class EmailPayLoad implements Serializable{
     private List<String> institutions;
     private String location;
     private Integer count;
+    private Integer failedCount;
     private String to;
 
     public List<String> getInstitutions() {
@@ -35,6 +36,14 @@ public class EmailPayLoad implements Serializable{
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getFailedCount() {
+        return failedCount;
+    }
+
+    public void setFailedCount(Integer failedCount) {
+        this.failedCount = failedCount;
     }
 
     public String getTo() {

@@ -81,7 +81,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
                     from(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
-                            .bean(new SCSBXMLFormatActiveMQConsumer(scsbXmlFormatterService, xmlFormatter), "processSCSBXmlString")
+                            .bean(new SCSBXMLFormatActiveMQConsumer(scsbXmlFormatterService, xmlFormatter,reportDetailRepository), "processSCSBXmlString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }
             });
@@ -91,7 +91,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
                     from(ReCAPConstants.DELETED_JSON_RECORD_FOR_DATA_EXPORT_Q)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
-                            .bean(new DeletedJsonFormatActiveMQConsumer(deletedJsonFormatterService), "processDeleteJsonString")
+                            .bean(new DeletedJsonFormatActiveMQConsumer(deletedJsonFormatterService,reportDetailRepository), "processDeleteJsonString")
                             .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q);
                 }
             });

@@ -31,8 +31,6 @@ public class DeletedDataDumpExecutorService extends AbstractDataDumpExecutorServ
 
     @Override
     public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
-        searchRecordsRequest.setFieldName("IsDeletedBib");
-        searchRecordsRequest.setFieldValue("true");
         searchRecordsRequest.setDeleted(true);
     }
 }

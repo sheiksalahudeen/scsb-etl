@@ -34,27 +34,33 @@ public class DataExportEmailProcessor implements Processor {
     private String requestingInstitutionCode;
     private String dateTimeStringForFolder;
     private String toEmailId;
+    private String requestId;
 
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        String totalRecordCount = null;
-        List<ReportEntity> byFileName = reportDetailRepository.findByFileName(dataExportHeaderUtil.getValueFor((String) exchange.getIn().getHeader("batchHeaders"), "requestId"));
+        String totalRecordCount = "0";
+        String failedBibs = "0";
+        List<ReportEntity> byFileName = reportDetailRepository.findByFileName(requestId);
         List<ReportDataEntity> reportDataEntities = byFileName.get(0).getReportDataEntities();
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity reportDataEntity = iterator.next();
             if(reportDataEntity.getHeaderName().equals("Num Bibs Exported")){
                 totalRecordCount = reportDataEntity.getHeaderValue();
             }
+            if(reportDataEntity.getHeaderName().equals("Failed Bibs")){
+                failedBibs = reportDataEntity.getHeaderValue();
+            }
         }
-        processEmail(totalRecordCount);
+        processEmail(totalRecordCount,failedBibs);
     }
 
-    private void processEmail(String totalRecordCount){
+    private void processEmail(String totalRecordCount,String failedBibs){
         if (transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 ||transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
             dataDumpEmailService.sendEmail(institutionCodes,
                     Integer.valueOf(totalRecordCount),
+                    Integer.valueOf(failedBibs),
                     requestingInstitutionCode,
                     transmissionType,
                     this.dateTimeStringForFolder,
@@ -108,5 +114,13 @@ public class DataExportEmailProcessor implements Processor {
 
     public void setToEmailId(String toEmailId) {
         this.toEmailId = toEmailId;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }
