@@ -2,9 +2,6 @@ package org.recap.service.formatter.datadump;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.file.FileEndpoint;
-import org.apache.camel.component.stream.StreamEndpoint;
-import org.apache.camel.component.stream.StreamProducer;
 import org.junit.Test;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcWriter;
@@ -23,7 +20,6 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static org.codehaus.plexus.util.MatchPatterns.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -186,6 +182,9 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         itemEntity.setCustomerCode("PA");
         itemEntity.setCopyNumber(1);
         itemEntity.setItemAvailabilityStatusId(1);
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setStatusCode("Available");
+        itemEntity.setItemStatusEntity(itemStatusEntity);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
 
