@@ -225,6 +225,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         for (ItemEntity itemEntity : itemEntityList) {
             for (DataField dataField : record.getDataFields()) {
                 if (dataField.getTag().equals("876")) {
+                    dataField.addSubfield(factory.newSubfield('a', itemEntity.getOwningInstitutionItemId()));
+                    dataField.addSubfield(factory.newSubfield('h', itemEntity.getUseRestrictions()!=null?itemEntity.getUseRestrictions():""));
+                    dataField.addSubfield(factory.newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
+                    dataField.addSubfield(factory.newSubfield('p', itemEntity.getBarcode()));
+                    dataField.addSubfield(factory.newSubfield('t', itemEntity.getCopyNumber()!=null?String.valueOf(itemEntity.getCopyNumber()):""));
                     dataField.addSubfield(factory.newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
                     is876Added = true;
                 }
