@@ -45,6 +45,42 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     }
 
     @Test
+    public void exportFullDataDumpMarcXmlFormatForHttp() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","CUL")
+                .param("fetchType","0")
+                .param("transmissionType", "1")
+                .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","0")
+                .param("emailToAddress","peri.subrahmanya@htcinc.com")
+                .param("collectionGroupIds","1,2"))
+                .andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertTrue(status == 200);
+        System.out.println(contentAsString);
+    }
+
+    @Test
+    public void exportFullDataDumpSCSBXmlFormatForHttp() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","CUL")
+                .param("fetchType","0")
+                .param("transmissionType", "1")
+                .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","1")
+                .param("emailToAddress","peri.subrahmanya@htcinc.com")
+                .param("collectionGroupIds","1,2"))
+                .andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertTrue(status == 200);
+        System.out.println(contentAsString);
+    }
+
+    @Test
     public void exportFullDataDumpMarcXmlFormat() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")

@@ -8,6 +8,7 @@ import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -24,12 +25,8 @@ public class DeletedRecordPreparerCallable implements Callable {
     }
 
     @Override
-    public List<DeletedRecord> call() throws Exception {
-        List<BibliographicEntity> successList = new ArrayList<>();
-        List<BibliographicEntity> failureList = new ArrayList<>();
-        List<DeletedRecord> deletedRecordList = new ArrayList<>();
-
-        deletedJsonFormatterService.prepareDeletedRecords(successList,failureList,deletedRecordList, bibliographicEntities);
-        return deletedRecordList;
+    public Map<String, Object> call() throws Exception {
+        Map<String, Object> prepareDeletedRecords = deletedJsonFormatterService.prepareDeletedRecords(bibliographicEntities);
+        return prepareDeletedRecords;
     }
 }

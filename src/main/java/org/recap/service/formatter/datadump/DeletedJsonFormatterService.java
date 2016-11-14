@@ -27,17 +27,12 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
     @Override
     public boolean isInterested(String formatType) {
         return formatType.equals(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT) ? true:false;
-
     }
 
-    @Override
-    public Object getFormattedOutput(List<BibliographicEntity> bibliographicEntityList) {
-        Map<String,Object> successAndFailureFormattedList= new HashMap<>();
-        List<BibliographicEntity> successList = new ArrayList<>();
-        List<BibliographicEntity> failureList = new ArrayList<>();
-        String formattedString = null;
-        String formatError = null;
-        List<DeletedRecord> deletedRecordList = new ArrayList<>();
+    public Map<String, Object> prepareDeletedRecords(List<BibliographicEntity> bibliographicEntityList){
+        Map resultsMap = new HashMap();
+        List<DeletedRecord> deletedRecords = new ArrayList<>();
+        List<BibliographicEntity> failureRecords = new ArrayList<>();
         for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
             try {
                 DeletedRecord deletedRecord = new DeletedRecord();
@@ -47,44 +42,18 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
                     itemIds.add(itemEntity.getBarcode().toString());
                 }
                 deletedRecord.setItemIds(itemIds);
-                deletedRecordList.add(deletedRecord);
-                successList.add(bibliographicEntity);
+                deletedRecords.add(deletedRecord);
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                failureList.add(bibliographicEntity);
+                failureRecords.add(bibliographicEntity);
             }
         }
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            formattedString = mapper.writeValueAsString(deletedRecordList);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            formatError = e.getMessage();
-        }
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_SUCCESSLIST,successList);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FAILURELIST,failureList);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATTEDSTRING,formattedString);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATERROR,formatError);
-        return successAndFailureFormattedList;
-    }
 
-    public void prepareDeletedRecords(List<BibliographicEntity> successList,List<BibliographicEntity> failureList,List<DeletedRecord> deletedRecordList,List<BibliographicEntity> bibliographicEntityList){
-        for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
-            try {
-                DeletedRecord deletedRecord = new DeletedRecord();
-                List<String> itemIds = new ArrayList<>();
-                deletedRecord.setBibId(bibliographicEntity.getBibliographicId().toString());
-                for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
-                    itemIds.add(itemEntity.getBarcode().toString());
-                }
-                deletedRecord.setItemIds(itemIds);
-                deletedRecordList.add(deletedRecord);
-                successList.add(bibliographicEntity);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                failureList.add(bibliographicEntity);
-            }
-        }
+        resultsMap.put(ReCAPConstants.SUCCESS, deletedRecords);
+        resultsMap.put(ReCAPConstants.FAILURE, failureRecords);
+
+
+        return resultsMap;
     }
 
     public String getJsonForDeletedRecords(List<DeletedRecord> deletedRecordList){

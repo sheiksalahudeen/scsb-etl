@@ -35,7 +35,6 @@ public class DataDumpExecutorService {
         for(DataDumpExecutorInterface dataDumpExecutorInterface:getExecutor()){
             if(dataDumpExecutorInterface.isInterested(dataDumpRequest.getFetchType())){
                 outputString = dataDumpExecutorInterface.process(dataDumpRequest);
-                logger.info("Data dump export complete.");
             }
         }
         return outputString;

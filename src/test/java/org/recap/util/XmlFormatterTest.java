@@ -15,7 +15,7 @@ public class XmlFormatterTest {
     public void format() throws Exception {
         XmlFormatter xmlFormatter = new XmlFormatter();
         String unformattedXml = FileUtils.readFileToString(new File(getClass().getResource("scsb-sample.xml").toURI()));
-        String formattedXml = xmlFormatter.format(unformattedXml);
+        String formattedXml = xmlFormatter.prettyPrint(unformattedXml);
         System.out.println(formattedXml);
     }
 

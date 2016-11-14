@@ -8,7 +8,6 @@ public class ReCAPConstants {
     public static final String DATA_DUMP_FILE_NAME = "ReCAPCollectionFor";
     public static final String FILENAME = "fileName";
     public static final String DATETIME_FOLDER = "dateTimeFolder";
-    public static final String CAMELFILENAME = "CamelFileName";
     public static final String REQUESTING_INST_CODE = "requestingInstitutionCode";
     public static final String XML_FILE_FORMAT = ".xml";
     public static final String ZIP_FILE_FORMAT = ".zip";
@@ -42,14 +41,13 @@ public class ReCAPConstants {
     public static final String DATADUMP_FAILURE_REPORT_Q = "scsbactivemq:queue:dataDumpFailureReportFileQ";
     public static final String DATADUMP_SUCCESS_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpSuccessReportFtpQ";
     public static final String DATADUMP_FAILURE_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpFailureReportFTPQ";
-    public static final String DATDUMP_FTP_Q = "scsbactivemq:queue:dataDumpQ";
     public static final String DATADUMP_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpFileSystemQ";
     public static final String DATADUMP_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpReportFtpQ";
     public static final String DATADUMP_REPORT_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpReportFileSystemQ";
     public static final String EMAIL_Q = "scsbactivemq:queue:emailQ";
-    public static final String DATADUMP_ZIPFILE_FILESYSTEM_Q = "direct:zipFileSystemQ";
     public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
     public static final String DATADUMP_ZIPFILE_FTP_Q = "direct:zipFileFtpQ";
+    public static final String DATADUMP_HTTP_Q = "scsbactivemq:queue:dataExportHttpQ";
 
     //Camel Route Ids
     public static final String REPORT_ROUTE_ID = "reportQRoute";
@@ -57,13 +55,8 @@ public class ReCAPConstants {
     public static final String CSV_FAILURE_ROUTE_ID = "csvFailureQ";
     public static final String FTP_SUCCESS_ROUTE_ID = "ftpFailureQ";
     public static final String FTP_FAILURE_ROUTE_ID = "ftpSuccessQ";
-    public static final String DATADUMP_SUCCESS_CSV_ROUTE_ID = "csvSuccessReportQ";
-    public static final String DATADUMP_FAILURE_CSV_ROUTE_ID = "csvFailureReportQ";
-    public static final String DATADUMP_SUCCESS_CSV_FTP_ROUTE_ID = "csvSuccessReportFtpQ";
-    public static final String DATADUMP_FAILURE_CSV_FTP_ROUTE_ID = "csvFailureReportFtpQ";
     public static final String EMAIL_ROUTE_ID = "emailQ";
     public static final String DATADUMP_ZIP_FILESYSTEM_ROUTE_ID = "zipDataDumpQ";
-    public static final String ZIP_DATADUMP_COMPLETED = "zipDataDumpCompleted";
     public static final String DATADUMP_ZIPFTP_ROUTE_ID = "zipDataDumpRoute";
 
 
@@ -115,10 +108,6 @@ public class ReCAPConstants {
     public static final String DATE_FORMAT_DDMMMYYYYHHMM = "ddMMMyyyyHHmm";
 
     //Data Dump
-    public static final String DATADUMP_LIMIT_PAGE = "datadump.limit.page";;
-    public static final String DATADUMP_THREADS = "datadump.threads";;
-    public static final String DATADUMP_BATCHSIZE = "datadump.batchsize";;
-    public static final String DATADUMP_EXPORT_SUCCESS = "Data dump exported successfully.";
     public static final String DATADUMP_EXPORT_FAILURE = "Data dump export failed, please check with the support team.";
     public static final String DATADUMP_NO_RECORD = "There is no data to export.";
     public static final String DATADUMP_PROCESS_STARTED = "Export process has started and we will send an email notification upon completion";
@@ -167,4 +156,5 @@ public class ReCAPConstants {
     public static final String REQUEST_ID = "requestId";
     public static final String FAILURE_CAUSE = "Failure Cause";
     public static final String FAILED_BIBS = "Failed Bibs";
+    public static final String DATADUMP_STAGING_Q = "scsbactivemq:queue:dataExportStagingQ";
 }

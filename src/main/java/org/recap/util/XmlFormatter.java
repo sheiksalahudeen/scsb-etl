@@ -1,25 +1,13 @@
 package org.recap.util;
 
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 
 /**
  * Created by peris on 11/8/16.
@@ -27,39 +15,29 @@ import java.io.Writer;
 
 @Component
 public class XmlFormatter {
-    public String format(String unformattedXml) {
-        try {
-            Document document = parseXmlFile(unformattedXml);
-
-            OutputFormat format = new OutputFormat(document);
-            format.setLineWidth(65);
-            format.setIndenting(true);
-            format.setIndent(2);
-            Writer out = new StringWriter();
-            XMLSerializer serializer = new XMLSerializer(out, format);
-            serializer.serialize(document);
-
-            return out.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
+    public String prettyPrint(final String xml) {
+        if (StringUtils.isBlank(xml)) {
+            throw new RuntimeException("xml was null or blank in prettyPrint()");
         }
 
-    }
+        final StringWriter sw;
 
-    private Document parseXmlFile(String in) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            InputSource is = new InputSource(new StringReader(in));
-            return db.parse(is);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
+            final OutputFormat format = OutputFormat.createPrettyPrint();
+            final org.dom4j.Document document = DocumentHelper.parseText(xml);
+            sw = new StringWriter();
+            final XMLWriter writer = new XMLWriter(sw, format);
+            writer.write(document);
+        } catch (Exception e) {
+            throw new RuntimeException("Error pretty printing xml:\n" + xml, e);
         }
-        return null;
+        String[] xmlArray = StringUtils.split(sw.toString(), '\n');
+        Object[] xmlContent = ArrayUtils.subarray(xmlArray, 1, xmlArray.length);
+        StringBuilder xmlStr = new StringBuilder();
+        for (Object object : xmlContent) {
+            xmlStr.append(object.toString());
+            xmlStr.append('\n');
+        }
+        return xmlStr.toString();
     }
 }

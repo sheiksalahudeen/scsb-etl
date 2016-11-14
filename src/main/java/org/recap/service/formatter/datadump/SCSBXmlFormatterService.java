@@ -29,41 +29,6 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return formatType.equals(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB) ? true:false;
     }
 
-    @Override
-    public Object getFormattedOutput(List<BibliographicEntity> bibliographicEntityList){
-        Map<String,Object> successAndFailureFormattedList= new HashMap<>();
-        List<BibliographicEntity> successList = new ArrayList<>();
-        List<BibliographicEntity> failureList = new ArrayList<>();
-        String formatError = null;
-        BibRecords bibRecords = new BibRecords();
-        List<BibRecord> bibRecordList = new ArrayList<>();
-        try {
-            if (!CollectionUtils.isEmpty(bibliographicEntityList)) {
-                for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
-                    BibRecord bibRecord = getBibRecord(bibliographicEntity);
-                    bibRecordList.add(bibRecord);
-                    successList.add(bibliographicEntity);
-                }
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            formatError = e.getMessage();
-        }
-        bibRecords.setBibRecords(bibRecordList);
-        String formattedString = null;
-        try {
-            formattedString = convertToXml(bibRecords);
-        } catch (Exception e) {
-            e.printStackTrace();
-            formatError = e.getMessage();
-        }
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_SUCCESSLIST,successList);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FAILURELIST,failureList);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATTEDSTRING,formattedString);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATERROR,formatError);
-        return successAndFailureFormattedList;
-    }
-
     public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords){
         String formattedString = null;
         try {
@@ -91,6 +56,16 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return stringWriter.toString();
     }
 
+    public List<BibRecord> prepareBibRecords(List<BibliographicEntity> bibliographicEntities) {
+        List<BibRecord> records = new ArrayList<>();
+        for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
+            BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
+            BibRecord bibRecord = getBibRecord(bibliographicEntity);
+            records.add(bibRecord);
+        }
+        return records;
+    }
+
     private BibRecord getBibRecord(BibliographicEntity bibliographicEntity) {
         BibRecord bibRecord = new BibRecord();
         Bib bib = getBib(bibliographicEntity);
@@ -113,6 +88,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         bib.setContent(contentType);
         return bib;
     }
+
 
     private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) {
         List<Holdings> holdingsList = new ArrayList<>();
@@ -222,11 +198,5 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return contentType;
     }
 
-    public void prepareBibRecords(List<BibliographicEntity> successList, List<BibliographicEntity> failureList, List<BibRecord> records, List<BibliographicEntity> bibliographicEntities) {
-        for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
-            BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
-            BibRecord bibRecord = getBibRecord(bibliographicEntity);
-            records.add(bibRecord);
-        }
-    }
+
 }

@@ -7,10 +7,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.camel.BibDataProcessor;
+import org.recap.camel.datadump.callable.BibRecordPreparerCallable;
+import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.ReportDetailRepository;
 import org.recap.util.DBReportUtil;
+import org.recap.util.XmlFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +38,9 @@ public class SCSBXmlFormatterServiceUT extends BaseTestCase {
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
+
+    @Autowired
+    XmlFormatter xmlFormatter;
 
     @Value("${etl.report.directory}")
     private String reportDirectoryPath;
@@ -156,9 +163,12 @@ public class SCSBXmlFormatterServiceUT extends BaseTestCase {
     @Test
     public void verifySCSBXmlGeneration() throws Exception {
         BibliographicEntity bibliographicEntity = getBibliographicEntity();
-        Map<String, Object> formattedOutput = (Map<String, Object>) scsbXmlFormatterService.getFormattedOutput(Arrays.asList(bibliographicEntity));
-        String formattedString = (String) formattedOutput.get("formattedString");
-        System.out.println(formattedString);
+
+        List<BibRecord> bibRecords = scsbXmlFormatterService.prepareBibRecords(Arrays.asList(bibliographicEntity));
+
+        String formattedOutput = scsbXmlFormatterService.getSCSBXmlForBibRecords(bibRecords);
+
+        System.out.println(xmlFormatter.prettyPrint(formattedOutput));
     }
 
     private BibliographicEntity getBibliographicEntity() throws URISyntaxException, IOException {

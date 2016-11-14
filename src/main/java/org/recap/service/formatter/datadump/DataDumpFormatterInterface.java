@@ -11,5 +11,5 @@ public interface DataDumpFormatterInterface {
 
     public boolean isInterested(String formatType);
 
-    public Object getFormattedOutput(List<BibliographicEntity> bibliographicEntityList);
+
 }

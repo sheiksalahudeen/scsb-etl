@@ -26,11 +26,7 @@ public class BibRecordPreparerCallable implements Callable {
 
     @Override
     public List<BibRecord> call() throws Exception {
-        List<BibliographicEntity> successList = new ArrayList<>();
-        List<BibliographicEntity> failureList = new ArrayList<>();
-        List<BibRecord> records = new ArrayList<>();
-
-        scsbXmlFormatterService.prepareBibRecords(successList, failureList, records, bibliographicEntities);
+        List<BibRecord> records = scsbXmlFormatterService.prepareBibRecords(bibliographicEntities);
         return records;
     }
 }

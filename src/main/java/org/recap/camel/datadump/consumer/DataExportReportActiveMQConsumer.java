@@ -1,8 +1,10 @@
-package org.recap.util.datadump;
+package org.recap.camel.datadump.consumer;
 
 import org.recap.ReCAPConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.repository.ReportDetailRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -13,13 +15,19 @@ import java.util.*;
  */
 
 @Component
-public class DataExportReportEntityHelper {
-    public ReportEntity processSuccessReportEntity(List<ReportEntity> byFileName, Map values) {
-        String requestingInstitutionCode = (String) values.get(ReCAPConstants.REQUESTING_INST_CODE);
-        String type = (String) values.get(ReCAPConstants.BATCH_EXPORT);
-        String requestId = (String) (values.get(ReCAPConstants.REQUEST_ID));
-        String numBibsExported = (String) values.get(ReCAPConstants.NUM_BIBS_EXPORTED);
-        String numRecords = (String) values.get(ReCAPConstants.NUM_RECORDS);
+public class DataExportReportActiveMQConsumer {
+
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
+
+    public ReportEntity saveSuccessReportEntity(Map body){
+        String requestingInstitutionCode = (String) body.get(ReCAPConstants.REQUESTING_INST_CODE);
+        String type = (String) body.get(ReCAPConstants.BATCH_EXPORT);
+        String requestId = (String) (body.get(ReCAPConstants.REQUEST_ID));
+        String numBibsExported = (String) body.get(ReCAPConstants.NUM_BIBS_EXPORTED);
+        String numRecords = (String) body.get(ReCAPConstants.NUM_RECORDS);
+
+        List<ReportEntity> byFileName = getReportDetailRepository().findByFileName(requestId);
 
         ReportEntity reportEntity = null;
         if (CollectionUtils.isEmpty(byFileName)) {
@@ -47,7 +55,17 @@ public class DataExportReportEntityHelper {
             }
         }
 
+        getReportDetailRepository().save(reportEntity);
+
         return reportEntity;
+    }
+
+    private ReportDetailRepository getReportDetailRepository() {
+        return reportDetailRepository;
+    }
+
+    public void setReportDetailRepository(ReportDetailRepository reportDetailRepository) {
+        this.reportDetailRepository = reportDetailRepository;
     }
 
     public ReportEntity processFailureReportEntity(List<ReportEntity> byFileName, Map values) {

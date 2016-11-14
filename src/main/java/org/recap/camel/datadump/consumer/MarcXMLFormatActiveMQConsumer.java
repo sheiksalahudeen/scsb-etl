@@ -1,15 +1,13 @@
 package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
-import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
-import org.recap.util.datadump.DataExportReportEntityHelper;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -20,14 +18,12 @@ import java.util.*;
 public class MarcXMLFormatActiveMQConsumer {
 
     private MarcXmlFormatterService marcXmlFormatterService;
-    private ReportDetailRepository reportDetailRepository;
     private DataExportHeaderUtil dataExportHeaderUtil;
-    private DataExportReportEntityHelper dataExportReportEntityHelper;
+    private ProducerTemplate producerTemplate;
 
-    public MarcXMLFormatActiveMQConsumer(MarcXmlFormatterService marcXmlFormatterService, ReportDetailRepository reportDetailRepository, DataExportReportEntityHelper dataExportReportEntityHelper) {
+    public MarcXMLFormatActiveMQConsumer(ProducerTemplate producerTemplate, MarcXmlFormatterService marcXmlFormatterService) {
         this.marcXmlFormatterService = marcXmlFormatterService;
-        this.reportDetailRepository = reportDetailRepository;
-        this.dataExportReportEntityHelper = dataExportReportEntityHelper;
+        this.producerTemplate = producerTemplate;
     }
 
     public String processMarcXmlString(Exchange exchange) throws Exception {
@@ -52,22 +48,6 @@ public class MarcXMLFormatActiveMQConsumer {
         return toMarcXmlString;
     }
 
-    private void processFailureReportEntity(List<Record> records, String batchHeaders, String requestId, Exception e) {
-        List<ReportEntity> byFileName = reportDetailRepository.findByFileName
-                (requestId);
-
-        HashMap values = new HashMap();
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, "requestingInstitutionCode"));
-        values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(records.size()));
-        values.put(ReCAPConstants.FAILURE_CAUSE, e.getMessage());
-        values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
-        values.put(ReCAPConstants.REQUEST_ID, requestId);
-
-        ReportEntity reportEntity = new ReportEntity();
-        dataExportReportEntityHelper.processFailureReportEntity(byFileName, values);
-        reportDetailRepository.save(reportEntity);
-    }
-
     private void processSuccessReportEntity(List<Record> records, String batchHeaders, String requestId) {
         Map values = new HashMap<>();
         values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, "requestingInstitutionCode"));
@@ -76,11 +56,19 @@ public class MarcXMLFormatActiveMQConsumer {
         values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT);
         values.put(ReCAPConstants.REQUEST_ID, requestId);
 
-        List<ReportEntity> byFileName = reportDetailRepository.findByFileName
-                (requestId);
-        ReportEntity reportEntity = dataExportReportEntityHelper.processSuccessReportEntity(byFileName, values);
+        producerTemplate.sendBody(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q, values);
 
-        reportDetailRepository.save(reportEntity);
+    }
+
+    private void processFailureReportEntity(List<Record> records, String batchHeaders, String requestId, Exception e) {
+        HashMap values = new HashMap();
+        values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, "requestingInstitutionCode"));
+        values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(records.size()));
+        values.put(ReCAPConstants.FAILURE_CAUSE, e.getMessage());
+        values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
+        values.put(ReCAPConstants.REQUEST_ID, requestId);
+
+        producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);
     }
 
     public DataExportHeaderUtil getDataExportHeaderUtil() {

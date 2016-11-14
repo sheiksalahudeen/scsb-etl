@@ -42,7 +42,6 @@ public class ZipFileProcessor implements Processor {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String folderName = getValueFor(batchHeaders, "folderName");
 
-
         dataExportEmailProcessor.setInstitutionCodes(getInstitutionCodes(getValueFor(batchHeaders, "institutionCodes")));
         dataExportEmailProcessor.setTransmissionType(getValueFor(batchHeaders, "transmissionType"));
         dataExportEmailProcessor.setDateTimeStringForFolder(getValueFor(batchHeaders, "dateTimeString"));

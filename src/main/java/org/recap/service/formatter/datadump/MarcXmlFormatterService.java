@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,65 +47,49 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return formatType.equals(ReCAPConstants.DATADUMP_XML_FORMAT_MARC) ? true : false;
     }
 
-    @Override
-    public Object getFormattedOutput(List<BibliographicEntity> bibliographicEntityList) {
-        Map<String, Object> successAndFailureFormattedList = new HashMap<>();
-        List<BibliographicEntity> successList = new ArrayList<>();
-        List<BibliographicEntity> failureList = new ArrayList<>();
-        String formattedString = null;
-        String formatError = null;
-        List<Record> recordList = new ArrayList<>();
-        for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
-            prepareBibEntity(successList, failureList, recordList, bibliographicEntity);
-        }
-        try {
-            formattedString = covertToMarcXmlString(recordList);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            formatError = e.getMessage();
-        }
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_SUCCESSLIST, successList);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FAILURELIST, failureList);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATTEDSTRING, formattedString);
-        successAndFailureFormattedList.put(ReCAPConstants.DATADUMP_FORMATERROR, formatError);
-        return successAndFailureFormattedList;
-    }
 
-    public void prepareBibEntities(List<BibliographicEntity> successList, List<BibliographicEntity> failureList, List<Record> recordList, List<BibliographicEntity> bibliographicEntities) {
+    public Map<String, Object> prepareMarcRecords(List<BibliographicEntity> bibliographicEntities) {
+        Map resultsMap = new HashMap();
+        List<Record> records = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
 
         for (Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator(); iterator.hasNext(); ) {
-            BibliographicEntity bibliographicEntity = null;
-            try {
-                bibliographicEntity = iterator.next();
-                Record record = getRecordFromContent(bibliographicEntity.getContent());
-                update001Field(record, bibliographicEntity);
-                record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities());
-                record = addItemInfo(record, bibliographicEntity.getItemEntities());
-                recordList.add(record);
-                successList.add(bibliographicEntity);
-                failureList.add(bibliographicEntity);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                failureList.add(bibliographicEntity);
+            BibliographicEntity bibliographicEntity = iterator.next();
+            Map<String, Object> stringObjectMap = prepareMarcRecord(bibliographicEntity);
+
+            Record record = (Record) stringObjectMap.get(ReCAPConstants.SUCCESS);
+
+            if (null != record) {
+                records.add(record);
+            }
+
+            String failureMsg = (String) stringObjectMap.get(ReCAPConstants.FAILURE);
+            if (null != failureMsg) {
+                errors.add(failureMsg);
             }
         }
 
+        resultsMap.put(ReCAPConstants.SUCCESS, records);
+        resultsMap.put(ReCAPConstants.FAILURE, errors);
 
+        return resultsMap;
     }
 
-    public void prepareBibEntity(List<BibliographicEntity> successList, List<BibliographicEntity> failureList, List<Record> recordList, BibliographicEntity bibliographicEntity) {
+    public Map<String, Object> prepareMarcRecord(BibliographicEntity bibliographicEntity) {
+        Record record = null;
+        Map results = new HashMap();
         try {
-            Record record = getRecordFromContent(bibliographicEntity.getContent());
+            record = getRecordFromContent(bibliographicEntity.getContent());
             update001Field(record, bibliographicEntity);
             record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities());
             record = addItemInfo(record, bibliographicEntity.getItemEntities());
-            recordList.add(record);
-            successList.add(bibliographicEntity);
-            failureList.add(bibliographicEntity);
+            results.put(ReCAPConstants.SUCCESS, record);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            failureList.add(bibliographicEntity);
+            results.put(ReCAPConstants.FAILURE, e.getMessage());
+
         }
+        return results;
     }
 
     private Record getRecordFromContent(byte[] content) {
@@ -226,10 +211,10 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             for (DataField dataField : record.getDataFields()) {
                 if (dataField.getTag().equals("876")) {
                     dataField.addSubfield(factory.newSubfield('a', itemEntity.getOwningInstitutionItemId()));
-                    dataField.addSubfield(factory.newSubfield('h', itemEntity.getUseRestrictions()!=null?itemEntity.getUseRestrictions():""));
+                    dataField.addSubfield(factory.newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
                     dataField.addSubfield(factory.newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
                     dataField.addSubfield(factory.newSubfield('p', itemEntity.getBarcode()));
-                    dataField.addSubfield(factory.newSubfield('t', itemEntity.getCopyNumber()!=null?String.valueOf(itemEntity.getCopyNumber()):""));
+                    dataField.addSubfield(factory.newSubfield('t', itemEntity.getCopyNumber() != null ? String.valueOf(itemEntity.getCopyNumber()) : ""));
                     dataField.addSubfield(factory.newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
                     is876Added = true;
                 }
