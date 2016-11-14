@@ -106,6 +106,9 @@ public class ReCAPConstants {
     public static final String DATE_FORMAT_MMDDYYY = "MM-dd-yyyy";
     public static final String DATE_FORMAT_YYYYMMDDHHMM = "yyyy-MM-dd HH:mm";
     public static final String DATE_FORMAT_DDMMMYYYYHHMM = "ddMMMyyyyHHmm";
+    public static final String UTC = "UTC";
+    public static final String UTC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String SOLR_DATE_RANGE_TO_NOW = " TO NOW";
 
     //Data Dump
     public static final String DATADUMP_EXPORT_FAILURE = "Data dump export failed, please check with the support team.";

@@ -3,7 +3,7 @@ package org.recap.camel.datadump.consumer;
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.marc4j.marc.Record;
+import org.apache.commons.collections.CollectionUtils;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.callable.DeletedRecordPreparerCallable;
@@ -12,7 +12,6 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -71,18 +70,20 @@ public class DeletedRecordFormatActiveMQConsumer {
         for (Future future : futureList) {
             Map<String, Object> results = (Map<String, Object>) future.get();
             Collection<? extends DeletedRecord> successRecords = (Collection<? extends DeletedRecord>) results.get(ReCAPConstants.SUCCESS);
-            if (!CollectionUtils.isEmpty(successRecords)) {
+            if (CollectionUtils.isNotEmpty(successRecords)) {
                 deletedRecordList.addAll(successRecords);
             }
             Collection failureRecords = (Collection) results.get(ReCAPConstants.FAILURE);
-            if (!CollectionUtils.isEmpty(failureRecords)) {
+            if (CollectionUtils.isNotEmpty(failureRecords)) {
                 failures.addAll(failureRecords);
             }
         }
 
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
-        processFailures(failures, batchHeaders, requestId);
+        if(CollectionUtils.isNotEmpty(failures)) {
+            processFailures(failures, batchHeaders, requestId);
+        }
 
         long endTime = System.currentTimeMillis();
 

@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -123,7 +123,16 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
 
     public String getFormattedDateString(String inputDateString){
-        String formattedDateString = inputDateString.substring(0,10)+"T"+inputDateString.substring(11,16)+":00Z TO NOW";
-        return formattedDateString;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        String utcStr = null;
+        try {
+            Date date = simpleDateFormat.parse(inputDateString);
+            DateFormat format = new SimpleDateFormat(ReCAPConstants.UTC_DATE_FORMAT);
+            format.setTimeZone(TimeZone.getTimeZone(ReCAPConstants.UTC));
+            utcStr = format.format(date);
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+        return utcStr + ReCAPConstants.SOLR_DATE_RANGE_TO_NOW;
     }
 }
