@@ -115,7 +115,7 @@ public class CamelJdbcUT extends BaseTestCase {
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setRequestingInstitutionCode("PUL");
-        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP);
+        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_MARC);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
