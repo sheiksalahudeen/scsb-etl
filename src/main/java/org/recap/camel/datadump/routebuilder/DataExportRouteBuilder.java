@@ -23,10 +23,9 @@ import org.springframework.stereotype.Component;
 /**
  * Created by peris on 11/5/16.
  */
-@Component
+
 public class DataExportRouteBuilder {
 
-    @Autowired
     public DataExportRouteBuilder(CamelContext camelContext,
                                   ProducerTemplate producerTemplate,
                                   BibliographicDetailsRepository bibliographicDetailsRepository,
@@ -41,6 +40,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
+                            .routeId(ReCAPConstants.SOLR_INPUT_DATA_EXPORT_ROUTE_ID)
                             .bean(new BibEntityGeneratorActiveMQConsumer(bibliographicDetailsRepository), "processBibEntities")
                             .to(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q);
                 }
@@ -55,6 +55,7 @@ public class DataExportRouteBuilder {
                             .process(new TransmissionTypeProcessorForDataExport());
 
                     from(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
+                            .routeId(ReCAPConstants.BIB_ENTITY_DATA_EXPORT_ROUTE_ID)
                             .choice()
                             .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC))
                             .bean(new MarcRecordFormatActiveMQConsumer(producerTemplate, marcXmlFormatterService), "processRecords")
@@ -75,6 +76,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
 
                     from(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
+                            .routeId(ReCAPConstants.MARC_RECORD_DATA_EXPORT_ROUTE_ID)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
                             .bean(new MarcXMLFormatActiveMQConsumer(producerTemplate, marcXmlFormatterService), "processMarcXmlString")
                             .to(ReCAPConstants.DATADUMP_STAGING_Q);
@@ -85,6 +87,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
+                            .routeId(ReCAPConstants.SCSB_RECORD_DATA_EXPORT_ROUTE_ID)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
                             .bean(new SCSBXMLFormatActiveMQConsumer(producerTemplate, scsbXmlFormatterService, xmlFormatter), "processSCSBXmlString")
                             .to(ReCAPConstants.DATADUMP_STAGING_Q);
@@ -95,6 +98,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.DELETED_JSON_RECORD_FOR_DATA_EXPORT_Q)
+                            .routeId(ReCAPConstants.DELETED_JSON_RECORD_DATA_EXPORT_ROUTE_ID)
                             .aggregate(constant(true), new DataExportAggregator()).completionPredicate(new DataExportPredicate(Integer.valueOf(dataDumpRecordsPerFile)))
                             .bean(new DeletedJsonFormatActiveMQConsumer(producerTemplate, deletedJsonFormatterService), "processDeleteJsonString")
                             .to(ReCAPConstants.DATADUMP_STAGING_Q);
@@ -106,6 +110,7 @@ public class DataExportRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.DATADUMP_STAGING_Q)
+                            .routeId(ReCAPConstants.DATADUMP_STAGING_ROUTE_ID)
                             .choice()
                                 .when(header("transmissionType").isEqualTo(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP))
                                     .to(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q)

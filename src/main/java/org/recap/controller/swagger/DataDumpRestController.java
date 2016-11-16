@@ -2,6 +2,7 @@ package org.recap.controller.swagger;
 
 import io.swagger.annotations.*;
 import org.recap.ReCAPConstants;
+import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.service.preprocessor.DataDumpExportService;
 import org.slf4j.Logger;
@@ -24,6 +25,9 @@ public class DataDumpRestController {
     @Autowired
     private DataDumpExportService dataDumpExportService;
 
+    @Autowired
+    private DynamicRouteBuilder dynamicRouteBuilder;
+
 
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
     @ApiOperation(value = "exportDataDump",
@@ -40,6 +44,7 @@ public class DataDumpRestController {
                                          @ApiParam(value = "Email address to whom we need to send an email" , name = "emailToAddress")@RequestParam(required=false) String emailToAddress
     ){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
+        dynamicRouteBuilder.addDataDumpExportRoutes();
         dataDumpExportService.setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,emailToAddress,outputFormat);
         ResponseEntity responseEntity = dataDumpExportService.validateIncomingRequest(dataDumpRequest);
         if(responseEntity!=null) {
