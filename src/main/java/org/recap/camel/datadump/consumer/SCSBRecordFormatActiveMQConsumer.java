@@ -2,7 +2,10 @@ package org.recap.camel.datadump.consumer;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
 import org.marc4j.marc.Record;
+import org.recap.ReCAPConstants;
+import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.callable.BibRecordPreparerCallable;
 import org.recap.camel.datadump.callable.MarcRecordPreparerCallable;
 import org.recap.model.jaxb.BibRecord;
@@ -11,11 +14,9 @@ import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -27,11 +28,13 @@ public class SCSBRecordFormatActiveMQConsumer {
     Logger logger = LoggerFactory.getLogger(SCSBRecordFormatActiveMQConsumer.class);
 
     SCSBXmlFormatterService scsbXmlFormatterService;
-
     private ExecutorService executorService;
+    private DataExportHeaderUtil dataExportHeaderUtil;
+    private ProducerTemplate producerTemplate;
 
-    public SCSBRecordFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService) {
+    public SCSBRecordFormatActiveMQConsumer(ProducerTemplate producerTemplate, SCSBXmlFormatterService scsbXmlFormatterService) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
+        this.producerTemplate = producerTemplate;
     }
 
     public List<BibRecord> processRecords(Exchange exchange) throws Exception {
@@ -41,20 +44,18 @@ public class SCSBRecordFormatActiveMQConsumer {
 
         List<BibliographicEntity> bibliographicEntities = (List<BibliographicEntity>) exchange.getIn().getBody();
 
-        List<Callable<BibRecord>> callables = new ArrayList<>();
+        List<Callable<Map<String, Object>>> callables = new ArrayList<>();
 
         List<List<BibliographicEntity>> partitionList = Lists.partition(bibliographicEntities, 1000);
 
         for (Iterator<List<BibliographicEntity>> iterator = partitionList.iterator(); iterator.hasNext(); ) {
             List<BibliographicEntity> bibliographicEntityList = iterator.next();
-
             BibRecordPreparerCallable scsbRecordPreparerCallable =
                     new BibRecordPreparerCallable(bibliographicEntityList, scsbXmlFormatterService);
-
             callables.add(scsbRecordPreparerCallable);
         }
 
-        List<Future<BibRecord>> futureList = getExecutorService().invokeAll(callables);
+        List<Future<Map<String, Object>>> futureList = getExecutorService().invokeAll(callables);
         futureList.stream()
                 .map(future -> {
                     try {
@@ -65,9 +66,22 @@ public class SCSBRecordFormatActiveMQConsumer {
                     }
                 });
 
+        List failures = new ArrayList();
         for (Future future : futureList) {
-            records.addAll((Collection<? extends BibRecord>) future.get());
+            Map<String, Object> results = (Map<String, Object>) future.get();
+            Collection<? extends BibRecord> successRecords = (Collection<? extends BibRecord>) results.get(ReCAPConstants.SUCCESS);
+            if (!CollectionUtils.isEmpty(successRecords)) {
+                records.addAll(successRecords);
+            }
+            Collection failureRecords = (Collection) results.get(ReCAPConstants.FAILURE);
+            if (!CollectionUtils.isEmpty(failureRecords)) {
+                failures.addAll(failureRecords);
+            }
         }
+
+        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
+        processFailures(failures, batchHeaders, requestId);
 
         long endTime = System.currentTimeMillis();
 
@@ -76,6 +90,18 @@ public class SCSBRecordFormatActiveMQConsumer {
         return records;
     }
 
+    private void processFailures(List failures, String batchHeaders, String requestId) {
+        if (!CollectionUtils.isEmpty(failures)) {
+            HashMap values = new HashMap();
+            values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, "requestingInstitutionCode"));
+            values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(failures.size()));
+            values.put(ReCAPConstants.FAILURE_CAUSE, failures.get(0));
+            values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
+            values.put(ReCAPConstants.REQUEST_ID, requestId);
+
+            producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);
+        }
+    }
 
     public ExecutorService getExecutorService() {
         if (null == executorService) {
@@ -87,5 +113,15 @@ public class SCSBRecordFormatActiveMQConsumer {
         return executorService;
     }
 
+    public DataExportHeaderUtil getDataExportHeaderUtil() {
+        if (null == dataExportHeaderUtil) {
+            dataExportHeaderUtil = new DataExportHeaderUtil();
+        }
+        return dataExportHeaderUtil;
+    }
+
+    public void setDataExportHeaderUtil(DataExportHeaderUtil dataExportHeaderUtil) {
+        this.dataExportHeaderUtil = dataExportHeaderUtil;
+    }
 }
 

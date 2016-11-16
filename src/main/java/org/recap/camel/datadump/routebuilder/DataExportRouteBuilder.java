@@ -60,7 +60,7 @@ public class DataExportRouteBuilder {
                             .bean(new MarcRecordFormatActiveMQConsumer(producerTemplate, marcXmlFormatterService), "processRecords")
                             .to(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
                             .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB))
-                            .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), "processRecords")
+                            .bean(new SCSBRecordFormatActiveMQConsumer(producerTemplate,scsbXmlFormatterService), "processRecords")
                             .to(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
                             .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT))
                             .bean(new DeletedRecordFormatActiveMQConsumer(producerTemplate, deletedJsonFormatterService), "processRecords")
