@@ -9,6 +9,7 @@ import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -25,8 +26,8 @@ public class BibRecordPreparerCallable implements Callable {
     }
 
     @Override
-    public List<BibRecord> call() throws Exception {
-        List<BibRecord> records = scsbXmlFormatterService.prepareBibRecords(bibliographicEntities);
-        return records;
+    public Map<String, Object> call() throws Exception {
+        Map<String, Object> results = scsbXmlFormatterService.prepareBibRecords(bibliographicEntities);
+        return results;
     }
 }

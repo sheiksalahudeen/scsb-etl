@@ -56,23 +56,43 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return stringWriter.toString();
     }
 
-    public List<BibRecord> prepareBibRecords(List<BibliographicEntity> bibliographicEntities) {
+    public Map<String, Object> prepareBibRecords(List<BibliographicEntity> bibliographicEntities) {
+        Map resultsMap = new HashMap();
         List<BibRecord> records = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+
         for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
-            BibRecord bibRecord = getBibRecord(bibliographicEntity);
-            records.add(bibRecord);
+            Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity);
+            BibRecord bibRecord = (BibRecord) stringObjectMap.get(ReCAPConstants.SUCCESS);
+            if (null != bibRecord) {
+                records.add(bibRecord);
+            }
+            String failureMsg = (String) stringObjectMap.get(ReCAPConstants.FAILURE);
+            if (null != failureMsg) {
+                errors.add(failureMsg);
+            }
         }
-        return records;
+        resultsMap.put(ReCAPConstants.SUCCESS, records);
+        resultsMap.put(ReCAPConstants.FAILURE, errors);
+        return resultsMap;
     }
 
-    private BibRecord getBibRecord(BibliographicEntity bibliographicEntity) {
-        BibRecord bibRecord = new BibRecord();
-        Bib bib = getBib(bibliographicEntity);
-        bibRecord.setBib(bib);
-        List<Holdings> holdings = getHoldings(bibliographicEntity.getHoldingsEntities());
-        bibRecord.setHoldings(holdings);
-        return bibRecord;
+    private Map<String, Object> prepareBibRecord(BibliographicEntity bibliographicEntity) {
+        BibRecord bibRecord = null;
+        Map results = new HashMap();
+        try {
+            Bib bib = getBib(bibliographicEntity);
+            List<Holdings> holdings = getHoldings(bibliographicEntity.getHoldingsEntities());
+            bibRecord = new BibRecord();
+            bibRecord.setBib(bib);
+            bibRecord.setHoldings(holdings);
+            results.put(ReCAPConstants.SUCCESS, bibRecord);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            results.put(ReCAPConstants.FAILURE, e.getMessage());
+        }
+        return results;
     }
 
     private Bib getBib(BibliographicEntity bibliographicEntity) {
