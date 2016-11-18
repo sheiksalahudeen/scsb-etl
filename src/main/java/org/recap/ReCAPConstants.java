@@ -9,6 +9,10 @@ public class ReCAPConstants {
     public static final String FILENAME = "fileName";
     public static final String DATETIME_FOLDER = "dateTimeFolder";
     public static final String REQUESTING_INST_CODE = "requestingInstitutionCode";
+    public static final String INSTITUTION_CODES = "institutionCodes";
+    public static final String TRANSMISSION_TYPE = "transmissionType";
+    public static final String EXPORT_FORMAT = "exportFormat";
+    public static final String TO_EMAIL_ID = "toEmailId";
     public static final String XML_FILE_FORMAT = ".xml";
     public static final String ZIP_FILE_FORMAT = ".zip";
     public static final String JSON_FILE_FORMAT = ".json";
@@ -37,13 +41,13 @@ public class ReCAPConstants {
     public static final String CSV_FAILURE_Q = "scsbactivemq:queue:csvFailureQ";
     public static final String FTP_SUCCESS_Q = "scsbactivemq:queue:ftpFailureQ";
     public static final String FTP_FAILURE_Q = "scsbactivemq:queue:ftpSuccessQ";
-    public static final String DATADUMP_SUCCESS_REPORT_Q = "scsbactivemq:queue:dataDumpSuccessReportFileQ";
-    public static final String DATADUMP_FAILURE_REPORT_Q = "scsbactivemq:queue:dataDumpFailureReportFileQ";
+    public static final String DATADUMP_SUCCESS_REPORT_Q = "scsbactivemq:queue:dataDumpSuccessReportQ";
+    public static final String DATADUMP_SUCCESS_REPORT_CSV_Q = "scsbactivemq:queue:dataDumpSuccessReportCsvQ";
+    public static final String DATADUMP_FAILURE_REPORT_Q = "scsbactivemq:queue:dataDumpFailureReportQ";
+    public static final String DATADUMP_FAILURE_REPORT_CSV_Q = "scsbactivemq:queue:dataDumpFailureReportCsvQ";
     public static final String DATADUMP_SUCCESS_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpSuccessReportFtpQ";
-    public static final String DATADUMP_FAILURE_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpFailureReportFTPQ";
+    public static final String DATADUMP_FAILURE_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpFailureReportFtpQ";
     public static final String DATADUMP_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpFileSystemQ";
-    public static final String DATADUMP_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpReportFtpQ";
-    public static final String DATADUMP_REPORT_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpReportFileSystemQ";
     public static final String EMAIL_Q = "scsbactivemq:queue:emailQ";
     public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
     public static final String DATADUMP_ZIPFILE_FTP_Q = "direct:zipFileFtpQ";
@@ -67,9 +71,6 @@ public class ReCAPConstants {
     //CSV Generator Constants
     public static final String FILE_SYSTEM = "FileSystem";
     public static final String OPERATION_TYPE_ETL = "ETL";
-    public static final String OPERATION_TYPE_DATADUMP = "Datadumpexport";
-    public static final String OPERATION_TYPE_DATADUMP_SUCCESS = "Datadumpexport-Success";
-    public static final String OPERATION_TYPE_DATADUMP_FAILURE = "Datadumpexport-Failure";
 
     //FTP Generator Constants
     public static final String FTP = "FTP";
@@ -163,9 +164,21 @@ public class ReCAPConstants {
     public static final String DATADUMP_STAGING_ROUTE_ID = "dataExportStagingRouteId";
 
     public static final String NUM_RECORDS = "Num Records";
-    public static final String NUM_BIBS_EXPORTED = "Num Bibs Exported";
-    public static final String BATCH_EXPORT = "Batch Export";
+    public static final String NUM_BIBS_EXPORTED = "NoOfBibsExported";
+    public static final String BATCH_EXPORT = "BatchExport";
+    public static final String BATCH_EXPORT_SUCCESS = "BatchExportSuccess";
+    public static final String BATCH_EXPORT_FAILURE = "BatchExportFailure";
     public static final String REQUEST_ID = "requestId";
-    public static final String FAILURE_CAUSE = "Failure Cause";
-    public static final String FAILED_BIBS = "Failed Bibs";
+    public static final String FAILURE_CAUSE = "FailureCause";
+    public static final String FAILED_BIBS = "FailedBibs";
+    public static final String COLLECTION_GROUP_IDS = "collectionGroupIds";
+    public static final String FETCH_TYPE = "fetchType";
+    public static final String EXPORT_FROM_DATE = "exportFromDate";
+
+    public static final String DATADUMP_SUCCESS_REPORT_CSV_ROUTE_ID = "dataExportSucccessReportCsvRouteId";
+    public static final String DATADUMP_FAILURE_REPORT_CSV_ROUTE_ID = "dataExportFailureReportCsvRouteId";
+    public static final String DATADUMP_SUCCESS_REPORT_FTP_ROUTE_ID = "dataExportSuccessReportFtpRouteId";
+    public static final String DATADUMP_FAILURE_REPORT_FTP_ROUTE_ID = "dataExportFailureReportFtpRouteId";
+    public static final String DATADUMP_SUCCESS_REPORT_ROUTE_ID = "dataExportSuccessReportRouteId";
+    public static final String DATADUMP_FAILURE_REPORT_ROUTE_ID = "dataExportFailureReportRouteId";
 }

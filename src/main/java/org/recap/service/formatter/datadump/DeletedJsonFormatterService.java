@@ -3,15 +3,12 @@ package org.recap.service.formatter.datadump;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DeletedRecord;
-import org.recap.model.jaxb.BibRecord;
-import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +29,7 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
     public Map<String, Object> prepareDeletedRecords(List<BibliographicEntity> bibliographicEntityList){
         Map resultsMap = new HashMap();
         List<DeletedRecord> deletedRecords = new ArrayList<>();
-        List<BibliographicEntity> failureRecords = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
         for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
             try {
                 DeletedRecord deletedRecord = new DeletedRecord();
@@ -45,26 +42,21 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
                 deletedRecords.add(deletedRecord);
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                failureRecords.add(bibliographicEntity);
+                errors.add(String.valueOf(e.getCause()));
             }
         }
 
         resultsMap.put(ReCAPConstants.SUCCESS, deletedRecords);
-        resultsMap.put(ReCAPConstants.FAILURE, failureRecords);
+        resultsMap.put(ReCAPConstants.FAILURE, errors);
 
 
         return resultsMap;
     }
 
-    public String getJsonForDeletedRecords(List<DeletedRecord> deletedRecordList){
+    public String getJsonForDeletedRecords(List<DeletedRecord> deletedRecordList) throws Exception{
         String formattedString = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            formattedString = mapper.writeValueAsString(deletedRecordList);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
-
+        ObjectMapper mapper = new ObjectMapper();
+        formattedString = mapper.writeValueAsString(deletedRecordList);
         return formattedString;
     }
 }

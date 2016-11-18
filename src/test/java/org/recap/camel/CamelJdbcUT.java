@@ -117,6 +117,7 @@ public class CamelJdbcUT extends BaseTestCase {
         dataDumpRequest.setRequestingInstitutionCode("PUL");
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
+        dataDumpRequest.setCollectionGroupIds(Arrays.asList(1,2));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_MARC);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
@@ -165,6 +166,7 @@ public class CamelJdbcUT extends BaseTestCase {
         dataDumpRequest.setRequestingInstitutionCode("PUL");
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
+        dataDumpRequest.setCollectionGroupIds(Arrays.asList(1,2));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
@@ -214,6 +216,7 @@ public class CamelJdbcUT extends BaseTestCase {
         dataDumpRequest.setRequestingInstitutionCode("PUL");
         dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
+        dataDumpRequest.setCollectionGroupIds(Arrays.asList(1,2));
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
