@@ -59,8 +59,8 @@ public class ReportGenerator {
     public String generateReport(String fileName, String operationType, String reportType, String institutionName, Date from, Date to, String transmissionType) {
 
         List<ReportEntity> reportEntities;
-        if(operationType.equals(ReCAPConstants.OPERATION_TYPE_DATADUMP)){
-            reportType = operationType+"-"+reportType;
+        if(operationType.equals(ReCAPConstants.BATCH_EXPORT)){
+            reportType = operationType+reportType;
         }
         if(StringUtils.isNotBlank(fileName)) {
             reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);

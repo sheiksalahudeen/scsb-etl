@@ -3,6 +3,7 @@ package org.recap.service.formatter.datadump;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
+import org.recap.model.export.DeletedRecord;
 import org.recap.model.jaxb.JAXBContextHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
@@ -29,10 +30,11 @@ public class DeletedJsonFormatterServiceUT extends BaseTestCase{
     private DeletedJsonFormatterService deletedJsonFormatterService;
 
     @Test
-    public void getFormattedOutput() throws IOException, URISyntaxException {
-//        Map<String,Object> successAndFailureFormattedList = (Map<String,Object>) deletedJsonFormatterService.getFormattedOutput(getBibliographicEntityList());
-//        String outputString = (String) successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_FORMATTEDSTRING);
-//        assertEquals("[{\"bibId\":\"100\",\"itemId\":\"3456\"},{\"bibId\":\"100\",\"itemId\":\"1234\"}]",outputString);
+    public void getFormattedOutput() throws Exception {
+        Map<String,Object> successAndFailureFormattedList = deletedJsonFormatterService.prepareDeletedRecords(getBibliographicEntityList());
+        List<DeletedRecord> deletedRecordList = (List<DeletedRecord>)successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
+        String outputString = (String) deletedJsonFormatterService.getJsonForDeletedRecords(deletedRecordList);
+        assertEquals("[{\"bibId\":\"100\",\"itemIds\":[\"3456\",\"1234\"]}]",outputString);
     }
 
     private List<BibliographicEntity> getBibliographicEntityList() throws URISyntaxException, IOException {

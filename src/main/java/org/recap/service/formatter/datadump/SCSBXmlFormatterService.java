@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -29,30 +28,21 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return formatType.equals(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB) ? true:false;
     }
 
-    public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords){
+    public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords) throws Exception{
         String formattedString = null;
-        try {
-            BibRecords bibRecords1 = new BibRecords();
-            bibRecords1.setBibRecords(bibRecords);
-            formattedString = convertToXml(bibRecords1);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+        BibRecords bibRecords1 = new BibRecords();
+        bibRecords1.setBibRecords(bibRecords);
+        formattedString = convertToXml(bibRecords1);
 
         return formattedString;
     }
 
-    private String convertToXml(BibRecords bibRecords){
+    private String convertToXml(BibRecords bibRecords) throws Exception {
         StringWriter stringWriter = new StringWriter();
-        try {
             Marshaller jaxbMarshaller = JAXBContextHandler.getInstance().getJAXBContextForClass(BibRecords.class).createMarshaller();
             synchronized (jaxbMarshaller) {
                 jaxbMarshaller.marshal(bibRecords, stringWriter);
             }
-        } catch (JAXBException e) {
-            logger.error(e.getMessage());
-            throw new RuntimeException(e);
-        }
         return stringWriter.toString();
     }
 
@@ -90,12 +80,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
             results.put(ReCAPConstants.SUCCESS, bibRecord);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            results.put(ReCAPConstants.FAILURE, e.getMessage());
+            results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
         }
         return results;
     }
 
-    private Bib getBib(BibliographicEntity bibliographicEntity) {
+    private Bib getBib(BibliographicEntity bibliographicEntity) throws Exception{
         Bib bib = new Bib();
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         bib.setOwningInstitutionId(bibliographicEntity.getInstitutionEntity().getInstitutionCode());
@@ -110,7 +100,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
     }
 
 
-    private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) {
+    private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) throws Exception{
         List<Holdings> holdingsList = new ArrayList<>();
         if (holdingsEntityList!=null && !CollectionUtils.isEmpty(holdingsEntityList)) {
             for (HoldingsEntity holdingsEntity : holdingsEntityList) {
@@ -205,14 +195,10 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return subfieldatafieldType;
     }
 
-    private ContentType getContentType(byte[] byteContent) {
+    private ContentType getContentType(byte[] byteContent) throws Exception{
         String content = new String(byteContent, Charset.forName("UTF-8"));
         CollectionType collectionType = null;
-        try {
-            collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
+        collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
         ContentType contentType = new ContentType();
         contentType.setCollection(collectionType);
         return contentType;

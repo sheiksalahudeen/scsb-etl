@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -86,7 +85,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             results.put(ReCAPConstants.SUCCESS, record);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            results.put(ReCAPConstants.FAILURE, e.getMessage());
+            results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
 
         }
         return results;

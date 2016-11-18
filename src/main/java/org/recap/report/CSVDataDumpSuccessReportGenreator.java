@@ -27,7 +27,7 @@ public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterfa
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(org.recap.ReCAPConstants.OPERATION_TYPE_DATADUMP_SUCCESS) ? true : false;
+        return reportType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT_SUCCESS) ? true : false;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterfa
 
     @Override
     public boolean isOperationType(String operationType) {
-        return operationType.equalsIgnoreCase(ReCAPConstants.OPERATION_TYPE_DATADUMP) ? true : false;
+        return operationType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT) ? true : false;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterfa
             dataDumpSuccessReport.setInstitutionName(reportEntity.getInstitutionName());
             dataDumpSuccessReport.setFileName(fileName);
             dataDumpSuccessReport.setDataDumpSuccessReportList(dataDumpSuccessReportList);
-            producerTemplate.sendBody(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q, dataDumpSuccessReport);
+            producerTemplate.sendBody(ReCAPConstants.DATADUMP_SUCCESS_REPORT_CSV_Q, dataDumpSuccessReport);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
             String generatedFileName = FilenameUtils.removeExtension(dataDumpSuccessReport.getFileName()) + "-" + dataDumpSuccessReport.getReportType() + "-" + df.format(new Date()) + ".csv";
             return generatedFileName;

@@ -50,6 +50,18 @@ public class DataExportHeaderUtil {
                 .append("#")
                 .append(dataDumpRequest.getOutputFileFormat())
                 .append(";")
+                .append("fetchType")
+                .append("#")
+                .append(dataDumpRequest.getFetchType())
+                .append(";")
+                .append("exportFromDate")
+                .append("#")
+                .append(dataDumpRequest.getDate())
+                .append(";")
+                .append("collectionGroupIds")
+                .append("#")
+                .append(getCollectionGroupIds(dataDumpRequest))
+                .append(";")
                 .append("transmissionType")
                 .append("#")
                 .append(dataDumpRequest.getTransmissionType())
@@ -82,6 +94,19 @@ public class DataExportHeaderUtil {
         StringBuilder stringBuilder = new StringBuilder();
         for (Iterator<String> iterator = institutionCodes.iterator(); iterator.hasNext(); ) {
             String code = iterator.next();
+            stringBuilder.append(code);
+            if(iterator.hasNext()){
+                stringBuilder.append("*");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private String getCollectionGroupIds(DataDumpRequest dataDumpRequest) {
+        List<Integer> institutionCodes = dataDumpRequest.getCollectionGroupIds();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Iterator<Integer> iterator = institutionCodes.iterator(); iterator.hasNext(); ) {
+            String code = String.valueOf(iterator.next());
             stringBuilder.append(code);
             if(iterator.hasNext()){
                 stringBuilder.append("*");

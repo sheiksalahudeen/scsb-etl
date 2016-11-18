@@ -28,7 +28,7 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(ReCAPConstants.OPERATION_TYPE_DATADUMP_FAILURE) ? true : false;
+        return reportType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT_FAILURE) ? true : false;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
 
     @Override
     public boolean isOperationType(String operationType) {
-        return operationType.equalsIgnoreCase(ReCAPConstants.OPERATION_TYPE_DATADUMP) ? true : false;
+        return operationType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT) ? true : false;
     }
 
     @Override

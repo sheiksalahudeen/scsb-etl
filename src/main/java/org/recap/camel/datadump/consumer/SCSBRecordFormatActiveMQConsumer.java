@@ -3,14 +3,11 @@ package org.recap.camel.datadump.consumer;
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.callable.BibRecordPreparerCallable;
-import org.recap.camel.datadump.callable.MarcRecordPreparerCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,10 +90,19 @@ public class SCSBRecordFormatActiveMQConsumer {
     private void processFailures(List failures, String batchHeaders, String requestId) {
         if (!CollectionUtils.isEmpty(failures)) {
             HashMap values = new HashMap();
-            values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, "requestingInstitutionCode"));
+
+            values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
+            values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
+            values.put(ReCAPConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.FETCH_TYPE));
+            values.put(ReCAPConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.COLLECTION_GROUP_IDS));
+            values.put(ReCAPConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TRANSMISSION_TYPE));
+            values.put(ReCAPConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FROM_DATE));
+            values.put(ReCAPConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FORMAT));
+            values.put(ReCAPConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TO_EMAIL_ID));
             values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(failures.size()));
             values.put(ReCAPConstants.FAILURE_CAUSE, failures.get(0));
-            values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
+            values.put(ReCAPConstants.FAILED_BIBS, ReCAPConstants.FAILED_BIBS);
+            values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
             values.put(ReCAPConstants.REQUEST_ID, requestId);
 
             producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);

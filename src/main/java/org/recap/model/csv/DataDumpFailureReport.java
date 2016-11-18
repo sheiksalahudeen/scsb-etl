@@ -21,17 +21,19 @@ public class DataDumpFailureReport implements Serializable{
     @DataField(pos = 3, columnName = "Fetch Type")
     private String fetchType;
     @DataField(pos = 4, columnName = "Export From Date")
-    private String exportFromdate;
+    private String exportFromDate;
     @DataField(pos = 5, columnName = "Collection Group Id(s)")
     private String collectionGroupIds;
     @DataField(pos = 6, columnName = "Transmission Type")
     private String transmissionType;
-    @DataField(pos = 7, columnName = "No of Records Per File")
-    private String noOfRecordsPerFile;
-    @DataField(pos = 8, columnName = "No of Bibs Failed To Export")
-    private String noOfBibsFailedToExport;
-    @DataField(pos = 9, columnName = "Error")
-    private String error;
+    @DataField(pos = 7, columnName = "Export Format")
+    private String exportFormat;
+    @DataField(pos = 8, columnName = "To Email Id(s)")
+    private String toEmailId;
+    @DataField(pos = 9, columnName = "Failed Bibs")
+    private String failedBibs;
+    @DataField(pos = 10, columnName = "Failure Cause")
+    private String failureCause;
 
     @Ignore
     private String fileName;
@@ -69,12 +71,12 @@ public class DataDumpFailureReport implements Serializable{
         this.fetchType = fetchType;
     }
 
-    public String getExportFromdate() {
-        return exportFromdate;
+    public String getExportFromDate() {
+        return exportFromDate;
     }
 
-    public void setExportFromdate(String exportFromdate) {
-        this.exportFromdate = exportFromdate;
+    public void setExportFromDate(String exportFromDate) {
+        this.exportFromDate = exportFromDate;
     }
 
     public String getCollectionGroupIds() {
@@ -93,28 +95,28 @@ public class DataDumpFailureReport implements Serializable{
         this.transmissionType = transmissionType;
     }
 
-    public String getNoOfRecordsPerFile() {
-        return noOfRecordsPerFile;
+    public String getExportFormat() {
+        return exportFormat;
     }
 
-    public void setNoOfRecordsPerFile(String noOfRecordsPerFile) {
-        this.noOfRecordsPerFile = noOfRecordsPerFile;
+    public void setExportFormat(String exportFormat) {
+        this.exportFormat = exportFormat;
     }
 
-    public String getNoOfBibsFailedToExport() {
-        return noOfBibsFailedToExport;
+    public String getToEmailId() {
+        return toEmailId;
     }
 
-    public void setNoOfBibsFailedToExport(String noOfBibsFailedToExport) {
-        this.noOfBibsFailedToExport = noOfBibsFailedToExport;
+    public void setToEmailId(String toEmailId) {
+        this.toEmailId = toEmailId;
     }
 
-    public String getError() {
-        return error;
+    public String getFailedBibs() {
+        return failedBibs;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setFailedBibs(String failedBibs) {
+        this.failedBibs = failedBibs;
     }
 
     public String getFileName() {
@@ -139,6 +141,14 @@ public class DataDumpFailureReport implements Serializable{
 
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;
+    }
+
+    public String getFailureCause() {
+        return failureCause;
+    }
+
+    public void setFailureCause(String failureCause) {
+        this.failureCause = failureCause;
     }
 
     public List<DataDumpFailureReport> getDataDumpFailureReportRecordList() {

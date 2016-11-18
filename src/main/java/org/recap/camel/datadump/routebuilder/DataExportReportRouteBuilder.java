@@ -13,18 +13,28 @@ import org.springframework.stereotype.Component;
  * Created by peris on 11/12/16.
  */
 @Component
-public class DataExportSuccessReportRouteBuilder {
+public class DataExportReportRouteBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataExportSuccessReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataExportReportRouteBuilder.class);
 
     @Autowired
-    public DataExportSuccessReportRouteBuilder(CamelContext camelContext) {
+    public DataExportReportRouteBuilder(CamelContext camelContext) {
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
                     from(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
+                            .routeId(ReCAPConstants.DATADUMP_SUCCESS_REPORT_ROUTE_ID)
                             .bean(DataExportReportActiveMQConsumer.class, "saveSuccessReportEntity");
+                }
+            });
+
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                            .routeId(ReCAPConstants.DATADUMP_FAILURE_REPORT_ROUTE_ID)
+                            .bean(DataExportReportActiveMQConsumer.class, "saveFailureReportEntity");
                 }
             });
         } catch (Exception e) {
