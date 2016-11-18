@@ -42,14 +42,16 @@ public class DataExportEmailProcessor implements Processor {
         String totalRecordCount = "0";
         String failedBibs = "0";
         List<ReportEntity> byFileName = reportDetailRepository.findByFileName(requestId);
-        List<ReportDataEntity> reportDataEntities = byFileName.get(0).getReportDataEntities();
-        for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
-            ReportDataEntity reportDataEntity = iterator.next();
-            if(reportDataEntity.getHeaderName().equals("Num Bibs Exported")){
-                totalRecordCount = reportDataEntity.getHeaderValue();
-            }
-            if(reportDataEntity.getHeaderName().equals("Failed Bibs")){
-                failedBibs = reportDataEntity.getHeaderValue();
+        for (ReportEntity reportEntity:byFileName) {
+            List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
+            for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
+                ReportDataEntity reportDataEntity = iterator.next();
+                if(reportDataEntity.getHeaderName().equals(ReCAPConstants.NUM_BIBS_EXPORTED)){
+                    totalRecordCount = reportDataEntity.getHeaderValue();
+                }
+                if(reportDataEntity.getHeaderName().equals(ReCAPConstants.FAILED_BIBS)){
+                    failedBibs = reportDataEntity.getHeaderValue();
+                }
             }
         }
         processEmail(totalRecordCount,failedBibs);
