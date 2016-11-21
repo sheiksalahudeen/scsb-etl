@@ -1,6 +1,10 @@
 package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.FluentProducerTemplate;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.DefaultFluentProducerTemplate;
+import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.callable.BibEntityPreparerCallable;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -25,7 +29,7 @@ public class BibEntityGeneratorActiveMQConsumer {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
-    public List<BibliographicEntity> processBibEntities(Exchange exchange) throws Exception {
+    public void processBibEntities(Exchange exchange) throws Exception {
 
         long startTime = System.currentTimeMillis();
 
@@ -78,7 +82,14 @@ public class BibEntityGeneratorActiveMQConsumer {
 
         getExecutorService().shutdown();
 
-        return bibliographicEntities;
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+        fluentProducerTemplate
+                .to(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
+                .withBody(bibliographicEntities)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
     }
 
     public ExecutorService getExecutorService() {

@@ -1,6 +1,9 @@
 package org.recap.service.executor.datadump;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DataDumpRequest;
@@ -34,10 +37,10 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    private DataExportHeaderUtil dataExportHeaderUtil;
+    CamelContext camelContext;
 
     @Autowired
-    private ProducerTemplate producer;
+    private DataExportHeaderUtil dataExportHeaderUtil;
 
     @Value("${datadump.httpresponse.record.limit}")
     private String httpResonseRecordLimit;
@@ -56,7 +59,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         searchRecordsRequest.setOwningInstitutions(dataDumpRequest.getInstitutionCodes());
         searchRecordsRequest.setCollectionGroupDesignations(getCodesForIds(dataDumpRequest.getCollectionGroupIds()));
         searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
-        populateSearchRequest(searchRecordsRequest,dataDumpRequest);
+        populateSearchRequest(searchRecordsRequest, dataDumpRequest);
 
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
         Integer totalPageCount = (Integer) results.get("totalPageCount");
@@ -67,14 +70,16 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             String fileName = getFileName(dataDumpRequest, 0);
             String folderName = getFolderName(dataDumpRequest);
             String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
-            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
+
+            sendBodyAndHeader(results, headerString);
 
             for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
+                Thread.sleep(10000);
                 searchRecordsRequest.setPageNumber(pageNum);
                 Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
                 fileName = getFileName(dataDumpRequest, pageNum + 1);
                 headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
-                producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
+                sendBodyAndHeader(results1, headerString);
             }
             return "Success";
 
@@ -82,6 +87,15 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
         }
         return outputString;
+    }
+
+    private void sendBodyAndHeader(Map results, String headerString) {
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
+        fluentProducerTemplate
+                .to(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
+                .withBody(results)
+                .withHeader("batchHeaders", headerString.toString());
+        fluentProducerTemplate.send();
     }
 
     private String getFileName(DataDumpRequest dataDumpRequest, int pageNum) {
@@ -122,7 +136,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
     public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
 
-    public String getFormattedDateString(String inputDateString){
+    public String getFormattedDateString(String inputDateString) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
         String utcStr = null;
         try {

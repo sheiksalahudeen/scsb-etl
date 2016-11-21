@@ -1,6 +1,7 @@
 package org.recap.camel.dynamicRouter;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
 import org.recap.camel.datadump.routebuilder.DataExportRouteBuilder;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -21,8 +22,6 @@ public class DynamicRouteBuilder {
     @Autowired
     CamelContext camelContext;
     @Autowired
-    ProducerTemplate producerTemplate;
-    @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
     @Autowired
     MarcXmlFormatterService marcXmlFormatterService;
@@ -36,7 +35,7 @@ public class DynamicRouteBuilder {
     String dataDumpRecordsPerFile;
 
     public void addDataDumpExportRoutes() {
-        new DataExportRouteBuilder(camelContext, producerTemplate, bibliographicDetailsRepository, marcXmlFormatterService, scsbXmlFormatterService,
+        new DataExportRouteBuilder(camelContext, bibliographicDetailsRepository, marcXmlFormatterService, scsbXmlFormatterService,
                 deletedJsonFormatterService, xmlFormatter, dataDumpRecordsPerFile);
     }
 }

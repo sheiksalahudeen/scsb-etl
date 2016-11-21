@@ -1,7 +1,9 @@
 package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DeletedRecord;
@@ -19,11 +21,9 @@ public class DeletedJsonFormatActiveMQConsumer {
 
     DeletedJsonFormatterService deletedJsonFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;
-    private ProducerTemplate producerTemplate;
 
-    public DeletedJsonFormatActiveMQConsumer(ProducerTemplate producerTemplate, DeletedJsonFormatterService deletedJsonFormatterService) {
+    public DeletedJsonFormatActiveMQConsumer(DeletedJsonFormatterService deletedJsonFormatterService) {
         this.deletedJsonFormatterService = deletedJsonFormatterService;
-        this.producerTemplate = producerTemplate;
     }
 
     public String processDeleteJsonString(Exchange exchange) throws Exception {
@@ -38,9 +38,9 @@ public class DeletedJsonFormatActiveMQConsumer {
         try {
             String formattedOutputForDeletedRecords = deletedJsonFormatterService.getJsonForDeletedRecords(deletedRecordList);
             deletedJsonString = formattedOutputForDeletedRecords.format(formattedOutputForDeletedRecords);
-            processSuccessReportEntity(deletedRecordList.size(), batchHeaders, requestId);
+            processSuccessReportEntity(exchange, deletedRecordList.size(), batchHeaders, requestId);
         } catch (Exception e) {
-            processFailureReportEntity(deletedRecordList.size(), batchHeaders, requestId, e);
+            processFailureReportEntity(exchange, deletedRecordList.size(), batchHeaders, requestId, e);
         }
         long endTime = System.currentTimeMillis();
 
@@ -49,7 +49,7 @@ public class DeletedJsonFormatActiveMQConsumer {
         return deletedJsonString;
     }
 
-    private void processSuccessReportEntity(Integer size, String batchHeaders, String requestId) {
+    private void processSuccessReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId) {
         Map values = new HashMap<>();
         values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
         values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
@@ -64,11 +64,18 @@ public class DeletedJsonFormatActiveMQConsumer {
         values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_SUCCESS);
         values.put(ReCAPConstants.REQUEST_ID, requestId);
 
-        producerTemplate.sendBody(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q, values);
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+        fluentProducerTemplate
+                .to(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
+                .withBody(values)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
 
     }
 
-    private void processFailureReportEntity(Integer size, String batchHeaders, String requestId, Exception e) {
+    private void processFailureReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId, Exception e) {
         Map values = new HashMap();
         values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
         values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
@@ -84,7 +91,14 @@ public class DeletedJsonFormatActiveMQConsumer {
         values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
         values.put(ReCAPConstants.REQUEST_ID, requestId);
 
-        producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+        fluentProducerTemplate
+                .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                .withBody(values)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
     }
 
     public DataExportHeaderUtil getDataExportHeaderUtil() {
