@@ -64,7 +64,7 @@ public class MarcXMLFormatActiveMQConsumer {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
-                .withBody(records)
+                .withBody(values)
                 .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
                 .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
@@ -91,7 +91,7 @@ public class MarcXMLFormatActiveMQConsumer {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
-                .withBody(records)
+                .withBody(values)
                 .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
                 .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));

@@ -60,13 +60,11 @@ public class ZipFileProcessor implements Processor {
             public void configure() throws Exception {
                 from("file:" + ftpStagingDir + File.separator + folderName + "?noop=true&antInclude=*.xml,*.json")
                         .routeId("ftpRoute")
-                        .onCompletion()
-                        .process(dataExportEmailProcessor)
-                        .end()
                         .aggregate(new ZipAggregationStrategy(true, true))
                         .constant(true)
                         .completionFromBatchConsumer()
                         .eagerCheckCompletion()
+                        .process(dataExportEmailProcessor)
                         .to("sftp://"
                                 + ftpUserName
                                 + "@"
