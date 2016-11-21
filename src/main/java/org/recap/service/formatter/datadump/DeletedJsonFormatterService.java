@@ -33,12 +33,12 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
         for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
             try {
                 DeletedRecord deletedRecord = new DeletedRecord();
-                List<String> itemIds = new ArrayList<>();
+                List<String> itemBarcodes = new ArrayList<>();
                 deletedRecord.setBibId(bibliographicEntity.getBibliographicId().toString());
                 for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
-                    itemIds.add(itemEntity.getBarcode().toString());
+                    itemBarcodes.add(itemEntity.getBarcode().toString());
                 }
-                deletedRecord.setItemIds(itemIds);
+                deletedRecord.setItemBarcodes(itemBarcodes);
                 deletedRecords.add(deletedRecord);
             } catch (Exception e) {
                 logger.error(e.getMessage());
