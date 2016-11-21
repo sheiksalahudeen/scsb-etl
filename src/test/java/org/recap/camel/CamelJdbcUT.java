@@ -246,19 +246,6 @@ public class CamelJdbcUT extends BaseTestCase {
         }
     }
 
-    private String getInstitutionCodes(DataDumpRequest dataDumpRequest) {
-        List<String> institutionCodes = dataDumpRequest.getInstitutionCodes();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Iterator<String> iterator = institutionCodes.iterator(); iterator.hasNext(); ) {
-            String code = iterator.next();
-            stringBuilder.append(code);
-            if(iterator.hasNext()){
-                stringBuilder.append("*");
-            }
-        }
-        return stringBuilder.toString();
-    }
-
     private String getDateTimeString() {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_MMDDYYY);

@@ -2,7 +2,9 @@ package org.recap.camel.datadump.consumer;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
@@ -21,8 +23,6 @@ import java.util.concurrent.*;
  */
 
 public class DeletedRecordFormatActiveMQConsumer {
-
-    private final ProducerTemplate producerTemplate;
     Logger logger = LoggerFactory.getLogger(DeletedRecordFormatActiveMQConsumer.class);
 
     DeletedJsonFormatterService deletedJsonFormatterService;
@@ -30,12 +30,13 @@ public class DeletedRecordFormatActiveMQConsumer {
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
-    public DeletedRecordFormatActiveMQConsumer(ProducerTemplate producerTemplate, DeletedJsonFormatterService deletedJsonFormatterService) {
+    public DeletedRecordFormatActiveMQConsumer(DeletedJsonFormatterService deletedJsonFormatterService) {
         this.deletedJsonFormatterService = deletedJsonFormatterService;
-        this.producerTemplate = producerTemplate;
     }
 
-    public List<DeletedRecord> processRecords(Exchange exchange) throws Exception {
+    public void processRecords(Exchange exchange) throws Exception {
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+
         List<DeletedRecord> deletedRecordList = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
@@ -82,17 +83,23 @@ public class DeletedRecordFormatActiveMQConsumer {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         if(CollectionUtils.isNotEmpty(failures)) {
-            processFailures(failures, batchHeaders, requestId);
+            processFailures(exchange, failures, batchHeaders, requestId);
         }
 
         long endTime = System.currentTimeMillis();
 
         logger.info("Time taken to prepare " + bibliographicEntities.size() + " deleted records : " + (endTime - startTime) / 1000 + " seconds ");
 
-        return deletedRecordList;
+        fluentProducerTemplate
+                .to(ReCAPConstants.DELETED_JSON_RECORD_FOR_DATA_EXPORT_Q)
+                .withBody(deletedRecordList)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
     }
 
-    private void processFailures(List failures, String batchHeaders, String requestId) {
+    private void processFailures(Exchange exchange, List failures, String batchHeaders, String requestId) {
         HashMap values = new HashMap();
         values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
         values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
@@ -108,7 +115,14 @@ public class DeletedRecordFormatActiveMQConsumer {
         values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
         values.put(ReCAPConstants.REQUEST_ID, requestId);
 
-        producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+        fluentProducerTemplate
+                .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                .withBody(values)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
     }
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {

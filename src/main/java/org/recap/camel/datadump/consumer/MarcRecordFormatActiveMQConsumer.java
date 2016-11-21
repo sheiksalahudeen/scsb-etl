@@ -2,7 +2,9 @@ package org.recap.camel.datadump.consumer;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
@@ -27,16 +29,15 @@ public class MarcRecordFormatActiveMQConsumer {
     MarcXmlFormatterService marcXmlFormatterService;
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
-    private ProducerTemplate producerTemplate;
 
-
-    public MarcRecordFormatActiveMQConsumer(ProducerTemplate producerTemplate, MarcXmlFormatterService marcXmlFormatterService) {
+    public MarcRecordFormatActiveMQConsumer(MarcXmlFormatterService marcXmlFormatterService) {
         this.marcXmlFormatterService = marcXmlFormatterService;
-        this.dataExportHeaderUtil = dataExportHeaderUtil;
-        this.producerTemplate = producerTemplate;
     }
 
-    public List<Record> processRecords(Exchange exchange) throws Exception {
+    public void processRecords(Exchange exchange) throws Exception {
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+
+
         List<Record> records = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
@@ -81,16 +82,22 @@ public class MarcRecordFormatActiveMQConsumer {
 
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
-        processFailures(failures, batchHeaders, requestId);
+        processFailures(exchange, failures, batchHeaders, requestId);
 
         long endTime = System.currentTimeMillis();
 
         logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
 
-        return records;
+        fluentProducerTemplate
+                .to(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
+                .withBody(records)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
     }
 
-    private void processFailures(List failures, String batchHeaders, String requestId) {
+    private void processFailures(Exchange exchange, List failures, String batchHeaders, String requestId) {
         if (!CollectionUtils.isEmpty(failures)) {
             HashMap values = new HashMap();
             values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
@@ -107,7 +114,15 @@ public class MarcRecordFormatActiveMQConsumer {
             values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
             values.put(ReCAPConstants.REQUEST_ID, requestId);
 
-            producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);
+            FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+            fluentProducerTemplate
+                    .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                    .withBody(values)
+                    .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                    .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                    .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+            fluentProducerTemplate.send();
+
         }
     }
 

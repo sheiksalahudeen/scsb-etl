@@ -50,7 +50,7 @@ public class ReCAPConstants {
     public static final String DATADUMP_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpFileSystemQ";
     public static final String EMAIL_Q = "scsbactivemq:queue:emailQ";
     public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
-    public static final String DATADUMP_ZIPFILE_FTP_Q = "direct:zipFileFtpQ";
+    public static final String DATADUMP_ZIPFILE_FTP_Q = "scsbactivemq:queue:zipFileFtpQ";
     public static final String DATADUMP_HTTP_Q = "scsbactivemq:queue:dataExportHttpQ";
 
     //Camel Route Ids

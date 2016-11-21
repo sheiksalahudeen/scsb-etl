@@ -2,7 +2,9 @@ package org.recap.camel.datadump.consumer;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.callable.BibRecordPreparerCallable;
@@ -27,14 +29,15 @@ public class SCSBRecordFormatActiveMQConsumer {
     SCSBXmlFormatterService scsbXmlFormatterService;
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
-    private ProducerTemplate producerTemplate;
+    private DefaultFluentProducerTemplate defaultFluentProducerTemplate;
 
-    public SCSBRecordFormatActiveMQConsumer(ProducerTemplate producerTemplate, SCSBXmlFormatterService scsbXmlFormatterService) {
+    public SCSBRecordFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
-        this.producerTemplate = producerTemplate;
     }
 
-    public List<BibRecord> processRecords(Exchange exchange) throws Exception {
+    public void processRecords(Exchange exchange) throws Exception {
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+
         List<BibRecord> records = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
@@ -78,16 +81,23 @@ public class SCSBRecordFormatActiveMQConsumer {
 
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
-        processFailures(failures, batchHeaders, requestId);
+        processFailures(failures, batchHeaders, requestId, fluentProducerTemplate);
 
         long endTime = System.currentTimeMillis();
 
         logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
 
-        return records;
-    }
 
-    private void processFailures(List failures, String batchHeaders, String requestId) {
+        fluentProducerTemplate
+                .to(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
+                .withBody(records)
+                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+        fluentProducerTemplate.send();
+   }
+
+    private void processFailures(List failures, String batchHeaders, String requestId, FluentProducerTemplate fluentProducerTemplate) {
         if (!CollectionUtils.isEmpty(failures)) {
             HashMap values = new HashMap();
 
@@ -105,7 +115,11 @@ public class SCSBRecordFormatActiveMQConsumer {
             values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
             values.put(ReCAPConstants.REQUEST_ID, requestId);
 
-            producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q, values);
+            fluentProducerTemplate
+                    .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                    .withBody(values);
+
+            fluentProducerTemplate.send();
         }
     }
 
