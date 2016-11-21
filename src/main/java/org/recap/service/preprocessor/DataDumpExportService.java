@@ -221,7 +221,10 @@ public class DataDumpExportService {
     private ResponseEntity getResponseEntity(String outputString, DataDumpRequest dataDumpRequest) throws Exception {
         HttpHeaders responseHeaders = new HttpHeaders();
         String date = new Date().toString();
-        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
+        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
+            return new ResponseEntity(ReCAPConstants.DATADUMP_PROCESS_STARTED, responseHeaders, HttpStatus.OK);
+        }else if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
             return new ResponseEntity(outputString, responseHeaders, HttpStatus.OK);
         } else if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && !dataDumpRequest.isRecordsAvailable()) {
