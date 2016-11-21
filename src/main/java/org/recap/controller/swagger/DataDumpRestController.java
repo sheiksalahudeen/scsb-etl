@@ -40,7 +40,7 @@ public class DataDumpRestController {
                                          @ApiParam(value = "Type of format - Marc xml (use 0) or SCSB xml (use 1), for deleted records only json format (use 2)",required=true, name = "outputFormat") @RequestParam String outputFormat,
                                          @ApiParam(value = "Get updates to middleware collection since the date provided. Default will be updates since the previous day. Date format will be a string (yyyy-MM-dd HH:mm)", name = "date") @RequestParam(required=false) String date,
                                          @ApiParam(value = "Collection group id will get the relevant info based on the id provided. Default will get both shared and open information - Shared (use 1), Open (use 2), Both (use 1,2)", name = "collectionGroupIds") @RequestParam(required=false) String collectionGroupIds,
-                                         @ApiParam(value = "Type of transmission - FTP (use 0), HTTP Response (use 1) this parameter is not considered for full dump, File system (use 2). Default will be ftp ", name = "transmissionType")@RequestParam(required=false) String transmissionType,
+                                         @ApiParam(value = "Type of transmission - FTP (use 0), HTTP Response (use 1) this parameter is not considered for full dump. Default will be ftp ", name = "transmissionType")@RequestParam(required=false) String transmissionType,
                                          @ApiParam(value = "Email address to whom we need to send an email" , name = "emailToAddress")@RequestParam(required=false) String emailToAddress
     ){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
