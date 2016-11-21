@@ -10,7 +10,7 @@ public class DeletedRecord implements Serializable{
 
     private String bibId;
 
-    private List<String> itemIds;
+    private List<String> itemBarcodes;
 
     public String getBibId() {
         return bibId;
@@ -20,11 +20,11 @@ public class DeletedRecord implements Serializable{
         this.bibId = bibId;
     }
 
-    public List<String> getItemIds() {
-        return itemIds;
+    public List<String> getItemBarcodes() {
+        return itemBarcodes;
     }
 
-    public void setItemIds(List<String> itemIds) {
-        this.itemIds = itemIds;
+    public void setItemBarcodes(List<String> itemBarcodes) {
+        this.itemBarcodes = itemBarcodes;
     }
 }
