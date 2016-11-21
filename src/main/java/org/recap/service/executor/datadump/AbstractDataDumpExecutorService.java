@@ -2,7 +2,6 @@ package org.recap.service.executor.datadump;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.DataExportHeaderUtil;
@@ -85,6 +84,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
         } else {
             outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
+            sendBodyForHttp(outputString);
         }
         return outputString;
     }
@@ -95,6 +95,14 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 .to(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
                 .withBody(results)
                 .withHeader("batchHeaders", headerString.toString());
+        fluentProducerTemplate.send();
+    }
+
+    private void sendBodyForHttp(String outputString) {
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
+        fluentProducerTemplate
+                .to(ReCAPConstants.DATADUMP_HTTP_Q)
+                .withBody(outputString);
         fluentProducerTemplate.send();
     }
 

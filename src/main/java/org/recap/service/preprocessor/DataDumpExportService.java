@@ -167,6 +167,12 @@ public class DataDumpExportService {
             erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
             errorcount++;
         }
+        if (!dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                && !dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)
+                ) {
+            erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
+            errorcount++;
+        }
         if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL)) {
             if (dataDumpRequest.getInstitutionCodes() == null) {
                 erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
@@ -178,15 +184,8 @@ public class DataDumpExportService {
                 erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
             }
-            if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
-                    && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)
-                    && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)
-                    ) {
-                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
-                errorcount++;
-            }
         }
-        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP) || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             if (StringUtils.isEmpty(dataDumpRequest.getToEmailAddress())) {
                 erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
             } else {
@@ -222,11 +221,7 @@ public class DataDumpExportService {
     private ResponseEntity getResponseEntity(String outputString, DataDumpRequest dataDumpRequest) throws Exception {
         HttpHeaders responseHeaders = new HttpHeaders();
         String date = new Date().toString();
-        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
-                || dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
-            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            return new ResponseEntity(ReCAPConstants.DATADUMP_PROCESS_STARTED, responseHeaders, HttpStatus.OK);
-        } else if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
+        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
             return new ResponseEntity(outputString, responseHeaders, HttpStatus.OK);
         } else if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && !dataDumpRequest.isRecordsAvailable()) {
