@@ -11,6 +11,7 @@ import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.camel.datadump.DataExportHeaderUtil;
+import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -69,6 +70,9 @@ public class CamelJdbcUT extends BaseTestCase {
     @Value("${datadump.batch.size}")
     String dataDumpBatchSize;
 
+    @Autowired
+    DynamicRouteBuilder dynamicRouteBuilder;
+
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
@@ -102,6 +106,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDumpForMarcXML() throws Exception {
+        dynamicRouteBuilder.addDataExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
@@ -151,6 +156,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDumpForSCSBXML() throws Exception {
+        dynamicRouteBuilder.addDataExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
@@ -200,6 +206,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDumpForDeletedJson() throws Exception {
+        dynamicRouteBuilder.addDataExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
