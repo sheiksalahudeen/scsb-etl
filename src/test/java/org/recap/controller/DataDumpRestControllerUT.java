@@ -13,14 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,6 +38,8 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     @Value("${solrclient.url}")
     String solrClientUrl;
 
+    private ExecutorService executorService;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -45,7 +47,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     }
 
     @Test
-    public void exportFullDataDumpMarcXmlFormatForHttp() throws Exception {
+    public void exportIncrementalMarcXmlFormatForHttp() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","CUL")
                 .param("fetchType","0")
@@ -63,12 +65,12 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     }
 
     @Test
-    public void exportFullDataDumpSCSBXmlFormatForHttp() throws Exception {
+    public void exportIncrementalSCSBXmlFormatForHttp() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","CUL")
                 .param("fetchType","0")
                 .param("transmissionType", "1")
-                .param("requestingInstitutionCode","NYPL")
+                .param("requestingInstitutionCode","PUL")
                 .param("outputFormat","1")
                 .param("emailToAddress","peri.subrahmanya@htcinc.com")
                 .param("collectionGroupIds","1,2"))
@@ -85,6 +87,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")
                 .param("fetchType","0")
+                .param("transmissionType", "0")
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","0")
                 .param("emailToAddress","hemalatha.s@htcindia.com")
@@ -101,6 +104,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("institutionCodes","NYPL")
                 .param("fetchType","0")
+                .param("transmissionType", "0")
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","1")
                 .param("emailToAddress","hemalatha.s@htcindia.com")
@@ -119,7 +123,21 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("requestingInstitutionCode","NYPL")
                 .param("outputFormat","1")
                 .param("emailToAddress","hemalatha.s@htcindia.com")
-                .param("date","2016-08-30 11:20"))
+                .param("date","2016-11-23 04:21"))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertTrue(status == 200);
+    }
+
+    @Test
+    public void exportDeletedRecordsDataDump() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                .param("institutionCodes","NYPL,PUL")
+                .param("fetchType","2")
+                .param("requestingInstitutionCode","NYPL")
+                .param("outputFormat","2")
+                .param("emailToAddress","peri.subrahmanya@htcinc.com"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
         assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
@@ -141,7 +159,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     }
 
     @Test
-    public void invalidIncremenatlDumpParameters()throws Exception{
+    public void invalidIncrementalDumpParameters()throws Exception{
         MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
                 .param("fetchType","1")
                 .param("requestingInstitutionCode","NYPL")
@@ -180,6 +198,78 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         System.out.println("Total Bibs : " + totalBibsCount);
         stopWatch.stop();
         System.out.println("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void concurrentHttpDataExport() throws Exception {
+        List<Callable<Map<String, String>>> callables = new ArrayList<>();
+
+        for(int i=0; i<5; i++) {
+            ConcurrentDataExportCallable concurrentDataExportCallable = new ConcurrentDataExportCallable(mockMvc);
+            callables.add(concurrentDataExportCallable);
+        }
+
+        List<Future<Map<String, String>>> futures = null;
+        try {
+            futures = getExecutorService().invokeAll(callables);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        futures
+                .stream()
+                .map(future -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                });
+
+        for (Iterator<Future<Map<String, String>>> iterator = futures.iterator(); iterator.hasNext(); ) {
+            Future future = iterator.next();
+            Object object = null;
+            try {
+                object = future.get();
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage());
+            } catch (ExecutionException e) {
+                logger.error(e.getMessage());
+            }
+            MvcResult mvcResult = (MvcResult) object;
+            logger.info(mvcResult.getResponse().getContentAsString());
+            assertNotNull(mvcResult.getResponse().getContentAsString());
+        }
+    }
+
+    public class ConcurrentDataExportCallable implements Callable {
+
+        protected MockMvc mockMvc;
+
+        public ConcurrentDataExportCallable(MockMvc mockMvc) {
+            this.mockMvc = mockMvc;
+        }
+
+        @Override
+        public Object call() throws Exception {
+
+            MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
+                    .param("fetchType","2")
+                    .param("requestingInstitutionCode","NYPL")
+                    .param("outputFormat","2")
+                    .param("emailToAddress","peri.subrahmanya@gmail.com")
+                    .param("institutionCodes","CUL")
+                    .param("transmissionType","1"))
+                    .andReturn();
+            return mvcResult;
+        }
+    }
+
+    public ExecutorService getExecutorService() {
+        if (null == executorService || executorService.isShutdown()) {
+            executorService = Executors.newFixedThreadPool(50);
+        }
+        return executorService;
     }
 
 }
