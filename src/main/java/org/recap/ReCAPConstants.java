@@ -116,11 +116,12 @@ public class ReCAPConstants {
     public static final String DATADUMP_NO_RECORD = "There is no data to export.";
     public static final String DATADUMP_PROCESS_STARTED = "Export process has started and we will send an email notification upon completion";
     public static final String DATADUMP_INSTITUTIONCODE_ERR_MSG = "Please enter the value for institutioncode parameter.";
-    public static final String DATADUMP_VALID_INST_CODES_ERR_MSG = "Please enter valid institution code CUL or PUL or NYP for institutionCodes .";
+    public static final String DATADUMP_VALID_INST_CODES_ERR_MSG = "Please enter valid institution code CUL or PUL or NYPL for institutionCodes .";
+    public static final String DATADUMP_MULTIPLE_INST_CODES_ERR_MSG = "Please enter only one institution code CUL or PUL or NYPL for institutionCodes .";
     public static final String DATADUMP_DATE_ERR_MSG = "Please enter the value for date .";
     public static final String DATADUMP_TRANS_TYPE_ERR_MSG = "Please enter valid transmission type.";
     public static final String DATADUMP_VALID_FETCHTYPE_ERR_MSG = "Please enter valid fetchType either 0 or 1.";
-    public static final String DATADUMP_VALID_REQ_INST_CODE_ERR_MSG = "Please enter valid institution code CUL or PUL or NYP for requestingInstitutionCode .";
+    public static final String DATADUMP_VALID_REQ_INST_CODE_ERR_MSG = "Please enter valid institution code CUL or PUL or NYPL for requestingInstitutionCode .";
     public static final String DATADUMP_FULL_VALID_TRANS_TYPE = "Transmission type 1 is not valid for full dump. Use transmission type 0 or 2";
     public static final String DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG = "There are more than 100 records. Use transmission type ftp to dump the data";
     public static final String DATADUMP_EMAIL_TO_ADDRESS_REQUIRED = "Please enter a valid e-mail address.";
@@ -140,6 +141,9 @@ public class ReCAPConstants {
     public static final String DATADUMP_FAILURELIST = "failureList";
     public static final String DATADUMP_FORMATTEDSTRING = "formattedString";
     public static final String DATADUMP_FORMATERROR = "formatError";
+    public static final String COMPLETED = "Completed";
+    public static final String IN_PROGRESS = "InProgress";
+    public static final String FULLDUMP_INPROGRESS_ERR_MSG = "Can't run data export now, already full data export in progress, wait until it completes.";
 
     public static final String  BIB_LASTUPDATED_DATE = "BibLastUpdatedDate";
     public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";

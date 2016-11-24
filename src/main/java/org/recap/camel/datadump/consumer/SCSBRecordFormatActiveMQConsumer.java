@@ -85,7 +85,7 @@ public class SCSBRecordFormatActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare " + bibliographicEntities.size() + " scsb records : " + (endTime - startTime) / 1000 + " seconds ");
 
 
         fluentProducerTemplate
