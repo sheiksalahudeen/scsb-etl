@@ -2,7 +2,7 @@ package org.recap.service.preprocessor;
 
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Exchange;
-import org.codehaus.groovy.util.StringUtil;
+import org.apache.commons.io.FileUtils;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.CollectionGroupEntity;
@@ -11,6 +11,7 @@ import org.recap.service.executor.datadump.DataDumpExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -42,6 +47,9 @@ public class DataDumpExportService {
 
     @Autowired
     ConsumerTemplate consumerTemplate;
+
+    @Value("${datadump.status.file.name}")
+    String dataDumpStatusFileName;
 
     public ResponseEntity startDataDumpProcess(DataDumpRequest dataDumpRequest) {
         ResponseEntity responseEntity;
@@ -143,64 +151,102 @@ public class DataDumpExportService {
     public ResponseEntity validateIncomingRequest(DataDumpRequest dataDumpRequest) {
         ResponseEntity responseEntity = null;
         HttpHeaders responseHeaders = new HttpHeaders();
-        Map<Integer, String> erroMessageMap = new HashMap<>();
+        Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorcount = 1;
         if (dataDumpRequest.getInstitutionCodes().size() > 0) {
             for (String institutionCode : dataDumpRequest.getInstitutionCodes()) {
                 if (!institutionCode.equals(ReCAPConstants.COLUMBIA) && !institutionCode.equals(ReCAPConstants.PRINCETON)
                         && !institutionCode.equals(ReCAPConstants.NYPL)) {
-                    erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_INST_CODES_ERR_MSG);
+                    errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_INST_CODES_ERR_MSG);
                     errorcount++;
                 }
+            }
+            if(dataDumpRequest.getInstitutionCodes().size() != 1 && dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL)) {
+                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_MULTIPLE_INST_CODES_ERR_MSG);
+                errorcount++;
             }
         }
         if (dataDumpRequest.getRequestingInstitutionCode() != null) {
             if (!dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.COLUMBIA) && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.PRINCETON)
                     && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.NYPL)) {
-                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
+                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
                 errorcount++;
             }
         }
         if (!dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) &&
                 !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)
                 && !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED)) {
-            erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
+            errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
             errorcount++;
         }
         if (!dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 && !dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)
                 ) {
-            erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
+            errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
             errorcount++;
         }
         if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL)) {
             if (dataDumpRequest.getInstitutionCodes() == null) {
-                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
+                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
             }
         }
         if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)) {
             if (dataDumpRequest.getDate() == null) {
-                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
+                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
             }
         }
         if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             if (StringUtils.isEmpty(dataDumpRequest.getToEmailAddress())) {
-                erroMessageMap.put(errorcount, ReCAPConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
+                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
             } else {
                 boolean isValid = validateEmailAddress(dataDumpRequest.getToEmailAddress());
                 if (!isValid) {
-                    erroMessageMap.put(errorcount, ReCAPConstants.INVALID_EMAIL_ADDRESS);
+                    errorMessageMap.put(errorcount, ReCAPConstants.INVALID_EMAIL_ADDRESS);
                 }
             }
         }
-        if (erroMessageMap.size() > 0) {
+
+        if(dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+            getFullDataExportStatus(errorMessageMap, errorcount);
+        }
+
+        if (errorMessageMap.size() > 0) {
             String date = new Date().toString();
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            responseEntity = new ResponseEntity(buildErrorMessage(erroMessageMap), responseHeaders, HttpStatus.BAD_REQUEST);
+            responseEntity = new ResponseEntity(buildErrorMessage(errorMessageMap), responseHeaders, HttpStatus.BAD_REQUEST);
         }
         return responseEntity;
+    }
+
+    private void getFullDataExportStatus(Map<Integer, String> errorMessageMap, Integer errorcount) {
+        File file = new File(dataDumpStatusFileName);
+        try {
+            if(file.exists()) {
+                String dataDumpStatus = FileUtils.readFileToString(file, Charset.defaultCharset());
+                if(dataDumpStatus.contains(ReCAPConstants.COMPLETED)) {
+                    writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
+                } else {
+                    errorMessageMap.put(errorcount, ReCAPConstants.FULLDUMP_INPROGRESS_ERR_MSG);
+                    errorcount++;
+                }
+            } else {
+                if(errorMessageMap.size() == 0) {
+                    file.createNewFile();
+                    writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
+                }
+            }
+        } catch (IOException e) {
+            logger.error(ReCAPConstants.DATADUMP_EXPORT_FAILURE);
+        }
+    }
+
+    private void writeStatusToFile(File file, String status) throws IOException {
+        FileWriter fileWriter = new FileWriter(file, false);
+        fileWriter.append(status);
+        fileWriter.flush();
+        fileWriter.close();
     }
 
     private String buildErrorMessage(Map<Integer, String> erroMessageMap) {
