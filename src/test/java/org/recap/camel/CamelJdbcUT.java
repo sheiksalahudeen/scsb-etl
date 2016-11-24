@@ -106,7 +106,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDumpForMarcXML() throws Exception {
-        dynamicRouteBuilder.addDataExportRoutes();
+        dynamicRouteBuilder.addDataDumpExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
@@ -156,7 +156,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDumpForSCSBXML() throws Exception {
-        dynamicRouteBuilder.addDataExportRoutes();
+        dynamicRouteBuilder.addDataDumpExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
@@ -206,7 +206,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Test
     public void exportDataDumpForDeletedJson() throws Exception {
-        dynamicRouteBuilder.addDataExportRoutes();
+        dynamicRouteBuilder.addDataDumpExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
