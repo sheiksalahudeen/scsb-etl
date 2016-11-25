@@ -238,7 +238,7 @@ public class DataDumpExportService {
                 }
             }
         } catch (IOException e) {
-            logger.error(ReCAPConstants.DATADUMP_EXPORT_FAILURE);
+            logger.error("Exception while creating or updating the file : " + e.getMessage());
         }
     }
 
