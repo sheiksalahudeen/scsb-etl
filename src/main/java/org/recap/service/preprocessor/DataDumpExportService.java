@@ -233,6 +233,7 @@ public class DataDumpExportService {
                 }
             } else {
                 if(errorMessageMap.size() == 0) {
+                    file.mkdir();
                     file.createNewFile();
                     writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
                 }
