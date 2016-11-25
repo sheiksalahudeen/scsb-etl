@@ -222,6 +222,7 @@ public class DataDumpExportService {
 
     private void getFullDataExportStatus(Map<Integer, String> errorMessageMap, Integer errorcount) {
         File file = new File(dataDumpStatusFileName);
+        File parentFile = file.getParentFile();
         try {
             if(file.exists()) {
                 String dataDumpStatus = FileUtils.readFileToString(file, Charset.defaultCharset());
@@ -233,7 +234,7 @@ public class DataDumpExportService {
                 }
             } else {
                 if(errorMessageMap.size() == 0) {
-                    file.mkdir();
+                    parentFile.mkdirs();
                     file.createNewFile();
                     writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
                 }
