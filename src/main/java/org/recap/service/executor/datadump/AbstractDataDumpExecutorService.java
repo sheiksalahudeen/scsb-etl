@@ -1,5 +1,6 @@
 package org.recap.service.executor.datadump;
 
+import org.apache.camel.BatchConsumer;
 import org.apache.camel.CamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
@@ -10,6 +11,7 @@ import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.service.DataDumpSolrService;
+import org.recap.util.datadump.BatchCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,13 +70,16 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         if (canProcess) {
             String fileName = getFileName(dataDumpRequest, 0);
             String folderName = getFolderName(dataDumpRequest);
+            BatchCounter.reset();
+            BatchCounter.setCurrentPage(1);
+            BatchCounter.setTotalPages(totalPageCount);
             String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
-
             sendBodyAndHeader(results, headerString);
 
             for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
                 Thread.sleep(10000);
                 searchRecordsRequest.setPageNumber(pageNum);
+                BatchCounter.setCurrentPage(pageNum+1);
                 Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
                 fileName = getFileName(dataDumpRequest, pageNum + 1);
                 headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
