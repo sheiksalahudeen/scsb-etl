@@ -222,6 +222,7 @@ public class DataDumpExportService {
 
     private void getFullDataExportStatus(Map<Integer, String> errorMessageMap, Integer errorcount) {
         File file = new File(dataDumpStatusFileName);
+        File parentFile = file.getParentFile();
         try {
             if(file.exists()) {
                 String dataDumpStatus = FileUtils.readFileToString(file, Charset.defaultCharset());
@@ -233,12 +234,13 @@ public class DataDumpExportService {
                 }
             } else {
                 if(errorMessageMap.size() == 0) {
+                    parentFile.mkdirs();
                     file.createNewFile();
                     writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
                 }
             }
         } catch (IOException e) {
-            logger.error(ReCAPConstants.DATADUMP_EXPORT_FAILURE);
+            logger.error("Exception while creating or updating the file : " + e.getMessage());
         }
     }
 
