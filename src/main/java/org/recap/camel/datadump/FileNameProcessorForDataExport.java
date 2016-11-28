@@ -3,6 +3,7 @@ package org.recap.camel.datadump;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.recap.ReCAPConstants;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.Iterator;

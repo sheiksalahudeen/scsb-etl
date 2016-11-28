@@ -3,7 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.ReCAPConstants;
-import org.recap.camel.datadump.DataExportHeaderUtil;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.FileNameProcessorForDataExport;
 import org.recap.camel.datadump.ZipFileProcessor;
 import org.slf4j.Logger;

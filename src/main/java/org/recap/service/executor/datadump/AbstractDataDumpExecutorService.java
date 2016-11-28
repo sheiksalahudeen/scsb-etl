@@ -1,11 +1,10 @@
 package org.recap.service.executor.datadump;
 
-import org.apache.camel.BatchConsumer;
 import org.apache.camel.CamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
-import org.recap.camel.datadump.DataExportHeaderUtil;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.search.SearchRecordsRequest;
@@ -79,7 +78,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
                 Thread.sleep(10000);
                 searchRecordsRequest.setPageNumber(pageNum);
-                BatchCounter.setCurrentPage(pageNum+1);
+                BatchCounter.setCurrentPage(pageNum + 1);
                 Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
                 fileName = getFileName(dataDumpRequest, pageNum + 1);
                 headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
@@ -114,13 +113,30 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private String getFileName(DataDumpRequest dataDumpRequest, int pageNum) {
         return dataDumpRequest.getRequestingInstitutionCode()
                 + File.separator
+                + getOutputFormat(dataDumpRequest)
+                + File.separator
                 + dataDumpRequest.getDateTimeString()
                 + File.separator
                 + pageNum;
     }
 
+    private String getOutputFormat(DataDumpRequest dataDumpRequest) {
+        switch (dataDumpRequest.getOutputFileFormat()) {
+            case "0":
+                return "MarcXml";
+            case "1":
+                return "SCSBXml";
+            case "2":
+                return "Json";
+        }
+        return null;
+
+    }
+
     private String getFolderName(DataDumpRequest dataDumpRequest) {
         return dataDumpRequest.getRequestingInstitutionCode()
+                + File.separator
+                + getOutputFormat(dataDumpRequest)
                 + File.separator
                 + dataDumpRequest.getDateTimeString();
     }

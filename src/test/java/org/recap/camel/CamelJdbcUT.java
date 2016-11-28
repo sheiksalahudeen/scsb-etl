@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.camel.activemq.JmxHelper;
-import org.recap.camel.datadump.DataExportHeaderUtil;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.search.SearchRecordsRequest;

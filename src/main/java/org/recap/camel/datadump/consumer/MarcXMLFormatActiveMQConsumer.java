@@ -2,11 +2,10 @@ package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
-import org.recap.camel.datadump.DataExportHeaderUtil;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 
 import java.util.*;

@@ -2,6 +2,7 @@ package org.recap.camel.datadump;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.recap.util.datadump.DataExportHeaderUtil;
 
 import java.util.Iterator;
 import java.util.Map;

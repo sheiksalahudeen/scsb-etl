@@ -1,4 +1,4 @@
-package org.recap.camel.datadump;
+package org.recap.util.datadump;
 
 import org.recap.model.export.DataDumpRequest;
 import org.springframework.stereotype.Component;
