@@ -40,7 +40,7 @@ public class DataExportEmailProcessor implements Processor {
     private String transmissionType;
     private List<String> institutionCodes;
     private String requestingInstitutionCode;
-    private String dateTimeStringForFolder;
+    private String folderName;
     private String toEmailId;
     private String requestId;
     private String fetchType;
@@ -83,9 +83,8 @@ public class DataExportEmailProcessor implements Processor {
             dataDumpEmailService.sendEmail(institutionCodes,
                     Integer.valueOf(totalRecordCount),
                     Integer.valueOf(failedBibs),
-                    requestingInstitutionCode,
                     transmissionType,
-                    this.dateTimeStringForFolder,
+                    this.folderName,
                     toEmailId);
         }
     }
@@ -122,12 +121,12 @@ public class DataExportEmailProcessor implements Processor {
         this.requestingInstitutionCode = requestingInstitutionCode;
     }
 
-    public String getDateTimeStringForFolder() {
-        return dateTimeStringForFolder;
+    public String getFolderName() {
+        return folderName;
     }
 
-    public void setDateTimeStringForFolder(String dateTimeStringForFolder) {
-        this.dateTimeStringForFolder = dateTimeStringForFolder;
+    public void setFolderName(String folderName) {
+        this.folderName = folderName;
     }
 
     public String getToEmailId() {

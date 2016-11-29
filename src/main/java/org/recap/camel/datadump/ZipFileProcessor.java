@@ -45,7 +45,7 @@ public class ZipFileProcessor implements Processor {
 
         dataExportEmailProcessor.setInstitutionCodes(getInstitutionCodes(getValueFor(batchHeaders, "institutionCodes")));
         dataExportEmailProcessor.setTransmissionType(getValueFor(batchHeaders, "transmissionType"));
-        dataExportEmailProcessor.setDateTimeStringForFolder(getValueFor(batchHeaders, "dateTimeString"));
+        dataExportEmailProcessor.setFolderName(folderName);
         dataExportEmailProcessor.setRequestingInstitutionCode(getValueFor(batchHeaders, "requestingInstitutionCode"));
         dataExportEmailProcessor.setToEmailId(getValueFor(batchHeaders, "toEmailId"));
         dataExportEmailProcessor.setRequestId(getValueFor(batchHeaders, "requestId"));

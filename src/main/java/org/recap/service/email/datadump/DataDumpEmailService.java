@@ -25,22 +25,22 @@ public class DataDumpEmailService {
     @Autowired
     private ProducerTemplate producer;
 
-    public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, Integer failedRecordCount, String requestingInstitutionCode, String transmissionType, String dateTimeStringForFolder, String toEmailAddress) {
+    public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, Integer failedRecordCount, String transmissionType, String dateTimeStringForFolder, String toEmailAddress) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
-        emailPayLoad.setLocation(getLocation(transmissionType, requestingInstitutionCode,dateTimeStringForFolder));
+        emailPayLoad.setLocation(getLocation(transmissionType,dateTimeStringForFolder));
         emailPayLoad.setCount(totalRecordCount);
         emailPayLoad.setFailedCount(failedRecordCount);
         emailPayLoad.setTo(toEmailAddress);
         producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
     }
 
-    private String getLocation(String transmissionType, String requestingInstitutionCode,String dateTimeStringForFolder) {
+    private String getLocation(String transmissionType,String dateTimeStringForFolder) {
         String location = null;
         if (transmissionType.equals("0")) {
-            location = "FTP location - " + ftpDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + dateTimeStringForFolder;
+            location = "FTP location - " + ftpDataDumpDirectory + File.separator + dateTimeStringForFolder;
         } else if (transmissionType.equals("2")) {
-            location = "File System - " + fileSystemDataDumpDirectory + File.separator + requestingInstitutionCode + File.separator + dateTimeStringForFolder;
+            location = "File System - " + fileSystemDataDumpDirectory + File.separator + dateTimeStringForFolder;
         }
         return location;
     }
