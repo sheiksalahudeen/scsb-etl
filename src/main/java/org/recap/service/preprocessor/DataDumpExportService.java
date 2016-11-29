@@ -145,7 +145,7 @@ public class DataDumpExportService {
 
         dataDumpRequest.setDateTimeString(getDateTimeString());
 
-        dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
+        dataDumpRequest.setRequestId(new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM).format(new Date()));
     }
 
     public ResponseEntity validateIncomingRequest(DataDumpRequest dataDumpRequest) {
