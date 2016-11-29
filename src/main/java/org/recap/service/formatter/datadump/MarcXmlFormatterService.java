@@ -40,6 +40,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
     @Value("${datadump.marc.nypl}")
     private String holdingNYPL;
+    private MarcFactory factory;
 
     @Override
     public boolean isInterested(String formatType) {
@@ -146,75 +147,67 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private Record add852aField(Record record, HoldingsEntity holdingEntity) {
-        MarcFactory factory = MarcFactory.newInstance();
-        DataField dataField = factory.newDataField("852", ' ', ' ');
+        DataField dataField = getFactory().newDataField("852", ' ', ' ');
         if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
-            dataField.addSubfield(factory.newSubfield('a', holdingPUL));
+            dataField.addSubfield(getFactory().newSubfield('a', holdingPUL));
         } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.COLUMBIA)) {
-            dataField.addSubfield(factory.newSubfield('a', holdingCUL));
+            dataField.addSubfield(getFactory().newSubfield('a', holdingCUL));
         } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.NYPL)) {
-            dataField.addSubfield(factory.newSubfield('a', holdingNYPL));
+            dataField.addSubfield(getFactory().newSubfield('a', holdingNYPL));
         }
         record.addVariableField(dataField);
         return record;
     }
 
     private void add852aField(DataField dataField, HoldingsEntity holdingEntity) {
-        MarcFactory factory = MarcFactory.newInstance();
         if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
-            dataField.addSubfield(factory.newSubfield('a', holdingPUL));
+            dataField.addSubfield(getFactory().newSubfield('a', holdingPUL));
         } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.COLUMBIA)) {
-            dataField.addSubfield(factory.newSubfield('a', holdingCUL));
+            dataField.addSubfield(getFactory().newSubfield('a', holdingCUL));
         } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.NYPL)) {
-            dataField.addSubfield(factory.newSubfield('a', holdingNYPL));
+            dataField.addSubfield(getFactory().newSubfield('a', holdingNYPL));
         }
     }
 
     private Record add8660Field(Record record, HoldingsEntity holdingsEntity) {
-        MarcFactory factory = MarcFactory.newInstance();
-        DataField dataField = factory.newDataField("866", ' ', ' ');
-        dataField.addSubfield(factory.newSubfield('0', holdingsEntity.getHoldingsId().toString()));
+        DataField dataField = getFactory().newDataField("866", ' ', ' ');
+        dataField.addSubfield(getFactory().newSubfield('0', holdingsEntity.getHoldingsId().toString()));
         record.addVariableField(dataField);
         return record;
     }
 
     private void add8660Field(DataField dataField, HoldingsEntity holdingEntity) {
-        MarcFactory factory = MarcFactory.newInstance();
-        dataField.addSubfield(factory.newSubfield('0', holdingEntity.getHoldingsId().toString()));
+        dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
     }
 
     private Record add8760Field(Record record, HoldingsEntity holdingEntity) {
-        MarcFactory factory = MarcFactory.newInstance();
-        DataField dataField = factory.newDataField("876", ' ', ' ');
-        dataField.addSubfield(factory.newSubfield('0', holdingEntity.getHoldingsId().toString()));
+        DataField dataField = getFactory().newDataField("876", ' ', ' ');
+        dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
         record.addVariableField(dataField);
         return record;
     }
 
     private void add8760Field(DataField dataField, HoldingsEntity holdingEntity) {
-        MarcFactory factory = MarcFactory.newInstance();
-        dataField.addSubfield(factory.newSubfield('0', holdingEntity.getHoldingsId().toString()));
+        dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
     }
 
     private void add876xField(Record record, String collectionGroupCode) {
-        MarcFactory factory = MarcFactory.newInstance();
-        DataField dataField = factory.newDataField("876", ' ', ' ');
-        dataField.addSubfield(factory.newSubfield('x', collectionGroupCode));
+        DataField dataField = getFactory().newDataField("876", ' ', ' ');
+        dataField.addSubfield(getFactory().newSubfield('x', collectionGroupCode));
         record.addVariableField(dataField);
     }
 
     private Record addItemInfo(Record record, List<ItemEntity> itemEntityList) {
-        MarcFactory factory = MarcFactory.newInstance();
         boolean is876Added = false;
         for (ItemEntity itemEntity : itemEntityList) {
             for (DataField dataField : record.getDataFields()) {
                 if (dataField.getTag().equals("876")) {
-                    dataField.addSubfield(factory.newSubfield('a', itemEntity.getOwningInstitutionItemId()));
-                    dataField.addSubfield(factory.newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
-                    dataField.addSubfield(factory.newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
-                    dataField.addSubfield(factory.newSubfield('p', itemEntity.getBarcode()));
-                    dataField.addSubfield(factory.newSubfield('t', itemEntity.getCopyNumber() != null ? String.valueOf(itemEntity.getCopyNumber()) : ""));
-                    dataField.addSubfield(factory.newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
+                    dataField.addSubfield(getFactory().newSubfield('a', itemEntity.getOwningInstitutionItemId()));
+                    dataField.addSubfield(getFactory().newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
+                    dataField.addSubfield(getFactory().newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
+                    dataField.addSubfield(getFactory().newSubfield('p', itemEntity.getBarcode()));
+                    dataField.addSubfield(getFactory().newSubfield('t', itemEntity.getCopyNumber() != null ? String.valueOf(itemEntity.getCopyNumber()) : ""));
+                    dataField.addSubfield(getFactory().newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
                     is876Added = true;
                 }
             }
@@ -233,5 +226,12 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         writer.close();
 
         return out.toString();
+    }
+
+    public MarcFactory getFactory() {
+        if (null == factory) {
+            factory = MarcFactory.newInstance();
+        }
+        return factory;
     }
 }

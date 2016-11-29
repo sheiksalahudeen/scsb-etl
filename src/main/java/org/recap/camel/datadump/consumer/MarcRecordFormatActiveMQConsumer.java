@@ -127,10 +127,10 @@ public class MarcRecordFormatActiveMQConsumer {
 
     public ExecutorService getExecutorService() {
         if (null == executorService) {
-            executorService = Executors.newFixedThreadPool(500);
+            executorService = Executors.newFixedThreadPool(10);
         }
         if (executorService.isShutdown()) {
-            executorService = Executors.newFixedThreadPool(500);
+            executorService = Executors.newFixedThreadPool(10);
         }
         return executorService;
     }
