@@ -53,7 +53,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
     @Override
     public String process(DataDumpRequest dataDumpRequest) throws ExecutionException, InterruptedException {
-        String outputString = null;
+        String outputString;
 
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(dataDumpRequest.getInstitutionCodes());
@@ -65,8 +65,11 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         Integer totalPageCount = (Integer) results.get("totalPageCount");
         Integer totalBibsCount = Integer.valueOf((String) results.get("totalRecordsCount"));
 
+        boolean isRecordsToProcess = totalBibsCount > 0 ? true : false;
         boolean canProcess = canProcessRecords(totalBibsCount, dataDumpRequest.getTransmissionType());
-        if (canProcess) {
+        if (isRecordsToProcess && canProcess) {
+            outputString = ReCAPConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS;
+            sendBodyForIsRecordAvailableMessage(outputString);
             String fileName = getFileName(dataDumpRequest, 0);
             String folderName = getFolderName(dataDumpRequest);
             BatchCounter.reset();
@@ -87,8 +90,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             return "Success";
 
         } else {
-            outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
-            sendBodyForHttp(outputString);
+            if (!isRecordsToProcess) {
+                outputString = ReCAPConstants.DATADUMP_NO_RECORD;
+                sendBodyForIsRecordAvailableMessage(outputString);
+            } else {
+                outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
+                sendBodyForHttp(outputString);
+            }
         }
         return outputString;
     }
@@ -106,6 +114,14 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_HTTP_Q)
+                .withBody(outputString);
+        fluentProducerTemplate.send();
+    }
+
+    private void sendBodyForIsRecordAvailableMessage(String outputString) {
+        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
+        fluentProducerTemplate
+                .to(ReCAPConstants.DATADUMP_IS_RECORD_AVAILABLE_Q)
                 .withBody(outputString);
         fluentProducerTemplate.send();
     }
