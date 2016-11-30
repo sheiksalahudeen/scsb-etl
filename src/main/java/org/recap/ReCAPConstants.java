@@ -52,6 +52,7 @@ public class ReCAPConstants {
     public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
     public static final String DATADUMP_ZIPFILE_FTP_Q = "scsbactivemq:queue:zipFileFtpQ";
     public static final String DATADUMP_HTTP_Q = "scsbactivemq:queue:dataExportHttpQ";
+    public static final String DATADUMP_IS_RECORD_AVAILABLE_Q = "scsbactivemq:queue:dataExportIsRecordAvailableQ";
 
     //Camel Route Ids
     public static final String REPORT_ROUTE_ID = "reportQRoute";
@@ -115,6 +116,7 @@ public class ReCAPConstants {
     public static final String DATADUMP_EXPORT_FAILURE = "Data dump export failed, please check with the support team.";
     public static final String DATADUMP_NO_RECORD = "There is no data to export.";
     public static final String DATADUMP_PROCESS_STARTED = "Export process has started and we will send an email notification upon completion";
+    public static final String DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS = "Data available to export";
     public static final String DATADUMP_INSTITUTIONCODE_ERR_MSG = "Please enter the value for institutioncode parameter.";
     public static final String DATADUMP_VALID_INST_CODES_ERR_MSG = "Please enter valid institution code CUL or PUL or NYPL for institutionCodes .";
     public static final String DATADUMP_MULTIPLE_INST_CODES_ERR_MSG = "Please enter only one institution code CUL or PUL or NYPL for institutionCodes .";
