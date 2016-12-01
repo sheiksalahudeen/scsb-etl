@@ -201,10 +201,10 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
             "</collection>\n";
 
     @Test
-    public void generateMarcXml() throws IOException, URISyntaxException {
+    public void generateMarcXml() throws Exception {
         BibliographicEntity bibliographicEntity = getBibliographicEntity();
         Map<String, Object> successAndFailureFormattedList = marcXmlFormatterService.prepareMarcRecords(Arrays.asList(bibliographicEntity));
-        String marcXmlString = (String) successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
+        String marcXmlString = marcXmlFormatterService.covertToMarcXmlString((List<Record>)successAndFailureFormattedList.get(ReCAPConstants.SUCCESS));
         System.out.println(marcXmlString);
         List<Record> recordList = readMarcXml(marcXmlString);
         assertNotNull(recordList);
