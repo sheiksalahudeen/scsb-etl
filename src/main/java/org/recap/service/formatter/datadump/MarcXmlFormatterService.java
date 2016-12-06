@@ -82,7 +82,6 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             record = getRecordFromContent(bibliographicEntity.getContent());
             update001Field(record, bibliographicEntity);
             record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities());
-            record = addItemInfo(record, bibliographicEntity.getItemEntities());
             results.put(ReCAPConstants.SUCCESS, record);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -113,49 +112,22 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
     private Record addHoldingInfo(Record record, List<HoldingsEntity> holdingsEntityList) {
         Record holdingRecord = null;
-        boolean is852Added = false;
-        boolean is866Added = false;
-        boolean is876Added = false;
         for (HoldingsEntity holdingsEntity : holdingsEntityList) {
             holdingRecord = getRecordFromContent(holdingsEntity.getContent());
             for (DataField dataField : holdingRecord.getDataFields()) {
                 if (dataField.getTag().equals("852")) {
+                    add0SubField(dataField, holdingsEntity);
                     add852aField(dataField, holdingsEntity);
-                    is852Added = true;
                 }
                 if (dataField.getTag().equals("866")) {
-                    add8660Field(dataField, holdingsEntity);
-                    is866Added = true;
-                }
-                if (dataField.getTag().equals("876")) {
-                    add8760Field(dataField, holdingsEntity);
-                    is876Added = true;
+                    add0SubField(dataField, holdingsEntity);
                 }
                 record.addVariableField(dataField);
             }
-            if (!is852Added) {
-                record = add852aField(record, holdingsEntity);
-            }
-            if (!is866Added) {
-                record = add8660Field(record, holdingsEntity);
-            }
-            if (!is876Added) {
-                record = add8760Field(record, holdingsEntity);
+            for(ItemEntity itemEntity : holdingsEntity.getItemEntities()){
+                record = addItemInfo(record, itemEntity,holdingsEntity);
             }
         }
-        return record;
-    }
-
-    private Record add852aField(Record record, HoldingsEntity holdingEntity) {
-        DataField dataField = getFactory().newDataField("852", ' ', ' ');
-        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
-            dataField.addSubfield(getFactory().newSubfield('a', holdingPUL));
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.COLUMBIA)) {
-            dataField.addSubfield(getFactory().newSubfield('a', holdingCUL));
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.NYPL)) {
-            dataField.addSubfield(getFactory().newSubfield('a', holdingNYPL));
-        }
-        record.addVariableField(dataField);
         return record;
     }
 
@@ -169,52 +141,22 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         }
     }
 
-    private Record add8660Field(Record record, HoldingsEntity holdingsEntity) {
-        DataField dataField = getFactory().newDataField("866", ' ', ' ');
-        dataField.addSubfield(getFactory().newSubfield('0', holdingsEntity.getHoldingsId().toString()));
-        record.addVariableField(dataField);
-        return record;
-    }
-
-    private void add8660Field(DataField dataField, HoldingsEntity holdingEntity) {
+    private void add0SubField(DataField dataField, HoldingsEntity holdingEntity) {
         dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
     }
 
-    private Record add8760Field(Record record, HoldingsEntity holdingEntity) {
+    private Record addItemInfo(Record record, ItemEntity itemEntity,HoldingsEntity holdingsEntity) {
         DataField dataField = getFactory().newDataField("876", ' ', ' ');
-        dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
+        dataField.addSubfield(getFactory().newSubfield('0', String.valueOf(holdingsEntity.getHoldingsId())));
+        dataField.addSubfield(getFactory().newSubfield('a', String.valueOf(itemEntity.getItemId())));
+        dataField.addSubfield(getFactory().newSubfield('b', itemEntity.getCustomerCode()));
+        dataField.addSubfield(getFactory().newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
+        dataField.addSubfield(getFactory().newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
+        dataField.addSubfield(getFactory().newSubfield('p', itemEntity.getBarcode()));
+        dataField.addSubfield(getFactory().newSubfield('t', itemEntity.getCopyNumber() != null ? String.valueOf(itemEntity.getCopyNumber()) : ""));
+        dataField.addSubfield(getFactory().newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
         record.addVariableField(dataField);
-        return record;
-    }
 
-    private void add8760Field(DataField dataField, HoldingsEntity holdingEntity) {
-        dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
-    }
-
-    private void add876xField(Record record, String collectionGroupCode) {
-        DataField dataField = getFactory().newDataField("876", ' ', ' ');
-        dataField.addSubfield(getFactory().newSubfield('x', collectionGroupCode));
-        record.addVariableField(dataField);
-    }
-
-    private Record addItemInfo(Record record, List<ItemEntity> itemEntityList) {
-        boolean is876Added = false;
-        for (ItemEntity itemEntity : itemEntityList) {
-            for (DataField dataField : record.getDataFields()) {
-                if (dataField.getTag().equals("876")) {
-                    dataField.addSubfield(getFactory().newSubfield('a', itemEntity.getOwningInstitutionItemId()));
-                    dataField.addSubfield(getFactory().newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
-                    dataField.addSubfield(getFactory().newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
-                    dataField.addSubfield(getFactory().newSubfield('p', itemEntity.getBarcode()));
-                    dataField.addSubfield(getFactory().newSubfield('t', itemEntity.getCopyNumber() != null ? String.valueOf(itemEntity.getCopyNumber()) : ""));
-                    dataField.addSubfield(getFactory().newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
-                    is876Added = true;
-                }
-            }
-            if (!is876Added) {
-                add876xField(record, itemEntity.getCollectionGroupEntity().getCollectionGroupCode());
-            }
-        }
         return record;
     }
 
