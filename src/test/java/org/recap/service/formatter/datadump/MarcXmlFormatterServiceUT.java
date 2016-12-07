@@ -306,6 +306,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         holdingsEntity.setInstitutionEntity(institutionEntity);
 
         ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setItemId(100);
         itemEntity.setCallNumberType("0");
         itemEntity.setCallNumber("callNum");
         itemEntity.setCreatedDate(new Date());
