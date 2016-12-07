@@ -7,6 +7,7 @@ import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.repository.CollectionGroupDetailsRepository;
+import org.recap.service.email.datadump.DataDumpEmailService;
 import org.recap.service.executor.datadump.DataDumpExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,9 @@ public class DataDumpExportService {
     private DataDumpExecutorService dataDumpExecutorService;
 
     @Autowired
+    DataDumpEmailService dataDumpEmailService;
+
+    @Autowired
     ConsumerTemplate consumerTemplate;
 
     @Value("${datadump.status.file.name}")
@@ -72,6 +76,16 @@ public class DataDumpExportService {
                 }
             }else{
                 outputString = getMessageFromIsRecordAvailableQ();
+                if(!outputString.equals(ReCAPConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)){
+                    dataDumpEmailService.sendEmail(dataDumpRequest.getInstitutionCodes(),
+                            Integer.valueOf(0),
+                            Integer.valueOf(0),
+                            dataDumpRequest.getTransmissionType(),
+                            null,
+                            dataDumpRequest.getToEmailAddress(),
+                            ReCAPConstants.DATADUMP_NO_DATA_AVAILABLE
+                    );
+                }
             }
             responseEntity = getResponseEntity(outputString, dataDumpRequest);
         } catch (Exception e) {

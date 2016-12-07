@@ -85,7 +85,9 @@ public class DataExportEmailProcessor implements Processor {
                     Integer.valueOf(failedBibs),
                     transmissionType,
                     this.folderName,
-                    toEmailId);
+                    toEmailId,
+                    ReCAPConstants.DATADUMP_DATA_AVAILABLE
+            );
         }
     }
 
