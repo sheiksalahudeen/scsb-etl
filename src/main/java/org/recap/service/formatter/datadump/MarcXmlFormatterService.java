@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -118,11 +119,12 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
                 if (dataField.getTag().equals("852")) {
                     add0SubField(dataField, holdingsEntity);
                     add852aField(dataField, holdingsEntity);
+                    record.addVariableField(dataField);
                 }
-                if (dataField.getTag().equals("866")) {
+                if (dataField.getTag().equals("866") && !StringUtils.isEmpty(dataField.getSubfield('a').getData())) {
                     add0SubField(dataField, holdingsEntity);
+                    record.addVariableField(dataField);
                 }
-                record.addVariableField(dataField);
             }
             for(ItemEntity itemEntity : holdingsEntity.getItemEntities()){
                 record = addItemInfo(record, itemEntity,holdingsEntity);
