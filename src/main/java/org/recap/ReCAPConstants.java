@@ -143,6 +143,9 @@ public class ReCAPConstants {
     public static final String DATADUMP_FAILURELIST = "failureList";
     public static final String DATADUMP_FORMATTEDSTRING = "formattedString";
     public static final String DATADUMP_FORMATERROR = "formatError";
+    public static final String DATADUMP_EMAILBODY_FOR = "emailBodyFor";
+    public static final String DATADUMP_DATA_AVAILABLE = "dataAvailable";
+    public static final String DATADUMP_NO_DATA_AVAILABLE = "dataNotAvailable";
     public static final String COMPLETED = "Completed";
     public static final String IN_PROGRESS = "InProgress";
     public static final String FULLDUMP_INPROGRESS_ERR_MSG = "Can't run data export now, already full data export in progress, wait until it completes.";
