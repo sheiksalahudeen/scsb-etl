@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -118,12 +117,16 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             for (DataField dataField : holdingRecord.getDataFields()) {
                 if (dataField.getTag().equals("852")) {
                     add0SubField(dataField, holdingsEntity);
-                    add852aField(dataField, holdingsEntity);
+                    update852bField(dataField, holdingsEntity);
                     record.addVariableField(dataField);
                 }
-                if (dataField.getTag().equals("866") && !StringUtils.isEmpty(dataField.getSubfield('a').getData())) {
-                    add0SubField(dataField, holdingsEntity);
-                    record.addVariableField(dataField);
+                if (dataField.getTag().equals("866")) {
+                    if(dataField.getSubfield('a')!=null && (dataField.getSubfield('a').getData()==null || dataField.getSubfield('a').getData().equals(""))){
+                        continue;
+                    }else {
+                        add0SubField(dataField, holdingsEntity);
+                        record.addVariableField(dataField);
+                    }
                 }
             }
             for(ItemEntity itemEntity : holdingsEntity.getItemEntities()){
@@ -133,30 +136,30 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return record;
     }
 
-    private void add852aField(DataField dataField, HoldingsEntity holdingEntity) {
-        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
-            dataField.addSubfield(getFactory().newSubfield('a', holdingPUL));
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.COLUMBIA)) {
-            dataField.addSubfield(getFactory().newSubfield('a', holdingCUL));
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.NYPL)) {
-            dataField.addSubfield(getFactory().newSubfield('a', holdingNYPL));
-        }
-    }
-
     private void add0SubField(DataField dataField, HoldingsEntity holdingEntity) {
         dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
+    }
+
+    private void update852bField(DataField dataField, HoldingsEntity holdingEntity){
+        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
+            dataField.getSubfield('b').setData(holdingPUL);
+        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.COLUMBIA)) {
+            dataField.getSubfield('b').setData(holdingCUL);
+        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.NYPL)) {
+            dataField.getSubfield('b').setData(holdingNYPL);
+        }
     }
 
     private Record addItemInfo(Record record, ItemEntity itemEntity,HoldingsEntity holdingsEntity) {
         DataField dataField = getFactory().newDataField("876", ' ', ' ');
         dataField.addSubfield(getFactory().newSubfield('0', String.valueOf(holdingsEntity.getHoldingsId())));
         dataField.addSubfield(getFactory().newSubfield('a', String.valueOf(itemEntity.getItemId())));
-        dataField.addSubfield(getFactory().newSubfield('b', itemEntity.getCustomerCode()));
         dataField.addSubfield(getFactory().newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
         dataField.addSubfield(getFactory().newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
         dataField.addSubfield(getFactory().newSubfield('p', itemEntity.getBarcode()));
         dataField.addSubfield(getFactory().newSubfield('t', itemEntity.getCopyNumber() != null ? String.valueOf(itemEntity.getCopyNumber()) : ""));
-        dataField.addSubfield(getFactory().newSubfield('x', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
+        dataField.addSubfield(getFactory().newSubfield('x', itemEntity.getCustomerCode()));
+        dataField.addSubfield(getFactory().newSubfield('z', itemEntity.getCollectionGroupEntity().getCollectionGroupCode()));
         record.addVariableField(dataField);
 
         return record;
