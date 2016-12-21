@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -55,9 +53,9 @@ public class DataDumpExportService {
     @Value("${datadump.status.file.name}")
     String dataDumpStatusFileName;
 
-    public ResponseEntity startDataDumpProcess(DataDumpRequest dataDumpRequest) {
-        ResponseEntity responseEntity;
+    public String startDataDumpProcess(DataDumpRequest dataDumpRequest) {
         String outputString = null;
+        String responseMessage = null;
         try {
             new Thread(() -> {
                 try {
@@ -87,15 +85,12 @@ public class DataDumpExportService {
                     );
                 }
             }
-            responseEntity = getResponseEntity(outputString, dataDumpRequest);
+            responseMessage = getResponseMessage(outputString, dataDumpRequest);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            String date = new Date().toString();
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            responseEntity = new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, responseHeaders, HttpStatus.BAD_REQUEST);
+            responseMessage = ReCAPConstants.DATADUMP_EXPORT_FAILURE;
         }
-        return responseEntity;
+        return responseMessage;
     }
 
     private String getMessageFromHttpQ(){
@@ -154,7 +149,7 @@ public class DataDumpExportService {
             dataDumpRequest.setDate(date);
         }
 
-        if (collectionGroupIds != null) {
+        if (collectionGroupIds != null && !collectionGroupIds.equals("")) {
             List<Integer> collectionGroupIdList = splitStringAndGetIntegerList(collectionGroupIds);
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         } else {
@@ -165,7 +160,7 @@ public class DataDumpExportService {
             collectionGroupIdList.add(collectionGroupEntityOpen.getCollectionGroupId());
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         }
-        if (transmissionType != null) {
+        if (transmissionType != null && !transmissionType.equals("")) {
             dataDumpRequest.setTransmissionType(transmissionType);
         } else {
             dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
@@ -186,9 +181,8 @@ public class DataDumpExportService {
         dataDumpRequest.setRequestId(new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM).format(new Date()));
     }
 
-    public ResponseEntity validateIncomingRequest(DataDumpRequest dataDumpRequest) {
-        ResponseEntity responseEntity = null;
-        HttpHeaders responseHeaders = new HttpHeaders();
+    public String validateIncomingRequest(DataDumpRequest dataDumpRequest) {
+        String validationMessage = null;
         Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorcount = 1;
         if (dataDumpRequest.getInstitutionCodes().size() > 0) {
@@ -230,7 +224,7 @@ public class DataDumpExportService {
             }
         }
         if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)) {
-            if (dataDumpRequest.getDate() == null) {
+            if (dataDumpRequest.getDate() == null || dataDumpRequest.getDate().equals("")) {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
             }
@@ -257,11 +251,9 @@ public class DataDumpExportService {
         }
 
         if (errorMessageMap.size() > 0) {
-            String date = new Date().toString();
-            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            responseEntity = new ResponseEntity(buildErrorMessage(errorMessageMap), responseHeaders, HttpStatus.BAD_REQUEST);
+            validationMessage = buildErrorMessage(errorMessageMap);
         }
-        return responseEntity;
+        return validationMessage;
     }
 
     private String getDataExportCurrentStatus(){
@@ -319,7 +311,7 @@ public class DataDumpExportService {
         return matcher.matches();
     }
 
-    private ResponseEntity getResponseEntity(String outputString, DataDumpRequest dataDumpRequest) throws Exception {
+    private String getResponseMessage(String outputString, DataDumpRequest dataDumpRequest) throws Exception {
         HttpHeaders responseHeaders = new HttpHeaders();
         String date = new Date().toString();
         if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
@@ -328,13 +320,13 @@ public class DataDumpExportService {
                 outputString = ReCAPConstants.DATADUMP_PROCESS_STARTED;
             }
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            return new ResponseEntity(outputString, responseHeaders, HttpStatus.OK);
+            return outputString;
         }else if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            return new ResponseEntity(outputString, responseHeaders, HttpStatus.OK);
+            return outputString;
         } else {
             responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            return new ResponseEntity(ReCAPConstants.DATADUMP_EXPORT_FAILURE, responseHeaders, HttpStatus.BAD_REQUEST);
+            return ReCAPConstants.DATADUMP_EXPORT_FAILURE;
         }
     }
 
