@@ -8,7 +8,6 @@ import org.recap.service.preprocessor.DataDumpExportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -34,7 +33,7 @@ public class DataDumpRestController {
             notes = "Export datadumps to institutions", nickname = "exportDataDump", position = 0)
     @ApiResponses(value = {@ApiResponse(code = 200, message = ReCAPConstants.DATADUMP_PROCESS_STARTED)})
     @ResponseBody
-    public ResponseEntity exportDataDump(@ApiParam(value = "Code of institutions whose shared collection updates are requested. Use PUL for Princeton, CUL for Columbia and NYPL for NYPL." , required = true, name = "institutionCodes") @RequestParam String institutionCodes,
+    public String exportDataDump(@ApiParam(value = "Code of institutions whose shared collection updates are requested. Use PUL for Princeton, CUL for Columbia and NYPL for NYPL." , required = true, name = "institutionCodes") @RequestParam String institutionCodes,
                                          @ApiParam(value = "Code of insitituion who is requesting. Use PUL for Princeton, CUL for Columbia and NYPL for NYPL. ",required=true, name = "requestingInstitutionCode") @RequestParam String requestingInstitutionCode,
                                          @ApiParam(value = "Type of export - Full (use 0) or Incremental (use 1) or Deleted (use 2)" , required = true , name = "fetchType") @RequestParam String fetchType,
                                          @ApiParam(value = "Type of format - Marc xml (use 0) or SCSB xml (use 1), for deleted records only json format (use 2)",required=true, name = "outputFormat") @RequestParam String outputFormat,
@@ -46,11 +45,11 @@ public class DataDumpRestController {
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dynamicRouteBuilder.addDataDumpExportRoutes();
         dataDumpExportService.setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,emailToAddress,outputFormat);
-        ResponseEntity responseEntity = dataDumpExportService.validateIncomingRequest(dataDumpRequest);
-        if(responseEntity!=null) {
-            return responseEntity;
+        String responseMessage = dataDumpExportService.validateIncomingRequest(dataDumpRequest);
+        if(responseMessage!=null) {
+            return responseMessage;
         }
-        responseEntity = dataDumpExportService.startDataDumpProcess(dataDumpRequest);
-        return responseEntity;
+        responseMessage = dataDumpExportService.startDataDumpProcess(dataDumpRequest);
+        return responseMessage;
     }
 }
