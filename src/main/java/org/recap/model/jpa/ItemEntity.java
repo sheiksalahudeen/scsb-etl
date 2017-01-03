@@ -86,6 +86,9 @@ public class ItemEntity implements Serializable{
     @Column(name = "IS_DELETED")
     private boolean isDeleted;
 
+    @Column(name = "CATALOGING_STATUS")
+    private String catalogingStatus;
+
     public ItemEntity() {
     }
 
@@ -264,6 +267,14 @@ public class ItemEntity implements Serializable{
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public String getCatalogingStatus() {
+        return catalogingStatus;
+    }
+
+    public void setCatalogingStatus(String catalogingStatus) {
+        this.catalogingStatus = catalogingStatus;
     }
 }
 
