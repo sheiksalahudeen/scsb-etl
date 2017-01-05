@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by pvsubrah on 6/21/16.
@@ -18,6 +19,9 @@ public class Bib implements Serializable {
     private String owningInstitutionId;
     @XmlElement
     private String owningInstitutionBibId;
+    @XmlElement
+    protected List<MatchingInstitutionBibIdType> matchingInstitutionBibId;
+
     @XmlElement(required = true, nillable = true)
     protected ContentType content;
 
@@ -35,6 +39,14 @@ public class Bib implements Serializable {
 
     public void setOwningInstitutionId(String owningInstitutionId) {
         this.owningInstitutionId = owningInstitutionId;
+    }
+
+    public List<MatchingInstitutionBibIdType> getMatchingInstitutionBibId() {
+        return matchingInstitutionBibId;
+    }
+
+    public void setMatchingInstitutionBibId(List<MatchingInstitutionBibIdType> matchingInstitutionBibId) {
+        this.matchingInstitutionBibId = matchingInstitutionBibId;
     }
 
     public ContentType getContent() {
