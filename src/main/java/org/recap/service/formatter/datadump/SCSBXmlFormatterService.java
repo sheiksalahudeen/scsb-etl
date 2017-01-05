@@ -89,6 +89,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Bib bib = new Bib();
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         bib.setOwningInstitutionId(bibliographicEntity.getInstitutionEntity().getInstitutionCode());
+        bib.setMatchingInstitutionBibId(getMatchingInstitutionBibId());
         ContentType contentType = getContentType(bibliographicEntity.getContent());
         List<RecordType> record = contentType.getCollection().getRecord();
         RecordType recordType = record.get(0);
@@ -99,6 +100,19 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return bib;
     }
 
+    //TODO need to get the matching inst bibid from report table
+    private List<MatchingInstitutionBibIdType> getMatchingInstitutionBibId(){
+        List<MatchingInstitutionBibIdType> matchingInstitutionBibIdTypeList = new ArrayList<>();
+        MatchingInstitutionBibIdType matchingInstitutionBibIdType = new MatchingInstitutionBibIdType();
+        matchingInstitutionBibIdType.setSource("CUL");
+        matchingInstitutionBibIdType.setValue("3245");
+        MatchingInstitutionBibIdType matchingInstitutionBibIdType1 = new MatchingInstitutionBibIdType();
+        matchingInstitutionBibIdType1.setSource("PUL");
+        matchingInstitutionBibIdType1.setValue("8978");
+        matchingInstitutionBibIdTypeList.add(matchingInstitutionBibIdType);
+        matchingInstitutionBibIdTypeList.add(matchingInstitutionBibIdType1);
+        return matchingInstitutionBibIdTypeList;
+    }
 
     private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) throws Exception{
         List<Holdings> holdingsList = new ArrayList<>();
