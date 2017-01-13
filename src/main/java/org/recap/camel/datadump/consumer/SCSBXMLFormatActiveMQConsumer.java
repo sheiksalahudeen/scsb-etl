@@ -41,6 +41,7 @@ public class SCSBXMLFormatActiveMQConsumer {
 //            toSCSBXmlString = xmlFormatter.prettyPrint(formattedOutputForBibRecords);
             processSuccessReportEntity(exchange, records.size(), batchHeaders, requestId);
         } catch (Exception e) {
+            e.printStackTrace();
             processFailureReportEntity(exchange, records.size(), batchHeaders, requestId, e);
         }
         long endTime = System.currentTimeMillis();
