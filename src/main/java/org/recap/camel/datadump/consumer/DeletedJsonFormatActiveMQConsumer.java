@@ -39,6 +39,7 @@ public class DeletedJsonFormatActiveMQConsumer {
             deletedJsonString = formattedOutputForDeletedRecords.format(formattedOutputForDeletedRecords);
             processSuccessReportEntity(exchange, deletedRecordList.size(), batchHeaders, requestId);
         } catch (Exception e) {
+            e.printStackTrace();
             processFailureReportEntity(exchange, deletedRecordList.size(), batchHeaders, requestId, e);
         }
         long endTime = System.currentTimeMillis();

@@ -145,7 +145,7 @@ public class DataDumpExportService {
             List<String> institutionCodeList = splitStringAndGetList(institutionCodes);
             dataDumpRequest.setInstitutionCodes(institutionCodeList);
         }
-        if (date != null) {
+        if (date != null && !date.equals("")) {
             dataDumpRequest.setDate(date);
         }
 

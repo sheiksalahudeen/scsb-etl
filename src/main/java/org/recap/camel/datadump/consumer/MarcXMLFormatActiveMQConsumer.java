@@ -35,6 +35,7 @@ public class MarcXMLFormatActiveMQConsumer {
             toMarcXmlString = marcXmlFormatterService.covertToMarcXmlString(records);
             processSuccessReportEntity(exchange, records, batchHeaders, requestId);
         } catch (Exception e) {
+            e.printStackTrace();
             processFailureReportEntity(exchange, records, batchHeaders, requestId, e);
         }
 
