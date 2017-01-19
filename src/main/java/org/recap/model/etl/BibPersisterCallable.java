@@ -2,7 +2,6 @@ package org.recap.model.etl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
-import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
@@ -11,6 +10,8 @@ import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.*;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -22,6 +23,7 @@ import java.util.concurrent.Callable;
  */
 public class BibPersisterCallable implements Callable {
 
+    private static final Logger logger = LoggerFactory.getLogger(BibPersisterCallable.class);
     private MarcUtil marcUtil;
     private BibRecord bibRecord;
     private XmlRecordEntity xmlRecordEntity;
@@ -46,7 +48,8 @@ public class BibPersisterCallable implements Callable {
         getDBReportUtil().setCollectionGroupMap(collectionGroupMap);
 
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
-        Map<String, Object> bibMap = processAndValidateBibliographicEntity(owningInstitutionId);
+        Date currentDate = new Date();
+        Map<String, Object> bibMap = processAndValidateBibliographicEntity(owningInstitutionId,currentDate);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
         ReportEntity bibReportEntity = (ReportEntity) bibMap.get("bibReportEntity");
         if (bibReportEntity != null) {
@@ -67,7 +70,7 @@ public class BibPersisterCallable implements Callable {
                     List<RecordType> holdingRecordTypes = holdingContentCollection.getRecord();
                     RecordType holdingsRecordType = holdingRecordTypes.get(0);
 
-                    Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, holdingEnt, holdingContentCollection);
+                    Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, holdingEnt, holdingContentCollection,currentDate);
                     HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
                     ReportEntity holdingsReportEntity = (ReportEntity) holdingsMap.get("holdingsReportEntity");
                     if (holdingsReportEntity != null) {
@@ -87,7 +90,7 @@ public class BibPersisterCallable implements Callable {
 
                         List<RecordType> itemRecordTypes = itemContentCollection.getRecord();
                         for (RecordType itemRecordType : itemRecordTypes) {
-                            Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecordType);
+                            Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecordType,currentDate);
                             ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
                             ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
                             if (itemReportEntity != null) {
@@ -116,7 +119,7 @@ public class BibPersisterCallable implements Callable {
         return map;
     }
 
-    private Map<String, Object> processAndValidateBibliographicEntity(Integer owningInstitutionId) {
+    private Map<String, Object> processAndValidateBibliographicEntity(Integer owningInstitutionId,Date currentDate) {
         Map<String, Object> map = new HashMap<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         StringBuffer errorMessage = new StringBuffer();
@@ -140,9 +143,11 @@ public class BibPersisterCallable implements Callable {
             errorMessage.append("\n");
             errorMessage.append("Owning Institution Id cannot be null");
         }
-        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedDate(currentDate);
         bibliographicEntity.setCreatedBy("etl");
-        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(currentDate);
+        bibliographicEntity.setBibHoldinglastUpdatedDate(currentDate);
+        bibliographicEntity.setBibItemlastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy("etl");
         bibliographicEntity.setCatalogingStatus(ReCAPConstants.COMPLETE_STATUS);
 
@@ -184,7 +189,7 @@ public class BibPersisterCallable implements Callable {
         return map;
     }
 
-    private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Holding holdingEnt, CollectionType holdingContentCollection) {
+    private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Holding holdingEnt, CollectionType holdingContentCollection,Date currentDate) {
         StringBuffer errorMessage = new StringBuffer();
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
@@ -201,9 +206,9 @@ public class BibPersisterCallable implements Callable {
         } else {
             errorMessage.append("Holdings Content cannot be empty");
         }
-        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedDate(currentDate);
         holdingsEntity.setCreatedBy("etl");
-        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(currentDate);
         holdingsEntity.setLastUpdatedBy("etl");
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
@@ -231,7 +236,7 @@ public class BibPersisterCallable implements Callable {
         return map;
     }
 
-    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, String holdingsCallNumberType, RecordType itemRecordType) {
+    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, String holdingsCallNumberType, RecordType itemRecordType,Date currentDate) {
         StringBuffer errorMessage = new StringBuffer();
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
@@ -274,9 +279,9 @@ public class BibPersisterCallable implements Callable {
         } else {
             itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get("Open"));
         }
-        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedDate(currentDate);
         itemEntity.setCreatedBy("etl");
-        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedDate(currentDate);
         itemEntity.setLastUpdatedBy("etl");
         itemEntity.setCatalogingStatus(ReCAPConstants.COMPLETE_STATUS);
 

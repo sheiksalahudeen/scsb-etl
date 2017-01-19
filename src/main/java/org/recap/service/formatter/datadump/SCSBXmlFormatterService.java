@@ -73,7 +73,8 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Map results = new HashMap();
         try {
             Bib bib = getBib(bibliographicEntity);
-            List<Holdings> holdings = getHoldings(bibliographicEntity.getHoldingsEntities());
+            List<Integer> itemIds = getItemIds(bibliographicEntity);
+            List<Holdings> holdings = getHoldings(bibliographicEntity.getHoldingsEntities(),itemIds);
             bibRecord = new BibRecord();
             bibRecord.setBib(bib);
             bibRecord.setHoldings(holdings);
@@ -83,6 +84,15 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
             results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
         }
         return results;
+    }
+
+    private List<Integer> getItemIds(BibliographicEntity bibliographicEntity){
+        List<Integer> itemIds = new ArrayList<>();
+        List<ItemEntity> itemEntityList = bibliographicEntity.getItemEntities();
+        for(ItemEntity itemEntity : itemEntityList){
+            itemIds.add(itemEntity.getItemId());
+        }
+        return itemIds;
     }
 
     private Bib getBib(BibliographicEntity bibliographicEntity) throws Exception{
@@ -114,7 +124,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return matchingInstitutionBibIdTypeList;
     }
 
-    private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList) throws Exception{
+    private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList,List<Integer> itemIds) throws Exception{
         List<Holdings> holdingsList = new ArrayList<>();
         if (holdingsEntityList!=null && !CollectionUtils.isEmpty(holdingsEntityList)) {
             for (HoldingsEntity holdingsEntity : holdingsEntityList) {
@@ -123,8 +133,14 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
                 holding.setOwningInstitutionHoldingsId(holdingsEntity.getOwningInstitutionHoldingsId());
                 ContentType contentType = getContentType(holdingsEntity.getContent());
                 holding.setContent(contentType);
+                List<ItemEntity> itemEntityList = new ArrayList<>();
                 if(holdingsEntity.getItemEntities()!=null && !isHoldingSingleItemPrivate(holdingsEntity.getItemEntities())) {
-                    Items items = getItems(holdingsEntity.getItemEntities());
+                    for(ItemEntity itemEntity:holdingsEntity.getItemEntities()){
+                        if(itemIds.contains(itemEntity.getItemId())) {
+                            itemEntityList.add(itemEntity);
+                        }
+                    }
+                    Items items = getItems(itemEntityList);
                     holding.setItems(Arrays.asList(items));
                     holdings.setHolding(Arrays.asList(holding));
                     holdingsList.add(holdings);

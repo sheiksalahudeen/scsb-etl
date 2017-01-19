@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Scope("prototype")
-public class IncrementalDataDumpExecutorService  extends AbstractDataDumpExecutorService{
+public class IncrementalDataDumpExecutorService extends AbstractDataDumpExecutorService {
 
     private static final Logger logger = LoggerFactory.getLogger(IncrementalDataDumpExecutorService.class);
 
@@ -24,7 +24,7 @@ public class IncrementalDataDumpExecutorService  extends AbstractDataDumpExecuto
 
     @Override
     public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
-        searchRecordsRequest.setFieldName(ReCAPConstants.BIB_LASTUPDATED_DATE);
+        searchRecordsRequest.setFieldName(ReCAPConstants.BIBITEM_LASTUPDATED_DATE);
         searchRecordsRequest.setFieldValue(getFormattedDateString(dataDumpRequest.getDate()));
     }
 }

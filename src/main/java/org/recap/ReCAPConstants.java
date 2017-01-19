@@ -151,6 +151,7 @@ public class ReCAPConstants {
     public static final String FULLDUMP_INPROGRESS_ERR_MSG = "Can't run data export now, already full data export in progress, wait until it completes.";
 
     public static final String  BIB_LASTUPDATED_DATE = "BibLastUpdatedDate";
+    public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";
     public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";
 
     public static final String COLLECTION_GROUP_SHARED = "Shared";

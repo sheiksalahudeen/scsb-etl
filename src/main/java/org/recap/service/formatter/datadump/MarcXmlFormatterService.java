@@ -81,7 +81,8 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         try {
             record = getRecordFromContent(bibliographicEntity.getContent());
             update001Field(record, bibliographicEntity);
-            record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities());
+            List<Integer> itemIds = getItemIds(bibliographicEntity);
+            record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities(),itemIds);
             results.put(ReCAPConstants.SUCCESS, record);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -89,6 +90,15 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
         }
         return results;
+    }
+
+    private List<Integer> getItemIds(BibliographicEntity bibliographicEntity){
+        List<Integer> itemIds = new ArrayList<>();
+        List<ItemEntity> itemEntityList = bibliographicEntity.getItemEntities();
+        for(ItemEntity itemEntity : itemEntityList){
+            itemIds.add(itemEntity.getItemId());
+        }
+        return itemIds;
     }
 
     private Record getRecordFromContent(byte[] content) {
@@ -110,7 +120,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         }
     }
 
-    private Record addHoldingInfo(Record record, List<HoldingsEntity> holdingsEntityList) {
+    private Record addHoldingInfo(Record record, List<HoldingsEntity> holdingsEntityList,List<Integer> itemIds) {
         Record holdingRecord = null;
         for (HoldingsEntity holdingsEntity : holdingsEntityList) {
             holdingRecord = getRecordFromContent(holdingsEntity.getContent());
@@ -130,7 +140,9 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
                 }
             }
             for(ItemEntity itemEntity : holdingsEntity.getItemEntities()){
-                record = addItemInfo(record, itemEntity,holdingsEntity);
+                if(itemIds.contains(itemEntity.getItemId())) {
+                    record = addItemInfo(record, itemEntity, holdingsEntity);
+                }
             }
         }
         return record;
