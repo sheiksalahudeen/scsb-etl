@@ -35,6 +35,14 @@ public class BibliographicEntity implements Serializable {
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "BIBHOLDING_LAST_UPDATED_DATE")
+    private Date bibHoldinglastUpdatedDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "BIBITEM_LAST_UPDATED_DATE")
+    private Date bibItemlastUpdatedDate;
+
     @Column(name = "LAST_UPDATED_BY")
     private String lastUpdatedBy;
 
@@ -107,6 +115,22 @@ public class BibliographicEntity implements Serializable {
 
     public Date getLastUpdatedDate() {
         return lastUpdatedDate;
+    }
+
+    public Date getBibHoldinglastUpdatedDate() {
+        return bibHoldinglastUpdatedDate;
+    }
+
+    public void setBibHoldinglastUpdatedDate(Date bibHoldinglastUpdatedDate) {
+        this.bibHoldinglastUpdatedDate = bibHoldinglastUpdatedDate;
+    }
+
+    public Date getBibItemlastUpdatedDate() {
+        return bibItemlastUpdatedDate;
+    }
+
+    public void setBibItemlastUpdatedDate(Date bibItemlastUpdatedDate) {
+        this.bibItemlastUpdatedDate = bibItemlastUpdatedDate;
     }
 
     public void setLastUpdatedDate(Date lastUpdatedDate) {
