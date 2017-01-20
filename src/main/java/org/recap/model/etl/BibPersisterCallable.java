@@ -146,8 +146,6 @@ public class BibPersisterCallable implements Callable {
         bibliographicEntity.setCreatedDate(currentDate);
         bibliographicEntity.setCreatedBy("etl");
         bibliographicEntity.setLastUpdatedDate(currentDate);
-        bibliographicEntity.setBibHoldinglastUpdatedDate(currentDate);
-        bibliographicEntity.setBibItemlastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy("etl");
         bibliographicEntity.setCatalogingStatus(ReCAPConstants.COMPLETE_STATUS);
 
