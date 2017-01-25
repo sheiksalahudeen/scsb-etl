@@ -81,6 +81,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         try {
             record = getRecordFromContent(bibliographicEntity.getContent());
             update001Field(record, bibliographicEntity);
+            add009Field(record, bibliographicEntity);
             List<Integer> itemIds = getItemIds(bibliographicEntity);
             record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities(),itemIds);
             results.put(ReCAPConstants.SUCCESS, record);
@@ -120,6 +121,12 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         }
     }
 
+    private void add009Field(Record record, BibliographicEntity bibliographicEntity){
+        ControlField controlField = getFactory().newControlField("009");
+        controlField.setData(bibliographicEntity.getOwningInstitutionBibId());
+        record.addVariableField(controlField);
+    }
+
     private Record addHoldingInfo(Record record, List<HoldingsEntity> holdingsEntityList,List<Integer> itemIds) {
         Record holdingRecord = null;
         for (HoldingsEntity holdingsEntity : holdingsEntityList) {
@@ -127,6 +134,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             for (DataField dataField : holdingRecord.getDataFields()) {
                 if (dataField.getTag().equals("852")) {
                     add0SubField(dataField, holdingsEntity);
+                    add852Subfield1(dataField, holdingsEntity);
                     update852bField(dataField, holdingsEntity);
                     record.addVariableField(dataField);
                 }
@@ -152,6 +160,10 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
     }
 
+    private void add852Subfield1(DataField dataField, HoldingsEntity holdingEntity){
+        dataField.addSubfield(getFactory().newSubfield('1', holdingEntity.getOwningInstitutionHoldingsId()));
+    }
+
     private void update852bField(DataField dataField, HoldingsEntity holdingEntity){
         if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
             dataField.getSubfield('b').setData(holdingPUL);
@@ -165,6 +177,8 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     private Record addItemInfo(Record record, ItemEntity itemEntity,HoldingsEntity holdingsEntity) {
         DataField dataField = getFactory().newDataField("876", ' ', ' ');
         dataField.addSubfield(getFactory().newSubfield('0', String.valueOf(holdingsEntity.getHoldingsId())));
+        dataField.addSubfield(getFactory().newSubfield('1', holdingsEntity.getOwningInstitutionHoldingsId()));
+        dataField.addSubfield(getFactory().newSubfield('2', itemEntity.getOwningInstitutionItemId()));
         dataField.addSubfield(getFactory().newSubfield('a', String.valueOf(itemEntity.getItemId())));
         dataField.addSubfield(getFactory().newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
         dataField.addSubfield(getFactory().newSubfield('j', itemEntity.getItemStatusEntity().getStatusCode()));
