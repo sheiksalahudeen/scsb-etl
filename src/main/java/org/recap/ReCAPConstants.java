@@ -194,4 +194,7 @@ public class ReCAPConstants {
     public static final String DATADUMP_FAILURE_REPORT_ROUTE_ID = "dataExportFailureReportRouteId";
 
     public static final String COMPLETE_STATUS = "Complete";
+
+    public static final String BIB_ID = "BibId";
+
 }

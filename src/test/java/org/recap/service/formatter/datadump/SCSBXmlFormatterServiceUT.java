@@ -20,12 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by premkb on 23/8/16.
@@ -66,9 +65,11 @@ public class SCSBXmlFormatterServiceUT extends BaseTestCase {
     @Autowired
     DBReportUtil dbReportUtil;
 
-
     @Autowired
     SCSBXmlFormatterService scsbXmlFormatterService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Before
     public void setUp() {
@@ -164,12 +165,43 @@ public class SCSBXmlFormatterServiceUT extends BaseTestCase {
     @Test
     public void verifySCSBXmlGeneration() throws Exception {
         BibliographicEntity bibliographicEntity = getBibliographicEntity();
-
+        generateMatchinInfo();
         Map<String, Object> resultMap = scsbXmlFormatterService.prepareBibRecords(Arrays.asList(bibliographicEntity));
         List<BibRecord> bibRecords = (List<BibRecord>)resultMap.get(ReCAPConstants.SUCCESS);
         String formattedOutput = scsbXmlFormatterService.getSCSBXmlForBibRecords(bibRecords);
 
         System.out.println(xmlFormatter.prettyPrint(formattedOutput));
+    }
+
+    private void generateMatchinInfo(){
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setRecordNumber(15);
+        reportEntity.setFileName("OCLC,ISBN");
+        reportEntity.setType("MultiMatch");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setInstitutionName("ALL");
+        List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
+        ReportDataEntity reportDataEntity = new ReportDataEntity();
+        reportDataEntity.setReportDataId(400);
+        reportDataEntity.setHeaderName("BibId");
+        reportDataEntity.setHeaderValue("11,100,12,1,2,3,4,5,6");
+        reportDataEntity.setRecordNum("50");
+        reportDataEntityList.add(reportDataEntity);
+        ReportDataEntity reportDataEntity1 = new ReportDataEntity();
+        reportDataEntity1.setReportDataId(401);
+        reportDataEntity1.setHeaderName("OwningInstitution");
+        reportDataEntity1.setHeaderValue("PUL,NYPL,CUL,CUL,CUL,PUL,PUL,NYPL,NYPL");
+        reportDataEntity1.setRecordNum("50");
+        reportDataEntityList.add(reportDataEntity1);
+        ReportDataEntity reportDataEntity2 = new ReportDataEntity();
+        reportDataEntity2.setReportDataId(402);
+        reportDataEntity2.setHeaderName("OwningInstitutionBibId");
+        reportDataEntity2.setHeaderValue("3214,20,17980,200,201,202,203,204,205");
+        reportDataEntity2.setRecordNum("50");
+        reportDataEntityList.add(reportDataEntity2);
+        reportEntity.setReportDataEntities(reportDataEntityList);
+        ReportEntity savedReportEntity = reportDetailRepository.saveAndFlush(reportEntity);
+        entityManager.refresh(savedReportEntity);
     }
 
     private BibliographicEntity getBibliographicEntity() throws URISyntaxException, IOException {
@@ -180,7 +212,7 @@ public class SCSBXmlFormatterServiceUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionBibId("1");
+        bibliographicEntity.setOwningInstitutionBibId("20");
         bibliographicEntity.setOwningInstitutionId(3);
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionId(1);
