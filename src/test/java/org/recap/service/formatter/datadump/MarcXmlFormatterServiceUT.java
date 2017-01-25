@@ -302,7 +302,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionId(3);
-        holdingsEntity.setOwningInstitutionHoldingsId("54323");
+        holdingsEntity.setOwningInstitutionHoldingsId(".h54323");
         holdingsEntity.setInstitutionEntity(institutionEntity);
 
         ItemEntity itemEntity = new ItemEntity();
