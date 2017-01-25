@@ -3,9 +3,10 @@ package org.recap.service.formatter.datadump;
 import org.recap.ReCAPConstants;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.*;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.*;
+import org.recap.repository.MatchingInstitutionBibRepository;
+import org.recap.repository.ReportDataRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +24,13 @@ import java.util.*;
 public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(SCSBXmlFormatterService.class);
+
+    @Autowired
+    private MatchingInstitutionBibRepository matchingInstitutionBibIdRepository;
+
+    @Autowired
+    private ReportDataRepository reportDataRepository;
+
     @Override
     public boolean isInterested(String formatType) {
         return formatType.equals(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB) ? true:false;
@@ -50,10 +58,14 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Map resultsMap = new HashMap();
         List<BibRecord> records = new ArrayList<>();
         List<String> errors = new ArrayList<>();
-
+        List<String> bibIdList = getBibIdList(bibliographicEntities);
+        List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList = matchingInstitutionBibIdRepository.findByBibIdList(bibIdList);
+        Map<String,String> bibIdRownumMap = getBibIdRowNumMap(matchingInstitutionBibIdViewEntityList);
+        List<ReportDataEntity> reportDataEntityList = getReportDataEntitieList(matchingInstitutionBibIdViewEntityList);
+        Map<String,List<ReportDataEntity>> reportDataEntityMap = getRownumReportDataEntityMap(reportDataEntityList);
         for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
-            Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity);
+            Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity,reportDataEntityMap.get(bibIdRownumMap.get(String.valueOf(bibliographicEntity.getBibliographicId()))));
             BibRecord bibRecord = (BibRecord) stringObjectMap.get(ReCAPConstants.SUCCESS);
             if (null != bibRecord) {
                 records.add(bibRecord);
@@ -68,11 +80,63 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return resultsMap;
     }
 
-    private Map<String, Object> prepareBibRecord(BibliographicEntity bibliographicEntity) {
+    private List<ReportDataEntity> getReportDataEntitieList(List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList) {
+        List<String> recordNumList = getRecordNumList(matchingInstitutionBibIdViewEntityList);
+        List<String> headerNameList = getHeaderNameList();
+        return reportDataRepository.getReportDataForMatchingInstitutionBib(recordNumList,headerNameList);
+    }
+
+    private List<String> getHeaderNameList() {
+        List<String> headerNameList = new ArrayList<>();
+        headerNameList.add(ReCAPConstants.BIB_ID);
+        headerNameList.add(ReCAPConstants.OWNING_INSTITUTION);
+        headerNameList.add(ReCAPConstants.OWNING_INSTITUTION_BIB_ID);
+        return headerNameList;
+    }
+
+    private List<String> getBibIdList(List<BibliographicEntity> bibliographicEntityList){
+        List<String> bibIdList = new ArrayList<>();
+        for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
+            bibIdList.add(String.valueOf(bibliographicEntity.getBibliographicId()));
+        }
+        return bibIdList;
+    }
+
+    private List<String> getRecordNumList(List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList){
+        List<String> recordNumList = new ArrayList<>();
+        for(MatchingInstitutionBibViewEntity matchingInstitutionBibIdViewEntity:matchingInstitutionBibIdViewEntityList){
+            recordNumList.add(matchingInstitutionBibIdViewEntity.getId());
+        }
+        return recordNumList;
+    }
+
+    private Map<String,String> getBibIdRowNumMap(List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList){
+        Map<String,String> bibIdRownumMap = new HashMap<>();
+        for(MatchingInstitutionBibViewEntity matchingInstitutionBibIdViewEntity: matchingInstitutionBibIdViewEntityList){
+            bibIdRownumMap.put(matchingInstitutionBibIdViewEntity.getBibId(),matchingInstitutionBibIdViewEntity.getId());
+        }
+        return bibIdRownumMap;
+    }
+
+    private  Map<String,List<ReportDataEntity>> getRownumReportDataEntityMap(List<ReportDataEntity> reportDataEntityList){
+        Map<String,List<ReportDataEntity>> reportDataEntityMap = new HashMap<>();
+        for(ReportDataEntity reportDataEntity:reportDataEntityList){
+            if(reportDataEntityMap.containsKey(reportDataEntity.getRecordNum())){
+                reportDataEntityMap.get(reportDataEntity.getRecordNum()).add(reportDataEntity);
+            }else{
+                List<ReportDataEntity> reportDataEntityListForRowNum = new ArrayList<>();
+                reportDataEntityListForRowNum.add(reportDataEntity);
+                reportDataEntityMap.put(reportDataEntity.getRecordNum(),reportDataEntityListForRowNum);
+            }
+        }
+        return reportDataEntityMap;
+    }
+
+    private Map<String, Object> prepareBibRecord(BibliographicEntity bibliographicEntity,List<ReportDataEntity> reportDataEntityList) {
         BibRecord bibRecord = null;
         Map results = new HashMap();
         try {
-            Bib bib = getBib(bibliographicEntity);
+            Bib bib = getBib(bibliographicEntity,reportDataEntityList);
             List<Integer> itemIds = getItemIds(bibliographicEntity);
             List<Holdings> holdings = getHoldings(bibliographicEntity.getHoldingsEntities(),itemIds);
             bibRecord = new BibRecord();
@@ -95,11 +159,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return itemIds;
     }
 
-    private Bib getBib(BibliographicEntity bibliographicEntity) throws Exception{
+    private Bib getBib(BibliographicEntity bibliographicEntity,List<ReportDataEntity> reportDataEntityList) throws Exception{
         Bib bib = new Bib();
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         bib.setOwningInstitutionId(bibliographicEntity.getInstitutionEntity().getInstitutionCode());
-        bib.setMatchingInstitutionBibId(getMatchingInstitutionBibId());
+        bib.setMatchingInstitutionBibId(getMatchingInstitutionBibId(bibliographicEntity.getBibliographicId(),reportDataEntityList));
         ContentType contentType = getContentType(bibliographicEntity.getContent());
         List<RecordType> record = contentType.getCollection().getRecord();
         RecordType recordType = record.get(0);
@@ -110,17 +174,30 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return bib;
     }
 
-    //TODO need to get the matching inst bibid from report table
-    private List<MatchingInstitutionBibIdType> getMatchingInstitutionBibId(){
+    private List<MatchingInstitutionBibIdType> getMatchingInstitutionBibId(Integer bibId,List<ReportDataEntity> reportDataEntityList){
         List<MatchingInstitutionBibIdType> matchingInstitutionBibIdTypeList = new ArrayList<>();
-        MatchingInstitutionBibIdType matchingInstitutionBibIdType = new MatchingInstitutionBibIdType();
-        matchingInstitutionBibIdType.setSource("CUL");
-        matchingInstitutionBibIdType.setValue("3245");
-        MatchingInstitutionBibIdType matchingInstitutionBibIdType1 = new MatchingInstitutionBibIdType();
-        matchingInstitutionBibIdType1.setSource("PUL");
-        matchingInstitutionBibIdType1.setValue("8978");
-        matchingInstitutionBibIdTypeList.add(matchingInstitutionBibIdType);
-        matchingInstitutionBibIdTypeList.add(matchingInstitutionBibIdType1);
+        String[] bibidArray = null;
+        String[] institutionArray = null;
+        String[] owningInstitutionBibIdArray = null;
+        if (reportDataEntityList != null) {
+            for(ReportDataEntity reportDataEntity:reportDataEntityList){
+                if(reportDataEntity.getHeaderName().equals(ReCAPConstants.BIB_ID)){
+                    bibidArray = reportDataEntity.getHeaderValue().split(",");
+                }else if(reportDataEntity.getHeaderName().equals(ReCAPConstants.OWNING_INSTITUTION)){
+                    institutionArray = reportDataEntity.getHeaderValue().split(",");
+                }else if(reportDataEntity.getHeaderName().equals(ReCAPConstants.OWNING_INSTITUTION_BIB_ID)){
+                    owningInstitutionBibIdArray = reportDataEntity.getHeaderValue().split(",");
+                }
+            }
+            for(int count=0;count<bibidArray.length;count++){
+                if(!bibidArray[count].equals(String.valueOf(bibId))){
+                    MatchingInstitutionBibIdType matchingInstitutionBibIdType = new MatchingInstitutionBibIdType();
+                    matchingInstitutionBibIdType.setSource(institutionArray[count]);
+                    matchingInstitutionBibIdType.setValue(owningInstitutionBibIdArray[count]);
+                    matchingInstitutionBibIdTypeList.add(matchingInstitutionBibIdType);
+                }
+            }
+        }
         return matchingInstitutionBibIdTypeList;
     }
 
