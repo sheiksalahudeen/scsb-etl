@@ -59,13 +59,23 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         List<BibRecord> records = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         List<String> bibIdList = getBibIdList(bibliographicEntities);
-        List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList = matchingInstitutionBibIdRepository.findByBibIdList(bibIdList);
-        Map<String,String> bibIdRownumMap = getBibIdRowNumMap(matchingInstitutionBibIdViewEntityList);
-        List<ReportDataEntity> reportDataEntityList = getReportDataEntitieList(matchingInstitutionBibIdViewEntityList);
-        Map<String,List<ReportDataEntity>> reportDataEntityMap = getRownumReportDataEntityMap(reportDataEntityList);
+        Map<String,String> bibIdRecordNumMap = null;
+        List<ReportDataEntity> reportDataEntityList = null;
+        Map<String,List<ReportDataEntity>> reportDataEntityMap = null;
+        List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList = matchingInstitutionBibIdRepository.findByBibIdList(bibIdList);//get matching bibid from view
+        if (matchingInstitutionBibIdViewEntityList != null && matchingInstitutionBibIdViewEntityList.size() > 0) {
+            bibIdRecordNumMap = getBibIdRowNumMap(matchingInstitutionBibIdViewEntityList);// put bib id and record num from report table in a map
+            reportDataEntityList = getReportDataEntitieList(matchingInstitutionBibIdViewEntityList);//get report data entities based on record num
+            reportDataEntityMap = getRecordNumReportDataEntityMap(reportDataEntityList);//put record num and report data entities in a map
+        }
         for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
-            Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity,reportDataEntityMap.get(bibIdRownumMap.get(String.valueOf(bibliographicEntity.getBibliographicId()))));
+            List<ReportDataEntity> reportDataEntityListForSingleBib = null;
+            if(bibIdRecordNumMap!=null){
+                String rowNum = bibIdRecordNumMap.get(String.valueOf(bibliographicEntity.getBibliographicId()));
+                reportDataEntityListForSingleBib = reportDataEntityMap.get(rowNum);
+            }
+            Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity,reportDataEntityListForSingleBib);
             BibRecord bibRecord = (BibRecord) stringObjectMap.get(ReCAPConstants.SUCCESS);
             if (null != bibRecord) {
                 records.add(bibRecord);
@@ -95,6 +105,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private List<String> getBibIdList(List<BibliographicEntity> bibliographicEntityList){
+        logger.info("bibliographicEntityList.size-->"+bibliographicEntityList.size());
         List<String> bibIdList = new ArrayList<>();
         for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
             bibIdList.add(String.valueOf(bibliographicEntity.getBibliographicId()));
@@ -118,7 +129,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return bibIdRownumMap;
     }
 
-    private  Map<String,List<ReportDataEntity>> getRownumReportDataEntityMap(List<ReportDataEntity> reportDataEntityList){
+    private  Map<String,List<ReportDataEntity>> getRecordNumReportDataEntityMap(List<ReportDataEntity> reportDataEntityList){
         Map<String,List<ReportDataEntity>> reportDataEntityMap = new HashMap<>();
         for(ReportDataEntity reportDataEntity:reportDataEntityList){
             if(reportDataEntityMap.containsKey(reportDataEntity.getRecordNum())){
@@ -163,7 +174,9 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Bib bib = new Bib();
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         bib.setOwningInstitutionId(bibliographicEntity.getInstitutionEntity().getInstitutionCode());
-        bib.setMatchingInstitutionBibId(getMatchingInstitutionBibId(bibliographicEntity.getBibliographicId(),reportDataEntityList));
+        if(reportDataEntityList!=null){
+            bib.setMatchingInstitutionBibId(getMatchingInstitutionBibId(bibliographicEntity.getBibliographicId(),reportDataEntityList));
+        }
         ContentType contentType = getContentType(bibliographicEntity.getContent());
         List<RecordType> record = contentType.getCollection().getRecord();
         RecordType recordType = record.get(0);
