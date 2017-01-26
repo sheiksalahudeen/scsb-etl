@@ -64,6 +64,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Map<String,List<ReportDataEntity>> reportDataEntityMap = null;
         List<MatchingInstitutionBibViewEntity> matchingInstitutionBibIdViewEntityList = matchingInstitutionBibIdRepository.findByBibIdList(bibIdList);//get matching bibid from view
         if (matchingInstitutionBibIdViewEntityList != null && matchingInstitutionBibIdViewEntityList.size() > 0) {
+            logger.info("matchingInstitutionBibIdViewEntityList size---->"+matchingInstitutionBibIdViewEntityList.size());
             bibIdRecordNumMap = getBibIdRowNumMap(matchingInstitutionBibIdViewEntityList);// put bib id and record num from report table in a map
             reportDataEntityList = getReportDataEntitieList(matchingInstitutionBibIdViewEntityList);//get report data entities based on record num
             reportDataEntityMap = getRecordNumReportDataEntityMap(reportDataEntityList);//put record num and report data entities in a map
@@ -105,7 +106,6 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private List<String> getBibIdList(List<BibliographicEntity> bibliographicEntityList){
-        logger.info("bibliographicEntityList.size-->"+bibliographicEntityList.size());
         List<String> bibIdList = new ArrayList<>();
         for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
             bibIdList.add(String.valueOf(bibliographicEntity.getBibliographicId()));
