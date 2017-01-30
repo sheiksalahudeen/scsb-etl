@@ -65,22 +65,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         List<String> errors = new ArrayList<>();
         List<String> bibIdList = getBibIdList(bibliographicEntities);
         Map<String,Integer> bibIdRecordNumMap = null;
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         List<Integer> recordNumList = matchingBibInfoDetailRepository.getRecordNum(bibIdList);
-        stopWatch.stop();
-        logger.info("recordNumList size--->"+recordNumList.size());
-        logger.info("Time taken to fetch record num---->"+stopWatch.getTotalTimeSeconds());
         Map<Integer,List<MatchingBibInfoDetail>> recordNumMatchingBibInfoDetailMap = null;
         if (recordNumList != null && recordNumList.size()>0) {
-            StopWatch stopWatch1 = new StopWatch();
-            stopWatch1.start();
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = matchingBibInfoDetailRepository.findByRecordNum(recordNumList);
-            stopWatch1.stop();
-            logger.info("Time taken to fetch MatchingBibInfoDetail---->"+stopWatch1.getTotalTimeSeconds());
             recordNumMatchingBibInfoDetailMap = null;
             if(recordNumList != null && recordNumList.size() > 0){
-                logger.info("recordNumList size --->"+recordNumList.size());
                 bibIdRecordNumMap = getBibIdRowNumMap(matchingBibInfoDetailList);// put bib id and record num from report table in a map
                 recordNumMatchingBibInfoDetailMap = getRecordNumReportDataEntityMap(matchingBibInfoDetailList);
             }
