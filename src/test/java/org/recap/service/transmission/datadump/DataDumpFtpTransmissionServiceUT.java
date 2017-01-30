@@ -2,6 +2,7 @@ package org.recap.service.transmission.datadump;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by premkb on 2/10/16.
  */
+@Ignore
 public class DataDumpFtpTransmissionServiceUT extends BaseTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpFtpTransmissionServiceUT.class);

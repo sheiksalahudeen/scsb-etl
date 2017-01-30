@@ -1,6 +1,7 @@
 package org.recap.camel.datadump;
 
 import org.apache.camel.ProducerTemplate;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by premkb on 31/10/16.
  */
+@Ignore
 public class ActiveMQRouteBuilderUT extends BaseTestCase{
 
     @Autowired
@@ -46,7 +48,7 @@ public class ActiveMQRouteBuilderUT extends BaseTestCase{
         assertTrue(fileExists);
         file.delete();
     }
-    private String getDateTimeString(){
+    public String getDateTimeString(){
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);

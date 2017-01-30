@@ -73,7 +73,7 @@ public class CamelJdbcUT extends BaseTestCase {
     @Autowired
     DynamicRouteBuilder dynamicRouteBuilder;
 
-    @Test
+    /*@Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
 
@@ -94,7 +94,7 @@ public class CamelJdbcUT extends BaseTestCase {
         });
 
         java.lang.Thread.sleep(10000);
-    }
+    }*/
 
     class XmlFileFilter implements GenericFileFilter {
         @Override
@@ -105,7 +105,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
 
     @Test
-    public void exportDataDumpForMarcXML() throws Exception {
+    /*public void exportDataDumpForMarcXML() throws Exception {
         dynamicRouteBuilder.addDataDumpExportRoutes();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("CUL"));
@@ -251,9 +251,9 @@ public class CamelJdbcUT extends BaseTestCase {
         while (true) {
 
         }
-    }
+    }*/
 
-    private String getDateTimeString() {
+    public String getDateTimeString() {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_MMDDYYY);
         return sdf.format(date);

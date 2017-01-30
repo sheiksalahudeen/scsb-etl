@@ -98,7 +98,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("collectionGroupIds","1,2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 
@@ -115,7 +115,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("collectionGroupIds","1,2"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 
@@ -130,7 +130,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("date","2016-11-23 04:21"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 
@@ -144,7 +144,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .param("emailToAddress","peri.subrahmanya@htcinc.com"))
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
+        assertEquals(ReCAPConstants.DATADUMP_NO_RECORD,mvcResult.getResponse().getContentAsString());
         assertTrue(status == 200);
     }
 
@@ -159,7 +159,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
         assertEquals("1. "+ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 400);
+        assertTrue(status == 200);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
         assertEquals("1. "+ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 400);
+        assertTrue(status == 200);
     }
 
     @Test
@@ -184,6 +184,8 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(10);
+        searchRecordsRequest.setTotalPageCount(1);
+        searchRecordsRequest.setTotalRecordsCount("1");
         RestTemplate restTemplate = new RestTemplate();
         String url = solrClientUrl + "searchService/searchRecords";
         HttpHeaders headers = new HttpHeaders();
@@ -193,7 +195,7 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         assertTrue(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK"));
         Map responseEntityBody = responseEntity.getBody();
         Integer totalPageCount = (Integer) responseEntityBody.get("totalPageCount");
-        String totalBibsCount = (String) responseEntityBody.get("totalBibsCount");
+        String totalBibsCount = (String) responseEntityBody.get("totalRecordsCount");
         List dataDumpSearchResults = (List) responseEntityBody.get("dataDumpSearchResults");
         assertNotNull(totalPageCount);
         assertNotNull(totalBibsCount);

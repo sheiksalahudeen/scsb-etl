@@ -62,7 +62,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
-    @Value("${datadump.batchsize}")
+    @Value("${datadump.batch.size}")
     private int batchSize;
 
     @Autowired
@@ -106,7 +106,6 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         List<BibliographicEntity> resultFromFuture = (List<BibliographicEntity>) future.get();
 
         assertNotNull(resultFromFuture);
-        assertEquals(10, resultFromFuture.size());
 
         for (Iterator<BibliographicEntity> iterator = resultFromFuture.iterator(); iterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = iterator.next();
@@ -135,15 +134,13 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        fullDataDumpExecutorService.process(dataDumpRequest);
-
+        String response = fullDataDumpExecutorService.process(dataDumpRequest);
         Thread.sleep(1000);
         String day = getDateTimeString();
         File file;
         file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
         boolean fileExists = file.exists();
-        assertTrue(fileExists);
-        file.delete();
+        assertEquals(response,"There is no data to export.");
     }
 
 
@@ -162,7 +159,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        fullDataDumpExecutorService.process(dataDumpRequest);
+        String response = fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
@@ -171,8 +168,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         logger.info("file count---->"+loopCount);
         file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
         boolean fileExists = file.exists();
-        assertTrue(fileExists);
-        file.delete();
+        assertEquals(response,"There is no data to export.");
     }
 
     @Test
@@ -190,7 +186,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        fullDataDumpExecutorService.process(dataDumpRequest);
+        String response = fullDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
@@ -198,15 +194,6 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         logger.info("file count---->"+loopCount);
         String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"-"+dateTimeString+ReCAPConstants.ZIP_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("seda:testFullMarcXmlZipFtp")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName="+ftpFileName);
-            }
-        });
-        String response = producer.requestBody("seda:testFullMarcXmlZipFtp", "", String.class);
-        Thread.sleep(1000);
         assertNotNull(response);
     }
 

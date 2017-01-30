@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by peris on 10/26/16.
  */
-public class DataDumpSolrServiceTest extends BaseTestCase {
+public class DataDumpSolrServiceUT extends BaseTestCase {
 
     @Autowired
     DataDumpSolrService dataDumpSolrService;
@@ -26,12 +26,14 @@ public class DataDumpSolrServiceTest extends BaseTestCase {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
+        searchRecordsRequest.setTotalRecordsCount("1");
+        searchRecordsRequest.setTotalPageCount(1);
         searchRecordsRequest.setPageSize(10);
 
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         Integer totalPageCount = (Integer) results.get("totalPageCount");
-        String totalBibsCount = (String) results.get("totalBibsCount");
+        String totalBibsCount = (String) results.get("totalRecordsCount");
         List dataDumpSearchResults = (List) results.get("dataDumpSearchResults");
         assertNotNull(totalPageCount);
         assertNotNull(totalBibsCount);
@@ -46,12 +48,14 @@ public class DataDumpSolrServiceTest extends BaseTestCase {
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setFieldName("BibLastUpdatedDate");
+        searchRecordsRequest.setTotalRecordsCount("1");
+        searchRecordsRequest.setTotalPageCount(1);
         searchRecordsRequest.setFieldValue(getFormattedString("2016-10-21 10:30"));
         searchRecordsRequest.setPageSize(10);
         Map results = dataDumpSolrService.getResults(searchRecordsRequest);
 
         Integer totalPageCount = (Integer) results.get("totalPageCount");
-        String totalBibsCount = (String) results.get("totalBibsCount");
+        String totalBibsCount = (String) results.get("totalRecordsCount");
         List dataDumpSearchResults = (List) results.get("dataDumpSearchResults");
         assertNotNull(totalPageCount);
         assertNotNull(totalBibsCount);

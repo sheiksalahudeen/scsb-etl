@@ -50,7 +50,7 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
-    @Value("${datadump.batchsize}")
+    @Value("${datadump.batch.size}")
     private int batchSize;
 
     @Autowired
@@ -107,7 +107,7 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        incrementalDataDumpExecutorService.process(dataDumpRequest);
+        String response = incrementalDataDumpExecutorService.process(dataDumpRequest);
         Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
         int loopCount = getLoopCount(totalRecordCount,batchSize);
         Thread.sleep(1000);
@@ -115,15 +115,6 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         logger.info("file count---->"+loopCount);
         String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.XML_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("seda:testIncrementalMarcXmlZipFtp")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName="+ftpFileName);
-            }
-        });
-        String response = producer.requestBody("seda:testIncrementalMarcXmlZipFtp", "", String.class);
-        Thread.sleep(1000);
         assertNotNull(response);
     }
 

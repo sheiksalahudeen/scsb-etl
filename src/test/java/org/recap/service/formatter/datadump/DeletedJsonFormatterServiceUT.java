@@ -34,7 +34,7 @@ public class DeletedJsonFormatterServiceUT extends BaseTestCase{
         Map<String,Object> successAndFailureFormattedList = deletedJsonFormatterService.prepareDeletedRecords(getBibliographicEntityList());
         List<DeletedRecord> deletedRecordList = (List<DeletedRecord>)successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
         String outputString = (String) deletedJsonFormatterService.getJsonForDeletedRecords(deletedRecordList);
-        assertEquals("[{\"bibId\":\"100\",\"itemIds\":[\"3456\",\"1234\"]}]",outputString);
+        assertEquals("[{\"bibId\":\"100\",\"itemBarcodes\":[\"3456\",\"1234\"]}]",outputString);
     }
 
     private List<BibliographicEntity> getBibliographicEntityList() throws URISyntaxException, IOException {
