@@ -3,15 +3,16 @@ package org.recap.service.formatter.datadump;
 import org.recap.ReCAPConstants;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.*;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.MatchingBibInfoDetail;
 import org.recap.repository.MatchingBibInfoDetailRepository;
-import org.recap.repository.MatchingInstitutionBibRepository;
 import org.recap.repository.ReportDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StopWatch;
 
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -26,9 +27,6 @@ import java.util.*;
 public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(SCSBXmlFormatterService.class);
-
-    @Autowired
-    private MatchingInstitutionBibRepository matchingInstitutionBibIdRepository;
 
     @Autowired
     private ReportDataRepository reportDataRepository;
