@@ -95,12 +95,12 @@ public class EtlDataLoadProcessor {
         long newItemsCount = itemDetailsRepository.countByOwningInstitutionId(instIdByFileName);
         long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldingsByInstId(instIdByFileName);
         long newBibItemsCount = itemDetailsRepository.findCountOfBibliographicItemsByInstId(instIdByFileName);
-        Integer processedBibsCount = (int) newBibsCount - (int)oldBibsCount;
-        Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
-        Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
-        Integer processedBibHoldingsCount = Integer.valueOf(new Long(newBibHoldingsCount).toString()) - Integer.valueOf(new Long(oldBibHoldingsCount).toString());
-        Integer processedBibItemsCount = Integer.valueOf(new Long(newBibItemsCount).toString()) - Integer.valueOf(new Long(oldBibItemsCount).toString());
-        Integer totalRecordsInfile = Integer.valueOf(new Long(xmlRecordRepository.countByXmlFileName(fileName)).toString());
+        Integer processedBibsCount = Integer.valueOf(Long.toString(newBibsCount)) - Integer.valueOf(Long.toString(oldBibsCount));
+        Integer processedHoldingsCount = Integer.valueOf(Long.toString(newHoldingsCount)) - Integer.valueOf(Long.toString(oldHoldingsCount));
+        Integer processedItemsCount = Integer.valueOf(Long.toString(newItemsCount)) - Integer.valueOf(Long.toString(oldItemsCount));
+        Integer processedBibHoldingsCount = Integer.valueOf(Long.toString(newBibHoldingsCount)) - Integer.valueOf(Long.toString(oldBibHoldingsCount));
+        Integer processedBibItemsCount = Integer.valueOf(Long.toString(newBibItemsCount)) - Integer.valueOf(Long.toString(oldBibItemsCount));
+        Integer totalRecordsInfile = Integer.valueOf(Long.toString(xmlRecordRepository.countByXmlFileName(fileName)));
 
         ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
         totalRecordsInFileEntity.setHeaderName(ReCAPConstants.TOTAL_RECORDS_IN_FILE);
