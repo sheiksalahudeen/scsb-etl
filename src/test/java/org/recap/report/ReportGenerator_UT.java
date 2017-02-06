@@ -1,7 +1,11 @@
 package org.recap.report;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.jpa.ReportDataEntity;
@@ -11,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -34,6 +35,14 @@ public class ReportGenerator_UT extends BaseTestCase {
 
     @Autowired
     ReportGenerator reportGenerator;
+
+    @Mock
+    ReportDetailRepository mockReportDetailsRepository;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
 
 
     @Test
@@ -67,6 +76,70 @@ public class ReportGenerator_UT extends BaseTestCase {
         boolean directoryContains = new File(directory, generatedReportFileName).exists();
         assertTrue(directoryContains);
     }
+
+    @Test
+    public void generateDataDumpFileSystemSuccessReportTest() throws Exception {
+
+        ReportEntity savedReportEntity1 = saveDataDumpSuccessReport();
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.SUCCESS, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM,savedReportEntity1.getFileName());
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
+    @Test
+    public void generateDataDumpFtpSuccessReportTest() throws Exception {
+
+        ReportEntity savedReportEntity1 = saveDataDumpSuccessReport();
+
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.SUCCESS, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FTP,savedReportEntity1.getFileName());
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
+    @Test
+    public void generateDataDumpFileSystemFailureReportTest() throws Exception {
+
+        ReportEntity savedReportEntity1 = saveDataDumpFailureReport();
+
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.FAILURE, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM,savedReportEntity1.getFileName());
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
+    @Test
+    public void generateDataDumpFtpFailureReportTest() throws Exception {
+
+        ReportEntity savedReportEntity1 = saveDataDumpFailureReport();
+
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.FAILURE, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FTP,savedReportEntity1.getFileName());
+
+        assertNotNull(generatedReportFileName);
+
+        File directory = new File(reportDirectory);
+        assertTrue(directory.isDirectory());
+
+        boolean directoryContains = new File(directory, generatedReportFileName).exists();
+        assertTrue(directoryContains);
+    }
+
 
     @Test
     public void generateFailureReportForTwoEntity() throws Exception {
@@ -202,6 +275,147 @@ public class ReportGenerator_UT extends BaseTestCase {
         return savedReportEntity;
     }
 
+
+    private ReportEntity saveDataDumpSuccessReport(){
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+
+        ReportDataEntity numberOfBibExportReportEntity = new ReportDataEntity();
+        numberOfBibExportReportEntity.setHeaderName("NoOfBibsExported");
+        numberOfBibExportReportEntity.setHeaderValue("1");
+        reportDataEntities.add(numberOfBibExportReportEntity);
+
+        ReportDataEntity requestingInstitutionReportDataEntity = new ReportDataEntity();
+        requestingInstitutionReportDataEntity.setHeaderName("RequestingInstitution");
+        requestingInstitutionReportDataEntity.setHeaderValue("CUL");
+        reportDataEntities.add(requestingInstitutionReportDataEntity);
+
+        ReportDataEntity institutionReportDataEntity = new ReportDataEntity();
+        institutionReportDataEntity.setHeaderName("InstitutionCodes");
+        institutionReportDataEntity.setHeaderValue("PUL");
+        reportDataEntities.add(institutionReportDataEntity);
+
+        ReportDataEntity fetchTypeReportDataEntity = new ReportDataEntity();
+        fetchTypeReportDataEntity.setHeaderName("FetchType");
+        fetchTypeReportDataEntity.setHeaderValue("1");
+        reportDataEntities.add(fetchTypeReportDataEntity);
+
+        ReportDataEntity exportDateReportDataEntity = new ReportDataEntity();
+        exportDateReportDataEntity.setHeaderName("ExportFromDate");
+        exportDateReportDataEntity.setHeaderValue(String.valueOf(new Date()));
+        reportDataEntities.add(exportDateReportDataEntity);
+
+        ReportDataEntity collectionGroupReportDataEntity = new ReportDataEntity();
+        collectionGroupReportDataEntity.setHeaderName("CollectionGroupIds");
+        collectionGroupReportDataEntity.setHeaderValue(String.valueOf(1));
+        reportDataEntities.add(collectionGroupReportDataEntity);
+
+        ReportDataEntity transmissionTypeReportDataEntity = new ReportDataEntity();
+        transmissionTypeReportDataEntity.setHeaderName("TransmissionType");
+        transmissionTypeReportDataEntity.setHeaderValue("0");
+        reportDataEntities.add(transmissionTypeReportDataEntity);
+
+        ReportDataEntity exportFormatReportDataEntity = new ReportDataEntity();
+        exportFormatReportDataEntity.setHeaderName("ExportFormat");
+        exportFormatReportDataEntity.setHeaderValue("1");
+        reportDataEntities.add(exportFormatReportDataEntity);
+
+        ReportDataEntity emailIdReportDataEntity = new ReportDataEntity();
+        emailIdReportDataEntity.setHeaderName("ToEmailId");
+        emailIdReportDataEntity.setHeaderValue("0");
+        reportDataEntities.add(emailIdReportDataEntity);
+
+        reportEntity.setFileName("2017-02-01 13:41");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("BatchExportSuccess");
+        reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntity.setInstitutionName("PUL");
+
+        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
+        return savedReportEntity;
+    }
+
+    private ReportEntity saveDataDumpFailureReport(){
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+
+        ReportDataEntity numberOfBibExportReportEntity = new ReportDataEntity();
+        numberOfBibExportReportEntity.setHeaderName("NoOfBibsExported");
+        numberOfBibExportReportEntity.setHeaderValue("0");
+        reportDataEntities.add(numberOfBibExportReportEntity);
+
+        ReportDataEntity requestingInstitutionReportDataEntity = new ReportDataEntity();
+        requestingInstitutionReportDataEntity.setHeaderName("RequestingInstitution");
+        requestingInstitutionReportDataEntity.setHeaderValue("CUL");
+        reportDataEntities.add(requestingInstitutionReportDataEntity);
+
+        ReportDataEntity institutionReportDataEntity = new ReportDataEntity();
+        institutionReportDataEntity.setHeaderName("InstitutionCodes");
+        institutionReportDataEntity.setHeaderValue("PUL");
+        reportDataEntities.add(institutionReportDataEntity);
+
+        ReportDataEntity fetchTypeReportDataEntity = new ReportDataEntity();
+        fetchTypeReportDataEntity.setHeaderName("FetchType");
+        fetchTypeReportDataEntity.setHeaderValue("1");
+        reportDataEntities.add(fetchTypeReportDataEntity);
+
+        ReportDataEntity exportDateReportDataEntity = new ReportDataEntity();
+        exportDateReportDataEntity.setHeaderName("ExportFromDate");
+        exportDateReportDataEntity.setHeaderValue(String.valueOf(new Date()));
+        reportDataEntities.add(exportDateReportDataEntity);
+
+        ReportDataEntity collectionGroupReportDataEntity = new ReportDataEntity();
+        collectionGroupReportDataEntity.setHeaderName("CollectionGroupIds");
+        collectionGroupReportDataEntity.setHeaderValue(String.valueOf(1));
+        reportDataEntities.add(collectionGroupReportDataEntity);
+
+        ReportDataEntity transmissionTypeReportDataEntity = new ReportDataEntity();
+        transmissionTypeReportDataEntity.setHeaderName("TransmissionType");
+        transmissionTypeReportDataEntity.setHeaderValue("0");
+        reportDataEntities.add(transmissionTypeReportDataEntity);
+
+        ReportDataEntity exportFormatReportDataEntity = new ReportDataEntity();
+        exportFormatReportDataEntity.setHeaderName("ExportFormat");
+        exportFormatReportDataEntity.setHeaderValue("1");
+        reportDataEntities.add(exportFormatReportDataEntity);
+
+        ReportDataEntity emailIdReportDataEntity = new ReportDataEntity();
+        emailIdReportDataEntity.setHeaderName("ToEmailId");
+        emailIdReportDataEntity.setHeaderValue("0");
+        reportDataEntities.add(emailIdReportDataEntity);
+
+        reportEntity.setFileName("2017-02-01 13:41");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("BatchExportFailure");
+        reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntity.setInstitutionName("PUL");
+
+        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
+        return savedReportEntity;
+    }
+
+    public Date getFromDate(Date date){
+        Calendar cal = Calendar.getInstance();
+        Date from = date;
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        return from;
+    }
+
+    public Date getToDate(Date date){
+        Calendar cal = Calendar.getInstance();
+        Date to = date;
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+        return to;
+    }
+
     private String generateReport(Date createdDate, String operationType, String reportType, String institutionName, String transmissionType) throws InterruptedException {
         Calendar cal = Calendar.getInstance();
         Date from = createdDate;
@@ -218,6 +432,28 @@ public class ReportGenerator_UT extends BaseTestCase {
         to = cal.getTime();
 
         String generatedFileName = reportGenerator.generateReport(fileName, operationType,reportType, institutionName, from, to, transmissionType);
+
+        Thread.sleep(1000);
+
+        return generatedFileName;
+    }
+
+    private String dataDumpGenerateReport(Date createdDate, String operationType, String reportType, String institutionName, String transmissionType,String dataDumpFileName) throws InterruptedException {
+        Calendar cal = Calendar.getInstance();
+        Date from = createdDate;
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = createdDate;
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        String generatedFileName = reportGenerator.generateReport(dataDumpFileName, operationType,reportType, institutionName, from, to, transmissionType);
 
         Thread.sleep(1000);
 
