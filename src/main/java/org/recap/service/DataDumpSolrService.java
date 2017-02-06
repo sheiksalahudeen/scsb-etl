@@ -19,13 +19,24 @@ public class DataDumpSolrService {
     @Value("${solrclient.url}")
     String solrClientUrl;
 
+    public String getSolrClientUrl() {
+        return solrClientUrl;
+    }
+
+    public void setSolrClientUrl(String solrClientUrl) {
+        this.solrClientUrl = solrClientUrl;
+    }
+
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+
     public Map getResults(SearchRecordsRequest searchRecordsRequest) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = solrClientUrl + "searchService/searchRecords";
+        String url = getSolrClientUrl() + "searchService/searchRecords";
         HttpHeaders headers = new HttpHeaders();
         headers.set("api_key","recap");
         HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
-        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, requestEntity, Map.class);
+        ResponseEntity<Map> responseEntity = getRestTemplate().postForEntity(url, requestEntity, Map.class);
 
         return responseEntity.getBody();
     }

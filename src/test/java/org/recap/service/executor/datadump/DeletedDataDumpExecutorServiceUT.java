@@ -2,7 +2,11 @@ package org.recap.service.executor.datadump;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -31,8 +36,14 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
     @Autowired
     private DeletedDataDumpExecutorService deletedDataDumpExecutorService;
 
+    @Mock
+    DeletedDataDumpExecutorService mockedDeletedDataDumpExecutorService;
+
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Mock
+    BibliographicDetailsRepository mockBibliographicDetailsRepository;
 
     @Value("${ftp.userName}")
     String ftpUserName;
@@ -57,6 +68,11 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
 
     private String requestingInstitutionCode = "CUL";
 
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void getFullDumpForDeleteRecordFileSystem()throws Exception{
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
@@ -74,19 +90,10 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        deletedDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
-        Thread.sleep(1000);
-        String day = getDateTimeString();
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.JSON_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-        }
+        Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String outputString = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
+        assertNotNull(outputString);
+        assertEquals(outputString,"Success");
     }
 
     @Test
@@ -106,19 +113,9 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        deletedDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
-        Thread.sleep(1000);
-        String day = getDateTimeString();
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.JSON_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-        }
+        Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String outputString = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
+        assertEquals(outputString,"Success");
     }
 
     @Test
@@ -138,15 +135,14 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        String response = deletedDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countDeletedRecordsForIncremental(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
+        Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();
-        logger.info("file count---->"+loopCount);
         String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.JSON_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
         assertNotNull(response);
+        assertNotNull(response,"Success");
     }
 
     private String getDateTimeString(){

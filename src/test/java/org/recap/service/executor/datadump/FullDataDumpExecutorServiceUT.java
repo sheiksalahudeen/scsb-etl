@@ -1,13 +1,18 @@
 package org.recap.service.executor.datadump;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.export.ImprovedFullDataDumpCallable;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.service.DataDumpSolrService;
@@ -16,7 +21,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,11 +45,20 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
 
     private Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Autowired
     private ApplicationContext appContext;
 
     @Autowired
     DataDumpSolrService dataDumpSolrService;
+
+    @Mock
+    DataDumpSolrService mockedDataDumpSolrService;
+
+    @Mock
+    DeletedDataDumpExecutorService mockedDeletedDataDumpExecutorService;
 
     @Autowired
     private FullDataDumpExecutorService fullDataDumpExecutorService;
@@ -65,10 +86,24 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
     @Value("${datadump.batch.size}")
     private int batchSize;
 
+    @Value("${solrclient.url}")
+    String solrClientUrl;
+
+    @Mock
+    RestTemplate mockRestTemplate;
+
+    @Mock
+    Future mockedFuture;
+
     @Autowired
     ProducerTemplate producer;
 
     private String requestingInstitutionCode = "PUL";
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
 
 
     @Test
@@ -93,7 +128,29 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(10);
 
-        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+
+        String url = solrClientUrl + "searchService/searchRecords";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api_key","recap");
+        HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
+        List<Integer> itemIds = new ArrayList<>();
+        itemIds.add(311);
+        List<LinkedHashMap<String, Object>> mapList = new ArrayList<>();
+        LinkedHashMap<String,Object> linkedHashMap = new LinkedHashMap<>();
+        linkedHashMap.put("bibId",95);
+        linkedHashMap.put("itemIds",itemIds);
+        mapList.add(linkedHashMap);
+        Map<String,Object> map = new HashMap<>();
+        map.put("totalPageCount",1);
+        map.put("dataDumpSearchResults",mapList);
+        map.put("totalRecordCount",2);
+
+        ResponseEntity<Map> responseEntity = new ResponseEntity<Map>(map, HttpStatus.OK);
+        Mockito.when(mockRestTemplate.postForEntity(url, requestEntity, Map.class)).thenReturn(responseEntity);
+        Mockito.when(mockedDataDumpSolrService.getRestTemplate()).thenReturn(mockRestTemplate);
+        Mockito.when(mockedDataDumpSolrService.getSolrClientUrl()).thenReturn(solrClientUrl);
+        Mockito.when(mockedDataDumpSolrService.getResults(searchRecordsRequest)).thenCallRealMethod();
+        Map results = mockedDataDumpSolrService.getResults(searchRecordsRequest);
         List<LinkedHashMap> dataDumpSearchResults = (List<LinkedHashMap>) results.get("dataDumpSearchResults");
 
         improvedFullDataDumpCallable = appContext.getBean(ImprovedFullDataDumpCallable.class,dataDumpSearchResults,bibliographicDetailsRepository);
@@ -102,8 +159,10 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
 
         Future future = executorService.submit(improvedFullDataDumpCallable);
-
-        List<BibliographicEntity> resultFromFuture = (List<BibliographicEntity>) future.get();
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
+        bibliographicEntityList.add(saveBibSingleHoldingsSingleItem());
+        Mockito.when((List<BibliographicEntity>)mockedFuture.get()).thenReturn(bibliographicEntityList);
+        List<BibliographicEntity> resultFromFuture = (List<BibliographicEntity>) mockedFuture.get();
 
         assertNotNull(resultFromFuture);
 
@@ -134,13 +193,11 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        String response = fullDataDumpExecutorService.process(dataDumpRequest);
-        Thread.sleep(1000);
-        String day = getDateTimeString();
-        File file;
-        file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
-        boolean fileExists = file.exists();
-        assertEquals(response,"There is no data to export.");
+        Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
+        assertNotNull(response);
+        assertEquals(response,"Success");
+
     }
 
 
@@ -159,16 +216,10 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        String response = fullDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
-        Thread.sleep(1000);
-        String day = getDateTimeString();
-        File file;
-        logger.info("file count---->"+loopCount);
-        file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+day+ ReCAPConstants.ZIP_FILE_FORMAT);
-        boolean fileExists = file.exists();
-        assertEquals(response,"There is no data to export.");
+        Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
+        assertNotNull(response);
+        assertEquals(response,"Success");
     }
 
     @Test
@@ -186,15 +237,10 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        String response = fullDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForFullDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes());
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
-        Thread.sleep(1000);
-        String dateTimeString = getDateTimeString();
-        logger.info("file count---->"+loopCount);
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"-"+dateTimeString+ReCAPConstants.ZIP_FILE_FORMAT;
-        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
+        Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
         assertNotNull(response);
+        assertEquals(response,"Success");
     }
 
     private String getDateTimeString(){
@@ -208,5 +254,59 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
         int loopCount = remainder == 0 ? quotient : quotient + 1;
         return loopCount;
+    }
+
+    public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
+        Random random = new Random();
+        BibliographicEntity bibliographicEntity = getBibliographicEntity(1, String.valueOf(random.nextInt()));
+
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("123");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("1");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        return savedBibliographicEntity;
+    }
+
+    private HoldingsEntity getHoldingsEntity(Random random, Integer institutionId) {
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(institutionId);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        return holdingsEntity;
+    }
+
+    private BibliographicEntity getBibliographicEntity(Integer institutionId, String owningInstitutionBibId1) {
+        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
+        bibliographicEntity1.setContent("mock Content".getBytes());
+        bibliographicEntity1.setCreatedDate(new Date());
+        bibliographicEntity1.setCreatedBy("etl");
+        bibliographicEntity1.setLastUpdatedBy("etl");
+        bibliographicEntity1.setLastUpdatedDate(new Date());
+        bibliographicEntity1.setOwningInstitutionId(institutionId);
+        bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId1);
+        return bibliographicEntity1;
     }
 }

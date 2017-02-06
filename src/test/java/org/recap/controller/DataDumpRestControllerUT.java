@@ -1,17 +1,23 @@
 package org.recap.controller;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.ReCAPConstants;
 import org.recap.controller.swagger.DataDumpRestController;
+import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
+import org.recap.service.DataDumpSolrService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -36,6 +42,12 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     @Autowired
     private DataDumpRestController dataDumpRestController;
 
+    @Mock
+    DataDumpRestController mockedDataDumpRestController;
+
+    @Mock
+    DataDumpSolrService mockedDataDumpSolrService;
+
     @Value("${solrclient.url}")
     String solrClientUrl;
 
@@ -43,6 +55,9 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
 
     @Value("${datadump.status.file.name}")
     String dataDumpStatusFileName;
+
+    @Mock
+    RestTemplate mockedRestTemplate;
 
     @Before
     public void setUp() {
@@ -191,7 +206,17 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         HttpHeaders headers = new HttpHeaders();
         headers.set("api_key","recap");
         HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
-        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, requestEntity, Map.class);
+
+        Map responseMap = new HashMap();
+        responseMap.put("totalPageCount", searchRecordsRequest.getTotalPageCount());
+        responseMap.put("totalRecordsCount", searchRecordsRequest.getTotalRecordsCount());
+        responseMap.put("dataDumpSearchResults", Arrays.asList(new DataDumpSearchResult()));
+
+        ResponseEntity<Map> mapResponseEntity = new ResponseEntity<Map>(responseMap, HttpStatus.OK);
+
+        Mockito.when(mockedRestTemplate.postForEntity(url, requestEntity, Map.class)).thenReturn(mapResponseEntity);
+
+        ResponseEntity<Map> responseEntity = mockedRestTemplate.postForEntity(url, requestEntity, Map.class);
         assertTrue(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK"));
         Map responseEntityBody = responseEntity.getBody();
         Integer totalPageCount = (Integer) responseEntityBody.get("totalPageCount");
@@ -316,6 +341,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
             executorService = Executors.newFixedThreadPool(50);
         }
         return executorService;
+    }
+
+    public String getFormattedString(String dateStr){
+        String formattedString = dateStr.substring(0,10)+"T"+dateStr.substring(11,16)+":00Z TO NOW";
+        return formattedString;
     }
 
 }
