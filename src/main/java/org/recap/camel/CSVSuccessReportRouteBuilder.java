@@ -5,6 +5,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.recap.ReCAPConstants;
 import org.recap.model.csv.ReCAPCSVSuccessRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,7 @@ import java.io.File;
 
 @Component
 public class CSVSuccessReportRouteBuilder {
-
+    Logger logger = LoggerFactory.getLogger(CSVSuccessReportRouteBuilder.class);
     @Autowired
     public CSVSuccessReportRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
         try {
@@ -32,7 +34,7 @@ public class CSVSuccessReportRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

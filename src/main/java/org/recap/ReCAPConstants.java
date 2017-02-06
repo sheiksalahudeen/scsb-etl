@@ -197,4 +197,7 @@ public class ReCAPConstants {
 
     public static final String BIB_ID = "BibId";
 
+    //Logger
+    public static final String ERROR = "error-->";
+
 }

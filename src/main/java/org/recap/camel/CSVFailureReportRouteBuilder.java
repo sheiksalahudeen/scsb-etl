@@ -35,7 +35,7 @@ public class CSVFailureReportRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            logger.error("error-->",e);
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

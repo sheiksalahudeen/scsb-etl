@@ -95,8 +95,7 @@ public class EtlDataLoadProcessor {
         long newItemsCount = itemDetailsRepository.countByOwningInstitutionId(instIdByFileName);
         long newBibHoldingsCount = bibliographicDetailsRepository.findCountOfBibliographicHoldingsByInstId(instIdByFileName);
         long newBibItemsCount = itemDetailsRepository.findCountOfBibliographicItemsByInstId(instIdByFileName);
-
-        Integer processedBibsCount = Integer.valueOf(new Long(newBibsCount).toString()) - Integer.valueOf(new Long(oldBibsCount).toString());
+        Integer processedBibsCount = (int) (long) newBibsCount - (int) (long) oldBibsCount;
         Integer processedHoldingsCount = Integer.valueOf(new Long(newHoldingsCount).toString()) - Integer.valueOf(new Long(oldHoldingsCount).toString());
         Integer processedItemsCount = Integer.valueOf(new Long(newItemsCount).toString()) - Integer.valueOf(new Long(oldItemsCount).toString());
         Integer processedBibHoldingsCount = Integer.valueOf(new Long(newBibHoldingsCount).toString()) - Integer.valueOf(new Long(oldBibHoldingsCount).toString());
