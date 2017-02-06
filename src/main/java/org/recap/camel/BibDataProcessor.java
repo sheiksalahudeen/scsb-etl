@@ -61,6 +61,7 @@ public class BibDataProcessor {
                 bibliographicDetailsRepository.save(bibliographicEntityList);
                 flushAndClearSession();
             } catch (Exception e) {
+                logger.error("error-->",e);
                 clearSession();
                 DBReportUtil.setCollectionGroupMap(etlExchange.getCollectionGroupMap());
                 DBReportUtil.setInstitutionEntitiesMap(etlExchange.getInstitutionEntityMap());
@@ -69,6 +70,7 @@ public class BibDataProcessor {
                         bibliographicDetailsRepository.save(bibliographicEntity);
                         flushAndClearSession();
                     } catch (Exception ex) {
+                        logger.error("error-->",ex);
                         clearSession();
                         reportEntity = processBibHoldingsItems(DBReportUtil, bibliographicEntity);
                     }
@@ -107,6 +109,7 @@ public class BibDataProcessor {
                             flushAndClearSession();
                             savedItemEntities.add(savedItemEntity);
                         } catch (Exception itemEx) {
+                            logger.error("error-->",itemEx);
                             clearSession();
                             List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
                             ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
@@ -122,6 +125,7 @@ public class BibDataProcessor {
                         }
                     }
                 } catch (Exception holdingsEx) {
+                    logger.error("error-->",holdingsEx);
                     clearSession();
                     List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
                     reportEntity.setReportDataEntities(reportDataEntities);
@@ -140,6 +144,7 @@ public class BibDataProcessor {
             bibliographicDetailsRepository.save(bibliographicEntity);
             flushAndClearSession();
         } catch (Exception bibEx) {
+            logger.error("error-->",bibEx);
             clearSession();
             List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibFailureReportEntity(bibliographicEntity);
 
