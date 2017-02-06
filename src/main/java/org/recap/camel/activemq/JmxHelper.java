@@ -1,6 +1,8 @@
 package org.recap.camel.activemq;
 
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ import java.io.IOException;
 @Component
 public class JmxHelper {
 
+    Logger logger = LoggerFactory.getLogger(JmxHelper.class);
 
     @Value("${activemq.jmx.service.url}")
     private String serviceUrl;
@@ -30,7 +33,7 @@ public class JmxHelper {
             DestinationViewMBean mbView = MBeanServerInvocationHandler.newProxyInstance(getConnection(), nameConsumers, DestinationViewMBean.class, true);
             return mbView;
         } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
+            logger.error("error-->",e);
         }
         return null;
     }
@@ -42,7 +45,7 @@ public class JmxHelper {
                 connector = JMXConnectorFactory.connect(new JMXServiceURL(serviceUrl));
                 connection = connector.getMBeanServerConnection();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("error-->",e);
             }
         }
         return connection;
