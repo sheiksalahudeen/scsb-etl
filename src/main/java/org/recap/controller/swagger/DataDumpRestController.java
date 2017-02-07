@@ -27,6 +27,25 @@ public class DataDumpRestController {
     @Autowired
     private DynamicRouteBuilder dynamicRouteBuilder;
 
+    public static Logger getLogger() {
+        return logger;
+    }
+
+    public DataDumpExportService getDataDumpExportService() {
+        return dataDumpExportService;
+    }
+
+    public void setDataDumpExportService(DataDumpExportService dataDumpExportService) {
+        this.dataDumpExportService = dataDumpExportService;
+    }
+
+    public DynamicRouteBuilder getDynamicRouteBuilder() {
+        return dynamicRouteBuilder;
+    }
+
+    public void setDynamicRouteBuilder(DynamicRouteBuilder dynamicRouteBuilder) {
+        this.dynamicRouteBuilder = dynamicRouteBuilder;
+    }
 
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
     @ApiOperation(value = "exportDataDump",
@@ -43,13 +62,13 @@ public class DataDumpRestController {
                                          @ApiParam(value = "Email address to whom we need to send an email" , name = "emailToAddress")@RequestParam(required=false) String emailToAddress
     ){
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
-        dynamicRouteBuilder.addDataDumpExportRoutes();
-        dataDumpExportService.setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,emailToAddress,outputFormat);
-        String responseMessage = dataDumpExportService.validateIncomingRequest(dataDumpRequest);
+        getDynamicRouteBuilder().addDataDumpExportRoutes();
+        getDataDumpExportService().setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,emailToAddress,outputFormat);
+        String responseMessage = getDataDumpExportService().validateIncomingRequest(dataDumpRequest);
         if(responseMessage!=null) {
             return responseMessage;
         }
-        responseMessage = dataDumpExportService.startDataDumpProcess(dataDumpRequest);
+        responseMessage = getDataDumpExportService().startDataDumpProcess(dataDumpRequest);
         return responseMessage;
     }
 }
