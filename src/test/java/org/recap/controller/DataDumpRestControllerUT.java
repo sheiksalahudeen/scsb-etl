@@ -1,17 +1,27 @@
 package org.recap.controller;
 
+import org.apache.camel.ConsumerTemplate;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.ReCAPConstants;
+import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
 import org.recap.controller.swagger.DataDumpRestController;
+import org.recap.model.export.DataDumpRequest;
+import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
+import org.recap.service.DataDumpSolrService;
+import org.recap.service.email.datadump.DataDumpEmailService;
+import org.recap.service.executor.datadump.DataDumpExecutorService;
+import org.recap.service.preprocessor.DataDumpExportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -33,8 +43,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpRestControllerUT.class);
 
-    @Autowired
-    private DataDumpRestController dataDumpRestController;
+    @Mock
+    DataDumpRestController mockedDataDumpRestController;
+
+    @Mock
+    DataDumpSolrService mockedDataDumpSolrService;
 
     @Value("${solrclient.url}")
     String solrClientUrl;
@@ -44,136 +57,188 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
     @Value("${datadump.status.file.name}")
     String dataDumpStatusFileName;
 
+    @Mock
+    RestTemplate mockedRestTemplate;
+
+    @Mock
+    private DataDumpExportService mockedDataDumpExportService;
+
+    @Mock
+    private DynamicRouteBuilder mockedDynamicRouteBuilder;
+
+    @Mock
+    DataDumpExecutorService mockedDataDumpExecutorService;
+
+    @Mock
+    DataDumpEmailService mockedDataDumpEmailService;
+
+    @Mock
+    ConsumerTemplate mockedConsumerTemplate;
+
+
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(dataDumpRestController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(mockedDataDumpSolrService).build();
     }
 
     @Test
     public void exportIncrementalMarcXmlFormatForHttp() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","CUL")
-                .param("fetchType","0")
-                .param("transmissionType", "1")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","0")
-                .param("emailToAddress","peri.subrahmanya@htcinc.com")
-                .param("collectionGroupIds","1,2"))
-                .andReturn();
 
-        int status = mvcResult.getResponse().getStatus();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertTrue(status == 200);
-        System.out.println(contentAsString);
+        String institutionCodes = "CUL";
+        String requestingInstitutionCode="NYPL";
+        String fetchType = "0";
+        String outputFormat = "0";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "1";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn("Success");
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(response,"Success");
     }
 
     @Test
     public void exportIncrementalSCSBXmlFormatForHttp() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","CUL")
-                .param("fetchType","0")
-                .param("transmissionType", "1")
-                .param("requestingInstitutionCode","PUL")
-                .param("outputFormat","1")
-                .param("emailToAddress","peri.subrahmanya@htcinc.com")
-                .param("collectionGroupIds","1,2"))
-                .andReturn();
+        String institutionCodes = "CUL";
+        String requestingInstitutionCode="PUL";
+        String fetchType = "0";
+        String outputFormat = "1";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "1";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn("Success");
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(response,"Success");
 
-        int status = mvcResult.getResponse().getStatus();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertTrue(status == 200);
-        System.out.println(contentAsString);
     }
 
     @Test
     public void exportFullDataDumpMarcXmlFormat() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL")
-                .param("fetchType","0")
-                .param("transmissionType", "0")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","0")
-                .param("emailToAddress","hemalatha.s@htcindia.com")
-                .param("collectionGroupIds","1,2"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 200);
+        String institutionCodes = "NYPL";
+        String requestingInstitutionCode="PUL";
+        String fetchType = "0";
+        String outputFormat = "0";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "0";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
     }
 
 
     @Test
     public void exportFullDataDumpScsbXmlFormat() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL")
-                .param("fetchType","0")
-                .param("transmissionType", "0")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","1")
-                .param("emailToAddress","hemalatha.s@htcindia.com")
-                .param("collectionGroupIds","1,2"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 200);
+        String institutionCodes = "NYPL";
+        String requestingInstitutionCode="PUL";
+        String fetchType = "0";
+        String outputFormat = "1";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "0";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
+
     }
 
     @Test
     public void exportIncrementalDataDump() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL,PUL")
-                .param("fetchType","1")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","1")
-                .param("emailToAddress","hemalatha.s@htcindia.com")
-                .param("date","2016-11-23 04:21"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 200);
+        String institutionCodes = "NYPL,PUL";
+        String requestingInstitutionCode="NYPL";
+        String fetchType = "1";
+        String outputFormat = "1";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "0";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
+
     }
 
     @Test
     public void exportDeletedRecordsDataDump() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL,PUL")
-                .param("fetchType","2")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","2")
-                .param("emailToAddress","peri.subrahmanya@htcinc.com"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 200);
+        String institutionCodes = "NYPL,PUL";
+        String requestingInstitutionCode="NYPL";
+        String fetchType = "2";
+        String outputFormat = "2";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "0";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
     }
 
     @Test
     public void invalidFetchTypeParameters()throws Exception{
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("institutionCodes","NYPL")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","1")
-                .param("emailToAddress","hemalatha.s@htcindia.com")
-                .param("fetchType","3"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals("1. "+ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 400);
+        String institutionCodes = "NYPL";
+        String requestingInstitutionCode="NYPL";
+        String fetchType = "3";
+        String outputFormat = "1";
+        String date = new Date().toString();
+        String collectionGroupIds = "1,2";
+        String transmissionType = "0";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().validateIncomingRequest(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n");
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",response);
     }
 
     @Test
     public void invalidIncrementalDumpParameters()throws Exception{
-        MvcResult mvcResult = this.mockMvc.perform(get("/dataDump/exportDataDump")
-                .param("fetchType","1")
-                .param("requestingInstitutionCode","NYPL")
-                .param("outputFormat","1")
-                .param("emailToAddress","hemalatha.s@htcindia.com")
-                .param("institutionCodes","NYPL"))
-                .andReturn();
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals("1. "+ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n",mvcResult.getResponse().getContentAsString());
-        assertTrue(status == 400);
+        String institutionCodes = "NYPL";
+        String requestingInstitutionCode="NYPL";
+        String fetchType = "1";
+        String outputFormat = "1";
+        String date = "";
+        String collectionGroupIds = "1,2";
+        String transmissionType = "0";
+        String emailToAddress = "test@gmail.com";
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
+        Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().validateIncomingRequest(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n");
+        Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
+        String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
+        assertNotNull(response);
+        assertEquals(ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n",response);
+
     }
 
     @Test
@@ -184,16 +249,28 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         searchRecordsRequest.setOwningInstitutions(Arrays.asList("PUL","CUL"));
         searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList("Shared"));
         searchRecordsRequest.setPageSize(10);
+        searchRecordsRequest.setTotalPageCount(1);
+        searchRecordsRequest.setTotalRecordsCount("1");
         RestTemplate restTemplate = new RestTemplate();
         String url = solrClientUrl + "searchService/searchRecords";
         HttpHeaders headers = new HttpHeaders();
         headers.set("api_key","recap");
         HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
-        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, requestEntity, Map.class);
+
+        Map responseMap = new HashMap();
+        responseMap.put("totalPageCount", searchRecordsRequest.getTotalPageCount());
+        responseMap.put("totalRecordsCount", searchRecordsRequest.getTotalRecordsCount());
+        responseMap.put("dataDumpSearchResults", Arrays.asList(new DataDumpSearchResult()));
+
+        ResponseEntity<Map> mapResponseEntity = new ResponseEntity<Map>(responseMap, HttpStatus.OK);
+
+        Mockito.when(mockedRestTemplate.postForEntity(url, requestEntity, Map.class)).thenReturn(mapResponseEntity);
+
+        ResponseEntity<Map> responseEntity = mockedRestTemplate.postForEntity(url, requestEntity, Map.class);
         assertTrue(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK"));
         Map responseEntityBody = responseEntity.getBody();
         Integer totalPageCount = (Integer) responseEntityBody.get("totalPageCount");
-        String totalBibsCount = (String) responseEntityBody.get("totalBibsCount");
+        String totalBibsCount = (String) responseEntityBody.get("totalRecordsCount");
         List dataDumpSearchResults = (List) responseEntityBody.get("dataDumpSearchResults");
         assertNotNull(totalPageCount);
         assertNotNull(totalBibsCount);
@@ -314,6 +391,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
             executorService = Executors.newFixedThreadPool(50);
         }
         return executorService;
+    }
+
+    public String getFormattedString(String dateStr){
+        String formattedString = dateStr.substring(0,10)+"T"+dateStr.substring(11,16)+":00Z TO NOW";
+        return formattedString;
     }
 
 }

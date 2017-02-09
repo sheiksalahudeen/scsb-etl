@@ -1,6 +1,7 @@
 package org.recap.service.transmission.datadump;
 
 import org.apache.camel.ProducerTemplate;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
@@ -20,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by premkb on 3/10/16.
  */
+@Ignore
 public class DataDumpFileSystemTranmissionServiceUT extends BaseTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpFileSystemTranmissionServiceUT.class);

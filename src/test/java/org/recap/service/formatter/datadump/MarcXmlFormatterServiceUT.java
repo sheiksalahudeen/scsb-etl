@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -39,6 +41,9 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
     @Autowired
     private ProducerTemplate producer;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
@@ -215,8 +220,8 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
     public void generateMarcXmlForMalformedBibContent() throws IOException, URISyntaxException {
         BibliographicEntity bibliographicEntity = getMalformedBibliographicEntity();
         Map<String, Object> successAndFailureFormattedList = marcXmlFormatterService.prepareMarcRecords(Arrays.asList(bibliographicEntity));
-        String marcXmlString = (String) successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
-        assertNull(marcXmlString);
+        List<String> marcXmlString = (List<String>) successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
+        assertEquals(marcXmlString.size(),0);
         List<String> failures = (List<String>) successAndFailureFormattedList.get(ReCAPConstants.FAILURE);
         String failureMessage = failures.get(0);
         assertNotNull(failureMessage);
@@ -302,7 +307,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionId(3);
-        holdingsEntity.setOwningInstitutionHoldingsId("54323");
+        holdingsEntity.setOwningInstitutionHoldingsId(".h54323");
         holdingsEntity.setInstitutionEntity(institutionEntity);
 
         ItemEntity itemEntity = new ItemEntity();
@@ -348,22 +353,23 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
     @Test
     public void generatedFormattedString() throws Exception {
+        saveBibSingleHoldingsSingleItem("100");
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findOne(new BibliographicPK(1, "100"));
 
         ArrayList<Record> recordList = new ArrayList<>();
-        marcXmlFormatterService.prepareMarcRecord(bibliographicEntity);
-        Record record = recordList.get(0);
+        Map<String, Object> recordMap = marcXmlFormatterService.prepareMarcRecord(bibliographicEntity);
+        Record record = (Record) recordMap.get(ReCAPConstants.SUCCESS);
         assertNotNull(record);
 
         OutputStream out = new ByteArrayOutputStream();
         MarcWriter writer = new MarcXmlWriter(out, "UTF-8", true);
         writeMarcXml(recordList, writer);
-
+        saveBibSingleHoldingsSingleItem("10002");
         BibliographicEntity bibliographicEntity1 = bibliographicDetailsRepository.findOne(new BibliographicPK(1, "10002"));
 
         ArrayList<Record> recordList1 = new ArrayList<>();
-        marcXmlFormatterService.prepareMarcRecord(bibliographicEntity1);
-        Record record1 = recordList.get(0);
+        Map<String, Object> recordMap1 = marcXmlFormatterService.prepareMarcRecord(bibliographicEntity1);
+        Record record1 = (Record) recordMap.get(ReCAPConstants.SUCCESS);
         assertNotNull(record1);
 
         writeMarcXml(recordList1, writer);
@@ -388,5 +394,63 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public void saveBibSingleHoldingsSingleItem(String owningInstBibId) throws Exception {
+        Random random = new Random();
+        BibliographicEntity bibliographicEntity = getBibEntity(1,owningInstBibId);
+
+        HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("123");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("1");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getBibliographicId());
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
+        assertNotNull(savedBibliographicEntity.getItemEntities().get(0).getItemId());
+    }
+
+    private HoldingsEntity getHoldingsEntity(Random random, Integer institutionId) {
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent(holdingContent.getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(institutionId);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        return holdingsEntity;
+    }
+
+    private BibliographicEntity getBibEntity(Integer institutionId, String owningInstitutionBibId1) {
+        BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
+        bibliographicEntity1.setContent(bibContent.getBytes());
+        bibliographicEntity1.setCreatedDate(new Date());
+        bibliographicEntity1.setCreatedBy("etl");
+        bibliographicEntity1.setLastUpdatedBy("etl");
+        bibliographicEntity1.setLastUpdatedDate(new Date());
+        bibliographicEntity1.setOwningInstitutionId(institutionId);
+        bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId1);
+        return bibliographicEntity1;
     }
 }

@@ -2,7 +2,11 @@ package org.recap.service.executor.datadump;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -31,6 +36,9 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
 
     @Autowired
     private IncrementalDataDumpExecutorService incrementalDataDumpExecutorService;
+
+    @Mock
+    IncrementalDataDumpExecutorService mockedIncrementalDataDumpExecutorService;
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -50,13 +58,18 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
-    @Value("${datadump.batchsize}")
+    @Value("${datadump.batch.size}")
     private int batchSize;
 
     @Autowired
     ProducerTemplate producer;
 
     private String requestingInstitutionCode = "CUL";
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void getIncrementalDumpForMarcXmlFileSystem()throws Exception{
@@ -75,19 +88,10 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setTransmissionType("2");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        incrementalDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(), DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
-        Thread.sleep(1000);
-        String day = getDateTimeString();
-        File file;
-        logger.info("file count---->"+loopCount);
-        for(int fileCount=1;fileCount<=loopCount;fileCount++){
-            file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+day+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +fileCount+"-"+day+ ReCAPConstants.XML_FILE_FORMAT);
-            boolean fileExists = file.exists();
-            assertTrue(fileExists);
-            file.delete();
-        }
+        Mockito.when(mockedIncrementalDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String response = mockedIncrementalDataDumpExecutorService.process(dataDumpRequest);
+        assertNotNull(response);
+        assertEquals(response,"Success");
     }
 
     @Test
@@ -107,24 +111,10 @@ public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
         dataDumpRequest.setTransmissionType("0");
         dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
-        incrementalDataDumpExecutorService.process(dataDumpRequest);
-        Long totalRecordCount = bibliographicDetailsRepository.countRecordsForIncrementalDump(dataDumpRequest.getCollectionGroupIds(),dataDumpRequest.getInstitutionCodes(),DateUtil.getDateFromString(inputDate, ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM));
-        int loopCount = getLoopCount(totalRecordCount,batchSize);
-        Thread.sleep(1000);
-        String dateTimeString = getDateTimeString();
-        logger.info("file count---->"+loopCount);
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.XML_FILE_FORMAT;
-        ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
-        camelContext.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                from("seda:testIncrementalMarcXmlZipFtp")
-                        .pollEnrich("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer + "?privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName="+ftpFileName);
-            }
-        });
-        String response = producer.requestBody("seda:testIncrementalMarcXmlZipFtp", "", String.class);
-        Thread.sleep(1000);
+        Mockito.when(mockedIncrementalDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
+        String response = mockedIncrementalDataDumpExecutorService.process(dataDumpRequest);
         assertNotNull(response);
+        assertEquals(response,"Success");
     }
 
 
