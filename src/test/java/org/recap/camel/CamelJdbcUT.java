@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.camel.activemq.JmxHelper;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
@@ -55,9 +54,6 @@ public class CamelJdbcUT extends BaseTestCase {
 
     @Value("${activemq.broker.url}")
     String brokerUrl;
-
-    @Autowired
-    JmxHelper jmxHelper;
 
     @Autowired
     DataExportHeaderUtil dataExportHeaderUtil;
