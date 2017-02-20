@@ -31,13 +31,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private static final Logger logger = LoggerFactory.getLogger(AbstractDataDumpExecutorService.class);
 
     @Autowired
-    DataDumpSolrService dataDumpSolrService;
+    private DataDumpSolrService dataDumpSolrService;
 
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    CamelContext camelContext;
+    private CamelContext camelContext;
 
     @Autowired
     private DataExportHeaderUtil dataExportHeaderUtil;
@@ -46,10 +46,10 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private String httpResonseRecordLimit;
 
     @Value("${solrclient.url}")
-    String solrClientUrl;
+    private String solrClientUrl;
 
     @Value("${datadump.batch.size}")
-    String dataDumpBatchSize;
+    private String dataDumpBatchSize;
 
     @Override
     public String process(DataDumpRequest dataDumpRequest) throws ExecutionException, InterruptedException {
