@@ -18,7 +18,7 @@ public class DataDumpFailureReportUtil {
 
     public List<ReportDataEntity> generateDataDumpFailureReport(List<Map<String,Object>> successAndFailureFormattedFullList, DataDumpRequest dataDumpRequest){
         int totalNoOfBibsFailedExported = 0;
-        StringBuffer formatError = new StringBuffer();
+        StringBuilder formatError = new StringBuilder();
         int count = 0;
         for(Map<String,Object>  successAndFailureFormattedList:successAndFailureFormattedFullList){
             List<BibliographicEntity> failureList = (List<BibliographicEntity>)successAndFailureFormattedList.get(ReCAPConstants.DATADUMP_SUCCESSLIST);

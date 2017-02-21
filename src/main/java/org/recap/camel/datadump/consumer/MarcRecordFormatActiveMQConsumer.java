@@ -85,7 +85,7 @@ public class MarcRecordFormatActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} marc records : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000);
 
         fluentProducerTemplate
                 .to(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)

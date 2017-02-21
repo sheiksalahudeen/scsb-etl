@@ -27,7 +27,6 @@ public class FileFormatProcessorForDataExport implements Processor {
     }
 
     private String getValueFor(String batchHeaderString, String key) {
-        String valueFor = new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
-        return valueFor;
+        return new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
     }
 }

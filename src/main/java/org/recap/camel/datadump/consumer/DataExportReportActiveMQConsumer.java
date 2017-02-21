@@ -36,7 +36,7 @@ public class DataExportReportActiveMQConsumer {
 
         List<ReportEntity> byFileName = getReportDetailRepository().findByFileNameAndType(requestId,ReCAPConstants.BATCH_EXPORT_SUCCESS);
 
-        ReportEntity reportEntity = null;
+        ReportEntity reportEntity;
         if (CollectionUtils.isEmpty(byFileName)) {
             reportEntity = new ReportEntity();
             reportEntity.setCreatedDate(new Date());
@@ -126,7 +126,7 @@ public class DataExportReportActiveMQConsumer {
         List<ReportEntity> byFileName = getReportDetailRepository().findByFileNameAndType(requestId,ReCAPConstants.BATCH_EXPORT_FAILURE);
 
 
-        ReportEntity reportEntity = null;
+        ReportEntity reportEntity;
         if (CollectionUtils.isEmpty(byFileName)) {
             reportEntity = new ReportEntity();
             reportEntity.setCreatedDate(new Date());

@@ -87,7 +87,7 @@ public class DeletedRecordFormatActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " deleted records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} deleted records :  {} seconds " ,bibliographicEntities.size() , (endTime - startTime) / 1000 );
 
         fluentProducerTemplate
                 .to(ReCAPConstants.DELETED_JSON_RECORD_FOR_DATA_EXPORT_Q)

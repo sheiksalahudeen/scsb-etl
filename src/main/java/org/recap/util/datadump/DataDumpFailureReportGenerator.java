@@ -1,9 +1,12 @@
 package org.recap.util.datadump;
 
+import info.freelibrary.util.LoggerFactory;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.DataDumpFailureReport;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.slf4j.Logger;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -16,6 +19,8 @@ import java.util.List;
  * Created by premkb on 30/9/16.
  */
 public class DataDumpFailureReportGenerator {
+
+    Logger logger = LoggerFactory.getLogger(DataDumpFailureReportGenerator.class);
 
     public DataDumpFailureReport prepareDataDumpCSVFailureRecord(ReportEntity reportEntity) {
 
@@ -31,10 +36,8 @@ public class DataDumpFailureReportGenerator {
             if(null != setterMethod){
                 try {
                     setterMethod.invoke(dataDumpFailureReport, headerValue);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    logger.error(ReCAPConstants.ERROR,e);
                 }
             }
         }
@@ -44,10 +47,9 @@ public class DataDumpFailureReportGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
-            return writeMethod;
+            return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
         return null;
     }
@@ -55,10 +57,9 @@ public class DataDumpFailureReportGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
-            return writeMethod;
+            return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
         return null;
     }

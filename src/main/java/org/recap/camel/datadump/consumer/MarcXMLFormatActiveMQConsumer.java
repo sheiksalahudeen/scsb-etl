@@ -5,16 +5,21 @@ import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
-import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
+import org.recap.util.datadump.DataExportHeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by peris on 11/1/16.
  */
 
 public class MarcXMLFormatActiveMQConsumer {
+    Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private MarcXmlFormatterService marcXmlFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;
@@ -25,7 +30,7 @@ public class MarcXMLFormatActiveMQConsumer {
 
     public String processMarcXmlString(Exchange exchange) throws Exception {
         List<Record> records = (List<Record>) exchange.getIn().getBody();
-        System.out.println("Num records to generate marc XMl for: " + records.size());
+        logger.info("Num records to generate marc XMl for: {} " , records.size());
         long startTime = System.currentTimeMillis();
 
         String toMarcXmlString = null;
@@ -35,13 +40,13 @@ public class MarcXMLFormatActiveMQConsumer {
             toMarcXmlString = marcXmlFormatterService.covertToMarcXmlString(records);
             processSuccessReportEntity(exchange, records, batchHeaders, requestId);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
             processFailureReportEntity(exchange, records, batchHeaders, requestId, e);
         }
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Time taken to generate marc xml for :" + records.size() + " is : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to generate marc xml for : {} is : {} seconds " , records.size() , (endTime - startTime) / 1000 );
 
         return toMarcXmlString;
     }

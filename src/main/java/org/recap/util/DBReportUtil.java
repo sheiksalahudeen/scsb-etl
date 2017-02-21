@@ -101,14 +101,12 @@ public class DBReportUtil {
     public List<ReportDataEntity> generateBibHoldingsFailureReportEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         reportDataEntities.addAll(generateBibFailureReportEntity(bibliographicEntity));
-        if (holdingsEntity != null) {
-            if(StringUtils.isNotBlank(holdingsEntity.getOwningInstitutionHoldingsId())) {
+        if (holdingsEntity != null && StringUtils.isNotBlank(holdingsEntity.getOwningInstitutionHoldingsId())) {
                 ReportDataEntity owningInstitutionHoldingsIdReportDataEntity = new ReportDataEntity();
                 owningInstitutionHoldingsIdReportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION_HOLDINGS_ID);
                 owningInstitutionHoldingsIdReportDataEntity.setHeaderValue(holdingsEntity.getOwningInstitutionHoldingsId());
                 reportDataEntities.add(owningInstitutionHoldingsIdReportDataEntity);
             }
-        }
         return reportDataEntities;
     }
 

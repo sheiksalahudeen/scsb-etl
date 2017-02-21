@@ -106,7 +106,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         fluentProducerTemplate
                 .to(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
                 .withBody(results)
-                .withHeader("batchHeaders", headerString.toString());
+                .withHeader("batchHeaders", headerString);
         fluentProducerTemplate.send();
     }
 

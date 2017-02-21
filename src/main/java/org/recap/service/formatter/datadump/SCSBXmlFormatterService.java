@@ -40,7 +40,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords) throws Exception{
-        String formattedString = null;
+        String formattedString;
         BibRecords bibRecords1 = new BibRecords();
         bibRecords1.setBibRecords(bibRecords);
         formattedString = convertToXml(bibRecords1);
@@ -65,10 +65,10 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Map<String,Integer> bibIdRecordNumMap = null;
         List<Integer> recordNumList = matchingBibInfoDetailRepository.getRecordNum(bibIdList);
         Map<Integer,List<MatchingBibInfoDetail>> recordNumMatchingBibInfoDetailMap = null;
-        if (recordNumList != null && recordNumList.size()>0) {
+        if (recordNumList != null && !recordNumList.isEmpty()) {
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = matchingBibInfoDetailRepository.findByRecordNum(recordNumList);
             recordNumMatchingBibInfoDetailMap = null;
-            if(recordNumList != null && recordNumList.size() > 0){
+            if(recordNumList != null && !recordNumList.isEmpty()){
                 bibIdRecordNumMap = getBibIdRowNumMap(matchingBibInfoDetailList);// put bib id and record num from report table in a map
                 recordNumMatchingBibInfoDetailMap = getRecordNumReportDataEntityMap(matchingBibInfoDetailList);
             }
@@ -138,7 +138,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
             bibRecord.setHoldings(holdings);
             results.put(ReCAPConstants.SUCCESS, bibRecord);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(ReCAPConstants.ERROR,e);
             results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
         }
         return results;
@@ -285,7 +285,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
 
     private ContentType getContentType(byte[] byteContent) throws Exception{
         String content = new String(byteContent, Charset.forName("UTF-8"));
-        CollectionType collectionType = null;
+        CollectionType collectionType;
         collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
         ContentType contentType = new ContentType();
         contentType.setCollection(collectionType);

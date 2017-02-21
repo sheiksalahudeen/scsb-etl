@@ -1,31 +1,29 @@
 package org.recap.camel.datadump.routebuilder;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.ReCAPConstants;
+import org.recap.camel.datadump.DataExportAggregator;
+import org.recap.camel.datadump.DataExportPredicate;
 import org.recap.camel.datadump.FileFormatProcessorForDataExport;
 import org.recap.camel.datadump.TransmissionTypeProcessorForDataExport;
 import org.recap.camel.datadump.consumer.*;
-import org.recap.camel.datadump.DataExportAggregator;
-import org.recap.camel.datadump.DataExportPredicate;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.ReportDetailRepository;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 import org.recap.util.XmlFormatter;
-import org.recap.camel.datadump.consumer.DataExportReportActiveMQConsumer;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * Created by peris on 11/5/16.
  */
 
 public class DataExportRouteBuilder {
+
+    Logger logger = LoggerFactory.getLogger(DataExportRouteBuilder.class);
 
     public DataExportRouteBuilder(CamelContext camelContext,
                                   BibliographicDetailsRepository bibliographicDetailsRepository,
@@ -118,7 +116,7 @@ public class DataExportRouteBuilder {
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

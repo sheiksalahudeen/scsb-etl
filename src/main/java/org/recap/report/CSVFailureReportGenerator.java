@@ -59,10 +59,8 @@ public class CSVFailureReportGenerator implements ReportGeneratorInterface  {
             reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(failureReportReCAPCSVRecords);
             producerTemplate.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName()) + "-" + reCAPCSVFailureRecord.getReportType() + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName()) + "-" + reCAPCSVFailureRecord.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
-
         return null;
     }
 }

@@ -37,9 +37,9 @@ public class DataDumpEmailService {
 
     private String getLocation(String transmissionType,String dateTimeStringForFolder) {
         String location = null;
-        if (transmissionType.equals("0")) {
+        if ("0".equals(transmissionType)) {
             location = "FTP location - " + ftpDataDumpDirectory + File.separator + dateTimeStringForFolder;
-        } else if (transmissionType.equals("2")) {
+        } else if ("2".equals(transmissionType)) {
             location = "File System - " + fileSystemDataDumpDirectory + File.separator + dateTimeStringForFolder;
         }
         return location;

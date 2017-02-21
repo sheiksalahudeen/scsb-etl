@@ -4,9 +4,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
-import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DeletedRecord;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
+import org.recap.util.datadump.DataExportHeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.Map;
  */
 
 public class DeletedJsonFormatActiveMQConsumer {
+    Logger logger = LoggerFactory.getLogger(DeletedJsonFormatActiveMQConsumer.class);
 
     DeletedJsonFormatterService deletedJsonFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;
@@ -27,7 +30,7 @@ public class DeletedJsonFormatActiveMQConsumer {
 
     public String processDeleteJsonString(Exchange exchange) throws Exception {
         List<DeletedRecord> deletedRecordList = (List<DeletedRecord>) exchange.getIn().getBody();
-        System.out.println("Num records to generate json for: " + deletedRecordList.size());
+        logger.info("Num records to generate json for: {} " , deletedRecordList.size());
         long startTime = System.currentTimeMillis();
 
         String deletedJsonString = null;
@@ -39,12 +42,12 @@ public class DeletedJsonFormatActiveMQConsumer {
             deletedJsonString = formattedOutputForDeletedRecords.format(formattedOutputForDeletedRecords);
             processSuccessReportEntity(exchange, deletedRecordList.size(), batchHeaders, requestId);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
             processFailureReportEntity(exchange, deletedRecordList.size(), batchHeaders, requestId, e);
         }
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Time taken to generate json for :"  + deletedRecordList.size() + " is : " + (endTime-startTime)/1000 + " seconds ");
+        logger.info("Time taken to generate json for : {} is : {} seconds " , deletedRecordList.size() , (endTime-startTime)/1000 );
 
         return deletedJsonString;
     }

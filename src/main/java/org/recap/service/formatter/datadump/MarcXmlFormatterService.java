@@ -86,7 +86,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities(),itemIds);
             results.put(ReCAPConstants.SUCCESS, record);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(ReCAPConstants.ERROR,e);
             results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
 
         }
@@ -115,7 +115,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
     private void update001Field(Record record, BibliographicEntity bibliographicEntity) {
         for (ControlField controlField : record.getControlFields()) {
-            if (controlField.getTag().equals("001")) {
+            if ("001".equals(controlField.getTag())) {
                 controlField.setData(ReCAPConstants.SCSB + "-" + bibliographicEntity.getBibliographicId());
             }
         }
@@ -128,18 +128,18 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private Record addHoldingInfo(Record record, List<HoldingsEntity> holdingsEntityList,List<Integer> itemIds) {
-        Record holdingRecord = null;
+        Record holdingRecord;
         for (HoldingsEntity holdingsEntity : holdingsEntityList) {
             holdingRecord = getRecordFromContent(holdingsEntity.getContent());
             for (DataField dataField : holdingRecord.getDataFields()) {
-                if (dataField.getTag().equals("852")) {
+                if ("852".equals(dataField.getTag())) {
                     add0SubField(dataField, holdingsEntity);
                     add852Subfield1(dataField, holdingsEntity);
                     update852bField(dataField, holdingsEntity);
                     record.addVariableField(dataField);
                 }
-                if (dataField.getTag().equals("866")) {
-                    if(dataField.getSubfield('a')!=null && (dataField.getSubfield('a').getData()==null || dataField.getSubfield('a').getData().equals(""))){
+                if ("866".equals(dataField.getTag())) {
+                    if(dataField.getSubfield('a')!=null && (dataField.getSubfield('a').getData()==null || "".equals(dataField.getSubfield('a').getData()))){
                         continue;
                     }else {
                         add0SubField(dataField, holdingsEntity);

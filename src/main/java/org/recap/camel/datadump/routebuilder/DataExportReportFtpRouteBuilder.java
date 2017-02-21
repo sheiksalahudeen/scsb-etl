@@ -8,6 +8,8 @@ import org.recap.camel.datadump.FileNameProcessorForDataDumpFailure;
 import org.recap.camel.datadump.FileNameProcessorForDataDumpSuccess;
 import org.recap.model.csv.DataDumpFailureReport;
 import org.recap.model.csv.DataDumpSuccessReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DataExportReportFtpRouteBuilder {
+
+    Logger logger = LoggerFactory.getLogger(DataExportReportFtpRouteBuilder.class);
 
     @Autowired
     public DataExportReportFtpRouteBuilder(CamelContext context,
@@ -46,7 +50,7 @@ public class DataExportReportFtpRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

@@ -49,7 +49,7 @@ public class DataExportCsvReportRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

@@ -70,10 +70,8 @@ public class RecordProcessor {
             Object object = null;
             try {
                 object = future.get();
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage());
-            } catch (ExecutionException e) {
-                logger.error(e.getMessage());
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error(ReCAPConstants.ERROR,e);
             }
 
             processFutureResults(object, bibliographicEntities, reportEntities);
@@ -135,6 +133,7 @@ public class RecordProcessor {
                 callables.add(bibPersisterCallable);
 
             } catch (Exception e) {
+                logger.error(ReCAPConstants.ERROR,e);
                 ReportEntity reportEntity = new ReportEntity();
                 List<ReportDataEntity> reportDataEntities = new ArrayList<>();
                 String owningInst = xmlRecordEntity.getOwningInst();
@@ -173,7 +172,7 @@ public class RecordProcessor {
         try {
             futures = getExecutorService().invokeAll(callables);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
 
         futures

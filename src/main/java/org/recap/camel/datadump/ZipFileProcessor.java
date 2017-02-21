@@ -66,25 +66,14 @@ public class ZipFileProcessor implements Processor {
                         .completionFromBatchConsumer()
                         .eagerCheckCompletion()
                         .process(dataExportEmailProcessor)
-                        .to("sftp://"
-                                + ftpUserName
-                                + "@"
-                                + ftpDataDumpRemoteServer
-                                + File.separator
-                                + "?fileName="
-                                + folderName
-                                + ".zip"
-                                + "&privateKeyFile="
-                                + ftpPrivateKey
-                                + "&knownHostsFile="
-                                + ftpKnownHost);
+                        .to("sftp://" + ftpUserName + "@" + ftpDataDumpRemoteServer + File.separator + "?fileName=" + folderName + ".zip"
+                                + "&privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost);
             }
         });
     }
 
     private String getValueFor(String batchHeaderString, String key) {
-        String valueFor = new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
-        return valueFor;
+        return new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
     }
 
     private List<String> getInstitutionCodes(String institutionCodes) {

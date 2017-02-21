@@ -2,7 +2,7 @@ package org.recap.controller.swagger;
 
 import io.swagger.annotations.*;
 import org.recap.ReCAPConstants;
-import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
+import org.recap.camel.dynamicrouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.service.preprocessor.DataDumpExportService;
 import org.slf4j.Logger;

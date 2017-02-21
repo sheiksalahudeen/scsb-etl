@@ -5,11 +5,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
-import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.camel.datadump.callable.BibRecordPreparerCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -28,7 +28,6 @@ public class SCSBRecordFormatActiveMQConsumer {
     SCSBXmlFormatterService scsbXmlFormatterService;
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
-    private DefaultFluentProducerTemplate defaultFluentProducerTemplate;
 
     public SCSBRecordFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
@@ -60,7 +59,7 @@ public class SCSBRecordFormatActiveMQConsumer {
                     try {
                         return future.get();
                     } catch (InterruptedException | ExecutionException e) {
-                        logger.error(e.getMessage());
+                        logger.error(ReCAPConstants.ERROR,e);
                         throw new RuntimeException(e);
                     }
                 });
@@ -84,7 +83,7 @@ public class SCSBRecordFormatActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " scsb records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} scsb records : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000 );
 
 
         fluentProducerTemplate

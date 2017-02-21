@@ -61,7 +61,7 @@ public class DataDumpExportService {
                 try {
                     dataDumpExecutorService.generateDataDump(dataDumpRequest);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(ReCAPConstants.ERROR,e);
                 }
             }).start();
 
@@ -87,7 +87,7 @@ public class DataDumpExportService {
             }
             responseMessage = getResponseMessage(outputString, dataDumpRequest);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(ReCAPConstants.ERROR,e);
             responseMessage = ReCAPConstants.DATADUMP_EXPORT_FAILURE;
         }
         return responseMessage;
@@ -119,8 +119,7 @@ public class DataDumpExportService {
 
     private List<String> splitStringAndGetList(String inputString) {
         String[] splittedString = inputString.split(",");
-        List<String> stringList = Arrays.asList(splittedString);
-        return stringList;
+        return Arrays.asList(splittedString);
     }
 
     private List<Integer> getIntegerListFromStringList(List<String> stringList) {
@@ -132,8 +131,7 @@ public class DataDumpExportService {
     }
 
     private List<Integer> splitStringAndGetIntegerList(String inputString) {
-        List<Integer> integerList = getIntegerListFromStringList(splitStringAndGetList(inputString));
-        return integerList;
+        return getIntegerListFromStringList(splitStringAndGetList(inputString));
     }
 
     public void setDataDumpRequest(DataDumpRequest dataDumpRequest, String fetchType, String institutionCodes, String date, String collectionGroupIds,
@@ -145,11 +143,11 @@ public class DataDumpExportService {
             List<String> institutionCodeList = splitStringAndGetList(institutionCodes);
             dataDumpRequest.setInstitutionCodes(institutionCodeList);
         }
-        if (date != null && !date.equals("")) {
+        if (date != null && !"".equals(date)) {
             dataDumpRequest.setDate(date);
         }
 
-        if (collectionGroupIds != null && !collectionGroupIds.equals("")) {
+        if (collectionGroupIds != null && !"".equals(collectionGroupIds)) {
             List<Integer> collectionGroupIdList = splitStringAndGetIntegerList(collectionGroupIds);
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         } else {
@@ -160,7 +158,7 @@ public class DataDumpExportService {
             collectionGroupIdList.add(collectionGroupEntityOpen.getCollectionGroupId());
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         }
-        if (transmissionType != null && !transmissionType.equals("")) {
+        if (transmissionType != null && !"".equals(transmissionType)) {
             dataDumpRequest.setTransmissionType(transmissionType);
         } else {
             dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
@@ -185,7 +183,7 @@ public class DataDumpExportService {
         String validationMessage = null;
         Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorcount = 1;
-        if (dataDumpRequest.getInstitutionCodes().size() > 0) {
+        if (!dataDumpRequest.getInstitutionCodes().isEmpty()) {
             for (String institutionCode : dataDumpRequest.getInstitutionCodes()) {
                 if (!institutionCode.equals(ReCAPConstants.COLUMBIA) && !institutionCode.equals(ReCAPConstants.PRINCETON)
                         && !institutionCode.equals(ReCAPConstants.NYPL)) {
@@ -198,12 +196,10 @@ public class DataDumpExportService {
                 errorcount++;
             }
         }
-        if (dataDumpRequest.getRequestingInstitutionCode() != null) {
-            if (!dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.COLUMBIA) && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.PRINCETON)
-                    && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.NYPL)) {
+        if (dataDumpRequest.getRequestingInstitutionCode() != null && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.COLUMBIA) && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.PRINCETON)
+                && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.NYPL) ) {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
                 errorcount++;
-            }
         }
         if (!dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) &&
                 !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)
@@ -217,17 +213,13 @@ public class DataDumpExportService {
             errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
             errorcount++;
         }
-        if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL)) {
-            if (dataDumpRequest.getInstitutionCodes() == null) {
+        if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) && dataDumpRequest.getInstitutionCodes() == null) {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
-            }
         }
-        if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)) {
-            if (dataDumpRequest.getDate() == null || dataDumpRequest.getDate().equals("")) {
+        if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) && dataDumpRequest.getDate() == null || "".equals(dataDumpRequest.getDate())) {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
-            }
         }
         if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             if (StringUtils.isEmpty(dataDumpRequest.getToEmailAddress())) {
@@ -264,6 +256,7 @@ public class DataDumpExportService {
                 dataDumpStatus = FileUtils.readFileToString(file, Charset.defaultCharset());
             }
         } catch (IOException e) {
+            logger.error(ReCAPConstants.ERROR,e);
             logger.error("Exception while creating or updating the file : " + e.getMessage());
         }
         return dataDumpStatus;
@@ -285,6 +278,7 @@ public class DataDumpExportService {
                 writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
             }
         } catch (IOException e) {
+            logger.error(ReCAPConstants.ERROR,e);
             logger.error("Exception while creating or updating the file : " + e.getMessage());
         }
     }
@@ -298,9 +292,7 @@ public class DataDumpExportService {
 
     private String buildErrorMessage(Map<Integer, String> erroMessageMap) {
         StringBuilder errorMessageBuilder = new StringBuilder();
-        erroMessageMap.entrySet().forEach(entry -> {
-            errorMessageBuilder.append(entry.getKey()).append(". ").append(entry.getValue()).append("\n");
-        });
+        erroMessageMap.entrySet().forEach(entry -> errorMessageBuilder.append(entry.getKey()).append(". ").append(entry.getValue()).append("\n"));
         return errorMessageBuilder.toString();
     }
 
