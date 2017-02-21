@@ -8,6 +8,8 @@ import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
 import org.recap.service.email.datadump.DataDumpEmailService;
 import org.recap.util.datadump.DataExportHeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ import java.util.List;
 @Component
 public class DataExportEmailProcessor implements Processor {
 
+    private static final Logger logger = LoggerFactory.getLogger(DataExportEmailProcessor.class);
     @Autowired
     DataDumpEmailService dataDumpEmailService;
 
@@ -36,6 +39,9 @@ public class DataExportEmailProcessor implements Processor {
 
     @Value("${datadump.status.file.name}")
     String dataDumpStatusFileName;
+
+    @Value("${datadump.fetchtype.full}")
+    private String fetchTypeFull;
 
     private String transmissionType;
     private List<String> institutionCodes;
@@ -64,7 +70,7 @@ public class DataExportEmailProcessor implements Processor {
             }
         }
         processEmail(totalRecordCount,failedBibs);
-        if(fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL)) {
+        if(fetchType.equals(fetchTypeFull)) {
             writeFullDumpStatusToFile();
         }
     }
@@ -72,9 +78,15 @@ public class DataExportEmailProcessor implements Processor {
     private void writeFullDumpStatusToFile() throws IOException {
         File file = new File(dataDumpStatusFileName);
         FileWriter fileWriter = new FileWriter(file, false);
-        fileWriter.append(ReCAPConstants.COMPLETED);
-        fileWriter.flush();
-        fileWriter.close();
+        try {
+            fileWriter.append(ReCAPConstants.COMPLETED);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            logger.error(ReCAPConstants.EXCEPTION,e);
+        } finally {
+            fileWriter.close();
+        }
     }
 
     private void processEmail(String totalRecordCount,String failedBibs){
