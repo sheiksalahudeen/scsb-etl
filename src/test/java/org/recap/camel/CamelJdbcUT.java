@@ -6,10 +6,14 @@ import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
 import org.apache.commons.io.FilenameUtils;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.camel.activemq.JmxHelper;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.camel.dynamicRouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
@@ -20,6 +24,11 @@ import org.recap.service.DataDumpSolrService;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -47,9 +56,6 @@ public class CamelJdbcUT extends BaseTestCase {
     String brokerUrl;
 
     @Autowired
-    JmxHelper jmxHelper;
-
-    @Autowired
     DataExportHeaderUtil dataExportHeaderUtil;
 
     @Autowired
@@ -73,6 +79,21 @@ public class CamelJdbcUT extends BaseTestCase {
     @Autowired
     DynamicRouteBuilder dynamicRouteBuilder;
 
+    @Mock
+    DataDumpSolrService mockedDataDumpSolrService;
+
+    @Value("${solrclient.url}")
+    String solrClientUrl;
+
+    @Mock
+    RestTemplate mockRestTemplate;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Ignore
     @Test
     public void parseXmlAndInsertIntoDb() throws Exception {
 
@@ -113,7 +134,28 @@ public class CamelJdbcUT extends BaseTestCase {
         searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
 
         long startTime = System.currentTimeMillis();
-        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        String url = solrClientUrl + "searchService/searchRecords";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api_key","recap");
+        HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
+        List<Integer> itemIds = new ArrayList<>();
+        itemIds.add(311);
+        List<LinkedHashMap<String, Object>> mapList = new ArrayList<>();
+        LinkedHashMap<String,Object> linkedHashMap = new LinkedHashMap<>();
+        linkedHashMap.put("bibId",95);
+        linkedHashMap.put("itemIds",itemIds);
+        mapList.add(linkedHashMap);
+        Map<String,Object> map = new HashMap<>();
+        map.put("totalPageCount",1);
+        map.put("dataDumpSearchResults",mapList);
+        map.put("totalRecordsCount","2");
+
+        ResponseEntity<Map> responseEntity = new ResponseEntity<Map>(map, HttpStatus.OK);
+        Mockito.when(mockRestTemplate.postForEntity(url, requestEntity, Map.class)).thenReturn(responseEntity);
+        Mockito.when(mockedDataDumpSolrService.getRestTemplate()).thenReturn(mockRestTemplate);
+        Mockito.when(mockedDataDumpSolrService.getSolrClientUrl()).thenReturn(solrClientUrl);
+        Mockito.when(mockedDataDumpSolrService.getResults(searchRecordsRequest)).thenCallRealMethod();
+        Map results = mockedDataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
@@ -141,7 +183,7 @@ public class CamelJdbcUT extends BaseTestCase {
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
             startTime = System.currentTimeMillis();
-            Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
+            Map results1 = mockedDataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
             fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
@@ -149,9 +191,9 @@ public class CamelJdbcUT extends BaseTestCase {
             producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
-        while (true) {
+       /* while (true) {
 
-        }
+        }*/
     }
 
     @Test
@@ -163,7 +205,28 @@ public class CamelJdbcUT extends BaseTestCase {
         searchRecordsRequest.setPageSize(Integer.valueOf(2));
 
         long startTime = System.currentTimeMillis();
-        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        String url = solrClientUrl + "searchService/searchRecords";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api_key","recap");
+        HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
+        List<Integer> itemIds = new ArrayList<>();
+        itemIds.add(311);
+        List<LinkedHashMap<String, Object>> mapList = new ArrayList<>();
+        LinkedHashMap<String,Object> linkedHashMap = new LinkedHashMap<>();
+        linkedHashMap.put("bibId",95);
+        linkedHashMap.put("itemIds",itemIds);
+        mapList.add(linkedHashMap);
+        Map<String,Object> map = new HashMap<>();
+        map.put("totalPageCount",1);
+        map.put("dataDumpSearchResults",mapList);
+        map.put("totalRecordsCount","2");
+
+        ResponseEntity<Map> responseEntity = new ResponseEntity<Map>(map, HttpStatus.OK);
+        Mockito.when(mockRestTemplate.postForEntity(url, requestEntity, Map.class)).thenReturn(responseEntity);
+        Mockito.when(mockedDataDumpSolrService.getRestTemplate()).thenReturn(mockRestTemplate);
+        Mockito.when(mockedDataDumpSolrService.getSolrClientUrl()).thenReturn(solrClientUrl);
+        Mockito.when(mockedDataDumpSolrService.getResults(searchRecordsRequest)).thenCallRealMethod();
+        Map results = mockedDataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
@@ -191,7 +254,7 @@ public class CamelJdbcUT extends BaseTestCase {
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
             startTime = System.currentTimeMillis();
-            Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
+            Map results1 = mockedDataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
             fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
@@ -199,9 +262,9 @@ public class CamelJdbcUT extends BaseTestCase {
             producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
-        while (true) {
+        /*while (true) {
 
-        }
+        }*/
     }
 
     @Test
@@ -214,7 +277,28 @@ public class CamelJdbcUT extends BaseTestCase {
         searchRecordsRequest.setPageSize(Integer.valueOf(dataDumpBatchSize));
 
         long startTime = System.currentTimeMillis();
-        Map results = dataDumpSolrService.getResults(searchRecordsRequest);
+        String url = solrClientUrl + "searchService/searchRecords";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api_key","recap");
+        HttpEntity<SearchRecordsRequest> requestEntity = new HttpEntity<>(searchRecordsRequest,headers);
+        List<Integer> itemIds = new ArrayList<>();
+        itemIds.add(311);
+        List<LinkedHashMap<String, Object>> mapList = new ArrayList<>();
+        LinkedHashMap<String,Object> linkedHashMap = new LinkedHashMap<>();
+        linkedHashMap.put("bibId",95);
+        linkedHashMap.put("itemIds",itemIds);
+        mapList.add(linkedHashMap);
+        Map<String,Object> map = new HashMap<>();
+        map.put("totalPageCount",1);
+        map.put("dataDumpSearchResults",mapList);
+        map.put("totalRecordsCount","2");
+
+        ResponseEntity<Map> responseEntity = new ResponseEntity<Map>(map, HttpStatus.OK);
+        Mockito.when(mockRestTemplate.postForEntity(url, requestEntity, Map.class)).thenReturn(responseEntity);
+        Mockito.when(mockedDataDumpSolrService.getRestTemplate()).thenReturn(mockRestTemplate);
+        Mockito.when(mockedDataDumpSolrService.getSolrClientUrl()).thenReturn(solrClientUrl);
+        Mockito.when(mockedDataDumpSolrService.getResults(searchRecordsRequest)).thenCallRealMethod();
+        Map results = mockedDataDumpSolrService.getResults(searchRecordsRequest);
 
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         dataDumpRequest.setToEmailAddress("peri.subrahmanya@gmail.com");
@@ -240,7 +324,7 @@ public class CamelJdbcUT extends BaseTestCase {
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
             startTime = System.currentTimeMillis();
-            Map results1 = dataDumpSolrService.getResults(searchRecordsRequest);
+            Map results1 = mockedDataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
             fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
@@ -248,9 +332,9 @@ public class CamelJdbcUT extends BaseTestCase {
             producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
-        while (true) {
+       /* while (true) {
 
-        }
+        }*/
     }
 
     private String getDateTimeString() {
