@@ -52,7 +52,7 @@ public class RecordProcessor {
     BibDataProcessor bibDataProcessor;
 
     @Autowired
-    DBReportUtil DBReportUtil;
+    DBReportUtil dbReportUtil;
 
     private ExecutorService executorService;
 
@@ -122,7 +122,7 @@ public class RecordProcessor {
             try {
                 bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
                 BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
-                bibPersisterCallable.setDBReportUtil(DBReportUtil);
+                bibPersisterCallable.setDbReportUtil(dbReportUtil);
                 bibPersisterCallable.setBibRecord(bibRecord);
                 bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
                 bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());

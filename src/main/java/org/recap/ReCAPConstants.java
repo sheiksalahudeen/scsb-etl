@@ -197,6 +197,10 @@ public class ReCAPConstants {
 
     public static final String BIB_ID = "BibId";
 
+    public static final String BATCH_HEADERS="batchHeaders";
+    public static final String PROCESS_RECORDS="processRecords";
+    public static final String FTP_ROUTE="ftpRoute";
+
     //Logger
     public static final String ERROR = "error-->";
 

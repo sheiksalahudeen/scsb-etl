@@ -56,12 +56,12 @@ public class DataExportRouteBuilder {
                             .routeId(ReCAPConstants.BIB_ENTITY_DATA_EXPORT_ROUTE_ID)
                             .threads(20)
                             .choice()
-                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC))
-                                    .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), "processRecords")
-                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB))
-                                    .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), "processRecords")
-                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT))
-                                    .bean(new DeletedRecordFormatActiveMQConsumer(deletedJsonFormatterService), "processRecords")
+                                .when(header(ReCAPConstants.EXPORT_FORMAT).isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC))
+                                    .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), ReCAPConstants.PROCESS_RECORDS)
+                                .when(header(ReCAPConstants.EXPORT_FORMAT).isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB))
+                                    .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), ReCAPConstants.PROCESS_RECORDS)
+                                .when(header(ReCAPConstants.EXPORT_FORMAT).isEqualTo(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT))
+                                    .bean(new DeletedRecordFormatActiveMQConsumer(deletedJsonFormatterService), ReCAPConstants.PROCESS_RECORDS)
                     ;
 
                 }

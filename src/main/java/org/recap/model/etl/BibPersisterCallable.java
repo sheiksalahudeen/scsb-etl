@@ -30,7 +30,7 @@ public class BibPersisterCallable implements Callable {
     private Map itemStatusMap;
     private Map collectionGroupMap;
 
-    private DBReportUtil DBReportUtil;
+    private DBReportUtil dbReportUtil;
 
     @Override
     public Object call() {
@@ -41,8 +41,8 @@ public class BibPersisterCallable implements Callable {
         List<ItemEntity> itemEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
 
-        getDBReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
-        getDBReportUtil().setCollectionGroupMap(collectionGroupMap);
+        getDbReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
+        getDbReportUtil().setCollectionGroupMap(collectionGroupMap);
 
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
         Date currentDate = new Date();
@@ -170,7 +170,7 @@ public class BibPersisterCallable implements Callable {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            reportDataEntities = getDBReportUtil().generateBibFailureReportEntity(bibliographicEntity);
+            reportDataEntities = getDbReportUtil().generateBibFailureReportEntity(bibliographicEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -216,7 +216,7 @@ public class BibPersisterCallable implements Callable {
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            getDBReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
+            getDbReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -297,7 +297,7 @@ public class BibPersisterCallable implements Callable {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            reportDataEntities = getDBReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
+            reportDataEntities = getDbReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -375,11 +375,11 @@ public class BibPersisterCallable implements Callable {
         return marcUtil;
     }
 
-    public DBReportUtil getDBReportUtil() {
-        return DBReportUtil;
+    public DBReportUtil getDbReportUtil() {
+        return dbReportUtil;
     }
 
-    public void setDBReportUtil(DBReportUtil DBReportUtil) {
-        this.DBReportUtil = DBReportUtil;
+    public void setDbReportUtil(DBReportUtil dbReportUtil) {
+        this.dbReportUtil = dbReportUtil;
     }
 }

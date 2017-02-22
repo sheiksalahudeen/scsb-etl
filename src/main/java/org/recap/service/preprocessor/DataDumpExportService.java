@@ -274,8 +274,10 @@ public class DataDumpExportService {
                 }
             } else {
                 parentFile.mkdirs();
-                file.createNewFile();
-                writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
+                boolean newFile = file.createNewFile();
+                if(newFile) {
+                    writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
+                }
             }
         } catch (IOException e) {
             logger.error(ReCAPConstants.ERROR,e);

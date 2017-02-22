@@ -144,9 +144,9 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 return "SCSBXml";
             case "2":
                 return "Json";
+            default:
+                return null;
         }
-        return null;
-
     }
 
     private String getFolderName(DataDumpRequest dataDumpRequest) {

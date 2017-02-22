@@ -77,7 +77,7 @@ public class SCSBRecordFormatActiveMQConsumer {
             }
         }
 
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         processFailures(failures, batchHeaders, requestId, fluentProducerTemplate);
 
@@ -89,7 +89,7 @@ public class SCSBRecordFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
                 .withBody(records)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
                 .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
         fluentProducerTemplate.send();

@@ -49,7 +49,7 @@ public class BibDataProcessor {
     EntityManager entityManager;
 
     @Autowired
-    DBReportUtil DBReportUtil;
+    DBReportUtil dbReportUtil;
 
     @Transactional
     public void processETLExchagneAndPersistToDB(ETLExchange etlExchange) {
@@ -63,8 +63,8 @@ public class BibDataProcessor {
             } catch (Exception e) {
                 logger.error(ReCAPConstants.ERROR,e);
                 clearSession();
-                DBReportUtil.setCollectionGroupMap(etlExchange.getCollectionGroupMap());
-                DBReportUtil.setInstitutionEntitiesMap(etlExchange.getInstitutionEntityMap());
+                dbReportUtil.setCollectionGroupMap(etlExchange.getCollectionGroupMap());
+                dbReportUtil.setInstitutionEntitiesMap(etlExchange.getInstitutionEntityMap());
                 for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
                     try {
                         bibliographicDetailsRepository.save(bibliographicEntity);
@@ -72,7 +72,7 @@ public class BibDataProcessor {
                     } catch (Exception ex) {
                         logger.error(ReCAPConstants.ERROR,ex);
                         clearSession();
-                        reportEntity = processBibHoldingsItems(DBReportUtil, bibliographicEntity);
+                        reportEntity = processBibHoldingsItems(dbReportUtil, bibliographicEntity);
                     }
                 }
             }

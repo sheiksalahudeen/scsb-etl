@@ -34,7 +34,7 @@ public class MarcXMLFormatActiveMQConsumer {
         long startTime = System.currentTimeMillis();
 
         String toMarcXmlString = null;
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         try {
             toMarcXmlString = marcXmlFormatterService.covertToMarcXmlString(records);
@@ -70,9 +70,9 @@ public class MarcXMLFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
 
     }
@@ -97,9 +97,9 @@ public class MarcXMLFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
 
