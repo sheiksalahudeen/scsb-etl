@@ -45,13 +45,16 @@ public class DataDumpExportService {
     private DataDumpExecutorService dataDumpExecutorService;
 
     @Autowired
-    DataDumpEmailService dataDumpEmailService;
+    private DataDumpEmailService dataDumpEmailService;
 
     @Autowired
-    ConsumerTemplate consumerTemplate;
+    private ConsumerTemplate consumerTemplate;
 
     @Value("${datadump.status.file.name}")
-    String dataDumpStatusFileName;
+    private String dataDumpStatusFileName;
+
+    @Value("${datadump.fetchtype.full}")
+    private String fetchTypeFull;
 
     public String startDataDumpProcess(DataDumpRequest dataDumpRequest) {
         String outputString = null;
@@ -191,7 +194,7 @@ public class DataDumpExportService {
                     errorcount++;
                 }
             }
-            if(dataDumpRequest.getInstitutionCodes().size() != 1 && dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL)) {
+            if(dataDumpRequest.getInstitutionCodes().size() != 1 && dataDumpRequest.getFetchType().equals(fetchTypeFull)) {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_MULTIPLE_INST_CODES_ERR_MSG);
                 errorcount++;
             }
@@ -201,7 +204,7 @@ public class DataDumpExportService {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
                 errorcount++;
         }
-        if (!dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) &&
+        if (!dataDumpRequest.getFetchType().equals(fetchTypeFull) &&
                 !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)
                 && !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED)) {
             errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
@@ -213,7 +216,7 @@ public class DataDumpExportService {
             errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
             errorcount++;
         }
-        if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) && dataDumpRequest.getInstitutionCodes() == null) {
+        if (dataDumpRequest.getFetchType().equals(fetchTypeFull) && dataDumpRequest.getInstitutionCodes() == null) {
                 errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
         }
@@ -234,7 +237,7 @@ public class DataDumpExportService {
             }
         }
 
-        if(dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_FULL) && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+        if(dataDumpRequest.getFetchType().equals(fetchTypeFull) && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             String dataExportStatus = getDataExportCurrentStatus();
             if(dataExportStatus != null && dataExportStatus.equals(ReCAPConstants.IN_PROGRESS)){
                 errorMessageMap.put(errorcount, ReCAPConstants.FULLDUMP_INPROGRESS_ERR_MSG);
@@ -287,9 +290,15 @@ public class DataDumpExportService {
 
     private void writeStatusToFile(File file, String status) throws IOException {
         FileWriter fileWriter = new FileWriter(file, false);
-        fileWriter.append(status);
-        fileWriter.flush();
-        fileWriter.close();
+        try {
+            fileWriter.append(status);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            logger.error(ReCAPConstants.EXCEPTION,e);
+        } finally {
+            fileWriter.close();
+        }
     }
 
     private String buildErrorMessage(Map<Integer, String> erroMessageMap) {
