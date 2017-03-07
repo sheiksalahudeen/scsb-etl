@@ -3,7 +3,7 @@ package org.recap.service.transmission.datadump;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.zipfile.ZipAggregationStrategy;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,19 +38,19 @@ public class DataDumpFtpTransmissionService implements DataDumpTransmissionInter
 
     @Override
     public boolean isInterested(DataDumpRequest dataDumpRequest) {
-        return dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP) ? true : false;
+        return dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP) ? true : false;
     }
 
     @Override
     public void transmitDataDump(Map<String, String> routeMap) throws Exception {
-        String requestingInstitutionCode = routeMap.get(ReCAPConstants.REQUESTING_INST_CODE);
-        String dateTimeFolder = routeMap.get(ReCAPConstants.DATETIME_FOLDER);
-        String fileName = routeMap.get(ReCAPConstants.FILENAME);
+        String requestingInstitutionCode = routeMap.get(RecapConstants.REQUESTING_INST_CODE);
+        String dateTimeFolder = routeMap.get(RecapConstants.DATETIME_FOLDER);
+        String fileName = routeMap.get(RecapConstants.FILENAME);
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("file:"+ dumpDirectoryPath + File.separator + requestingInstitutionCode + File.separator + dateTimeFolder + "?antInclude=*.xml")
-                        .routeId(ReCAPConstants.DATADUMP_ZIPFTP_ROUTE_ID)
+                        .routeId(RecapConstants.DATADUMP_ZIPFTP_ROUTE_ID)
                         .aggregate(new ZipAggregationStrategy())
                         .constant(true)
                         .completionFromBatchConsumer()

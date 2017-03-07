@@ -2,7 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +31,7 @@ public class ReportDataRepositoryUT extends BaseTestCase {
     private void saveReportDataEntity(){
         ReportDataEntity reportDataEntity = new ReportDataEntity();
         reportDataEntity.setReportDataId(100);
-        reportDataEntity.setHeaderName(ReCAPConstants.BIB_ID);
+        reportDataEntity.setHeaderName(RecapConstants.BIB_ID);
         reportDataEntity.setHeaderValue("10,20");
         reportDataEntity.setRecordNum("50");
         reportDataRepository.saveAndFlush(reportDataEntity);
@@ -39,9 +39,9 @@ public class ReportDataRepositoryUT extends BaseTestCase {
 
     private List<String> getHeaderNameList() {
         List<String> headerNameList = new ArrayList<>();
-        headerNameList.add(ReCAPConstants.BIB_ID);
-        headerNameList.add(ReCAPConstants.OWNING_INSTITUTION);
-        headerNameList.add(ReCAPConstants.OWNING_INSTITUTION_BIB_ID);
+        headerNameList.add(RecapConstants.BIB_ID);
+        headerNameList.add(RecapConstants.OWNING_INSTITUTION);
+        headerNameList.add(RecapConstants.OWNING_INSTITUTION_BIB_ID);
         return headerNameList;
     }
 }

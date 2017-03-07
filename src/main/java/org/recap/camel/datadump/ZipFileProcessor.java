@@ -5,7 +5,7 @@ import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.zipfile.ZipAggregationStrategy;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,16 +52,16 @@ public class ZipFileProcessor implements Processor {
         dataExportEmailProcessor.setRequestId(getValueFor(batchHeaders, "requestId"));
         dataExportEmailProcessor.setFetchType(getValueFor(batchHeaders, "fetchType"));
 
-        Route ftpRoute = exchange.getContext().getRoute(ReCAPConstants.FTP_ROUTE);
+        Route ftpRoute = exchange.getContext().getRoute(RecapConstants.FTP_ROUTE);
         if (null != ftpRoute) {
-            exchange.getContext().removeRoute(ReCAPConstants.FTP_ROUTE);
+            exchange.getContext().removeRoute(RecapConstants.FTP_ROUTE);
         }
 
         exchange.getContext().addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("file:" + ftpStagingDir + File.separator + folderName + "?noop=true&antInclude=*.xml,*.json")
-                        .routeId(ReCAPConstants.FTP_ROUTE)
+                        .routeId(RecapConstants.FTP_ROUTE)
                         .aggregate(new ZipAggregationStrategy(true, true))
                         .constant(true)
                         .completionFromBatchConsumer()

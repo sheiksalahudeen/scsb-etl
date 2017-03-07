@@ -2,7 +2,7 @@ package org.recap.camel.datadump;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
@@ -61,10 +61,10 @@ public class DataExportEmailProcessor implements Processor {
             List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
             for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
                 ReportDataEntity reportDataEntity = iterator.next();
-                if(reportDataEntity.getHeaderName().equals(ReCAPConstants.NUM_BIBS_EXPORTED)){
+                if(reportDataEntity.getHeaderName().equals(RecapConstants.NUM_BIBS_EXPORTED)){
                     totalRecordCount = reportDataEntity.getHeaderValue();
                 }
-                if(reportDataEntity.getHeaderName().equals(ReCAPConstants.FAILED_BIBS)){
+                if(reportDataEntity.getHeaderName().equals(RecapConstants.FAILED_BIBS)){
                     failedBibs = reportDataEntity.getHeaderValue();
                 }
             }
@@ -79,26 +79,26 @@ public class DataExportEmailProcessor implements Processor {
         File file = new File(dataDumpStatusFileName);
         FileWriter fileWriter = new FileWriter(file, false);
         try {
-            fileWriter.append(ReCAPConstants.COMPLETED);
+            fileWriter.append(RecapConstants.COMPLETED);
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
-            logger.error(ReCAPConstants.EXCEPTION,e);
+            logger.error(RecapConstants.EXCEPTION,e);
         } finally {
             fileWriter.close();
         }
     }
 
     private void processEmail(String totalRecordCount,String failedBibs){
-        if (transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
-                ||transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
+        if (transmissionType.equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                ||transmissionType.equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
             dataDumpEmailService.sendEmail(institutionCodes,
                     Integer.valueOf(totalRecordCount),
                     Integer.valueOf(failedBibs),
                     transmissionType,
                     this.folderName,
                     toEmailId,
-                    ReCAPConstants.DATADUMP_DATA_AVAILABLE
+                    RecapConstants.DATADUMP_DATA_AVAILABLE
             );
         }
     }

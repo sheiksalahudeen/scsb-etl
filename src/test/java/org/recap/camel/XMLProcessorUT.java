@@ -5,7 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.jpa.XmlRecordEntity;
@@ -119,14 +119,14 @@ public class XMLProcessorUT extends BaseTestCase {
 
         Thread.sleep(2000);
 
-        List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndType("etlTestLoadReport.xml", ReCAPConstants.XML_LOAD);
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndType("etlTestLoadReport.xml", RecapConstants.XML_LOAD);
         ReportEntity reportEntity = reportEntities.get(0);
         List<ReportDataEntity> reportDataEntities =
                 reportEntity.getReportDataEntities();
 
         ReportDataEntity reportDataEntity = reportDataEntities.get(0);
-        assertEquals(ReCAPConstants.FILE_LOAD_STATUS, reportDataEntity.getHeaderName());
-        assertEquals(ReCAPConstants.FILE_LOADED, reportDataEntity.getHeaderValue());
+        assertEquals(RecapConstants.FILE_LOAD_STATUS, reportDataEntity.getHeaderName());
+        assertEquals(RecapConstants.FILE_LOADED, reportDataEntity.getHeaderValue());
     }
 
     @Test

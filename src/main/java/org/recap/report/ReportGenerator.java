@@ -2,7 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class ReportGenerator {
     public String generateReport(String fileName, String operationType, String reportType, String institutionName, Date from, Date to, String transmissionType) {
 
         List<ReportEntity> reportEntities;
-        if(operationType.equals(ReCAPConstants.BATCH_EXPORT)){
+        if(operationType.equals(RecapConstants.BATCH_EXPORT)){
             reportType = operationType+reportType;
         }
         if(StringUtils.isNotBlank(fileName)) {

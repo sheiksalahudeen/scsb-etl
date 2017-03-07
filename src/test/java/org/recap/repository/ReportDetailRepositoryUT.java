@@ -2,7 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName("test.xml");
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(ReCAPConstants.FAILURE);
+        reportEntity.setType(RecapConstants.FAILURE);
         reportEntity.setInstitutionName("CUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();

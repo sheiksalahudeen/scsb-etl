@@ -1,17 +1,15 @@
 package org.recap.service.executor.datadump;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +86,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
         String outputString = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
@@ -111,7 +109,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
         String outputString = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
@@ -133,13 +131,13 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
         institutionCodes.add("PUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.JSON_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.JSON_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
         String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
         Thread.sleep(1000);
         String dateTimeString = getDateTimeString();
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ReCAPConstants.JSON_FILE_FORMAT;
+        String ftpFileName = RecapConstants.DATA_DUMP_FILE_NAME+requestingInstitutionCode+"1"+"-"+dateTimeString+ RecapConstants.JSON_FILE_FORMAT;
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+requestingInstitutionCode+File.separator+dateTimeString;
         assertNotNull(response);
         assertNotNull(response,"Success");
@@ -147,7 +145,7 @@ public class DeletedDataDumpExecutorServiceUT extends BaseTestCase{
 
     private String getDateTimeString(){
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);
     }
 

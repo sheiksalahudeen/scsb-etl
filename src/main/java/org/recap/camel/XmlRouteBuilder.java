@@ -6,7 +6,7 @@ import org.apache.camel.component.file.FileEndpoint;
 import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileFilter;
 import org.apache.commons.io.FilenameUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.repository.XmlRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class XmlRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
 
     }

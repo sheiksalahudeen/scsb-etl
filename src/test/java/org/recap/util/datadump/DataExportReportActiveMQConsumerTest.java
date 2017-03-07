@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.consumer.DataExportReportActiveMQConsumer;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -32,11 +32,11 @@ public class DataExportReportActiveMQConsumerTest {
     public void processNewSuccessReportEntity() throws  Exception {
        DataExportReportActiveMQConsumer dataExportReportActiveMQConsumer = new DataExportReportActiveMQConsumer();
         HashMap values = new HashMap();
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, "PUL");
-        values.put(ReCAPConstants.NUM_RECORDS, "12");
-        values.put(ReCAPConstants.NUM_BIBS_EXPORTED, "Num Bibs Exported");
-        values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
-        values.put(ReCAPConstants.REQUEST_ID, "PUL-2017-12-12 11");
+        values.put(RecapConstants.REQUESTING_INST_CODE, "PUL");
+        values.put(RecapConstants.NUM_RECORDS, "12");
+        values.put(RecapConstants.NUM_BIBS_EXPORTED, "Num Bibs Exported");
+        values.put(RecapConstants.BATCH_EXPORT, "Batch Export");
+        values.put(RecapConstants.REQUEST_ID, "PUL-2017-12-12 11");
 
         dataExportReportActiveMQConsumer.setReportDetailRepository(mockReportDetailsRepository);
 
@@ -51,18 +51,18 @@ public class DataExportReportActiveMQConsumerTest {
     public void processExistingSuccessReportEntity() throws  Exception {
        DataExportReportActiveMQConsumer dataExportReportActiveMQConsumer = new DataExportReportActiveMQConsumer();
         HashMap values = new HashMap();
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, "PUL");
-        values.put(ReCAPConstants.NUM_RECORDS, "12");
-        values.put(ReCAPConstants.NUM_BIBS_EXPORTED, "NoOfBibsExported");
-        values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_SUCCESS);
-        values.put(ReCAPConstants.REQUEST_ID, "PUL-2017-12-12 11");
+        values.put(RecapConstants.REQUESTING_INST_CODE, "PUL");
+        values.put(RecapConstants.NUM_RECORDS, "12");
+        values.put(RecapConstants.NUM_BIBS_EXPORTED, "NoOfBibsExported");
+        values.put(RecapConstants.BATCH_EXPORT, RecapConstants.BATCH_EXPORT_SUCCESS);
+        values.put(RecapConstants.REQUEST_ID, "PUL-2017-12-12 11");
         dataExportReportActiveMQConsumer.setReportDetailRepository(mockReportDetailsRepository);
 
         ReportEntity savedReportEntity = dataExportReportActiveMQConsumer.saveSuccessReportEntity(values);
 
 
-        Mockito.when(mockReportDetailsRepository.findByFileNameAndType("PUL-2017-12-12 11",ReCAPConstants.BATCH_EXPORT_SUCCESS)).thenReturn(Arrays.asList(savedReportEntity));
-        values.put(ReCAPConstants.NUM_RECORDS, "10");
+        Mockito.when(mockReportDetailsRepository.findByFileNameAndType("PUL-2017-12-12 11", RecapConstants.BATCH_EXPORT_SUCCESS)).thenReturn(Arrays.asList(savedReportEntity));
+        values.put(RecapConstants.NUM_RECORDS, "10");
         ReportEntity updatedReportEntity = dataExportReportActiveMQConsumer.saveSuccessReportEntity(values);
         assertNotNull(updatedReportEntity);
         List<ReportDataEntity> updatedReportDataEntities = updatedReportEntity.getReportDataEntities();
@@ -78,11 +78,11 @@ public class DataExportReportActiveMQConsumerTest {
     public void processNewFailureReportEntity() throws  Exception {
        DataExportReportActiveMQConsumer dataExportReportActiveMQConsumer = new DataExportReportActiveMQConsumer();
         HashMap values = new HashMap();
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, "PUL");
-        values.put(ReCAPConstants.FAILED_BIBS, "2");
-        values.put(ReCAPConstants.FAILURE_CAUSE, "Bad happened");
-        values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
-        values.put(ReCAPConstants.REQUEST_ID, "PUL-2017-12-12 11");
+        values.put(RecapConstants.REQUESTING_INST_CODE, "PUL");
+        values.put(RecapConstants.FAILED_BIBS, "2");
+        values.put(RecapConstants.FAILURE_CAUSE, "Bad happened");
+        values.put(RecapConstants.BATCH_EXPORT, "Batch Export");
+        values.put(RecapConstants.REQUEST_ID, "PUL-2017-12-12 11");
         dataExportReportActiveMQConsumer.setReportDetailRepository(mockReportDetailsRepository);
 
         ReportEntity savedReportEntity = dataExportReportActiveMQConsumer.saveFailureReportEntity(values);
@@ -93,24 +93,24 @@ public class DataExportReportActiveMQConsumerTest {
     public void processExistingFailureReportEntity() throws  Exception {
         DataExportReportActiveMQConsumer dataExportReportActiveMQConsumer = new DataExportReportActiveMQConsumer();
         HashMap values = new HashMap();
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, "PUL");
-        values.put(ReCAPConstants.FAILED_BIBS, "2");
-        values.put(ReCAPConstants.FAILURE_CAUSE, "Bad happened");
-        values.put(ReCAPConstants.BATCH_EXPORT, "Batch Export");
-        values.put(ReCAPConstants.REQUEST_ID, "PUL-2017-12-12 11");
+        values.put(RecapConstants.REQUESTING_INST_CODE, "PUL");
+        values.put(RecapConstants.FAILED_BIBS, "2");
+        values.put(RecapConstants.FAILURE_CAUSE, "Bad happened");
+        values.put(RecapConstants.BATCH_EXPORT, "Batch Export");
+        values.put(RecapConstants.REQUEST_ID, "PUL-2017-12-12 11");
         dataExportReportActiveMQConsumer.setReportDetailRepository(mockReportDetailsRepository);
 
         ReportEntity savedReportEntity = dataExportReportActiveMQConsumer.saveFailureReportEntity(values);
 
 
-        Mockito.when(mockReportDetailsRepository.findByFileNameAndType("PUL-2017-12-12 11",ReCAPConstants.BATCH_EXPORT_FAILURE)).thenReturn(Arrays.asList(savedReportEntity));
-        values.put(ReCAPConstants.NUM_RECORDS, "3");
+        Mockito.when(mockReportDetailsRepository.findByFileNameAndType("PUL-2017-12-12 11", RecapConstants.BATCH_EXPORT_FAILURE)).thenReturn(Arrays.asList(savedReportEntity));
+        values.put(RecapConstants.NUM_RECORDS, "3");
         ReportEntity updatedReportEntity = dataExportReportActiveMQConsumer.saveFailureReportEntity(values);
         assertNotNull(updatedReportEntity);
         List<ReportDataEntity> updatedReportDataEntities = updatedReportEntity.getReportDataEntities();
         for (Iterator<ReportDataEntity> iterator = updatedReportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity reportDataEntity = iterator.next();
-            if(reportDataEntity.getHeaderName().equals(ReCAPConstants.FAILED_BIBS)){
+            if(reportDataEntity.getHeaderName().equals(RecapConstants.FAILED_BIBS)){
                 assertEquals("5", reportDataEntity.getHeaderValue());
             }
         }

@@ -3,7 +3,7 @@ package org.recap.camel.datadump.consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 import org.recap.util.XmlFormatter;
@@ -38,13 +38,13 @@ public class SCSBXMLFormatActiveMQConsumer {
         long startTime = System.currentTimeMillis();
 
         String toSCSBXmlString = null;
-        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
+        String batchHeaders = (String) exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         try {
             toSCSBXmlString = scsbXmlFormatterService.getSCSBXmlForBibRecords(records);
             processSuccessReportEntity(exchange, records.size(), batchHeaders, requestId);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
             processFailureReportEntity(exchange, records.size(), batchHeaders, requestId, e);
         }
         long endTime = System.currentTimeMillis();
@@ -56,26 +56,26 @@ public class SCSBXMLFormatActiveMQConsumer {
 
     private void processSuccessReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId) {
         Map values = new HashMap<>();
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
-        values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
-        values.put(ReCAPConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.FETCH_TYPE));
-        values.put(ReCAPConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.COLLECTION_GROUP_IDS));
-        values.put(ReCAPConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TRANSMISSION_TYPE));
-        values.put(ReCAPConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FROM_DATE));
-        values.put(ReCAPConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FORMAT));
-        values.put(ReCAPConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TO_EMAIL_ID));
-        values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(size));
-        values.put(ReCAPConstants.NUM_BIBS_EXPORTED, ReCAPConstants.NUM_BIBS_EXPORTED);
-        values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_SUCCESS);
-        values.put(ReCAPConstants.REQUEST_ID, requestId);
+        values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
+        values.put(RecapConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.INSTITUTION_CODES));
+        values.put(RecapConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.FETCH_TYPE));
+        values.put(RecapConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.COLLECTION_GROUP_IDS));
+        values.put(RecapConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.TRANSMISSION_TYPE));
+        values.put(RecapConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.EXPORT_FROM_DATE));
+        values.put(RecapConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.EXPORT_FORMAT));
+        values.put(RecapConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.TO_EMAIL_ID));
+        values.put(RecapConstants.NUM_RECORDS, String.valueOf(size));
+        values.put(RecapConstants.NUM_BIBS_EXPORTED, RecapConstants.NUM_BIBS_EXPORTED);
+        values.put(RecapConstants.BATCH_EXPORT, RecapConstants.BATCH_EXPORT_SUCCESS);
+        values.put(RecapConstants.REQUEST_ID, requestId);
 
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
-                .to(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
+                .to(RecapConstants.DATADUMP_SUCCESS_REPORT_Q)
                 .withBody(values)
-                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
-                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
-                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
+                .withHeader(RecapConstants.BATCH_HEADERS, exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS))
+                .withHeader(RecapConstants.EXPORT_FORMAT, exchange.getIn().getHeader(RecapConstants.EXPORT_FORMAT))
+                .withHeader(RecapConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(RecapConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
 
     }
@@ -83,27 +83,27 @@ public class SCSBXMLFormatActiveMQConsumer {
     private void processFailureReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId, Exception e) {
         HashMap values = new HashMap();
 
-        values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
-        values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
-        values.put(ReCAPConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.FETCH_TYPE));
-        values.put(ReCAPConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.COLLECTION_GROUP_IDS));
-        values.put(ReCAPConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TRANSMISSION_TYPE));
-        values.put(ReCAPConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FROM_DATE));
-        values.put(ReCAPConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FORMAT));
-        values.put(ReCAPConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TO_EMAIL_ID));
-        values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(size));
-        values.put(ReCAPConstants.FAILURE_CAUSE, String.valueOf(e.getCause()));
-        values.put(ReCAPConstants.FAILED_BIBS, ReCAPConstants.FAILED_BIBS);
-        values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
-        values.put(ReCAPConstants.REQUEST_ID, requestId);
+        values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
+        values.put(RecapConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.INSTITUTION_CODES));
+        values.put(RecapConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.FETCH_TYPE));
+        values.put(RecapConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.COLLECTION_GROUP_IDS));
+        values.put(RecapConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.TRANSMISSION_TYPE));
+        values.put(RecapConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.EXPORT_FROM_DATE));
+        values.put(RecapConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.EXPORT_FORMAT));
+        values.put(RecapConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.TO_EMAIL_ID));
+        values.put(RecapConstants.NUM_RECORDS, String.valueOf(size));
+        values.put(RecapConstants.FAILURE_CAUSE, String.valueOf(e.getCause()));
+        values.put(RecapConstants.FAILED_BIBS, RecapConstants.FAILED_BIBS);
+        values.put(RecapConstants.BATCH_EXPORT, RecapConstants.BATCH_EXPORT_FAILURE);
+        values.put(RecapConstants.REQUEST_ID, requestId);
 
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
-                .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                .to(RecapConstants.DATADUMP_FAILURE_REPORT_Q)
                 .withBody(values)
-                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
-                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
-                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
+                .withHeader(RecapConstants.BATCH_HEADERS, exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS))
+                .withHeader(RecapConstants.EXPORT_FORMAT, exchange.getIn().getHeader(RecapConstants.EXPORT_FORMAT))
+                .withHeader(RecapConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(RecapConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
 

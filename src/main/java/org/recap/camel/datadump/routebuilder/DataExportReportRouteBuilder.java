@@ -2,7 +2,7 @@ package org.recap.camel.datadump.routebuilder;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.consumer.DataExportReportActiveMQConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +23,8 @@ public class DataExportReportRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
-                            .routeId(ReCAPConstants.DATADUMP_SUCCESS_REPORT_ROUTE_ID)
+                    from(RecapConstants.DATADUMP_SUCCESS_REPORT_Q)
+                            .routeId(RecapConstants.DATADUMP_SUCCESS_REPORT_ROUTE_ID)
                             .bean(DataExportReportActiveMQConsumer.class, "saveSuccessReportEntity");
                 }
             });
@@ -32,13 +32,13 @@ public class DataExportReportRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
-                            .routeId(ReCAPConstants.DATADUMP_FAILURE_REPORT_ROUTE_ID)
+                    from(RecapConstants.DATADUMP_FAILURE_REPORT_Q)
+                            .routeId(RecapConstants.DATADUMP_FAILURE_REPORT_ROUTE_ID)
                             .bean(DataExportReportActiveMQConsumer.class, "saveFailureReportEntity");
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 }

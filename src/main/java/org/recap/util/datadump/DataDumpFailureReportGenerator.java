@@ -2,7 +2,7 @@ package org.recap.util.datadump;
 
 import info.freelibrary.util.LoggerFactory;
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.DataDumpFailureReport;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -37,7 +37,7 @@ public class DataDumpFailureReportGenerator {
                 try {
                     setterMethod.invoke(dataDumpFailureReport, headerValue);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    logger.error(ReCAPConstants.ERROR,e);
+                    logger.error(RecapConstants.ERROR,e);
                 }
             }
         }
@@ -49,7 +49,7 @@ public class DataDumpFailureReportGenerator {
         try {
             return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
         } catch (IntrospectionException e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
         return null;
     }
@@ -59,7 +59,7 @@ public class DataDumpFailureReportGenerator {
         try {
             return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DataDumpFailureReport.class));
         } catch (IntrospectionException e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
         return null;
     }

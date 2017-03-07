@@ -3,7 +3,7 @@ package org.recap.camel.datadump.consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.callable.BibEntityPreparerCallable;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -65,7 +65,7 @@ public class BibEntityGeneratorActiveMQConsumer {
                     try {
                         return future.get();
                     } catch (InterruptedException | ExecutionException e) {
-                        logger.error(ReCAPConstants.ERROR,e);
+                        logger.error(RecapConstants.ERROR,e);
                         throw new RuntimeException(e);
                     }
                 });
@@ -83,7 +83,7 @@ public class BibEntityGeneratorActiveMQConsumer {
 
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
-                .to(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
+                .to(RecapConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
                 .withBody(bibliographicEntities)
                 .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))

@@ -1,7 +1,7 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -36,7 +36,7 @@ public class ReCAPCSVSuccessRecordGenerator {
                 try {
                     setterMethod.invoke(successReportReCAPCSVRecord, headerValue);
                 } catch (Exception e) {
-                    logger.error(ReCAPConstants.ERROR,e);
+                    logger.error(RecapConstants.ERROR,e);
                 }
             }
         }
@@ -48,7 +48,7 @@ public class ReCAPCSVSuccessRecordGenerator {
         try {
             return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, SuccessReportReCAPCSVRecord.class));
         } catch (IntrospectionException e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
         return null;
     }
@@ -58,7 +58,7 @@ public class ReCAPCSVSuccessRecordGenerator {
         try {
             return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SuccessReportReCAPCSVRecord.class));
         } catch (IntrospectionException e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
         return null;
     }

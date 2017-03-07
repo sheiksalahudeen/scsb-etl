@@ -3,7 +3,7 @@ package org.recap.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,20 +35,20 @@ public class EmailRouteBuilder {
                     loadEmailBodyTemplateForNoData();
                     loadEmailPassword();
 
-                    from(ReCAPConstants.EMAIL_Q)
-                            .routeId(ReCAPConstants.EMAIL_ROUTE_ID)
+                    from(RecapConstants.EMAIL_Q)
+                            .routeId(RecapConstants.EMAIL_ROUTE_ID)
                             .setHeader("emailPayLoad").body(EmailPayLoad.class)
                             .onCompletion().log("Email has been sent successfully.")
                             .end()
                                 .choice()
-                                    .when(header(ReCAPConstants.DATADUMP_EMAILBODY_FOR).isEqualTo(ReCAPConstants.DATADUMP_DATA_AVAILABLE))
+                                    .when(header(RecapConstants.DATADUMP_EMAILBODY_FOR).isEqualTo(RecapConstants.DATADUMP_DATA_AVAILABLE))
                                         .setHeader("subject", simple(subject))
                                         .setBody(simple(emailBody))
                                         .setHeader("from", simple(from))
                                         .setHeader("to", simple("${header.emailPayLoad.to}"))
                                         .log("email body for data available")
                                         .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
-                                    .when(header("emailBodyFor").isEqualTo(ReCAPConstants.DATADUMP_NO_DATA_AVAILABLE))
+                                    .when(header("emailBodyFor").isEqualTo(RecapConstants.DATADUMP_NO_DATA_AVAILABLE))
                                         .setHeader("subject", simple(noDataSubject))
                                         .setBody(simple(emailBodyForNoData))
                                         .setHeader("from", simple(from))
@@ -73,7 +73,7 @@ public class EmailRouteBuilder {
                             }
                         }
                     } catch (IOException e) {
-                        logger.error(ReCAPConstants.ERROR,e);
+                        logger.error(RecapConstants.ERROR,e);
                     }
                     emailBody = out.toString();
                 }
@@ -93,7 +93,7 @@ public class EmailRouteBuilder {
                             }
                         }
                     } catch (IOException e) {
-                        logger.error(ReCAPConstants.ERROR,e);
+                        logger.error(RecapConstants.ERROR,e);
                     }
                     emailBodyForNoData = out.toString();
                 }
@@ -104,13 +104,13 @@ public class EmailRouteBuilder {
                         try {
                             emailPassword = FileUtils.readFileToString(file, "UTF-8").trim();
                         } catch (IOException e) {
-                            logger.error(ReCAPConstants.ERROR,e);
+                            logger.error(RecapConstants.ERROR,e);
                         }
                     }
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 

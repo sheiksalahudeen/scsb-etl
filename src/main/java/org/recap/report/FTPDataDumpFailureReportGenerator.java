@@ -2,7 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FilenameUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.DataDumpFailureReport;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.util.datadump.DataDumpFailureReportGenerator;
@@ -28,17 +28,17 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT_FAILURE) ? true : false;
+        return reportType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT_FAILURE) ? true : false;
     }
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return transmissionType.equalsIgnoreCase(ReCAPConstants.FTP) ? true : false;
+        return transmissionType.equalsIgnoreCase(RecapConstants.FTP) ? true : false;
     }
 
     @Override
     public boolean isOperationType(String operationType) {
-        return operationType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT) ? true : false;
+        return operationType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT) ? true : false;
     }
 
     @Override
@@ -56,8 +56,8 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
             dataDumpFailureReport.setInstitutionName(reportEntity.getInstitutionName());
             dataDumpFailureReport.setFileName(fileName);
             dataDumpFailureReport.setDataDumpFailureReportRecordList(dataDumpSuccessReportList);
-            producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_FTP_Q, dataDumpFailureReport);
-            DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
+            producerTemplate.sendBody(RecapConstants.DATADUMP_FAILURE_REPORT_FTP_Q, dataDumpFailureReport);
+            DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             return FilenameUtils.removeExtension(dataDumpFailureReport.getFileName()) + "-" + dataDumpFailureReport.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
         return null;
