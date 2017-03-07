@@ -20,7 +20,7 @@ import java.util.Map;
 @Service
 public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
 
-    private Logger logger = LoggerFactory.getLogger(DeletedJsonFormatterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeletedJsonFormatterService.class);
     @Override
     public boolean isInterested(String formatType) {
         return formatType.equals(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT) ? true:false;

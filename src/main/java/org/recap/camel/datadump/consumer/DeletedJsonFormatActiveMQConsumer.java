@@ -19,7 +19,7 @@ import java.util.Map;
  */
 
 public class DeletedJsonFormatActiveMQConsumer {
-    Logger logger = LoggerFactory.getLogger(DeletedJsonFormatActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeletedJsonFormatActiveMQConsumer.class);
 
     DeletedJsonFormatterService deletedJsonFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;

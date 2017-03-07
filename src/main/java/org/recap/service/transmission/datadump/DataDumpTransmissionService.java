@@ -18,7 +18,7 @@ import java.util.Map;
 @Service
 public class DataDumpTransmissionService {
 
-    Logger logger = LoggerFactory.getLogger(DataDumpTransmissionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpTransmissionService.class);
 
     private List<DataDumpTransmissionInterface> dataDumpTransmissionInterfaceList;
 

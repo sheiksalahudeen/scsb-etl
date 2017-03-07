@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class EtlDataLoadProcessor {
 
-    Logger logger = LoggerFactory.getLogger(EtlDataLoadProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(EtlDataLoadProcessor.class);
 
     private Integer batchSize;
     private String fileName;
@@ -144,14 +144,6 @@ public class EtlDataLoadProcessor {
         reportEntity.setInstitutionName(institutionName);
 
         producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
-    }
-
-    public Logger getLogger() {
-        return logger;
-    }
-
-    public void setLogger(Logger logger) {
-        this.logger = logger;
     }
 
     public ProducerTemplate getProducer() {

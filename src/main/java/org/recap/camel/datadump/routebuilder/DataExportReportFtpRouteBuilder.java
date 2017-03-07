@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataExportReportFtpRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(DataExportReportFtpRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataExportReportFtpRouteBuilder.class);
 
     @Autowired
     public DataExportReportFtpRouteBuilder(CamelContext context,

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileNameProcessorForFailureRecord implements Processor {
 
-    Logger logger = LoggerFactory.getLogger(FileNameProcessorForFailureRecord.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileNameProcessorForFailureRecord.class);
 
     @Override
     public void process(Exchange exchange) throws Exception {

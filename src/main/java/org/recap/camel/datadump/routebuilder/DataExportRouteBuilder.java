@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class DataExportRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(DataExportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataExportRouteBuilder.class);
 
     public DataExportRouteBuilder(CamelContext camelContext,
                                   BibliographicDetailsRepository bibliographicDetailsRepository,

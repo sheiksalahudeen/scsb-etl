@@ -35,7 +35,7 @@ import java.util.Date;
 @Controller
 public class EtlDataLoadController {
 
-    Logger logger = LoggerFactory.getLogger(EtlDataLoadController.class);
+    private static final Logger logger = LoggerFactory.getLogger(EtlDataLoadController.class);
 
     @Autowired
     CamelContext camelContext;

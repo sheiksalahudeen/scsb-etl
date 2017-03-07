@@ -19,7 +19,7 @@ import java.util.Map;
  */
 
 public class MarcXMLFormatActiveMQConsumer {
-    Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private MarcXmlFormatterService marcXmlFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;

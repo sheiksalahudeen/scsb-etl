@@ -19,7 +19,7 @@ import java.io.File;
 
 @Component
 public class CSVFailureReportRouteBuilder {
-    Logger logger = LoggerFactory.getLogger(CSVFailureReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVFailureReportRouteBuilder.class);
 
     @Autowired
     public CSVFailureReportRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {

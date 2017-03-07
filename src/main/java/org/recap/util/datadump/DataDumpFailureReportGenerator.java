@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DataDumpFailureReportGenerator {
 
-    Logger logger = LoggerFactory.getLogger(DataDumpFailureReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpFailureReportGenerator.class);
 
     public DataDumpFailureReport prepareDataDumpCSVFailureRecord(ReportEntity reportEntity) {
 

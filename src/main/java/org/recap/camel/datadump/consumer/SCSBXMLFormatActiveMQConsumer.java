@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class SCSBXMLFormatActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(SCSBXMLFormatActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(SCSBXMLFormatActiveMQConsumer.class);
 
     SCSBXmlFormatterService scsbXmlFormatterService;
     XmlFormatter xmlFormatter;

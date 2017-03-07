@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 public class SCSBRecordFormatActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(SCSBRecordFormatActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(SCSBRecordFormatActiveMQConsumer.class);
 
     SCSBXmlFormatterService scsbXmlFormatterService;
     private ExecutorService executorService;
