@@ -22,7 +22,7 @@ import java.util.concurrent.*;
  */
 
 public class DeletedRecordFormatActiveMQConsumer {
-    Logger logger = LoggerFactory.getLogger(DeletedRecordFormatActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeletedRecordFormatActiveMQConsumer.class);
 
     DeletedJsonFormatterService deletedJsonFormatterService;
 

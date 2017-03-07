@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 
 public class BibEntityGeneratorActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ExecutorService executorService;

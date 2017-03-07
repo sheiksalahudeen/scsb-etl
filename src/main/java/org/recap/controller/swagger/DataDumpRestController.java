@@ -27,10 +27,6 @@ public class DataDumpRestController {
     @Autowired
     private DynamicRouteBuilder dynamicRouteBuilder;
 
-    public static Logger getLogger() {
-        return logger;
-    }
-
     public DataDumpExportService getDataDumpExportService() {
         return dataDumpExportService;
     }

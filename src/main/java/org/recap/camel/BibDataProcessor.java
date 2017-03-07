@@ -27,7 +27,7 @@ import java.util.List;
 @Component
 public class BibDataProcessor {
 
-    Logger logger = LoggerFactory.getLogger(BibDataProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibDataProcessor.class);
 
     private String xmlFileName;
 

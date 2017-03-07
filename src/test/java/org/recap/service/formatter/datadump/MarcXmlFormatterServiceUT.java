@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNull;
  */
 public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
-    private Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterServiceUT.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterServiceUT.class);
 
     @Autowired
     private MarcXmlFormatterService marcXmlFormatterService;

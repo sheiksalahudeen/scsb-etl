@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FtpFailureReportRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(FtpFailureReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FtpFailureReportRouteBuilder.class);
 
     @Autowired
     public FtpFailureReportRouteBuilder(CamelContext context,

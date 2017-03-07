@@ -30,7 +30,7 @@ import java.util.*;
 @Scope("prototype")
 public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
-    private Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterService.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterService.class);
 
     @Value("${datadump.marc.pul}")
     private String holdingPUL;

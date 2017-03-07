@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 
 @Component
 public class RecordProcessor {
-    private Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
 
     private Map institutionEntityMap;
     private Map itemStatusMap;

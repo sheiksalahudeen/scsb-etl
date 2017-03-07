@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class FullDataDumpExecutorServiceUT extends BaseTestCase {
 
-    private Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
 
     @PersistenceContext
     private EntityManager entityManager;

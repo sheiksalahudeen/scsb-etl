@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  * Created by peris on 11/5/16.
  */
 public class DataExportPredicate implements Predicate {
-    Logger logger = LoggerFactory.getLogger(DataExportPredicate.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataExportPredicate.class);
     private Integer batchSize;
 
     public DataExportPredicate(Integer batchSize) {

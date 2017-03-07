@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class XmlProcessor implements Processor {
 
-    Logger logger = LoggerFactory.getLogger(XmlProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(XmlProcessor.class);
 
     private final XmlRecordRepository xmlRecordRepository;
 

@@ -23,7 +23,7 @@ import java.io.File;
 @Component
 public class XmlRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
     @Autowired
     public XmlRouteBuilder(CamelContext context, XmlRecordRepository xmlRecordRepository, XMLFileLoadReportProcessor xmlFileLoadReportProcessor, XMLFileLoadExceptionReportProcessor xmlFileLoadExceptionReportProcessor, XMLFileLoadValidator xmlFileLoadValidator,

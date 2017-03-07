@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class IncrementalDataDumpExecutorServiceUT extends BaseTestCase{
 
-    private Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
 
     @Autowired
     private IncrementalDataDumpExecutorService incrementalDataDumpExecutorService;

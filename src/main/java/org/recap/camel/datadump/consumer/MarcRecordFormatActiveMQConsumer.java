@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 public class MarcRecordFormatActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(MarcRecordFormatActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(MarcRecordFormatActiveMQConsumer.class);
 
     MarcXmlFormatterService marcXmlFormatterService;
     private ExecutorService executorService;

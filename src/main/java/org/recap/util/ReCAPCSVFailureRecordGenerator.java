@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class ReCAPCSVFailureRecordGenerator {
 
-    Logger logger = LoggerFactory.getLogger(ReCAPCSVFailureRecordGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReCAPCSVFailureRecordGenerator.class);
 
     public FailureReportReCAPCSVRecord prepareFailureReportReCAPCSVRecord(ReportEntity reportEntity) {
 
