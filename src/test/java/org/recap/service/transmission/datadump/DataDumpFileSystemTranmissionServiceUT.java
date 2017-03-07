@@ -4,7 +4,7 @@ import org.apache.camel.ProducerTemplate;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,11 @@ public class DataDumpFileSystemTranmissionServiceUT extends BaseTestCase {
     @Test
     public void transmitFileSystemDataDump() throws Exception {
         dateTimeString = getDateTimeString();
-        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  xmlString, "routeMap", getRouteMap());
+        producer.sendBodyAndHeader(RecapConstants.DATADUMP_FILE_SYSTEM_Q,  xmlString, "routeMap", getRouteMap());
         dataDumpFileSystemTranmissionService.transmitDataDump(getRouteMap());
         Thread.sleep(2000);
-        logger.info(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+dateTimeString+ ReCAPConstants.XML_FILE_FORMAT);
-        File file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode + ReCAPConstants.ZIP_FILE_FORMAT);
+        logger.info(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + RecapConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +"-"+dateTimeString+ RecapConstants.XML_FILE_FORMAT);
+        File file = new File(dumpDirectoryPath+File.separator+ requestingInstitutionCode +File.separator+dateTimeString+ File.separator  + RecapConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode + RecapConstants.ZIP_FILE_FORMAT);
         boolean fileExists = file.exists();
         assertTrue(fileExists);
         file.delete();
@@ -57,17 +57,17 @@ public class DataDumpFileSystemTranmissionServiceUT extends BaseTestCase {
 
     public Map<String,String> getRouteMap(){
         Map<String,String> routeMap = new HashMap<>();
-        String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode;
-        routeMap.put(ReCAPConstants.FILENAME,fileName);
-        routeMap.put(ReCAPConstants.DATETIME_FOLDER, getDateTimeString());
-        routeMap.put(ReCAPConstants.REQUESTING_INST_CODE,requestingInstitutionCode);
-        routeMap.put(ReCAPConstants.FILE_FORMAT,ReCAPConstants.XML_FILE_FORMAT);
+        String fileName = RecapConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode;
+        routeMap.put(RecapConstants.FILENAME,fileName);
+        routeMap.put(RecapConstants.DATETIME_FOLDER, getDateTimeString());
+        routeMap.put(RecapConstants.REQUESTING_INST_CODE,requestingInstitutionCode);
+        routeMap.put(RecapConstants.FILE_FORMAT, RecapConstants.XML_FILE_FORMAT);
         return routeMap;
     }
 
     private String getDateTimeString(){
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);
     }
 }

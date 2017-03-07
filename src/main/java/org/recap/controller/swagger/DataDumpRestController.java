@@ -1,7 +1,7 @@
 package org.recap.controller.swagger;
 
 import io.swagger.annotations.*;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.dynamicrouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.service.preprocessor.DataDumpExportService;
@@ -46,7 +46,7 @@ public class DataDumpRestController {
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
     @ApiOperation(value = "exportDataDump",
             notes = "Export datadumps to institutions", nickname = "exportDataDump", position = 0)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = ReCAPConstants.DATADUMP_PROCESS_STARTED)})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = RecapConstants.DATADUMP_PROCESS_STARTED)})
     @ResponseBody
     public String exportDataDump(@ApiParam(value = "Code of institutions whose shared collection updates are requested. Use PUL for Princeton, CUL for Columbia and NYPL for NYPL." , required = true, name = "institutionCodes") @RequestParam String institutionCodes,
                                          @ApiParam(value = "Code of insitituion who is requesting. Use PUL for Princeton, CUL for Columbia and NYPL for NYPL. ",required=true, name = "requestingInstitutionCode") @RequestParam String requestingInstitutionCode,

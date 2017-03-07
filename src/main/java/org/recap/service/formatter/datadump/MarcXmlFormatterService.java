@@ -8,7 +8,7 @@ import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
 import org.marc4j.marc.MarcFactory;
 import org.marc4j.marc.Record;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -44,7 +44,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
     @Override
     public boolean isInterested(String formatType) {
-        return formatType.equals(ReCAPConstants.DATADUMP_XML_FORMAT_MARC) ? true : false;
+        return formatType.equals(RecapConstants.DATADUMP_XML_FORMAT_MARC) ? true : false;
     }
 
 
@@ -57,20 +57,20 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             BibliographicEntity bibliographicEntity = iterator.next();
             Map<String, Object> stringObjectMap = prepareMarcRecord(bibliographicEntity);
 
-            Record record = (Record) stringObjectMap.get(ReCAPConstants.SUCCESS);
+            Record record = (Record) stringObjectMap.get(RecapConstants.SUCCESS);
 
             if (null != record) {
                 records.add(record);
             }
 
-            String failureMsg = (String) stringObjectMap.get(ReCAPConstants.FAILURE);
+            String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
             if (null != failureMsg) {
                 errors.add(failureMsg);
             }
         }
 
-        resultsMap.put(ReCAPConstants.SUCCESS, records);
-        resultsMap.put(ReCAPConstants.FAILURE, errors);
+        resultsMap.put(RecapConstants.SUCCESS, records);
+        resultsMap.put(RecapConstants.FAILURE, errors);
 
         return resultsMap;
     }
@@ -84,10 +84,10 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             add009Field(record, bibliographicEntity);
             List<Integer> itemIds = getItemIds(bibliographicEntity);
             record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities(),itemIds);
-            results.put(ReCAPConstants.SUCCESS, record);
+            results.put(RecapConstants.SUCCESS, record);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
-            results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
+            logger.error(RecapConstants.ERROR,e);
+            results.put(RecapConstants.FAILURE, String.valueOf(e.getCause()));
 
         }
         return results;
@@ -116,7 +116,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     private void update001Field(Record record, BibliographicEntity bibliographicEntity) {
         for (ControlField controlField : record.getControlFields()) {
             if ("001".equals(controlField.getTag())) {
-                controlField.setData(ReCAPConstants.SCSB + "-" + bibliographicEntity.getBibliographicId());
+                controlField.setData(RecapConstants.SCSB + "-" + bibliographicEntity.getBibliographicId());
             }
         }
     }
@@ -165,11 +165,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private void update852bField(DataField dataField, HoldingsEntity holdingEntity){
-        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.PRINCETON)) {
+        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.PRINCETON)) {
             dataField.getSubfield('b').setData(holdingPUL);
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.COLUMBIA)) {
+        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.COLUMBIA)) {
             dataField.getSubfield('b').setData(holdingCUL);
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(ReCAPConstants.NYPL)) {
+        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.NYPL)) {
             dataField.getSubfield('b').setData(holdingNYPL);
         }
     }

@@ -3,7 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.FileNameProcessorForDataExport;
 import org.recap.camel.datadump.ZipFileProcessor;
 import org.recap.util.datadump.DataExportHeaderUtil;
@@ -29,10 +29,10 @@ public class DataDumpFtpRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        interceptFrom(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q)
+        interceptFrom(RecapConstants.DATADUMP_ZIPFILE_FTP_Q)
                 .process(fileNameProcessorForDataExport);
 
-        from(ReCAPConstants.DATADUMP_ZIPFILE_FTP_Q)
+        from(RecapConstants.DATADUMP_ZIPFILE_FTP_Q)
                 .onCompletion()
                 .onWhen(new ExportFileDumpComplete())
                 .process(zipFileProcessor)

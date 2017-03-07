@@ -1,6 +1,6 @@
 package org.recap.service.executor.datadump;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.search.SearchRecordsRequest;
 import org.springframework.context.annotation.Scope;
@@ -15,12 +15,12 @@ public class IncrementalDataDumpExecutorService extends AbstractDataDumpExecutor
 
     @Override
     public boolean isInterested(String fetchType) {
-        return fetchType.equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL) ? true:false;
+        return fetchType.equals(RecapConstants.DATADUMP_FETCHTYPE_INCREMENTAL) ? true:false;
     }
 
     @Override
     public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
-        searchRecordsRequest.setFieldName(ReCAPConstants.BIBITEM_LASTUPDATED_DATE);
+        searchRecordsRequest.setFieldName(RecapConstants.BIBITEM_LASTUPDATED_DATE);
         searchRecordsRequest.setFieldValue(getFormattedDateString(dataDumpRequest.getDate()));
     }
 }

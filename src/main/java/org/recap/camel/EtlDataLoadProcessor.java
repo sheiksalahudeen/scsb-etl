@@ -1,7 +1,7 @@
 package org.recap.camel;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.jpa.XmlRecordEntity;
@@ -103,47 +103,47 @@ public class EtlDataLoadProcessor {
         Integer totalRecordsInfile = Integer.valueOf(Long.toString(xmlRecordRepository.countByXmlFileName(fileName)));
 
         ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
-        totalRecordsInFileEntity.setHeaderName(ReCAPConstants.TOTAL_RECORDS_IN_FILE);
+        totalRecordsInFileEntity.setHeaderName(RecapConstants.TOTAL_RECORDS_IN_FILE);
         totalRecordsInFileEntity.setHeaderValue(String.valueOf(totalRecordsInfile));
         reportDataEntities.add(totalRecordsInFileEntity);
 
         ReportDataEntity totalBibsLoadedEntity = new ReportDataEntity();
-        totalBibsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIBS_LOADED);
+        totalBibsLoadedEntity.setHeaderName(RecapConstants.TOTAL_BIBS_LOADED);
         totalBibsLoadedEntity.setHeaderValue(String.valueOf(processedBibsCount));
         reportDataEntities.add(totalBibsLoadedEntity);
 
         ReportDataEntity totalHoldingsLoadedEntity = new ReportDataEntity();
-        totalHoldingsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_HOLDINGS_LOADED);
+        totalHoldingsLoadedEntity.setHeaderName(RecapConstants.TOTAL_HOLDINGS_LOADED);
         totalHoldingsLoadedEntity.setHeaderValue(String.valueOf(processedHoldingsCount));
         reportDataEntities.add(totalHoldingsLoadedEntity);
 
         ReportDataEntity totalItemsLoadedEntity = new ReportDataEntity();
-        totalItemsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_ITEMS_LOADED);
+        totalItemsLoadedEntity.setHeaderName(RecapConstants.TOTAL_ITEMS_LOADED);
         totalItemsLoadedEntity.setHeaderValue(String.valueOf(processedItemsCount));
         reportDataEntities.add(totalItemsLoadedEntity);
 
         ReportDataEntity totalBibHoldingsLoadedEntity = new ReportDataEntity();
-        totalBibHoldingsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIB_HOLDINGS_LOADED);
+        totalBibHoldingsLoadedEntity.setHeaderName(RecapConstants.TOTAL_BIB_HOLDINGS_LOADED);
         totalBibHoldingsLoadedEntity.setHeaderValue(String.valueOf(processedBibHoldingsCount));
         reportDataEntities.add(totalBibHoldingsLoadedEntity);
 
         ReportDataEntity totalBiBItemsLoadedEntity = new ReportDataEntity();
-        totalBiBItemsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIB_ITEMS_LOADED);
+        totalBiBItemsLoadedEntity.setHeaderName(RecapConstants.TOTAL_BIB_ITEMS_LOADED);
         totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(processedBibItemsCount));
         reportDataEntities.add(totalBiBItemsLoadedEntity);
 
         ReportDataEntity fileNameEntity = new ReportDataEntity();
-        fileNameEntity.setHeaderName(ReCAPConstants.FILE_NAME);
+        fileNameEntity.setHeaderName(RecapConstants.FILE_NAME);
         fileNameEntity.setHeaderValue(fileName);
         reportDataEntities.add(fileNameEntity);
 
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(org.recap.ReCAPConstants.SUCCESS);
+        reportEntity.setType(RecapConstants.SUCCESS);
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntity.setInstitutionName(institutionName);
 
-        producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
+        producer.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
     public ProducerTemplate getProducer() {

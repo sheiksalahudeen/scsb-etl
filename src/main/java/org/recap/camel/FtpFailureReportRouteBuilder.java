@@ -3,7 +3,7 @@ package org.recap.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +29,15 @@ public class FtpFailureReportRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.FTP_SUCCESS_Q)
-                            .routeId(ReCAPConstants.FTP_SUCCESS_ROUTE_ID)
+                    from(RecapConstants.FTP_SUCCESS_Q)
+                            .routeId(RecapConstants.FTP_SUCCESS_ROUTE_ID)
                             .process(new FileNameProcessorForFailureRecord())
                             .marshal().bindy(BindyType.Csv, ReCAPCSVFailureRecord.class)
                             .to("sftp://" + ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.directoryName}/${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 }

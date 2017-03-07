@@ -1,7 +1,7 @@
 package org.recap.util;
 
 import org.junit.Test;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,9 +20,9 @@ public class DateUtilUT {
         Calendar cal = Calendar.getInstance();
         System.out.print(cal);
         Date inputDate = cal.getTime();
-        DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_MMDDYYY);
         String inputDateString = df.format(inputDate);
-        Date outputDate = DateUtil.getDateFromString(inputDateString, ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        Date outputDate = DateUtil.getDateFromString(inputDateString, RecapConstants.DATE_FORMAT_MMDDYYY);
         assertEquals(inputDate.getDate(), outputDate.getDate());
         assertEquals(inputDate.getMonth(), outputDate.getMonth());
         assertEquals(inputDate.getYear(), outputDate.getYear());

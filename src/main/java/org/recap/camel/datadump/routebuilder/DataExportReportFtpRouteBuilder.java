@@ -3,7 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.FileNameProcessorForDataDumpFailure;
 import org.recap.camel.datadump.FileNameProcessorForDataDumpSuccess;
 import org.recap.model.csv.DataDumpFailureReport;
@@ -31,8 +31,8 @@ public class DataExportReportFtpRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DATADUMP_SUCCESS_REPORT_FTP_Q)
-                            .routeId(ReCAPConstants.DATADUMP_SUCCESS_REPORT_FTP_ROUTE_ID)
+                    from(RecapConstants.DATADUMP_SUCCESS_REPORT_FTP_Q)
+                            .routeId(RecapConstants.DATADUMP_SUCCESS_REPORT_FTP_ROUTE_ID)
                             .process(new FileNameProcessorForDataDumpSuccess())
                             .marshal().bindy(BindyType.Csv, DataDumpSuccessReport.class)
                             .to("sftp://" + ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.directoryName}/${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
@@ -42,15 +42,15 @@ public class DataExportReportFtpRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DATADUMP_FAILURE_REPORT_FTP_Q)
-                            .routeId(ReCAPConstants.DATADUMP_FAILURE_REPORT_FTP_ROUTE_ID)
+                    from(RecapConstants.DATADUMP_FAILURE_REPORT_FTP_Q)
+                            .routeId(RecapConstants.DATADUMP_FAILURE_REPORT_FTP_ROUTE_ID)
                             .process(new FileNameProcessorForDataDumpFailure())
                             .marshal().bindy(BindyType.Csv, DataDumpFailureReport.class)
                             .to("sftp://" + ftpUserName + "@" + ftpRemoteServer + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.directoryName}/${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 }

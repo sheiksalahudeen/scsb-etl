@@ -1,6 +1,6 @@
 package org.recap.service.transmission.datadump;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class DataDumpTransmissionService {
                 try {
                     dataDumpTransmissionInterface.transmitDataDump(routeMap);
                 } catch (Exception e) {
-                    logger.error(ReCAPConstants.ERROR,e);
+                    logger.error(RecapConstants.ERROR,e);
                 }
             }
         }

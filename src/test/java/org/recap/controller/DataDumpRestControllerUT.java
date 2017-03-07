@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.dynamicrouter.DynamicRouteBuilder;
 import org.recap.controller.swagger.DataDumpRestController;
 import org.recap.model.search.DataDumpSearchResult;
@@ -134,11 +134,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         String emailToAddress = "test@gmail.com";
         Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
         Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
-        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(RecapConstants.DATADUMP_PROCESS_STARTED);
         Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
         String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
+        assertEquals(RecapConstants.DATADUMP_PROCESS_STARTED,response);
     }
 
 
@@ -154,11 +154,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         String emailToAddress = "test@gmail.com";
         Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
         Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
-        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(RecapConstants.DATADUMP_PROCESS_STARTED);
         Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
         String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
+        assertEquals(RecapConstants.DATADUMP_PROCESS_STARTED,response);
 
     }
 
@@ -174,11 +174,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         String emailToAddress = "test@gmail.com";
         Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
         Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
-        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(RecapConstants.DATADUMP_PROCESS_STARTED);
         Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
         String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
+        assertEquals(RecapConstants.DATADUMP_PROCESS_STARTED,response);
 
     }
 
@@ -194,11 +194,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         String emailToAddress = "test@gmail.com";
         Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
         Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
-        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_PROCESS_STARTED);
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().startDataDumpProcess(Mockito.any())).thenReturn(RecapConstants.DATADUMP_PROCESS_STARTED);
         Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
         String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.DATADUMP_PROCESS_STARTED,response);
+        assertEquals(RecapConstants.DATADUMP_PROCESS_STARTED,response);
     }
 
     @Test
@@ -213,11 +213,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         String emailToAddress = "test@gmail.com";
         Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
         Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
-        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().validateIncomingRequest(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n");
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().validateIncomingRequest(Mockito.any())).thenReturn(RecapConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n");
         Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
         String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",response);
+        assertEquals(RecapConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG+"\n",response);
     }
 
     @Test
@@ -232,11 +232,11 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         String emailToAddress = "test@gmail.com";
         Mockito.when(mockedDataDumpRestController.getDataDumpExportService()).thenReturn(mockedDataDumpExportService);
         Mockito.when(mockedDataDumpRestController.getDynamicRouteBuilder()).thenReturn(mockedDynamicRouteBuilder);
-        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().validateIncomingRequest(Mockito.any())).thenReturn(ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n");
+        Mockito.when(mockedDataDumpRestController.getDataDumpExportService().validateIncomingRequest(Mockito.any())).thenReturn(RecapConstants.DATADUMP_DATE_ERR_MSG+"\n");
         Mockito.when(mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress)).thenCallRealMethod();
         String response = mockedDataDumpRestController.exportDataDump(institutionCodes,requestingInstitutionCode,fetchType,outputFormat,date,collectionGroupIds,transmissionType,emailToAddress);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.DATADUMP_DATE_ERR_MSG+"\n",response);
+        assertEquals(RecapConstants.DATADUMP_DATE_ERR_MSG+"\n",response);
 
     }
 

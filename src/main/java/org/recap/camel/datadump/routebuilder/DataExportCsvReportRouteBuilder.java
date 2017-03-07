@@ -3,7 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.FileNameProcessorForDataDumpFailure;
 import org.recap.camel.datadump.FileNameProcessorForDataDumpSuccess;
 import org.recap.model.csv.DataDumpFailureReport;
@@ -30,8 +30,8 @@ public class DataExportCsvReportRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DATADUMP_SUCCESS_REPORT_CSV_Q)
-                            .routeId(ReCAPConstants.DATADUMP_SUCCESS_REPORT_CSV_ROUTE_ID)
+                    from(RecapConstants.DATADUMP_SUCCESS_REPORT_CSV_Q)
+                            .routeId(RecapConstants.DATADUMP_SUCCESS_REPORT_CSV_ROUTE_ID)
                             .process(new FileNameProcessorForDataDumpSuccess())
                             .marshal().bindy(BindyType.Csv, DataDumpSuccessReport.class)
                             .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
@@ -41,15 +41,15 @@ public class DataExportCsvReportRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DATADUMP_FAILURE_REPORT_CSV_Q)
-                            .routeId(ReCAPConstants.DATADUMP_FAILURE_REPORT_CSV_ROUTE_ID)
+                    from(RecapConstants.DATADUMP_FAILURE_REPORT_CSV_Q)
+                            .routeId(RecapConstants.DATADUMP_FAILURE_REPORT_CSV_ROUTE_ID)
                             .process(new FileNameProcessorForDataDumpFailure())
                             .marshal().bindy(BindyType.Csv, DataDumpFailureReport.class)
                             .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 }

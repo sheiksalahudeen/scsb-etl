@@ -1,7 +1,7 @@
 package org.recap.service.email.datadump;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class DataDumpEmailService {
         emailPayLoad.setCount(totalRecordCount);
         emailPayLoad.setFailedCount(failedRecordCount);
         emailPayLoad.setTo(toEmailAddress);
-        producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad,ReCAPConstants.DATADUMP_EMAILBODY_FOR,emailBodyFor);
+        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.DATADUMP_EMAILBODY_FOR,emailBodyFor);
     }
 
     private String getLocation(String transmissionType,String dateTimeStringForFolder) {

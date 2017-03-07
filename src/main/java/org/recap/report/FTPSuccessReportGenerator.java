@@ -2,7 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FilenameUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.ReCAPCSVSuccessRecord;
 import org.recap.model.csv.SuccessReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportEntity;
@@ -29,17 +29,17 @@ public class FTPSuccessReportGenerator implements ReportGeneratorInterface {
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(ReCAPConstants.SUCCESS) ? true : false;
+        return reportType.equalsIgnoreCase(RecapConstants.SUCCESS) ? true : false;
     }
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return transmissionType.equalsIgnoreCase(ReCAPConstants.FTP) ? true : false;
+        return transmissionType.equalsIgnoreCase(RecapConstants.FTP) ? true : false;
     }
 
     @Override
     public boolean isOperationType(String operationType) {
-        return operationType.equalsIgnoreCase(org.recap.ReCAPConstants.OPERATION_TYPE_ETL) ? true : false;
+        return operationType.equalsIgnoreCase(RecapConstants.OPERATION_TYPE_ETL) ? true : false;
     }
 
     @Override
@@ -57,8 +57,8 @@ public class FTPSuccessReportGenerator implements ReportGeneratorInterface {
             reCAPCSVSuccessRecord.setInstitutionName(reportEntity.getInstitutionName());
             reCAPCSVSuccessRecord.setReportFileName(fileName);
             reCAPCSVSuccessRecord.setSuccessReportReCAPCSVRecordList(successReportReCAPCSVRecords);
-            producerTemplate.sendBody(ReCAPConstants.FTP_FAILURE_Q, reCAPCSVSuccessRecord);
-            DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
+            producerTemplate.sendBody(RecapConstants.FTP_FAILURE_Q, reCAPCSVSuccessRecord);
+            DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             return FilenameUtils.removeExtension(reCAPCSVSuccessRecord.getReportFileName()) + "-" + reCAPCSVSuccessRecord.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
         return null;

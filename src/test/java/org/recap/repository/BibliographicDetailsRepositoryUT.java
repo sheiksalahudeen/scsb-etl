@@ -2,7 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.BibliographicPK;
 import org.recap.model.jpa.HoldingsEntity;
@@ -424,7 +424,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
-        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Long count = bibliographicDetailsRepository.countRecordsForIncrementalDump(cgIds,institutionCodes,inputDate);
         assertEquals(new Long(1),count);
     }
@@ -479,7 +479,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
-        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.getRecordsForIncrementalDump(new PageRequest(0, 10),cgIds,institutionCodes,inputDate);
         List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
         assertNotNull(bibliographicEntityList);
@@ -663,7 +663,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("PUL");
-        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Date inputDate = DateUtil.getDateFromString("2016-09-02 12:00", RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.getDeletedRecordsForIncrementalDump(new PageRequest(0, 10),cgIds,institutionCodes,inputDate);
         List<BibliographicEntity> bibliographicEntityList = bibliographicEntities.getContent();
         assertNotNull(bibliographicEntityList);
@@ -782,7 +782,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         cgIds.add(1);
         List<String> institutionCodes = new ArrayList<>();
         institutionCodes.add("NYPL");
-        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        Date inputDate = DateUtil.getDateFromString("2016-08-30 11:20", RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Long count = bibliographicDetailsRepository.countDeletedRecordsForIncremental(cgIds,institutionCodes,inputDate);
         assertEquals(new Long(1),count);
     }

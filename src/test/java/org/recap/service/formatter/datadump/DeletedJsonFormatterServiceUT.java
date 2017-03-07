@@ -2,20 +2,14 @@ package org.recap.service.formatter.datadump;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DeletedRecord;
-import org.recap.model.jaxb.JAXBContextHandler;
-import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -32,7 +26,7 @@ public class DeletedJsonFormatterServiceUT extends BaseTestCase{
     @Test
     public void getFormattedOutput() throws Exception {
         Map<String,Object> successAndFailureFormattedList = deletedJsonFormatterService.prepareDeletedRecords(getBibliographicEntityList());
-        List<DeletedRecord> deletedRecordList = (List<DeletedRecord>)successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
+        List<DeletedRecord> deletedRecordList = (List<DeletedRecord>)successAndFailureFormattedList.get(RecapConstants.SUCCESS);
         String outputString = (String) deletedJsonFormatterService.getJsonForDeletedRecords(deletedRecordList);
         assertEquals("[{\"bibId\":\"100\",\"itemBarcodes\":[\"3456\",\"1234\"]}]",outputString);
     }

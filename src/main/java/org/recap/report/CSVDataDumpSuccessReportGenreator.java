@@ -2,7 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FilenameUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.DataDumpSuccessReport;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.util.datadump.DataDumpSuccessReportGenerator;
@@ -27,17 +27,17 @@ public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterfa
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT_SUCCESS) ? true : false;
+        return reportType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT_SUCCESS) ? true : false;
     }
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return transmissionType.equalsIgnoreCase(org.recap.ReCAPConstants.FILE_SYSTEM) ? true : false;
+        return transmissionType.equalsIgnoreCase(RecapConstants.FILE_SYSTEM) ? true : false;
     }
 
     @Override
     public boolean isOperationType(String operationType) {
-        return operationType.equalsIgnoreCase(ReCAPConstants.BATCH_EXPORT) ? true : false;
+        return operationType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT) ? true : false;
     }
 
     @Override
@@ -54,8 +54,8 @@ public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterfa
             dataDumpSuccessReport.setInstitutionName(reportEntity.getInstitutionName());
             dataDumpSuccessReport.setFileName(fileName);
             dataDumpSuccessReport.setDataDumpSuccessReportList(dataDumpSuccessReportList);
-            producerTemplate.sendBody(ReCAPConstants.DATADUMP_SUCCESS_REPORT_CSV_Q, dataDumpSuccessReport);
-            DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
+            producerTemplate.sendBody(RecapConstants.DATADUMP_SUCCESS_REPORT_CSV_Q, dataDumpSuccessReport);
+            DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             return FilenameUtils.removeExtension(dataDumpSuccessReport.getFileName()) + "-" + dataDumpSuccessReport.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
         return null;

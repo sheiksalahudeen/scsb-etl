@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.camel.dynamicrouter.DynamicRouteBuilder;
 import org.recap.model.export.DataDumpRequest;
@@ -162,15 +162,15 @@ public class CamelJdbcUT extends BaseTestCase {
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setRequestingInstitutionCode("PUL");
-        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
+        dataDumpRequest.setTransmissionType(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setCollectionGroupIds(Arrays.asList(1,2));
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_MARC);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.DATADUMP_XML_FORMAT_MARC);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
-        String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
+        String fileName = "PUL" + File.separator + dateTimeString + File.separator + RecapConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
         String folderName = "PUL" + File.separator + dateTimeString;
 
 //        Integer totalPageCount = (Integer) results.get("totalPageCount");
@@ -178,7 +178,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
         String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
 
-        producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
+        producer.sendBodyAndHeader(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
 
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
@@ -186,9 +186,9 @@ public class CamelJdbcUT extends BaseTestCase {
             Map results1 = mockedDataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
-            fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
+            fileName = "PUL" + File.separator + dateTimeString + File.separator + RecapConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
             headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
-            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
+            producer.sendBodyAndHeader(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
        /* while (true) {
@@ -233,15 +233,15 @@ public class CamelJdbcUT extends BaseTestCase {
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setRequestingInstitutionCode("PUL");
-        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
+        dataDumpRequest.setTransmissionType(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setCollectionGroupIds(Arrays.asList(1,2));
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.DATADUMP_XML_FORMAT_SCSB);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
-        String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
+        String fileName = "PUL" + File.separator + dateTimeString + File.separator + RecapConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
         String folderName = "PUL" + File.separator + dateTimeString;
 
 //        Integer totalPageCount = (Integer) results.get("totalPageCount");
@@ -249,7 +249,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
         String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
 
-        producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
+        producer.sendBodyAndHeader(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString.toString());
 
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
@@ -257,9 +257,9 @@ public class CamelJdbcUT extends BaseTestCase {
             Map results1 = mockedDataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
-            fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
+            fileName = "PUL" + File.separator + dateTimeString + File.separator + RecapConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
             headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
-            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
+            producer.sendBodyAndHeader(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
         /*while (true) {
@@ -305,21 +305,21 @@ public class CamelJdbcUT extends BaseTestCase {
         String dateTimeString = getDateTimeString();
         dataDumpRequest.setDateTimeString(dateTimeString);
         dataDumpRequest.setRequestingInstitutionCode("PUL");
-        dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
+        dataDumpRequest.setTransmissionType(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         dataDumpRequest.setInstitutionCodes(Arrays.asList("NYPL", "CUL"));
         dataDumpRequest.setCollectionGroupIds(Arrays.asList(1,2));
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.DATADUMP_DELETED_JSON_FORMAT);
         dataDumpRequest.setRequestId(new SimpleDateFormat("yyyy-MM-dd HH").format(new Date()));
 
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken to fetch 10K results for page 1 is : " + (endTime - startTime) / 1000 + " seconds ");
-        String fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
+        String fileName = "PUL" + File.separator + dateTimeString + File.separator + RecapConstants.DATA_DUMP_FILE_NAME + "PUL" + 0;
         String folderName = "PUL" + File.separator + dateTimeString;
 
         Integer totalPageCount = (Integer) results.get("totalPageCount");
 
         String headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, 1, folderName, fileName, dataDumpRequest);
-        producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString);
+        producer.sendBodyAndHeader(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results, "batchHeaders", headerString);
 
         for (int pageNum = 1; pageNum < totalPageCount; pageNum++) {
             searchRecordsRequest.setPageNumber(pageNum);
@@ -327,9 +327,9 @@ public class CamelJdbcUT extends BaseTestCase {
             Map results1 = mockedDataDumpSolrService.getResults(searchRecordsRequest);
             endTime = System.currentTimeMillis();
             System.out.println("Time taken to fetch 10K results for page  : " + pageNum + " is " + (endTime - startTime) / 1000 + " seconds ");
-            fileName = "PUL" + File.separator + dateTimeString + File.separator + ReCAPConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
+            fileName = "PUL" + File.separator + dateTimeString + File.separator + RecapConstants.DATA_DUMP_FILE_NAME + "PUL" + pageNum + 1;
             headerString = dataExportHeaderUtil.getBatchHeaderString(totalPageCount, pageNum + 1, folderName, fileName, dataDumpRequest);
-            producer.sendBodyAndHeader(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
+            producer.sendBodyAndHeader(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q, results1, "batchHeaders", headerString.toString());
         }
 
        /* while (true) {
@@ -339,7 +339,7 @@ public class CamelJdbcUT extends BaseTestCase {
 
     private String getDateTimeString() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_MMDDYYY);
+        SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_MMDDYYY);
         return sdf.format(date);
     }
 }

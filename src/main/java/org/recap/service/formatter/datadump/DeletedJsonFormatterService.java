@@ -1,7 +1,7 @@
 package org.recap.service.formatter.datadump;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DeletedRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -23,7 +23,7 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
     private static final Logger logger = LoggerFactory.getLogger(DeletedJsonFormatterService.class);
     @Override
     public boolean isInterested(String formatType) {
-        return formatType.equals(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT) ? true:false;
+        return formatType.equals(RecapConstants.DATADUMP_DELETED_JSON_FORMAT) ? true:false;
     }
 
     public Map<String, Object> prepareDeletedRecords(List<BibliographicEntity> bibliographicEntityList){
@@ -41,13 +41,13 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
                 deletedRecord.setItemBarcodes(itemBarcodes);
                 deletedRecords.add(deletedRecord);
             } catch (Exception e) {
-                logger.error(ReCAPConstants.ERROR,e);
+                logger.error(RecapConstants.ERROR,e);
                 errors.add(String.valueOf(e.getCause()));
             }
         }
 
-        resultsMap.put(ReCAPConstants.SUCCESS, deletedRecords);
-        resultsMap.put(ReCAPConstants.FAILURE, errors);
+        resultsMap.put(RecapConstants.SUCCESS, deletedRecords);
+        resultsMap.put(RecapConstants.FAILURE, errors);
 
 
         return resultsMap;

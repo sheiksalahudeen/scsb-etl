@@ -3,7 +3,7 @@ package org.recap;
 /**
  * Created by premkb on 19/8/16.
  */
-public class ReCAPConstants {
+public class RecapConstants {
 
     public static final String DATA_DUMP_FILE_NAME = "ReCAPCollectionFor";
     public static final String FILENAME = "fileName";
