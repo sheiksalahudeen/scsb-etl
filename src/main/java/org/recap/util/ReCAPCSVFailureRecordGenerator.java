@@ -1,9 +1,12 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.recap.ReCAPConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -16,6 +19,8 @@ import java.util.List;
  * Created by SheikS on 8/8/2016.
  */
 public class ReCAPCSVFailureRecordGenerator {
+
+    Logger logger = LoggerFactory.getLogger(ReCAPCSVFailureRecordGenerator.class);
 
     public FailureReportReCAPCSVRecord prepareFailureReportReCAPCSVRecord(ReportEntity reportEntity) {
 
@@ -31,10 +36,8 @@ public class ReCAPCSVFailureRecordGenerator {
             if(null != setterMethod){
                 try {
                     setterMethod.invoke(failureReportReCAPCSVRecord, headerValue);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    logger.error(ReCAPConstants.ERROR,e);
                 }
             }
         }
@@ -44,10 +47,9 @@ public class ReCAPCSVFailureRecordGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, FailureReportReCAPCSVRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, FailureReportReCAPCSVRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
         return null;
     }
@@ -55,10 +57,9 @@ public class ReCAPCSVFailureRecordGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, FailureReportReCAPCSVRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, FailureReportReCAPCSVRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
         return null;
     }

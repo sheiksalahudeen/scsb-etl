@@ -10,8 +10,6 @@ import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.*;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -23,7 +21,6 @@ import java.util.concurrent.Callable;
  */
 public class BibPersisterCallable implements Callable {
 
-    private static final Logger logger = LoggerFactory.getLogger(BibPersisterCallable.class);
     private MarcUtil marcUtil;
     private BibRecord bibRecord;
     private XmlRecordEntity xmlRecordEntity;
@@ -33,7 +30,7 @@ public class BibPersisterCallable implements Callable {
     private Map itemStatusMap;
     private Map collectionGroupMap;
 
-    private DBReportUtil DBReportUtil;
+    private DBReportUtil dbReportUtil;
 
     @Override
     public Object call() {
@@ -44,8 +41,8 @@ public class BibPersisterCallable implements Callable {
         List<ItemEntity> itemEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
 
-        getDBReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
-        getDBReportUtil().setCollectionGroupMap(collectionGroupMap);
+        getDbReportUtil().setInstitutionEntitiesMap(institutionEntitiesMap);
+        getDbReportUtil().setCollectionGroupMap(collectionGroupMap);
 
         Integer owningInstitutionId = (Integer) institutionEntitiesMap.get(bibRecord.getBib().getOwningInstitutionId());
         Date currentDate = new Date();
@@ -122,7 +119,7 @@ public class BibPersisterCallable implements Callable {
     private Map<String, Object> processAndValidateBibliographicEntity(Integer owningInstitutionId,Date currentDate) {
         Map<String, Object> map = new HashMap<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        StringBuffer errorMessage = new StringBuffer();
+        StringBuilder errorMessage = new StringBuilder();
 
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
@@ -173,7 +170,7 @@ public class BibPersisterCallable implements Callable {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            reportDataEntities = getDBReportUtil().generateBibFailureReportEntity(bibliographicEntity);
+            reportDataEntities = getDbReportUtil().generateBibFailureReportEntity(bibliographicEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -188,7 +185,7 @@ public class BibPersisterCallable implements Callable {
     }
 
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Holding holdingEnt, CollectionType holdingContentCollection,Date currentDate) {
-        StringBuffer errorMessage = new StringBuffer();
+        StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
 
@@ -219,7 +216,7 @@ public class BibPersisterCallable implements Callable {
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            getDBReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
+            getDbReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -235,7 +232,7 @@ public class BibPersisterCallable implements Callable {
     }
 
     private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, String holdingsCallNumberType, RecordType itemRecordType,Date currentDate) {
-        StringBuffer errorMessage = new StringBuffer();
+        StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
 
@@ -284,7 +281,7 @@ public class BibPersisterCallable implements Callable {
         itemEntity.setCatalogingStatus(ReCAPConstants.COMPLETE_STATUS);
 
         String useRestrictions = getMarcUtil().getDataFieldValue(itemRecordType, "876", null, null, "h");
-        if (StringUtils.isNotBlank(useRestrictions) && (useRestrictions.equalsIgnoreCase("In Library Use") || useRestrictions.equalsIgnoreCase("Supervised Use"))) {
+        if (StringUtils.isNotBlank(useRestrictions) && ("In Library Use".equalsIgnoreCase(useRestrictions) || "Supervised Use".equalsIgnoreCase(useRestrictions))) {
             itemEntity.setUseRestrictions(useRestrictions);
         }
 
@@ -300,7 +297,7 @@ public class BibPersisterCallable implements Callable {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            reportDataEntities = getDBReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
+            reportDataEntities = getDbReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(ReCAPConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -378,11 +375,11 @@ public class BibPersisterCallable implements Callable {
         return marcUtil;
     }
 
-    public DBReportUtil getDBReportUtil() {
-        return DBReportUtil;
+    public DBReportUtil getDbReportUtil() {
+        return dbReportUtil;
     }
 
-    public void setDBReportUtil(DBReportUtil DBReportUtil) {
-        this.DBReportUtil = DBReportUtil;
+    public void setDbReportUtil(DBReportUtil dbReportUtil) {
+        this.dbReportUtil = dbReportUtil;
     }
 }

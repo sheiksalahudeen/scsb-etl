@@ -1,31 +1,29 @@
 package org.recap.camel.datadump.routebuilder;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.ReCAPConstants;
+import org.recap.camel.datadump.DataExportAggregator;
+import org.recap.camel.datadump.DataExportPredicate;
 import org.recap.camel.datadump.FileFormatProcessorForDataExport;
 import org.recap.camel.datadump.TransmissionTypeProcessorForDataExport;
 import org.recap.camel.datadump.consumer.*;
-import org.recap.camel.datadump.DataExportAggregator;
-import org.recap.camel.datadump.DataExportPredicate;
 import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.ReportDetailRepository;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 import org.recap.util.XmlFormatter;
-import org.recap.camel.datadump.consumer.DataExportReportActiveMQConsumer;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * Created by peris on 11/5/16.
  */
 
 public class DataExportRouteBuilder {
+
+    Logger logger = LoggerFactory.getLogger(DataExportRouteBuilder.class);
 
     public DataExportRouteBuilder(CamelContext camelContext,
                                   BibliographicDetailsRepository bibliographicDetailsRepository,
@@ -58,12 +56,12 @@ public class DataExportRouteBuilder {
                             .routeId(ReCAPConstants.BIB_ENTITY_DATA_EXPORT_ROUTE_ID)
                             .threads(20)
                             .choice()
-                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC))
-                                    .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), "processRecords")
-                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB))
-                                    .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), "processRecords")
-                                .when(header("exportFormat").isEqualTo(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT))
-                                    .bean(new DeletedRecordFormatActiveMQConsumer(deletedJsonFormatterService), "processRecords")
+                                .when(header(ReCAPConstants.EXPORT_FORMAT).isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_MARC))
+                                    .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), ReCAPConstants.PROCESS_RECORDS)
+                                .when(header(ReCAPConstants.EXPORT_FORMAT).isEqualTo(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB))
+                                    .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), ReCAPConstants.PROCESS_RECORDS)
+                                .when(header(ReCAPConstants.EXPORT_FORMAT).isEqualTo(ReCAPConstants.DATADUMP_DELETED_JSON_FORMAT))
+                                    .bean(new DeletedRecordFormatActiveMQConsumer(deletedJsonFormatterService), ReCAPConstants.PROCESS_RECORDS)
                     ;
 
                 }
@@ -118,7 +116,7 @@ public class DataExportRouteBuilder {
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

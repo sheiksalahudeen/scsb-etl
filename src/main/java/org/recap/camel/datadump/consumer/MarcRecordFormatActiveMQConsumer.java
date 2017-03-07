@@ -79,20 +79,20 @@ public class MarcRecordFormatActiveMQConsumer {
             }
         }
 
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         processFailures(exchange, failures, batchHeaders, requestId);
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " marc records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} marc records : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000);
 
         fluentProducerTemplate
                 .to(ReCAPConstants.MARC_RECORD_FOR_DATA_EXPORT_Q)
                 .withBody(records)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
 
@@ -117,9 +117,9 @@ public class MarcRecordFormatActiveMQConsumer {
             fluentProducerTemplate
                     .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
                     .withBody(values)
-                    .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                    .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                    .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                    .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                    .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                    .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
             fluentProducerTemplate.send();
 
         }

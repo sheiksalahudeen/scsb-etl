@@ -106,7 +106,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         fluentProducerTemplate
                 .to(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
                 .withBody(results)
-                .withHeader("batchHeaders", headerString.toString());
+                .withHeader("batchHeaders", headerString);
         fluentProducerTemplate.send();
     }
 
@@ -144,9 +144,9 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 return "SCSBXml";
             case "2":
                 return "Json";
+            default:
+                return null;
         }
-        return null;
-
     }
 
     private String getFolderName(DataDumpRequest dataDumpRequest) {

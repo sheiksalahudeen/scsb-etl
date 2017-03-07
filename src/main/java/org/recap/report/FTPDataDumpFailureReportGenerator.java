@@ -58,10 +58,8 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
             dataDumpFailureReport.setDataDumpFailureReportRecordList(dataDumpSuccessReportList);
             producerTemplate.sendBody(ReCAPConstants.DATADUMP_FAILURE_REPORT_FTP_Q, dataDumpFailureReport);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = FilenameUtils.removeExtension(dataDumpFailureReport.getFileName()) + "-" + dataDumpFailureReport.getReportType() + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return FilenameUtils.removeExtension(dataDumpFailureReport.getFileName()) + "-" + dataDumpFailureReport.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
-
         return null;
     }
 }

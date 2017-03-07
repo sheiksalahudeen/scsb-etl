@@ -2,7 +2,6 @@ package org.recap.camel;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,8 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -229,7 +226,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
-        bibPersisterCallable.setDBReportUtil(dbReportUtil);
+        bibPersisterCallable.setDbReportUtil(dbReportUtil);
         bibPersisterCallable.setInstitutionName("NYPL");
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {

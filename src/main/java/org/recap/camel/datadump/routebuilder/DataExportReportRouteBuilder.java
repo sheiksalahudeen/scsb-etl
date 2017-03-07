@@ -38,7 +38,7 @@ public class DataExportReportRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(ReCAPConstants.ERROR,e);
         }
     }
 }

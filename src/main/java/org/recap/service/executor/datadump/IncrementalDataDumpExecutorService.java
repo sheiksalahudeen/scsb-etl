@@ -3,8 +3,6 @@ package org.recap.service.executor.datadump;
 import org.recap.ReCAPConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.search.SearchRecordsRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Scope("prototype")
 public class IncrementalDataDumpExecutorService extends AbstractDataDumpExecutorService {
-
-    private static final Logger logger = LoggerFactory.getLogger(IncrementalDataDumpExecutorService.class);
 
     @Override
     public boolean isInterested(String fetchType) {

@@ -4,7 +4,6 @@ import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by peris on 7/21/16.

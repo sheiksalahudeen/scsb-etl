@@ -36,12 +36,12 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
                 List<String> itemBarcodes = new ArrayList<>();
                 deletedRecord.setBibId(bibliographicEntity.getBibliographicId().toString());
                 for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
-                    itemBarcodes.add(itemEntity.getBarcode().toString());
+                    itemBarcodes.add(itemEntity.getBarcode());
                 }
                 deletedRecord.setItemBarcodes(itemBarcodes);
                 deletedRecords.add(deletedRecord);
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(ReCAPConstants.ERROR,e);
                 errors.add(String.valueOf(e.getCause()));
             }
         }
@@ -54,7 +54,7 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
     }
 
     public String getJsonForDeletedRecords(List<DeletedRecord> deletedRecordList) throws Exception{
-        String formattedString = null;
+        String formattedString;
         ObjectMapper mapper = new ObjectMapper();
         formattedString = mapper.writeValueAsString(deletedRecordList);
         return formattedString;

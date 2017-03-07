@@ -79,7 +79,7 @@ public class DeletedRecordFormatActiveMQConsumer {
             }
         }
 
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         if(CollectionUtils.isNotEmpty(failures)) {
             processFailures(exchange, failures, batchHeaders, requestId);
@@ -87,14 +87,14 @@ public class DeletedRecordFormatActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " deleted records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} deleted records :  {} seconds " ,bibliographicEntities.size() , (endTime - startTime) / 1000 );
 
         fluentProducerTemplate
                 .to(ReCAPConstants.DELETED_JSON_RECORD_FOR_DATA_EXPORT_Q)
                 .withBody(deletedRecordList)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
 
@@ -118,9 +118,9 @@ public class DeletedRecordFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
     public DataExportHeaderUtil getDataExportHeaderUtil() {

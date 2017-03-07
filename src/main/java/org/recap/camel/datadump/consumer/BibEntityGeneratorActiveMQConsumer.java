@@ -2,7 +2,6 @@ package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.camel.datadump.callable.BibEntityPreparerCallable;
@@ -66,7 +65,7 @@ public class BibEntityGeneratorActiveMQConsumer {
                     try {
                         return future.get();
                     } catch (InterruptedException | ExecutionException e) {
-                        logger.error(e.getMessage());
+                        logger.error(ReCAPConstants.ERROR,e);
                         throw new RuntimeException(e);
                     }
                 });
@@ -78,7 +77,7 @@ public class BibEntityGeneratorActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " bib entities is : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} bib entities is : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000);
 
         getExecutorService().shutdown();
 

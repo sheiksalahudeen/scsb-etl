@@ -73,13 +73,10 @@ public class ReportGenerator {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
             if(reportGeneratorInterface.isOperationType(operationType) && reportGeneratorInterface.isInterested(reportType)
                     && reportGeneratorInterface.isTransmitted(transmissionType)){
-                String generatedFileName = reportGeneratorInterface.generateReport(reportEntities, fileName);
-                return generatedFileName;
+                return reportGeneratorInterface.generateReport(reportEntities, fileName);
             }
         }
-
         return null;
-
     }
 
     public List<ReportGeneratorInterface> getReportGenerators() {

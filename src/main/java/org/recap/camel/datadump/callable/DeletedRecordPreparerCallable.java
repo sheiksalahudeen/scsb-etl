@@ -1,12 +1,8 @@
 package org.recap.camel.datadump.callable;
 
-import org.recap.model.export.DeletedRecord;
-import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
-import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,7 +22,6 @@ public class DeletedRecordPreparerCallable implements Callable {
 
     @Override
     public Map<String, Object> call() throws Exception {
-        Map<String, Object> prepareDeletedRecords = deletedJsonFormatterService.prepareDeletedRecords(bibliographicEntities);
-        return prepareDeletedRecords;
+        return deletedJsonFormatterService.prepareDeletedRecords(bibliographicEntities);
     }
 }

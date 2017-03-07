@@ -63,6 +63,7 @@ public class HoldingsEntity implements Serializable{
     private List<ItemEntity> itemEntities;
 
     public HoldingsEntity() {
+        //Do nothing
     }
 
     public Integer getHoldingsId() {
@@ -163,8 +164,10 @@ public class HoldingsEntity implements Serializable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         HoldingsEntity holdingsEntity = (HoldingsEntity) o;
 

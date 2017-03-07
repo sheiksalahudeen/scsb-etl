@@ -94,4 +94,20 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
     public int compareTo(SearchItemResultRow searchItemResultRow) {
         return this.getChronologyAndEnum().compareTo(searchItemResultRow.getChronologyAndEnum());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SearchItemResultRow))
+            return false;
+        SearchItemResultRow searchItemResultRow = (SearchItemResultRow) o;
+        return chronologyAndEnum.equals(searchItemResultRow.chronologyAndEnum);
+    }
+
+    @Override
+    public int hashCode() {
+        return chronologyAndEnum.hashCode();
+    }
+
 }

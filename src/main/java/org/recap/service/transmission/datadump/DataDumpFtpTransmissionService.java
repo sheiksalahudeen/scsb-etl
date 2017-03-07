@@ -46,7 +46,7 @@ public class DataDumpFtpTransmissionService implements DataDumpTransmissionInter
         String requestingInstitutionCode = routeMap.get(ReCAPConstants.REQUESTING_INST_CODE);
         String dateTimeFolder = routeMap.get(ReCAPConstants.DATETIME_FOLDER);
         String fileName = routeMap.get(ReCAPConstants.FILENAME);
-        camelContext.addRoutes((new RouteBuilder() {
+        camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("file:"+ dumpDirectoryPath + File.separator + requestingInstitutionCode + File.separator + dateTimeFolder + "?antInclude=*.xml")
@@ -58,6 +58,6 @@ public class DataDumpFtpTransmissionService implements DataDumpTransmissionInter
                         .to("sftp://" +ftpUserName + "@" + ftpDataDumpRemoteServer+ File.separator+"?fileName="+requestingInstitutionCode + File.separator + dateTimeFolder + File.separator + fileName + ".zip" + "&privateKeyFile="+ ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost)
                 ;
             }
-        }));
+        });
     }
 }

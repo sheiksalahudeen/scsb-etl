@@ -56,8 +56,7 @@ public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterfa
             dataDumpSuccessReport.setDataDumpSuccessReportList(dataDumpSuccessReportList);
             producerTemplate.sendBody(ReCAPConstants.DATADUMP_SUCCESS_REPORT_CSV_Q, dataDumpSuccessReport);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = FilenameUtils.removeExtension(dataDumpSuccessReport.getFileName()) + "-" + dataDumpSuccessReport.getReportType() + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return FilenameUtils.removeExtension(dataDumpSuccessReport.getFileName()) + "-" + dataDumpSuccessReport.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
         return null;
     }

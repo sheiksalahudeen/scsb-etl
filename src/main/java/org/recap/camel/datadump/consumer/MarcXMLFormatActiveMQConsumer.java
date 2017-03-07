@@ -5,16 +5,21 @@ import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
-import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
+import org.recap.util.datadump.DataExportHeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by peris on 11/1/16.
  */
 
 public class MarcXMLFormatActiveMQConsumer {
+    Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private MarcXmlFormatterService marcXmlFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;
@@ -25,23 +30,23 @@ public class MarcXMLFormatActiveMQConsumer {
 
     public String processMarcXmlString(Exchange exchange) throws Exception {
         List<Record> records = (List<Record>) exchange.getIn().getBody();
-        System.out.println("Num records to generate marc XMl for: " + records.size());
+        logger.info("Num records to generate marc XMl for: {} " , records.size());
         long startTime = System.currentTimeMillis();
 
         String toMarcXmlString = null;
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         try {
             toMarcXmlString = marcXmlFormatterService.covertToMarcXmlString(records);
             processSuccessReportEntity(exchange, records, batchHeaders, requestId);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
             processFailureReportEntity(exchange, records, batchHeaders, requestId, e);
         }
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Time taken to generate marc xml for :" + records.size() + " is : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to generate marc xml for : {} is : {} seconds " , records.size() , (endTime - startTime) / 1000 );
 
         return toMarcXmlString;
     }
@@ -65,9 +70,9 @@ public class MarcXMLFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
 
     }
@@ -92,9 +97,9 @@ public class MarcXMLFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
 

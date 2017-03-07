@@ -4,15 +4,11 @@ package org.recap.model.jaxb.marc;
 import org.apache.log4j.Logger;
 import org.recap.model.jaxb.JAXBContextHandler;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -77,7 +73,7 @@ public class CollectionType implements Serializable {
      */
     public List<RecordType> getRecord() {
         if (record == null) {
-            record = new ArrayList<RecordType>();
+            record = new ArrayList<>();
         }
         return this.record;
     }

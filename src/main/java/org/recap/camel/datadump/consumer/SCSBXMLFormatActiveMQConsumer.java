@@ -4,10 +4,12 @@ import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.recap.ReCAPConstants;
-import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
 import org.recap.util.XmlFormatter;
+import org.recap.util.datadump.DataExportHeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.Map;
  */
 
 public class SCSBXMLFormatActiveMQConsumer {
+
+    Logger logger = LoggerFactory.getLogger(SCSBXMLFormatActiveMQConsumer.class);
 
     SCSBXmlFormatterService scsbXmlFormatterService;
     XmlFormatter xmlFormatter;
@@ -30,23 +34,22 @@ public class SCSBXMLFormatActiveMQConsumer {
 
     public String processSCSBXmlString(Exchange exchange) throws Exception {
         List<BibRecord> records = (List<BibRecord>) exchange.getIn().getBody();
-        System.out.println("Num records to generate scsb XMl for: " + records.size());
+        logger.info("Num records to generate scsb XMl for: {} " , records.size());
         long startTime = System.currentTimeMillis();
 
         String toSCSBXmlString = null;
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         try {
             toSCSBXmlString = scsbXmlFormatterService.getSCSBXmlForBibRecords(records);
-//            toSCSBXmlString = xmlFormatter.prettyPrint(formattedOutputForBibRecords);
             processSuccessReportEntity(exchange, records.size(), batchHeaders, requestId);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ReCAPConstants.ERROR,e);
             processFailureReportEntity(exchange, records.size(), batchHeaders, requestId, e);
         }
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Time taken to generate scsb xml for :" + records.size() + " is : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to generate scsb xml for : {} is : seconds " , records.size() ,  (endTime - startTime) / 1000 );
 
         return toSCSBXmlString;
     }
@@ -70,9 +73,9 @@ public class SCSBXMLFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_SUCCESS_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
 
     }
@@ -98,9 +101,9 @@ public class SCSBXMLFormatActiveMQConsumer {
         fluentProducerTemplate
                 .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
                 .withBody(values)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
-                .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader(ReCAPConstants.BATCH_HEADERS, exchange.getIn().getHeader(ReCAPConstants.BATCH_HEADERS))
+                .withHeader(ReCAPConstants.EXPORT_FORMAT, exchange.getIn().getHeader(ReCAPConstants.EXPORT_FORMAT))
+                .withHeader(ReCAPConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(ReCAPConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
 

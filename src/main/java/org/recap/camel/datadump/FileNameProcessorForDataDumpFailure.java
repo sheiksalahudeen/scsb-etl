@@ -5,7 +5,6 @@ import org.apache.camel.Processor;
 import org.apache.commons.io.FilenameUtils;
 import org.recap.ReCAPConstants;
 import org.recap.model.csv.DataDumpFailureReport;
-import org.recap.model.csv.DataDumpSuccessReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

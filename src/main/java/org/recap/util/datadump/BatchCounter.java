@@ -11,11 +11,11 @@ public class BatchCounter {
     private BatchCounter() {
     }
 
-    public synchronized static void setCurrentPage(Integer pageNum) {
+    public static synchronized void setCurrentPage(Integer pageNum) {
         currentPage = pageNum;
     }
 
-    public synchronized static void setTotalPages(Integer totalPageCount) {
+    public static synchronized void setTotalPages(Integer totalPageCount) {
         totalPages = totalPageCount;
     }
 
@@ -24,11 +24,11 @@ public class BatchCounter {
         totalPages = 0;
     }
 
-    public synchronized static Integer getCurrentPage() {
+    public static synchronized Integer getCurrentPage() {
         return currentPage;
     }
 
-    public synchronized static Integer getTotalPages() {
+    public static synchronized Integer getTotalPages() {
         return totalPages;
     }
 }

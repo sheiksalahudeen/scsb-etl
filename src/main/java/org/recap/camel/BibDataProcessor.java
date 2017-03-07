@@ -49,7 +49,7 @@ public class BibDataProcessor {
     EntityManager entityManager;
 
     @Autowired
-    DBReportUtil DBReportUtil;
+    DBReportUtil dbReportUtil;
 
     @Transactional
     public void processETLExchagneAndPersistToDB(ETLExchange etlExchange) {
@@ -61,16 +61,18 @@ public class BibDataProcessor {
                 bibliographicDetailsRepository.save(bibliographicEntityList);
                 flushAndClearSession();
             } catch (Exception e) {
+                logger.error(ReCAPConstants.ERROR,e);
                 clearSession();
-                DBReportUtil.setCollectionGroupMap(etlExchange.getCollectionGroupMap());
-                DBReportUtil.setInstitutionEntitiesMap(etlExchange.getInstitutionEntityMap());
+                dbReportUtil.setCollectionGroupMap(etlExchange.getCollectionGroupMap());
+                dbReportUtil.setInstitutionEntitiesMap(etlExchange.getInstitutionEntityMap());
                 for (BibliographicEntity bibliographicEntity : bibliographicEntityList) {
                     try {
                         bibliographicDetailsRepository.save(bibliographicEntity);
                         flushAndClearSession();
                     } catch (Exception ex) {
+                        logger.error(ReCAPConstants.ERROR,ex);
                         clearSession();
-                        reportEntity = processBibHoldingsItems(DBReportUtil, bibliographicEntity);
+                        reportEntity = processBibHoldingsItems(dbReportUtil, bibliographicEntity);
                     }
                 }
             }
@@ -107,6 +109,7 @@ public class BibDataProcessor {
                             flushAndClearSession();
                             savedItemEntities.add(savedItemEntity);
                         } catch (Exception itemEx) {
+                            logger.error(ReCAPConstants.ERROR,itemEx);
                             clearSession();
                             List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
                             ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
@@ -122,6 +125,7 @@ public class BibDataProcessor {
                         }
                     }
                 } catch (Exception holdingsEx) {
+                    logger.error(ReCAPConstants.ERROR,holdingsEx);
                     clearSession();
                     List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
                     reportEntity.setReportDataEntities(reportDataEntities);
@@ -140,6 +144,7 @@ public class BibDataProcessor {
             bibliographicDetailsRepository.save(bibliographicEntity);
             flushAndClearSession();
         } catch (Exception bibEx) {
+            logger.error(ReCAPConstants.ERROR,bibEx);
             clearSession();
             List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibFailureReportEntity(bibliographicEntity);
 

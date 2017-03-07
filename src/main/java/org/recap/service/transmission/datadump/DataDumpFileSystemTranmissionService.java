@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +34,7 @@ public class DataDumpFileSystemTranmissionService implements DataDumpTransmissio
         String requestingInstitutionCode = routeMap.get(ReCAPConstants.REQUESTING_INST_CODE);
         String dateTimeFolder = routeMap.get(ReCAPConstants.DATETIME_FOLDER);
         String fileName = routeMap.get(ReCAPConstants.FILENAME);
-        camelContext.addRoutes((new RouteBuilder() {
+        camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("file:"+ dumpDirectoryPath + File.separator + requestingInstitutionCode + File.separator + dateTimeFolder + "?antInclude=*.xml")
@@ -47,6 +46,6 @@ public class DataDumpFileSystemTranmissionService implements DataDumpTransmissio
                         .to("file:"+ dumpDirectoryPath + File.separator+"?fileName="+ requestingInstitutionCode +File.separator + dateTimeFolder + File.separator + fileName + ".zip")
                 ;
             }
-        }));
+        });
     }
 }

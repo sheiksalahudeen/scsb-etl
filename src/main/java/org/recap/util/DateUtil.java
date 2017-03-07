@@ -1,11 +1,11 @@
 package org.recap.util;
 
+import org.recap.ReCAPConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +37,7 @@ public class DateUtil {
             LocalDateTime parsedDateTime = LocalDateTime.parse(inputDateTimeString, formatter);
             outputDateTime = Date.from(parsedDateTime.atZone(ZoneId.systemDefault()).toInstant());
         }catch (Exception e){
-            logger.error(e.getMessage());
+            logger.error(ReCAPConstants.ERROR,e);
         }
         return outputDateTime;
     }

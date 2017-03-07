@@ -58,10 +58,8 @@ public class CSVSuccessReportGenerator implements ReportGeneratorInterface{
             reCAPCSVSuccessRecord.setSuccessReportReCAPCSVRecordList(successReportReCAPCSVRecords);
             producerTemplate.sendBody(ReCAPConstants.CSV_SUCCESS_Q, reCAPCSVSuccessRecord);
             DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = FilenameUtils.removeExtension(reCAPCSVSuccessRecord.getReportFileName()) + "-" + reCAPCSVSuccessRecord.getReportType() + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return FilenameUtils.removeExtension(reCAPCSVSuccessRecord.getReportFileName()) + "-" + reCAPCSVSuccessRecord.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
-
         return null;
     }
 }
