@@ -24,7 +24,6 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by premkb on 2/10/16.
@@ -327,6 +326,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         itemEntity.setCollectionGroupEntity(collectionGroupEntity);
         itemEntity.setCustomerCode("PA");
         itemEntity.setCopyNumber(1);
+        itemEntity.setVolumePartYear("v. 30-31 1980-81");
         itemEntity.setItemAvailabilityStatusId(1);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setStatusCode("Available");
