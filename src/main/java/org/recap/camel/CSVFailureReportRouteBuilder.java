@@ -3,7 +3,7 @@ package org.recap.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import java.io.File;
 
 @Component
 public class CSVFailureReportRouteBuilder {
-    Logger logger = LoggerFactory.getLogger(CSVFailureReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVFailureReportRouteBuilder.class);
 
     @Autowired
     public CSVFailureReportRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
@@ -27,15 +27,15 @@ public class CSVFailureReportRouteBuilder {
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.CSV_FAILURE_Q)
-                            .routeId(ReCAPConstants.CSV_FAILURE_ROUTE_ID)
+                    from(RecapConstants.CSV_FAILURE_Q)
+                            .routeId(RecapConstants.CSV_FAILURE_ROUTE_ID)
                             .process(new FileNameProcessorForFailureRecord())
                             .marshal().bindy(BindyType.Csv, ReCAPCSVFailureRecord.class)
                             .to("file:" + reportsDirectory + File.separator + "?fileName=${in.header.fileName}-${in.header.reportType}-${date:now:ddMMMyyyy}.csv&fileExist=append");
                 }
             });
         } catch (Exception e) {
-            logger.error(ReCAPConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 }

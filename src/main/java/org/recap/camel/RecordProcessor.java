@@ -2,7 +2,7 @@ package org.recap.camel;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 
 @Component
 public class RecordProcessor {
-    private Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
 
     private Map institutionEntityMap;
     private Map itemStatusMap;
@@ -52,7 +52,7 @@ public class RecordProcessor {
     BibDataProcessor bibDataProcessor;
 
     @Autowired
-    DBReportUtil DBReportUtil;
+    DBReportUtil dbReportUtil;
 
     private ExecutorService executorService;
 
@@ -70,10 +70,8 @@ public class RecordProcessor {
             Object object = null;
             try {
                 object = future.get();
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage());
-            } catch (ExecutionException e) {
-                logger.error(e.getMessage());
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error(RecapConstants.ERROR,e);
             }
 
             processFutureResults(object, bibliographicEntities, reportEntities);
@@ -92,7 +90,7 @@ public class RecordProcessor {
 
         if (!CollectionUtils.isEmpty(reportEntities)) {
             for(ReportEntity reportEntity : reportEntities) {
-                producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
+                producer.sendBody(RecapConstants.REPORT_Q, reportEntity);
             }
         }
 
@@ -124,7 +122,7 @@ public class RecordProcessor {
             try {
                 bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
                 BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
-                bibPersisterCallable.setDBReportUtil(DBReportUtil);
+                bibPersisterCallable.setDbReportUtil(dbReportUtil);
                 bibPersisterCallable.setBibRecord(bibRecord);
                 bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
                 bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
@@ -135,31 +133,32 @@ public class RecordProcessor {
                 callables.add(bibPersisterCallable);
 
             } catch (Exception e) {
+                logger.error(RecapConstants.ERROR,e);
                 ReportEntity reportEntity = new ReportEntity();
                 List<ReportDataEntity> reportDataEntities = new ArrayList<>();
                 String owningInst = xmlRecordEntity.getOwningInst();
                 reportEntity.setCreatedDate(new Date());
-                reportEntity.setType(ReCAPConstants.FAILURE);
+                reportEntity.setType(RecapConstants.FAILURE);
                 reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
                 reportEntity.setInstitutionName(owningInst);
 
                 if(StringUtils.isNotBlank(owningInst)) {
                     ReportDataEntity reportDataEntity = new ReportDataEntity();
-                    reportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION);
+                    reportDataEntity.setHeaderName(RecapConstants.OWNING_INSTITUTION);
                     reportDataEntity.setHeaderValue(String.valueOf(getInstitutionEntityMap().get(owningInst)));
                     reportDataEntities.add(reportDataEntity);
                 }
 
                 if(StringUtils.isNotBlank(xmlRecordEntity.getOwningInstBibId())) {
                     ReportDataEntity reportDataEntity = new ReportDataEntity();
-                    reportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION_BIB_ID);
+                    reportDataEntity.setHeaderName(RecapConstants.OWNING_INSTITUTION_BIB_ID);
                     reportDataEntity.setHeaderValue(xmlRecordEntity.getOwningInstBibId());
                     reportDataEntities.add(reportDataEntity);
                 }
 
                 if(e.getCause() != null) {
                     ReportDataEntity reportDataEntity = new ReportDataEntity();
-                    reportDataEntity.setHeaderName(ReCAPConstants.EXCEPTION_MESSAGE);
+                    reportDataEntity.setHeaderName(RecapConstants.EXCEPTION_MESSAGE);
                     reportDataEntity.setHeaderValue(e.getCause().getMessage());
                     reportDataEntities.add(reportDataEntity);
                 }
@@ -173,7 +172,7 @@ public class RecordProcessor {
         try {
             futures = getExecutorService().invokeAll(callables);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.ERROR,e);
         }
 
         futures

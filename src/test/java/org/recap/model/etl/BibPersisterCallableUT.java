@@ -102,7 +102,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
-        bibPersisterCallable.setDBReportUtil(dbReportUtil);
+        bibPersisterCallable.setDbReportUtil(dbReportUtil);
         assertNotNull(bibPersisterCallable.getItemStatusMap());
         assertNotNull(bibPersisterCallable.getInstitutionEntitiesMap());
         assertNotNull(bibPersisterCallable.getCollectionGroupMap());
@@ -140,7 +140,7 @@ public class BibPersisterCallableUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
-        bibPersisterCallable.setDBReportUtil(dbReportUtil);
+        bibPersisterCallable.setDbReportUtil(dbReportUtil);
         assertNotNull(bibPersisterCallable.getItemStatusMap());
         assertNotNull(bibPersisterCallable.getInstitutionEntitiesMap());
         assertNotNull(bibPersisterCallable.getCollectionGroupMap());

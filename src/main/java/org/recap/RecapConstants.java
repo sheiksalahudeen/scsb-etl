@@ -3,7 +3,7 @@ package org.recap;
 /**
  * Created by premkb on 19/8/16.
  */
-public class ReCAPConstants {
+public class RecapConstants {
 
     public static final String DATA_DUMP_FILE_NAME = "ReCAPCollectionFor";
     public static final String FILENAME = "fileName";
@@ -197,6 +197,10 @@ public class ReCAPConstants {
 
     public static final String BIB_ID = "BibId";
     public static final String EXCEPTION = "Exception->";
+
+    public static final String BATCH_HEADERS="batchHeaders";
+    public static final String PROCESS_RECORDS="processRecords";
+    public static final String FTP_ROUTE="ftpRoute";
 
     //Logger
     public static final String ERROR = "error-->";

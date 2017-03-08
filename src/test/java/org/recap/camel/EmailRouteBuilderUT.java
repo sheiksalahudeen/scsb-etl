@@ -3,7 +3,7 @@ package org.recap.camel;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -40,7 +40,7 @@ public class EmailRouteBuilderUT extends BaseTestCase {
         emailPayLoad.setLocation(location);
         emailPayLoad.setCount(100);
         emailPayLoad.setTo(dataDumpEmailNyplTo);
-        producer.sendBody(ReCAPConstants.EMAIL_Q, emailPayLoad);
+        producer.sendBody(RecapConstants.EMAIL_Q, emailPayLoad);
     }
 
 }

@@ -1,8 +1,6 @@
 package org.recap.service.executor.datadump;
 
 import org.recap.model.export.DataDumpRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -16,8 +14,6 @@ import java.util.concurrent.ExecutionException;
  */
 @Service
 public class DataDumpExecutorService {
-
-    private Logger logger = LoggerFactory.getLogger(DataDumpExecutorService.class);
 
     private List<DataDumpExecutorInterface> dataDumpExecutorInterfaceList;
 

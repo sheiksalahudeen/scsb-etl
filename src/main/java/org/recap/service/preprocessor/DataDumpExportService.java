@@ -3,7 +3,7 @@ package org.recap.service.preprocessor;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Exchange;
 import org.apache.commons.io.FileUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.repository.CollectionGroupDetailsRepository;
@@ -64,44 +64,44 @@ public class DataDumpExportService {
                 try {
                     dataDumpExecutorService.generateDataDump(dataDumpRequest);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(RecapConstants.ERROR,e);
                 }
             }).start();
 
-            if(dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)){
+            if(dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)){
                 String message = getMessageFromIsRecordAvailableQ();
-                if (message.equals(ReCAPConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)) {
+                if (message.equals(RecapConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)) {
                     outputString = getMessageFromHttpQ();
                 } else{
                     outputString = message;
                 }
             }else{
                 outputString = getMessageFromIsRecordAvailableQ();
-                if(!outputString.equals(ReCAPConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)){
+                if(!outputString.equals(RecapConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)){
                     dataDumpEmailService.sendEmail(dataDumpRequest.getInstitutionCodes(),
                             Integer.valueOf(0),
                             Integer.valueOf(0),
                             dataDumpRequest.getTransmissionType(),
                             null,
                             dataDumpRequest.getToEmailAddress(),
-                            ReCAPConstants.DATADUMP_NO_DATA_AVAILABLE
+                            RecapConstants.DATADUMP_NO_DATA_AVAILABLE
                     );
                 }
             }
             responseMessage = getResponseMessage(outputString, dataDumpRequest);
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            responseMessage = ReCAPConstants.DATADUMP_EXPORT_FAILURE;
+            logger.error(RecapConstants.ERROR,e);
+            responseMessage = RecapConstants.DATADUMP_EXPORT_FAILURE;
         }
         return responseMessage;
     }
 
     private String getMessageFromHttpQ(){
         String outputString;
-        Exchange receive = consumerTemplate.receive(ReCAPConstants.DATADUMP_HTTP_Q);
+        Exchange receive = consumerTemplate.receive(RecapConstants.DATADUMP_HTTP_Q);
         Object body = receive.getIn().getBody();
         while (null == body) {
-            receive = consumerTemplate.receive(ReCAPConstants.DATADUMP_HTTP_Q);
+            receive = consumerTemplate.receive(RecapConstants.DATADUMP_HTTP_Q);
             body = receive.getIn().getBody();
         }
         outputString = (String) receive.getIn().getBody();
@@ -110,10 +110,10 @@ public class DataDumpExportService {
 
     private String getMessageFromIsRecordAvailableQ(){
         String outputString;
-        Exchange receive = consumerTemplate.receive(ReCAPConstants.DATADUMP_IS_RECORD_AVAILABLE_Q);
+        Exchange receive = consumerTemplate.receive(RecapConstants.DATADUMP_IS_RECORD_AVAILABLE_Q);
         Object body = receive.getIn().getBody();
         while (null == body) {
-            receive = consumerTemplate.receive(ReCAPConstants.DATADUMP_IS_RECORD_AVAILABLE_Q);
+            receive = consumerTemplate.receive(RecapConstants.DATADUMP_IS_RECORD_AVAILABLE_Q);
             body = receive.getIn().getBody();
         }
         outputString = (String) receive.getIn().getBody();
@@ -122,8 +122,7 @@ public class DataDumpExportService {
 
     private List<String> splitStringAndGetList(String inputString) {
         String[] splittedString = inputString.split(",");
-        List<String> stringList = Arrays.asList(splittedString);
-        return stringList;
+        return Arrays.asList(splittedString);
     }
 
     private List<Integer> getIntegerListFromStringList(List<String> stringList) {
@@ -135,8 +134,7 @@ public class DataDumpExportService {
     }
 
     private List<Integer> splitStringAndGetIntegerList(String inputString) {
-        List<Integer> integerList = getIntegerListFromStringList(splitStringAndGetList(inputString));
-        return integerList;
+        return getIntegerListFromStringList(splitStringAndGetList(inputString));
     }
 
     public void setDataDumpRequest(DataDumpRequest dataDumpRequest, String fetchType, String institutionCodes, String date, String collectionGroupIds,
@@ -148,25 +146,25 @@ public class DataDumpExportService {
             List<String> institutionCodeList = splitStringAndGetList(institutionCodes);
             dataDumpRequest.setInstitutionCodes(institutionCodeList);
         }
-        if (date != null && !date.equals("")) {
+        if (date != null && !"".equals(date)) {
             dataDumpRequest.setDate(date);
         }
 
-        if (collectionGroupIds != null && !collectionGroupIds.equals("")) {
+        if (collectionGroupIds != null && !"".equals(collectionGroupIds)) {
             List<Integer> collectionGroupIdList = splitStringAndGetIntegerList(collectionGroupIds);
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         } else {
             List<Integer> collectionGroupIdList = new ArrayList<>();
-            CollectionGroupEntity collectionGroupEntityShared = collectionGroupDetailsRepository.findByCollectionGroupCode(ReCAPConstants.COLLECTION_GROUP_SHARED);
+            CollectionGroupEntity collectionGroupEntityShared = collectionGroupDetailsRepository.findByCollectionGroupCode(RecapConstants.COLLECTION_GROUP_SHARED);
             collectionGroupIdList.add(collectionGroupEntityShared.getCollectionGroupId());
-            CollectionGroupEntity collectionGroupEntityOpen = collectionGroupDetailsRepository.findByCollectionGroupCode(ReCAPConstants.COLLECTION_GROUP_OPEN);
+            CollectionGroupEntity collectionGroupEntityOpen = collectionGroupDetailsRepository.findByCollectionGroupCode(RecapConstants.COLLECTION_GROUP_OPEN);
             collectionGroupIdList.add(collectionGroupEntityOpen.getCollectionGroupId());
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
         }
-        if (transmissionType != null && !transmissionType.equals("")) {
+        if (transmissionType != null && !"".equals(transmissionType)) {
             dataDumpRequest.setTransmissionType(transmissionType);
         } else {
-            dataDumpRequest.setTransmissionType(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
+            dataDumpRequest.setTransmissionType(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP);
         }
         if (requestingInstitutionCode != null) {
             dataDumpRequest.setRequestingInstitutionCode(requestingInstitutionCode);
@@ -181,74 +179,68 @@ public class DataDumpExportService {
 
         dataDumpRequest.setDateTimeString(getDateTimeString());
 
-        dataDumpRequest.setRequestId(new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM).format(new Date()));
+        dataDumpRequest.setRequestId(new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM).format(new Date()));
     }
 
     public String validateIncomingRequest(DataDumpRequest dataDumpRequest) {
         String validationMessage = null;
         Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorcount = 1;
-        if (dataDumpRequest.getInstitutionCodes().size() > 0) {
+        if (!dataDumpRequest.getInstitutionCodes().isEmpty()) {
             for (String institutionCode : dataDumpRequest.getInstitutionCodes()) {
-                if (!institutionCode.equals(ReCAPConstants.COLUMBIA) && !institutionCode.equals(ReCAPConstants.PRINCETON)
-                        && !institutionCode.equals(ReCAPConstants.NYPL)) {
-                    errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_INST_CODES_ERR_MSG);
+                if (!institutionCode.equals(RecapConstants.COLUMBIA) && !institutionCode.equals(RecapConstants.PRINCETON)
+                        && !institutionCode.equals(RecapConstants.NYPL)) {
+                    errorMessageMap.put(errorcount, RecapConstants.DATADUMP_VALID_INST_CODES_ERR_MSG);
                     errorcount++;
                 }
             }
             if(dataDumpRequest.getInstitutionCodes().size() != 1 && dataDumpRequest.getFetchType().equals(fetchTypeFull)) {
-                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_MULTIPLE_INST_CODES_ERR_MSG);
+                errorMessageMap.put(errorcount, RecapConstants.DATADUMP_MULTIPLE_INST_CODES_ERR_MSG);
                 errorcount++;
             }
         }
-        if (dataDumpRequest.getRequestingInstitutionCode() != null) {
-            if (!dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.COLUMBIA) && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.PRINCETON)
-                    && !dataDumpRequest.getRequestingInstitutionCode().equals(ReCAPConstants.NYPL)) {
-                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
+        if (dataDumpRequest.getRequestingInstitutionCode() != null && !dataDumpRequest.getRequestingInstitutionCode().equals(RecapConstants.COLUMBIA) && !dataDumpRequest.getRequestingInstitutionCode().equals(RecapConstants.PRINCETON)
+                && !dataDumpRequest.getRequestingInstitutionCode().equals(RecapConstants.NYPL) ) {
+                errorMessageMap.put(errorcount, RecapConstants.DATADUMP_VALID_REQ_INST_CODE_ERR_MSG);
                 errorcount++;
-            }
         }
         if (!dataDumpRequest.getFetchType().equals(fetchTypeFull) &&
-                !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)
-                && !dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_DELETED)) {
-            errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
+                !dataDumpRequest.getFetchType().equals(RecapConstants.DATADUMP_FETCHTYPE_INCREMENTAL)
+                && !dataDumpRequest.getFetchType().equals(RecapConstants.DATADUMP_FETCHTYPE_DELETED)) {
+            errorMessageMap.put(errorcount, RecapConstants.DATADUMP_VALID_FETCHTYPE_ERR_MSG);
             errorcount++;
         }
-        if (!dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
-                && !dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)
+        if (!dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
+                && !dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)
                 ) {
-            errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
+            errorMessageMap.put(errorcount, RecapConstants.DATADUMP_TRANS_TYPE_ERR_MSG);
             errorcount++;
         }
-        if (dataDumpRequest.getFetchType().equals(fetchTypeFull)) {
-            if (dataDumpRequest.getInstitutionCodes() == null) {
-                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
+        if (dataDumpRequest.getFetchType().equals(fetchTypeFull) && dataDumpRequest.getInstitutionCodes() == null) {
+                errorMessageMap.put(errorcount, RecapConstants.DATADUMP_INSTITUTIONCODE_ERR_MSG);
                 errorcount++;
-            }
         }
-        if (dataDumpRequest.getFetchType().equals(ReCAPConstants.DATADUMP_FETCHTYPE_INCREMENTAL)) {
-            if (dataDumpRequest.getDate() == null || dataDumpRequest.getDate().equals("")) {
-                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_DATE_ERR_MSG);
+        if (dataDumpRequest.getFetchType().equals(RecapConstants.DATADUMP_FETCHTYPE_INCREMENTAL) && dataDumpRequest.getDate() == null || "".equals(dataDumpRequest.getDate())) {
+                errorMessageMap.put(errorcount, RecapConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
-            }
         }
-        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+        if (dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             if (StringUtils.isEmpty(dataDumpRequest.getToEmailAddress())) {
-                errorMessageMap.put(errorcount, ReCAPConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
+                errorMessageMap.put(errorcount, RecapConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
                 errorcount++;
             } else {
                 boolean isValid = validateEmailAddress(dataDumpRequest.getToEmailAddress());
                 if (!isValid) {
-                    errorMessageMap.put(errorcount, ReCAPConstants.INVALID_EMAIL_ADDRESS);
+                    errorMessageMap.put(errorcount, RecapConstants.INVALID_EMAIL_ADDRESS);
                     errorcount++;
                 }
             }
         }
 
-        if(dataDumpRequest.getFetchType().equals(fetchTypeFull) && dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+        if(dataDumpRequest.getFetchType().equals(fetchTypeFull) && dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             String dataExportStatus = getDataExportCurrentStatus();
-            if(dataExportStatus != null && dataExportStatus.equals(ReCAPConstants.IN_PROGRESS)){
-                errorMessageMap.put(errorcount, ReCAPConstants.FULLDUMP_INPROGRESS_ERR_MSG);
+            if(dataExportStatus != null && dataExportStatus.equals(RecapConstants.IN_PROGRESS)){
+                errorMessageMap.put(errorcount, RecapConstants.FULLDUMP_INPROGRESS_ERR_MSG);
                 errorcount++;
             }
         }
@@ -267,6 +259,7 @@ public class DataDumpExportService {
                 dataDumpStatus = FileUtils.readFileToString(file, Charset.defaultCharset());
             }
         } catch (IOException e) {
+            logger.error(RecapConstants.ERROR,e);
             logger.error("Exception while creating or updating the file : " + e.getMessage());
         }
         return dataDumpStatus;
@@ -279,15 +272,18 @@ public class DataDumpExportService {
         try {
             if (file.exists()) {
                 String dataDumpStatus = FileUtils.readFileToString(file, Charset.defaultCharset());
-                if (dataDumpStatus.contains(ReCAPConstants.COMPLETED)) {
-                    writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
+                if (dataDumpStatus.contains(RecapConstants.COMPLETED)) {
+                    writeStatusToFile(file, RecapConstants.IN_PROGRESS);
                 }
             } else {
                 parentFile.mkdirs();
-                file.createNewFile();
-                writeStatusToFile(file, ReCAPConstants.IN_PROGRESS);
+                boolean newFile = file.createNewFile();
+                if(newFile) {
+                    writeStatusToFile(file, RecapConstants.IN_PROGRESS);
+                }
             }
         } catch (IOException e) {
+            logger.error(RecapConstants.ERROR,e);
             logger.error("Exception while creating or updating the file : " + e.getMessage());
         }
     }
@@ -299,7 +295,7 @@ public class DataDumpExportService {
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
-            logger.error(ReCAPConstants.EXCEPTION,e);
+            logger.error(RecapConstants.EXCEPTION,e);
         } finally {
             fileWriter.close();
         }
@@ -307,14 +303,12 @@ public class DataDumpExportService {
 
     private String buildErrorMessage(Map<Integer, String> erroMessageMap) {
         StringBuilder errorMessageBuilder = new StringBuilder();
-        erroMessageMap.entrySet().forEach(entry -> {
-            errorMessageBuilder.append(entry.getKey()).append(". ").append(entry.getValue()).append("\n");
-        });
+        erroMessageMap.entrySet().forEach(entry -> errorMessageBuilder.append(entry.getKey()).append(". ").append(entry.getValue()).append("\n"));
         return errorMessageBuilder.toString();
     }
 
     private boolean validateEmailAddress(String toEmailAddress) {
-        String regex = ReCAPConstants.REGEX_FOR_EMAIL_ADDRESS;
+        String regex = RecapConstants.REGEX_FOR_EMAIL_ADDRESS;
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(toEmailAddress);
         return matcher.matches();
@@ -323,25 +317,25 @@ public class DataDumpExportService {
     private String getResponseMessage(String outputString, DataDumpRequest dataDumpRequest) throws Exception {
         HttpHeaders responseHeaders = new HttpHeaders();
         String date = new Date().toString();
-        if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
-            if (outputString.equals(ReCAPConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)) {
+        if (dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
+            if (outputString.equals(RecapConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS)) {
                 setDataExportCurrentStatus();
-                outputString = ReCAPConstants.DATADUMP_PROCESS_STARTED;
+                outputString = RecapConstants.DATADUMP_PROCESS_STARTED;
             }
-            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
+            responseHeaders.add(RecapConstants.RESPONSE_DATE, date);
             return outputString;
-        }else if (dataDumpRequest.getTransmissionType().equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
-            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
+        }else if (dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP) && outputString != null) {
+            responseHeaders.add(RecapConstants.RESPONSE_DATE, date);
             return outputString;
         } else {
-            responseHeaders.add(ReCAPConstants.RESPONSE_DATE, date);
-            return ReCAPConstants.DATADUMP_EXPORT_FAILURE;
+            responseHeaders.add(RecapConstants.RESPONSE_DATE, date);
+            return RecapConstants.DATADUMP_EXPORT_FAILURE;
         }
     }
 
     private String getDateTimeString() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);
     }
 

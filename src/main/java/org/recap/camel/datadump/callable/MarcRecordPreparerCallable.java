@@ -1,10 +1,10 @@
 package org.recap.camel.datadump.callable;
 
-import org.marc4j.marc.Record;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.service.formatter.datadump.MarcXmlFormatterService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -22,7 +22,6 @@ public class MarcRecordPreparerCallable implements Callable {
 
     @Override
     public Map<String, Object> call() throws Exception {
-        Map<String, Object> results = marcXmlFormatterService.prepareMarcRecords(bibliographicEntities);
-        return results;
+        return marcXmlFormatterService.prepareMarcRecords(bibliographicEntities);
     }
 }

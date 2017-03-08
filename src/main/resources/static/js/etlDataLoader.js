@@ -33,7 +33,6 @@ function bulkIngest() {
         type: 'post',
         data: $form.serialize(),
         success: function (response) {
-            console.log("completed");
             $("#submit").removeAttr('disabled');
         }
     });

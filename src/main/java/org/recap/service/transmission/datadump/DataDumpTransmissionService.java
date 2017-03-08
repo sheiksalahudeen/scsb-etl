@@ -1,6 +1,9 @@
 package org.recap.service.transmission.datadump;
 
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -14,6 +17,8 @@ import java.util.Map;
  */
 @Service
 public class DataDumpTransmissionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpTransmissionService.class);
 
     private List<DataDumpTransmissionInterface> dataDumpTransmissionInterfaceList;
 
@@ -30,7 +35,7 @@ public class DataDumpTransmissionService {
                 try {
                     dataDumpTransmissionInterface.transmitDataDump(routeMap);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(RecapConstants.ERROR,e);
                 }
             }
         }

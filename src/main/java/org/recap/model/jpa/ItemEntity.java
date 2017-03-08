@@ -90,6 +90,7 @@ public class ItemEntity implements Serializable{
     private String catalogingStatus;
 
     public ItemEntity() {
+        //Do nothing
     }
 
 

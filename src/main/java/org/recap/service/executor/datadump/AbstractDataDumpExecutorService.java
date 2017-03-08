@@ -3,7 +3,7 @@ package org.recap.service.executor.datadump;
 import org.apache.camel.CamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.jpa.CollectionGroupEntity;
@@ -68,7 +68,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         boolean isRecordsToProcess = totalBibsCount > 0 ? true : false;
         boolean canProcess = canProcessRecords(totalBibsCount, dataDumpRequest.getTransmissionType());
         if (isRecordsToProcess && canProcess) {
-            outputString = ReCAPConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS;
+            outputString = RecapConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS;
             sendBodyForIsRecordAvailableMessage(outputString);
             String fileName = getFileName(dataDumpRequest, 0);
             String folderName = getFolderName(dataDumpRequest);
@@ -91,10 +91,10 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
         } else {
             if (!isRecordsToProcess) {
-                outputString = ReCAPConstants.DATADUMP_NO_RECORD;
+                outputString = RecapConstants.DATADUMP_NO_RECORD;
                 sendBodyForIsRecordAvailableMessage(outputString);
             } else {
-                outputString = ReCAPConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
+                outputString = RecapConstants.DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG;
                 sendBodyForIsRecordAvailableMessage(outputString);
             }
         }
@@ -104,16 +104,16 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private void sendBodyAndHeader(Map results, String headerString) {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
-                .to(ReCAPConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
+                .to(RecapConstants.SOLR_INPUT_FOR_DATA_EXPORT_Q)
                 .withBody(results)
-                .withHeader("batchHeaders", headerString.toString());
+                .withHeader("batchHeaders", headerString);
         fluentProducerTemplate.send();
     }
 
     private void sendBodyForHttp(String outputString) {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
-                .to(ReCAPConstants.DATADUMP_HTTP_Q)
+                .to(RecapConstants.DATADUMP_HTTP_Q)
                 .withBody(outputString);
         fluentProducerTemplate.send();
     }
@@ -121,7 +121,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     private void sendBodyForIsRecordAvailableMessage(String outputString) {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
-                .to(ReCAPConstants.DATADUMP_IS_RECORD_AVAILABLE_Q)
+                .to(RecapConstants.DATADUMP_IS_RECORD_AVAILABLE_Q)
                 .withBody(outputString);
         fluentProducerTemplate.send();
     }
@@ -144,9 +144,9 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 return "SCSBXml";
             case "2":
                 return "Json";
+            default:
+                return null;
         }
-        return null;
-
     }
 
     private String getFolderName(DataDumpRequest dataDumpRequest) {
@@ -159,7 +159,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
     private boolean canProcessRecords(Integer totalRecordCount, String transmissionType) {
         boolean canProcess = true;
-        if (totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType.equals(ReCAPConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)) {
+        if (totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType.equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)) {
             canProcess = false;
         }
         return canProcess;
@@ -182,16 +182,16 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
 
     public String getFormattedDateString(String inputDateString) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         String utcStr = null;
         try {
             Date date = simpleDateFormat.parse(inputDateString);
-            DateFormat format = new SimpleDateFormat(ReCAPConstants.UTC_DATE_FORMAT);
-            format.setTimeZone(TimeZone.getTimeZone(ReCAPConstants.UTC));
+            DateFormat format = new SimpleDateFormat(RecapConstants.UTC_DATE_FORMAT);
+            format.setTimeZone(TimeZone.getTimeZone(RecapConstants.UTC));
             utcStr = format.format(date);
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
-        return utcStr + ReCAPConstants.SOLR_DATE_RANGE_TO_NOW;
+        return utcStr + RecapConstants.SOLR_DATE_RANGE_TO_NOW;
     }
 }

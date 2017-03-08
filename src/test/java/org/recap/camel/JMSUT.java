@@ -6,7 +6,7 @@ import org.apache.camel.*;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.csv.FailureReportReCAPCSVRecord;
 import org.recap.model.csv.ReCAPCSVFailureRecord;
 import org.recap.model.jpa.ReportDataEntity;
@@ -75,17 +75,17 @@ public class JMSUT extends BaseTestCase {
 
         ReCAPCSVFailureRecord reCAPCSVFailureRecord = new ReCAPCSVFailureRecord();
         reCAPCSVFailureRecord.setFileName("test.xml");
-        reCAPCSVFailureRecord.setReportType(ReCAPConstants.FAILURE);
+        reCAPCSVFailureRecord.setReportType(RecapConstants.FAILURE);
         reCAPCSVFailureRecord.setInstitutionName("PUL");
         assertNotNull(failureReportReCAPCSVRecord.getCreateDateItem());
         assertNotNull(failureReportReCAPCSVRecord.getLastUpdatedDateItem());
         reCAPCSVFailureRecord.setFailureReportReCAPCSVRecordList(Arrays.asList(failureReportReCAPCSVRecord));
 
-        producer.sendBody(ReCAPConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
+        producer.sendBody(RecapConstants.CSV_FAILURE_Q, reCAPCSVFailureRecord);
 
         Thread.sleep(1000);
 
-        DateFormat df = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_FOR_FILE_NAME);
+        DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         String fileName = FilenameUtils.removeExtension(reCAPCSVFailureRecord.getFileName()) + "-Failure-" + df.format(new Date());
         File file = new File(reportDirectoryPath + File.separator + fileName + ".csv");
         assertTrue(file.exists());
@@ -150,10 +150,10 @@ public class JMSUT extends BaseTestCase {
 
         reportEntity.setFileName("TestSuccessReport.xml");
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(org.recap.ReCAPConstants.SUCCESS);
+        reportEntity.setType(RecapConstants.SUCCESS);
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntity.setInstitutionName("NYPL");
-        producer.sendBody(ReCAPConstants.REPORT_Q, reportEntity);
+        producer.sendBody(RecapConstants.REPORT_Q, reportEntity);
         Thread.sleep(1000);
 
         List<ReportEntity> byFileName = reportDetailRepository.findByFileName("TestSuccessReport.xml");

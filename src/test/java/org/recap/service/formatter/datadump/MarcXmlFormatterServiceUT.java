@@ -9,7 +9,7 @@ import org.marc4j.MarcXmlReader;
 import org.marc4j.MarcXmlWriter;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.slf4j.Logger;
@@ -24,14 +24,13 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by premkb on 2/10/16.
  */
 public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
-    private Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterServiceUT.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(MarcXmlFormatterServiceUT.class);
 
     @Autowired
     private MarcXmlFormatterService marcXmlFormatterService;
@@ -209,7 +208,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
     public void generateMarcXml() throws Exception {
         BibliographicEntity bibliographicEntity = getBibliographicEntity();
         Map<String, Object> successAndFailureFormattedList = marcXmlFormatterService.prepareMarcRecords(Arrays.asList(bibliographicEntity));
-        String marcXmlString = marcXmlFormatterService.covertToMarcXmlString((List<Record>)successAndFailureFormattedList.get(ReCAPConstants.SUCCESS));
+        String marcXmlString = marcXmlFormatterService.covertToMarcXmlString((List<Record>)successAndFailureFormattedList.get(RecapConstants.SUCCESS));
         System.out.println(marcXmlString);
         List<Record> recordList = readMarcXml(marcXmlString);
         assertNotNull(recordList);
@@ -220,9 +219,9 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
     public void generateMarcXmlForMalformedBibContent() throws IOException, URISyntaxException {
         BibliographicEntity bibliographicEntity = getMalformedBibliographicEntity();
         Map<String, Object> successAndFailureFormattedList = marcXmlFormatterService.prepareMarcRecords(Arrays.asList(bibliographicEntity));
-        List<String> marcXmlString = (List<String>) successAndFailureFormattedList.get(ReCAPConstants.SUCCESS);
+        List<String> marcXmlString = (List<String>) successAndFailureFormattedList.get(RecapConstants.SUCCESS);
         assertEquals(marcXmlString.size(),0);
-        List<String> failures = (List<String>) successAndFailureFormattedList.get(ReCAPConstants.FAILURE);
+        List<String> failures = (List<String>) successAndFailureFormattedList.get(RecapConstants.FAILURE);
         String failureMessage = failures.get(0);
         assertNotNull(failureMessage);
         System.out.println(failureMessage);
@@ -327,6 +326,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         itemEntity.setCollectionGroupEntity(collectionGroupEntity);
         itemEntity.setCustomerCode("PA");
         itemEntity.setCopyNumber(1);
+        itemEntity.setVolumePartYear("v. 30-31 1980-81");
         itemEntity.setItemAvailabilityStatusId(1);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setStatusCode("Available");
@@ -358,7 +358,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
         ArrayList<Record> recordList = new ArrayList<>();
         Map<String, Object> recordMap = marcXmlFormatterService.prepareMarcRecord(bibliographicEntity);
-        Record record = (Record) recordMap.get(ReCAPConstants.SUCCESS);
+        Record record = (Record) recordMap.get(RecapConstants.SUCCESS);
         assertNotNull(record);
 
         OutputStream out = new ByteArrayOutputStream();
@@ -369,7 +369,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
         ArrayList<Record> recordList1 = new ArrayList<>();
         Map<String, Object> recordMap1 = marcXmlFormatterService.prepareMarcRecord(bibliographicEntity1);
-        Record record1 = (Record) recordMap.get(ReCAPConstants.SUCCESS);
+        Record record1 = (Record) recordMap.get(RecapConstants.SUCCESS);
         assertNotNull(record1);
 
         writeMarcXml(recordList1, writer);

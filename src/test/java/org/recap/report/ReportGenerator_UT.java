@@ -4,10 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.ReportDetailRepository;
@@ -50,7 +49,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), RecapConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -66,7 +65,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveSuccessReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), RecapConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -81,7 +80,7 @@ public class ReportGenerator_UT extends BaseTestCase {
     public void generateDataDumpFileSystemSuccessReportTest() throws Exception {
 
         ReportEntity savedReportEntity1 = saveDataDumpSuccessReport();
-        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.SUCCESS, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM,savedReportEntity1.getFileName());
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport", RecapConstants.SUCCESS, savedReportEntity1.getInstitutionName(), RecapConstants.FILE_SYSTEM,savedReportEntity1.getFileName());
 
         assertNotNull(generatedReportFileName);
 
@@ -97,7 +96,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveDataDumpSuccessReport();
 
-        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.SUCCESS, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FTP,savedReportEntity1.getFileName());
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport", RecapConstants.SUCCESS, savedReportEntity1.getInstitutionName(), RecapConstants.FTP,savedReportEntity1.getFileName());
 
         assertNotNull(generatedReportFileName);
 
@@ -113,7 +112,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveDataDumpFailureReport();
 
-        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.FAILURE, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FILE_SYSTEM,savedReportEntity1.getFileName());
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport", RecapConstants.FAILURE, savedReportEntity1.getInstitutionName(), RecapConstants.FILE_SYSTEM,savedReportEntity1.getFileName());
 
         assertNotNull(generatedReportFileName);
 
@@ -129,7 +128,7 @@ public class ReportGenerator_UT extends BaseTestCase {
 
         ReportEntity savedReportEntity1 = saveDataDumpFailureReport();
 
-        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport",ReCAPConstants.FAILURE, savedReportEntity1.getInstitutionName(), org.recap.ReCAPConstants.FTP,savedReportEntity1.getFileName());
+        String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport", RecapConstants.FAILURE, savedReportEntity1.getInstitutionName(), RecapConstants.FTP,savedReportEntity1.getFileName());
 
         assertNotNull(generatedReportFileName);
 
@@ -146,7 +145,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         ReportEntity savedReportEntity1 = saveFailureReportEntity();
         ReportEntity savedReportEntity2 = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedReportEntity1.getCreatedDate(), "ETL",savedReportEntity1.getType(), savedReportEntity1.getInstitutionName(), RecapConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -162,7 +161,7 @@ public class ReportGenerator_UT extends BaseTestCase {
     public void uploadFailureReportToFTP() throws Exception {
         ReportEntity savedReportEntity = saveFailureReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), "ETL",savedReportEntity.getType(), savedReportEntity.getInstitutionName(), ReCAPConstants.FTP);
+        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), "ETL",savedReportEntity.getType(), savedReportEntity.getInstitutionName(), RecapConstants.FTP);
 
         assertNotNull(generatedReportFileName);
     }
@@ -171,7 +170,7 @@ public class ReportGenerator_UT extends BaseTestCase {
     public void uploadSuccessReportToFTP() throws Exception {
         ReportEntity savedReportEntity = saveSuccessReportEntity();
 
-        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), "ETL",savedReportEntity.getType(), savedReportEntity.getInstitutionName(), ReCAPConstants.FTP);
+        String generatedReportFileName = generateReport(savedReportEntity.getCreatedDate(), "ETL",savedReportEntity.getType(), savedReportEntity.getInstitutionName(), RecapConstants.FTP);
 
         assertNotNull(generatedReportFileName);
     }
@@ -181,7 +180,7 @@ public class ReportGenerator_UT extends BaseTestCase {
         ReportEntity savedSuccessReportEntity1 = saveSuccessReportEntity();
         ReportEntity savedSuccessReportEntity2 = saveSuccessReportEntity();
         fileName = "";
-        String generatedReportFileName = generateReport(savedSuccessReportEntity1.getCreatedDate(), "ETL",savedSuccessReportEntity1.getType(), savedSuccessReportEntity1.getInstitutionName(), ReCAPConstants.FILE_SYSTEM);
+        String generatedReportFileName = generateReport(savedSuccessReportEntity1.getCreatedDate(), "ETL",savedSuccessReportEntity1.getType(), savedSuccessReportEntity1.getInstitutionName(), RecapConstants.FILE_SYSTEM);
 
         assertNotNull(generatedReportFileName);
 
@@ -198,26 +197,26 @@ public class ReportGenerator_UT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(org.recap.ReCAPConstants.FAILURE);
+        reportEntity.setType(RecapConstants.FAILURE);
         reportEntity.setInstitutionName("PUL");
 
         ReportDataEntity reportDataEntity = new ReportDataEntity();
-        reportDataEntity.setHeaderName(ReCAPConstants.ITEM_BARCODE);
+        reportDataEntity.setHeaderName(RecapConstants.ITEM_BARCODE);
         reportDataEntity.setHeaderValue("103");
         reportDataEntities.add(reportDataEntity);
 
         ReportDataEntity reportDataEntity2 = new ReportDataEntity();
-        reportDataEntity2.setHeaderName(ReCAPConstants.CUSTOMER_CODE);
+        reportDataEntity2.setHeaderName(RecapConstants.CUSTOMER_CODE);
         reportDataEntity2.setHeaderValue("PA");
         reportDataEntities.add(reportDataEntity2);
 
         ReportDataEntity reportDataEntity3 = new ReportDataEntity();
-        reportDataEntity3.setHeaderName(ReCAPConstants.LOCAL_ITEM_ID);
+        reportDataEntity3.setHeaderName(RecapConstants.LOCAL_ITEM_ID);
         reportDataEntity3.setHeaderValue("10412");
         reportDataEntities.add(reportDataEntity3);
 
         ReportDataEntity reportDataEntity4 = new ReportDataEntity();
-        reportDataEntity4.setHeaderName(ReCAPConstants.OWNING_INSTITUTION);
+        reportDataEntity4.setHeaderName(RecapConstants.OWNING_INSTITUTION);
         reportDataEntity4.setHeaderValue("PUL");
         reportDataEntities.add(reportDataEntity4);
 
@@ -231,43 +230,43 @@ public class ReportGenerator_UT extends BaseTestCase {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportDataEntity totalRecordsInFileEntity = new ReportDataEntity();
-        totalRecordsInFileEntity.setHeaderName(ReCAPConstants.TOTAL_RECORDS_IN_FILE);
+        totalRecordsInFileEntity.setHeaderName(RecapConstants.TOTAL_RECORDS_IN_FILE);
         totalRecordsInFileEntity.setHeaderValue(String.valueOf(10000));
         reportDataEntities.add(totalRecordsInFileEntity);
 
         ReportDataEntity totalBibsLoadedEntity = new ReportDataEntity();
-        totalBibsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIBS_LOADED);
+        totalBibsLoadedEntity.setHeaderName(RecapConstants.TOTAL_BIBS_LOADED);
         totalBibsLoadedEntity.setHeaderValue(String.valueOf(10000));
         reportDataEntities.add(totalBibsLoadedEntity);
 
         ReportDataEntity totalHoldingsLoadedEntity = new ReportDataEntity();
-        totalHoldingsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_HOLDINGS_LOADED);
+        totalHoldingsLoadedEntity.setHeaderName(RecapConstants.TOTAL_HOLDINGS_LOADED);
         totalHoldingsLoadedEntity.setHeaderValue(String.valueOf(8000));
         reportDataEntities.add(totalHoldingsLoadedEntity);
 
         ReportDataEntity totalItemsLoadedEntity = new ReportDataEntity();
-        totalItemsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_ITEMS_LOADED);
+        totalItemsLoadedEntity.setHeaderName(RecapConstants.TOTAL_ITEMS_LOADED);
         totalItemsLoadedEntity.setHeaderValue(String.valueOf(12000));
         reportDataEntities.add(totalItemsLoadedEntity);
 
         ReportDataEntity totalBibHoldingsLoadedEntity = new ReportDataEntity();
-        totalBibHoldingsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIB_HOLDINGS_LOADED);
+        totalBibHoldingsLoadedEntity.setHeaderName(RecapConstants.TOTAL_BIB_HOLDINGS_LOADED);
         totalBibHoldingsLoadedEntity.setHeaderValue(String.valueOf(18000));
         reportDataEntities.add(totalBibHoldingsLoadedEntity);
 
         ReportDataEntity totalBiBItemsLoadedEntity = new ReportDataEntity();
-        totalBiBItemsLoadedEntity.setHeaderName(ReCAPConstants.TOTAL_BIB_ITEMS_LOADED);
+        totalBiBItemsLoadedEntity.setHeaderName(RecapConstants.TOTAL_BIB_ITEMS_LOADED);
         totalBiBItemsLoadedEntity.setHeaderValue(String.valueOf(22000));
         reportDataEntities.add(totalBiBItemsLoadedEntity);
 
         ReportDataEntity fileNameLoadedEntity = new ReportDataEntity();
-        fileNameLoadedEntity.setHeaderName(ReCAPConstants.FILE_NAME);
+        fileNameLoadedEntity.setHeaderName(RecapConstants.FILE_NAME);
         fileNameLoadedEntity.setHeaderValue(fileName);
         reportDataEntities.add(fileNameLoadedEntity);
 
         reportEntity.setFileName(fileName);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(org.recap.ReCAPConstants.SUCCESS);
+        reportEntity.setType(RecapConstants.SUCCESS);
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntity.setInstitutionName("PUL");
 

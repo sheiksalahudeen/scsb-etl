@@ -2,14 +2,13 @@ package org.recap.camel;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
@@ -22,8 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -229,7 +226,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         bibPersisterCallable.setCollectionGroupMap(collectionGroupMap);
         bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
         bibPersisterCallable.setBibRecord(bibRecord);
-        bibPersisterCallable.setDBReportUtil(dbReportUtil);
+        bibPersisterCallable.setDbReportUtil(dbReportUtil);
         bibPersisterCallable.setInstitutionName("NYPL");
         Map<String, Object> map = (Map<String, Object>) bibPersisterCallable.call();
         if (map != null) {
@@ -264,7 +261,7 @@ public class BibDataProcessorUT extends BaseTestCase {
 
         java.lang.Thread.sleep(500);
 
-        List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndInstitutionNameAndType(bibDataProcessor.getXmlFileName(), bibDataProcessor.getInstitutionName(), ReCAPConstants.FAILURE);
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndInstitutionNameAndType(bibDataProcessor.getXmlFileName(), bibDataProcessor.getInstitutionName(), RecapConstants.FAILURE);
         assertNotNull(reportEntities);
     }
 

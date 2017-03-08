@@ -1,8 +1,6 @@
-package org.recap.camel.dynamicRouter;
+package org.recap.camel.dynamicrouter;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.recap.camel.datadump.routebuilder.DataExportRouteBuilder;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;

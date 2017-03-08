@@ -5,7 +5,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +58,10 @@ public class DataDumpFtpTransmissionServiceUT extends BaseTestCase {
     @Test
     public void transmitFtpDataDump() throws Exception {
         dateTimeString = getDateTimeString();
-        producer.sendBodyAndHeader(ReCAPConstants.DATADUMP_FILE_SYSTEM_Q,  xmlString, "routeMap", getRouteMap());
+        producer.sendBodyAndHeader(RecapConstants.DATADUMP_FILE_SYSTEM_Q,  xmlString, "routeMap", getRouteMap());
         dataDumpFtpTransmissionService.transmitDataDump(getRouteMap());
         String dateTimeString = getDateTimeString();
-        String ftpFileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode +ReCAPConstants.ZIP_FILE_FORMAT;
+        String ftpFileName = RecapConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode + RecapConstants.ZIP_FILE_FORMAT;
         logger.info("ftpFileName---->"+ftpFileName);
         ftpDataDumpRemoteServer = ftpDataDumpRemoteServer+ File.separator+ requestingInstitutionCode +File.separator+dateTimeString;
         System.out.println("ftpDataDumpRemoteServer--->"+ftpDataDumpRemoteServer);
@@ -79,17 +79,17 @@ public class DataDumpFtpTransmissionServiceUT extends BaseTestCase {
 
     public Map<String,String> getRouteMap(){
         Map<String,String> routeMap = new HashMap<>();
-        String fileName = ReCAPConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode;
-        routeMap.put(ReCAPConstants.FILENAME,fileName);
-        routeMap.put(ReCAPConstants.DATETIME_FOLDER, dateTimeString);
-        routeMap.put(ReCAPConstants.REQUESTING_INST_CODE, requestingInstitutionCode);
-        routeMap.put(ReCAPConstants.FILE_FORMAT,ReCAPConstants.XML_FILE_FORMAT);
+        String fileName = RecapConstants.DATA_DUMP_FILE_NAME+ requestingInstitutionCode;
+        routeMap.put(RecapConstants.FILENAME,fileName);
+        routeMap.put(RecapConstants.DATETIME_FOLDER, dateTimeString);
+        routeMap.put(RecapConstants.REQUESTING_INST_CODE, requestingInstitutionCode);
+        routeMap.put(RecapConstants.FILE_FORMAT, RecapConstants.XML_FILE_FORMAT);
         return routeMap;
     }
 
     private String getDateTimeString(){
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);
     }
 

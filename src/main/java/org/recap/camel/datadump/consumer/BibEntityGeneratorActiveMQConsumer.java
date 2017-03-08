@@ -2,9 +2,8 @@ package org.recap.camel.datadump.consumer;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.callable.BibEntityPreparerCallable;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -20,7 +19,7 @@ import java.util.concurrent.*;
 
 public class BibEntityGeneratorActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ExecutorService executorService;
@@ -66,7 +65,7 @@ public class BibEntityGeneratorActiveMQConsumer {
                     try {
                         return future.get();
                     } catch (InterruptedException | ExecutionException e) {
-                        logger.error(e.getMessage());
+                        logger.error(RecapConstants.ERROR,e);
                         throw new RuntimeException(e);
                     }
                 });
@@ -78,13 +77,13 @@ public class BibEntityGeneratorActiveMQConsumer {
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " bib entities is : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} bib entities is : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000);
 
         getExecutorService().shutdown();
 
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
-                .to(ReCAPConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
+                .to(RecapConstants.BIB_ENTITY_FOR_DATA_EXPORT_Q)
                 .withBody(bibliographicEntities)
                 .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))

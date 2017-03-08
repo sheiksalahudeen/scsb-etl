@@ -4,12 +4,12 @@ import com.google.common.collect.Lists;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
-import org.recap.ReCAPConstants;
-import org.recap.util.datadump.DataExportHeaderUtil;
+import org.recap.RecapConstants;
 import org.recap.camel.datadump.callable.BibRecordPreparerCallable;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.service.formatter.datadump.SCSBXmlFormatterService;
+import org.recap.util.datadump.DataExportHeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -23,12 +23,11 @@ import java.util.concurrent.*;
 
 public class SCSBRecordFormatActiveMQConsumer {
 
-    Logger logger = LoggerFactory.getLogger(SCSBRecordFormatActiveMQConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(SCSBRecordFormatActiveMQConsumer.class);
 
     SCSBXmlFormatterService scsbXmlFormatterService;
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
-    private DefaultFluentProducerTemplate defaultFluentProducerTemplate;
 
     public SCSBRecordFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
@@ -60,7 +59,7 @@ public class SCSBRecordFormatActiveMQConsumer {
                     try {
                         return future.get();
                     } catch (InterruptedException | ExecutionException e) {
-                        logger.error(e.getMessage());
+                        logger.error(RecapConstants.ERROR,e);
                         throw new RuntimeException(e);
                     }
                 });
@@ -68,29 +67,29 @@ public class SCSBRecordFormatActiveMQConsumer {
         List failures = new ArrayList();
         for (Future future : futureList) {
             Map<String, Object> results = (Map<String, Object>) future.get();
-            Collection<? extends BibRecord> successRecords = (Collection<? extends BibRecord>) results.get(ReCAPConstants.SUCCESS);
+            Collection<? extends BibRecord> successRecords = (Collection<? extends BibRecord>) results.get(RecapConstants.SUCCESS);
             if (!CollectionUtils.isEmpty(successRecords)) {
                 records.addAll(successRecords);
             }
-            Collection failureRecords = (Collection) results.get(ReCAPConstants.FAILURE);
+            Collection failureRecords = (Collection) results.get(RecapConstants.FAILURE);
             if (!CollectionUtils.isEmpty(failureRecords)) {
                 failures.addAll(failureRecords);
             }
         }
 
-        String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
+        String batchHeaders = (String) exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         processFailures(failures, batchHeaders, requestId, fluentProducerTemplate);
 
         long endTime = System.currentTimeMillis();
 
-        logger.info("Time taken to prepare " + bibliographicEntities.size() + " scsb records : " + (endTime - startTime) / 1000 + " seconds ");
+        logger.info("Time taken to prepare {} scsb records : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000 );
 
 
         fluentProducerTemplate
-                .to(ReCAPConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
+                .to(RecapConstants.SCSB_RECORD_FOR_DATA_EXPORT_Q)
                 .withBody(records)
-                .withHeader("batchHeaders", exchange.getIn().getHeader("batchHeaders"))
+                .withHeader(RecapConstants.BATCH_HEADERS, exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
                 .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
         fluentProducerTemplate.send();
@@ -100,22 +99,22 @@ public class SCSBRecordFormatActiveMQConsumer {
         if (!CollectionUtils.isEmpty(failures)) {
             HashMap values = new HashMap();
 
-            values.put(ReCAPConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.REQUESTING_INST_CODE));
-            values.put(ReCAPConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.INSTITUTION_CODES));
-            values.put(ReCAPConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.FETCH_TYPE));
-            values.put(ReCAPConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.COLLECTION_GROUP_IDS));
-            values.put(ReCAPConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TRANSMISSION_TYPE));
-            values.put(ReCAPConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FROM_DATE));
-            values.put(ReCAPConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.EXPORT_FORMAT));
-            values.put(ReCAPConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, ReCAPConstants.TO_EMAIL_ID));
-            values.put(ReCAPConstants.NUM_RECORDS, String.valueOf(failures.size()));
-            values.put(ReCAPConstants.FAILURE_CAUSE, failures.get(0));
-            values.put(ReCAPConstants.FAILED_BIBS, ReCAPConstants.FAILED_BIBS);
-            values.put(ReCAPConstants.BATCH_EXPORT, ReCAPConstants.BATCH_EXPORT_FAILURE);
-            values.put(ReCAPConstants.REQUEST_ID, requestId);
+            values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
+            values.put(RecapConstants.INSTITUTION_CODES, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.INSTITUTION_CODES));
+            values.put(RecapConstants.FETCH_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.FETCH_TYPE));
+            values.put(RecapConstants.COLLECTION_GROUP_IDS, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.COLLECTION_GROUP_IDS));
+            values.put(RecapConstants.TRANSMISSION_TYPE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.TRANSMISSION_TYPE));
+            values.put(RecapConstants.EXPORT_FROM_DATE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.EXPORT_FROM_DATE));
+            values.put(RecapConstants.EXPORT_FORMAT, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.EXPORT_FORMAT));
+            values.put(RecapConstants.TO_EMAIL_ID, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.TO_EMAIL_ID));
+            values.put(RecapConstants.NUM_RECORDS, String.valueOf(failures.size()));
+            values.put(RecapConstants.FAILURE_CAUSE, failures.get(0));
+            values.put(RecapConstants.FAILED_BIBS, RecapConstants.FAILED_BIBS);
+            values.put(RecapConstants.BATCH_EXPORT, RecapConstants.BATCH_EXPORT_FAILURE);
+            values.put(RecapConstants.REQUEST_ID, requestId);
 
             fluentProducerTemplate
-                    .to(ReCAPConstants.DATADUMP_FAILURE_REPORT_Q)
+                    .to(RecapConstants.DATADUMP_FAILURE_REPORT_Q)
                     .withBody(values);
 
             fluentProducerTemplate.send();

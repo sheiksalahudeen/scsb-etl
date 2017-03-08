@@ -1,6 +1,6 @@
 package org.recap.service.formatter.datadump;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jaxb.*;
 import org.recap.model.jaxb.marc.*;
 import org.recap.model.jpa.BibliographicEntity;
@@ -36,11 +36,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
 
     @Override
     public boolean isInterested(String formatType) {
-        return formatType.equals(ReCAPConstants.DATADUMP_XML_FORMAT_SCSB) ? true:false;
+        return formatType.equals(RecapConstants.DATADUMP_XML_FORMAT_SCSB) ? true:false;
     }
 
     public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords) throws Exception{
-        String formattedString = null;
+        String formattedString;
         BibRecords bibRecords1 = new BibRecords();
         bibRecords1.setBibRecords(bibRecords);
         formattedString = convertToXml(bibRecords1);
@@ -65,10 +65,10 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         Map<String,Integer> bibIdRecordNumMap = null;
         List<Integer> recordNumList = matchingBibInfoDetailRepository.getRecordNum(bibIdList);
         Map<Integer,List<MatchingBibInfoDetail>> recordNumMatchingBibInfoDetailMap = null;
-        if (recordNumList != null && recordNumList.size()>0) {
+        if (recordNumList != null && !recordNumList.isEmpty()) {
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = matchingBibInfoDetailRepository.findByRecordNum(recordNumList);
             recordNumMatchingBibInfoDetailMap = null;
-            if(recordNumList != null && recordNumList.size() > 0){
+            if(recordNumList != null && !recordNumList.isEmpty()){
                 bibIdRecordNumMap = getBibIdRowNumMap(matchingBibInfoDetailList);// put bib id and record num from report table in a map
                 recordNumMatchingBibInfoDetailMap = getRecordNumReportDataEntityMap(matchingBibInfoDetailList);
             }
@@ -82,17 +82,17 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
                 matchingBibInfoDetailListForSingleBib = recordNumMatchingBibInfoDetailMap.get(rowNum);
             }
             Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity,matchingBibInfoDetailListForSingleBib);
-            BibRecord bibRecord = (BibRecord) stringObjectMap.get(ReCAPConstants.SUCCESS);
+            BibRecord bibRecord = (BibRecord) stringObjectMap.get(RecapConstants.SUCCESS);
             if (null != bibRecord) {
                 records.add(bibRecord);
             }
-            String failureMsg = (String) stringObjectMap.get(ReCAPConstants.FAILURE);
+            String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
             if (null != failureMsg) {
                 errors.add(failureMsg);
             }
         }
-        resultsMap.put(ReCAPConstants.SUCCESS, records);
-        resultsMap.put(ReCAPConstants.FAILURE, errors);
+        resultsMap.put(RecapConstants.SUCCESS, records);
+        resultsMap.put(RecapConstants.FAILURE, errors);
         return resultsMap;
     }
 
@@ -136,10 +136,10 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
             bibRecord = new BibRecord();
             bibRecord.setBib(bib);
             bibRecord.setHoldings(holdings);
-            results.put(ReCAPConstants.SUCCESS, bibRecord);
+            results.put(RecapConstants.SUCCESS, bibRecord);
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            results.put(ReCAPConstants.FAILURE, String.valueOf(e.getCause()));
+            logger.error(RecapConstants.ERROR,e);
+            results.put(RecapConstants.FAILURE, String.valueOf(e.getCause()));
         }
         return results;
     }
@@ -163,7 +163,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         ContentType contentType = getContentType(bibliographicEntity.getContent());
         List<RecordType> record = contentType.getCollection().getRecord();
         RecordType recordType = record.get(0);
-        String value = ReCAPConstants.SCSB+"-"+bibliographicEntity.getBibliographicId();
+        String value = RecapConstants.SCSB+"-"+bibliographicEntity.getBibliographicId();
         recordType.getControlfield().get(0).setValue(value);
         bib.setContent(contentType);
         return bib;
@@ -209,11 +209,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private boolean isHoldingSingleItemPrivate(List<ItemEntity> itemEntities){
-        if(itemEntities.size()==1 && itemEntities.get(0).getCollectionGroupEntity().getCollectionGroupCode().equals(ReCAPConstants.COLLECTION_GROUP_PRIVATE)){
+        if(itemEntities.size()==1 && itemEntities.get(0).getCollectionGroupEntity().getCollectionGroupCode().equals(RecapConstants.COLLECTION_GROUP_PRIVATE)){
             return true;
         }else{
             for(ItemEntity itemEntity : itemEntities) {
-                if (itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(ReCAPConstants.COLLECTION_GROUP_PRIVATE)) {
+                if (itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(RecapConstants.COLLECTION_GROUP_PRIVATE)) {
                     return true;
                 }
             }
@@ -235,7 +235,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         List<RecordType> recordTypes = new ArrayList<>();
         if (itemEntities!=null) {
             for (ItemEntity itemEntity : itemEntities) {
-                if(!itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(ReCAPConstants.COLLECTION_GROUP_PRIVATE)) {
+                if(!itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(RecapConstants.COLLECTION_GROUP_PRIVATE)) {
                     RecordType recordType = new RecordType();
                     List<DataFieldType> dataFieldTypeList = new ArrayList<>();
                     dataFieldTypeList.add(build876DataField(itemEntity));
@@ -285,7 +285,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
 
     private ContentType getContentType(byte[] byteContent) throws Exception{
         String content = new String(byteContent, Charset.forName("UTF-8"));
-        CollectionType collectionType = null;
+        CollectionType collectionType;
         collectionType = (CollectionType) JAXBHandler.getInstance().unmarshal(content, CollectionType.class);
         ContentType contentType = new ContentType();
         contentType.setCollection(collectionType);

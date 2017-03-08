@@ -5,6 +5,7 @@ import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.zipfile.ZipAggregationStrategy;
+import org.recap.RecapConstants;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,40 +52,29 @@ public class ZipFileProcessor implements Processor {
         dataExportEmailProcessor.setRequestId(getValueFor(batchHeaders, "requestId"));
         dataExportEmailProcessor.setFetchType(getValueFor(batchHeaders, "fetchType"));
 
-        Route ftpRoute = exchange.getContext().getRoute("ftpRoute");
+        Route ftpRoute = exchange.getContext().getRoute(RecapConstants.FTP_ROUTE);
         if (null != ftpRoute) {
-            exchange.getContext().removeRoute("ftpRoute");
+            exchange.getContext().removeRoute(RecapConstants.FTP_ROUTE);
         }
 
         exchange.getContext().addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 from("file:" + ftpStagingDir + File.separator + folderName + "?noop=true&antInclude=*.xml,*.json")
-                        .routeId("ftpRoute")
+                        .routeId(RecapConstants.FTP_ROUTE)
                         .aggregate(new ZipAggregationStrategy(true, true))
                         .constant(true)
                         .completionFromBatchConsumer()
                         .eagerCheckCompletion()
                         .process(dataExportEmailProcessor)
-                        .to("sftp://"
-                                + ftpUserName
-                                + "@"
-                                + ftpDataDumpRemoteServer
-                                + File.separator
-                                + "?fileName="
-                                + folderName
-                                + ".zip"
-                                + "&privateKeyFile="
-                                + ftpPrivateKey
-                                + "&knownHostsFile="
-                                + ftpKnownHost);
+                        .to("sftp://" + ftpUserName + "@" + ftpDataDumpRemoteServer + File.separator + "?fileName=" + folderName + ".zip"
+                                + "&privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost);
             }
         });
     }
 
     private String getValueFor(String batchHeaderString, String key) {
-        String valueFor = new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
-        return valueFor;
+        return new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
     }
 
     private List<String> getInstitutionCodes(String institutionCodes) {

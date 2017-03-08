@@ -27,14 +27,13 @@ public class MarcUtil {
 
     private List<String> resolveValue(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
         List<String> values = new ArrayList<>();
-        String indicator1 = (StringUtils.isNotBlank(ind1) ? String.valueOf(ind1.charAt(0)) : " ");
-        String indicator2 = (StringUtils.isNotBlank(ind2) ? String.valueOf(ind2.charAt(0)) : " ");
+        String indicator1 = StringUtils.isNotBlank(ind1) ? String.valueOf(ind1.charAt(0)) : " ";
+        String indicator2 = StringUtils.isNotBlank(ind2) ? String.valueOf(ind2.charAt(0)) : " ";
         List<DataFieldType> dataFields = marcRecord.getDatafield();
 
         for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
             DataFieldType dataField = dataFieldIterator.next();
-            if (dataField != null && dataField.getTag().equals(field)) {
-                if (doIndicatorsMatch(indicator1, indicator2, dataField)) {
+            if (dataField != null && dataField.getTag().equals(field) && doIndicatorsMatch(indicator1, indicator2, dataField)) {
                     List<SubfieldatafieldType> subFields = dataField.getSubfield();
                     for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
                         SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
@@ -46,7 +45,6 @@ public class MarcUtil {
                         }
                     }
                 }
-            }
         }
         return values;
     }

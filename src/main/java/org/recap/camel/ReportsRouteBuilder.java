@@ -2,7 +2,7 @@ package org.recap.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ReportsRouteBuilder {
-    Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
     @Autowired
     public ReportsRouteBuilder(CamelContext camelContext, ReportProcessor reportProcessor) {
@@ -22,13 +22,13 @@ public class ReportsRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.REPORT_Q)
-                            .routeId(ReCAPConstants.REPORT_ROUTE_ID)
+                    from(RecapConstants.REPORT_Q)
+                            .routeId(RecapConstants.REPORT_ROUTE_ID)
                             .process(reportProcessor);
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.ERROR,e);
         }
     }
 }

@@ -1,6 +1,5 @@
 package org.recap.model.export;
 
-import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -40,7 +39,6 @@ public class FullDataDumpCallable implements Callable {
     @Override
     public Object call() throws Exception {
         DataDumpCallableHelperService dataDumpCallableHelperService = appContext.getBean(DataDumpCallableHelperService.class);
-        List<BibliographicEntity> bibliographicEntityList = dataDumpCallableHelperService.getFullDataDumpRecords(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
-        return bibliographicEntityList;
+        return dataDumpCallableHelperService.getFullDataDumpRecords(pageNum,batchSize,dataDumpRequest,bibliographicDetailsRepository);
     }
 }

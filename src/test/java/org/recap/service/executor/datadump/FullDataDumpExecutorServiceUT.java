@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
 import org.recap.model.export.ImprovedFullDataDumpCallable;
 import org.recap.model.jpa.BibliographicEntity;
@@ -29,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -43,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class FullDataDumpExecutorServiceUT extends BaseTestCase {
 
-    private Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(FullDataDumpExecutorServiceUT.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -120,7 +119,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("NYPL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
 
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
@@ -191,7 +190,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
         String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
@@ -214,7 +213,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("2");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
         String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
@@ -235,7 +234,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
         institutionCodes.add("CUL");
         dataDumpRequest.setInstitutionCodes(institutionCodes);
         dataDumpRequest.setTransmissionType("0");
-        dataDumpRequest.setOutputFileFormat(ReCAPConstants.XML_FILE_FORMAT);
+        dataDumpRequest.setOutputFileFormat(RecapConstants.XML_FILE_FORMAT);
         dataDumpRequest.setDateTimeString(getDateTimeString());
         Mockito.when(mockedDeletedDataDumpExecutorService.process(dataDumpRequest)).thenReturn("Success");
         String response = mockedDeletedDataDumpExecutorService.process(dataDumpRequest);
@@ -245,7 +244,7 @@ public class FullDataDumpExecutorServiceUT extends BaseTestCase {
 
     private String getDateTimeString(){
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(ReCAPConstants.DATE_FORMAT_DDMMMYYYYHHMM);
+        SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_DDMMMYYYYHHMM);
         return sdf.format(date);
     }
 

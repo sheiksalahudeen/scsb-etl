@@ -3,11 +3,14 @@ package org.recap.camel.datadump;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.recap.util.datadump.BatchCounter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by peris on 11/5/16.
  */
 public class DataExportPredicate implements Predicate {
+    private static final Logger logger = LoggerFactory.getLogger(DataExportPredicate.class);
     private Integer batchSize;
 
     public DataExportPredicate(Integer batchSize) {
@@ -21,7 +24,7 @@ public class DataExportPredicate implements Predicate {
         Integer totalPageCount = BatchCounter.getTotalPages();
         Integer currentPageCount = BatchCounter.getCurrentPage();
 
-        System.out.println("Total page count: " + totalPageCount + " and Current page count: " + currentPageCount);
+        logger.info("Total page count: {} and Current page count: {} " , totalPageCount ,  currentPageCount);
 
         if (this.batchSize.equals(batchSize) || (currentPageCount.equals(totalPageCount))) {
             exchange.getIn().setHeader("batchSize", 0);

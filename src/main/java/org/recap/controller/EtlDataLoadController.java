@@ -35,7 +35,7 @@ import java.util.Date;
 @Controller
 public class EtlDataLoadController {
 
-    Logger logger = LoggerFactory.getLogger(EtlDataLoadController.class);
+    private static final Logger logger = LoggerFactory.getLogger(EtlDataLoadController.class);
 
     @Autowired
     CamelContext camelContext;
@@ -106,7 +106,6 @@ public class EtlDataLoadController {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Status  : " + status).append("\n");
         //TODO: This call takes a long time to fetch the count.
-        //stringBuilder.append("Number of Bibs loaded : " + bibliographicDetailsRepository.count()).append("\n");
         return stringBuilder.toString();
     }
 
@@ -157,7 +156,7 @@ public class EtlDataLoadController {
         if(StringUtils.isBlank(generatedReportFileName)){
             logger.error("Report wasn't generated! Please contact help desk!");
         } else {
-            logger.info("Report successfully generated!" + " : " + generatedReportFileName);
+            logger.info("Report successfully generated! : {} " , generatedReportFileName);
         }
         return etlDataLoader(model);
     }
