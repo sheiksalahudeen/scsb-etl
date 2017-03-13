@@ -213,6 +213,11 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         List<Record> recordList = readMarcXml(marcXmlString);
         assertNotNull(recordList);
         assertEquals("SCSB-100", recordList.get(0).getControlFields().get(0).getData());
+        assertEquals("x", String.valueOf(recordList.get(0).getDataFields().get(19).getSubfields().get(9).getCode()));
+        assertEquals("Shared", recordList.get(0).getDataFields().get(19).getSubfields().get(9).getData());
+        assertEquals("z", String.valueOf(recordList.get(0).getDataFields().get(19).getSubfields().get(10).getCode()));
+        assertEquals("PA", recordList.get(0).getDataFields().get(19).getSubfields().get(10).getData());
+
     }
 
     @Test
