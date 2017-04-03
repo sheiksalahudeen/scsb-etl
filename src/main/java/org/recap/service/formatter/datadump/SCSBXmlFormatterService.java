@@ -192,7 +192,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
                 ContentType contentType = getContentType(holdingsEntity.getContent());
                 holding.setContent(contentType);
                 List<ItemEntity> itemEntityList = new ArrayList<>();
-                if(holdingsEntity.getItemEntities()!=null && !isHoldingSingleItemPrivate(holdingsEntity.getItemEntities())) {
+                if(holdingsEntity.getItemEntities()!=null) {
                     for(ItemEntity itemEntity:holdingsEntity.getItemEntities()){
                         if(itemIds.contains(itemEntity.getItemId())) {
                             itemEntityList.add(itemEntity);
@@ -206,19 +206,6 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
             }
         }
         return holdingsList;
-    }
-
-    private boolean isHoldingSingleItemPrivate(List<ItemEntity> itemEntities){
-        if(itemEntities.size()==1 && itemEntities.get(0).getCollectionGroupEntity().getCollectionGroupCode().equals(RecapConstants.COLLECTION_GROUP_PRIVATE)){
-            return true;
-        }else{
-            for(ItemEntity itemEntity : itemEntities) {
-                if (itemEntity.getCollectionGroupEntity().getCollectionGroupCode().equals(RecapConstants.COLLECTION_GROUP_PRIVATE)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private Items getItems(List<ItemEntity> itemEntities) {
