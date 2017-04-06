@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by peris on 8/17/16.
  */
-public class ReportGenerator_UT extends BaseTestCase {
+public class ReportGeneratorUT extends BaseTestCase {
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
@@ -338,11 +338,6 @@ public class ReportGenerator_UT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
-        ReportDataEntity numberOfBibExportReportEntity = new ReportDataEntity();
-        numberOfBibExportReportEntity.setHeaderName("NoOfBibsExported");
-        numberOfBibExportReportEntity.setHeaderValue("0");
-        reportDataEntities.add(numberOfBibExportReportEntity);
-
         ReportDataEntity requestingInstitutionReportDataEntity = new ReportDataEntity();
         requestingInstitutionReportDataEntity.setHeaderName("RequestingInstitution");
         requestingInstitutionReportDataEntity.setHeaderValue("CUL");
@@ -383,7 +378,22 @@ public class ReportGenerator_UT extends BaseTestCase {
         emailIdReportDataEntity.setHeaderValue("0");
         reportDataEntities.add(emailIdReportDataEntity);
 
-        reportEntity.setFileName("2017-02-01 13:41");
+        ReportDataEntity failedBibsEntity = new ReportDataEntity();
+        failedBibsEntity.setHeaderName("FailedBibs");
+        failedBibsEntity.setHeaderValue("1");
+        reportDataEntities.add(failedBibsEntity);
+
+        ReportDataEntity failureCauseEntity = new ReportDataEntity();
+        failureCauseEntity.setHeaderName("FailureCause");
+        failureCauseEntity.setHeaderValue("parsing exception");
+        reportDataEntities.add(failureCauseEntity);
+
+        ReportDataEntity fileNameLoadedEntity = new ReportDataEntity();
+        fileNameLoadedEntity.setHeaderName(RecapConstants.FILE_NAME);
+        fileNameLoadedEntity.setHeaderValue(fileName);
+        reportDataEntities.add(fileNameLoadedEntity);
+
+        reportEntity.setFileName("2017-02-01 13:42");
         reportEntity.setCreatedDate(new Date());
         reportEntity.setType("BatchExportFailure");
         reportEntity.setReportDataEntities(reportDataEntities);
