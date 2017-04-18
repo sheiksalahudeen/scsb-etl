@@ -12,7 +12,7 @@ import org.recap.repository.ReportDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -76,19 +76,21 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
 
         for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
-            List<MatchingBibInfoDetail> matchingBibInfoDetailListForSingleBib = null;
-            if(bibIdRecordNumMap!=null){
-                Integer rowNum = bibIdRecordNumMap.get(String.valueOf(bibliographicEntity.getBibliographicId()));
-                matchingBibInfoDetailListForSingleBib = recordNumMatchingBibInfoDetailMap.get(rowNum);
-            }
-            Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity,matchingBibInfoDetailListForSingleBib);
-            BibRecord bibRecord = (BibRecord) stringObjectMap.get(RecapConstants.SUCCESS);
-            if (null != bibRecord) {
-                records.add(bibRecord);
-            }
-            String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
-            if (null != failureMsg) {
-                errors.add(failureMsg);
+            if(CollectionUtils.isNotEmpty(bibliographicEntity.getItemEntities())) {
+                List<MatchingBibInfoDetail> matchingBibInfoDetailListForSingleBib = null;
+                if(bibIdRecordNumMap!=null){
+                    Integer rowNum = bibIdRecordNumMap.get(String.valueOf(bibliographicEntity.getBibliographicId()));
+                    matchingBibInfoDetailListForSingleBib = recordNumMatchingBibInfoDetailMap.get(rowNum);
+                }
+                Map<String, Object> stringObjectMap = prepareBibRecord(bibliographicEntity,matchingBibInfoDetailListForSingleBib);
+                BibRecord bibRecord = (BibRecord) stringObjectMap.get(RecapConstants.SUCCESS);
+                if (null != bibRecord) {
+                    records.add(bibRecord);
+                }
+                String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
+                if (null != failureMsg) {
+                    errors.add(failureMsg);
+                }
             }
         }
         resultsMap.put(RecapConstants.SUCCESS, records);

@@ -1,5 +1,6 @@
 package org.recap.service.formatter.datadump;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlReader;
@@ -55,17 +56,19 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
         for (Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator(); iterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = iterator.next();
-            Map<String, Object> stringObjectMap = prepareMarcRecord(bibliographicEntity);
+            if(CollectionUtils.isNotEmpty(bibliographicEntity.getItemEntities())) {
+                Map<String, Object> stringObjectMap = prepareMarcRecord(bibliographicEntity);
 
-            Record record = (Record) stringObjectMap.get(RecapConstants.SUCCESS);
+                Record record = (Record) stringObjectMap.get(RecapConstants.SUCCESS);
 
-            if (null != record) {
-                records.add(record);
-            }
+                if (null != record) {
+                    records.add(record);
+                }
 
-            String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
-            if (null != failureMsg) {
-                errors.add(failureMsg);
+                String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
+                if (null != failureMsg) {
+                    errors.add(failureMsg);
+                }
             }
         }
 
