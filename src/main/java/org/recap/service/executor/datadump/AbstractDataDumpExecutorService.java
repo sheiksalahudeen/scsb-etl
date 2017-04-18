@@ -3,6 +3,7 @@ package org.recap.service.executor.datadump;
 import org.apache.camel.CamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
+import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DataDumpRequest;
@@ -67,7 +68,8 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
 
         boolean isRecordsToProcess = totalBibsCount > 0 ? true : false;
         boolean canProcess = canProcessRecords(totalBibsCount, dataDumpRequest.getTransmissionType());
-        if (isRecordsToProcess && canProcess) {
+        boolean bibHasItems = bibHasItems(results);
+        if (isRecordsToProcess && canProcess && bibHasItems) {
             outputString = RecapConstants.DATADUMP_RECORDS_AVAILABLE_FOR_PROCESS;
             sendBodyForIsRecordAvailableMessage(outputString);
             String fileName = getFileName(dataDumpRequest, 0);
@@ -90,7 +92,7 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             return "Success";
 
         } else {
-            if (!isRecordsToProcess) {
+            if (!isRecordsToProcess || !bibHasItems) {
                 outputString = RecapConstants.DATADUMP_NO_RECORD;
                 sendBodyForIsRecordAvailableMessage(outputString);
             } else {
@@ -99,6 +101,18 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
             }
         }
         return outputString;
+    }
+
+    private boolean bibHasItems(Map results) {
+        List<HashMap> dataDumpSearchResults = (List<HashMap>) results.get("dataDumpSearchResults");
+        for (Iterator<HashMap> iterator = dataDumpSearchResults.iterator(); iterator.hasNext(); ) {
+            HashMap bibItemIds = iterator.next();
+            List<Integer> itemIds = (List<Integer>) bibItemIds.get("itemIds");
+            if(CollectionUtils.isNotEmpty(itemIds)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void sendBodyAndHeader(Map results, String headerString) {
