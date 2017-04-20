@@ -81,7 +81,7 @@ public class BibEntityGeneratorActiveMQConsumer {
 
             long endTime = System.currentTimeMillis();
 
-            logger.info("Time taken to prepare {} bib entities is : {} seconds " , bibliographicEntities.size() , (endTime - startTime) / 1000);
+        logger.info("Time taken to prepare {} bib entities is : {} seconds, solr result size {}" , bibliographicEntities.size() , (endTime - startTime) / 1000,dataDumpSearchResults.size());
 
             getExecutorService().shutdown();
 
