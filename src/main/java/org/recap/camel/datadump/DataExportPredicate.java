@@ -19,14 +19,14 @@ public class DataExportPredicate implements Predicate {
 
     @Override
     public boolean matches(Exchange exchange) {
-        Integer batchSize = (Integer) exchange.getIn().getHeader("batchSize");
+        Integer batchSizeFromHeader = (Integer) exchange.getIn().getHeader("batchSize");
 
         Integer totalPageCount = BatchCounter.getTotalPages();
         Integer currentPageCount = BatchCounter.getCurrentPage();
 
-        logger.info("Total page count: {} and Current page count: {}, configured batch size-> {}, current batch size-> {}" , totalPageCount ,  currentPageCount,this.batchSize,batchSize);
+        logger.info("Total page count: {} and Current page count: {}, configured batch size-> {}, current batch size-> {}" , totalPageCount ,  currentPageCount,this.batchSize,batchSizeFromHeader);
 
-        if (this.batchSize.equals(batchSize) || batchSize > this.batchSize || (currentPageCount.equals(totalPageCount))) {
+        if (this.batchSize.equals(batchSizeFromHeader) || batchSizeFromHeader > this.batchSize || (currentPageCount.equals(totalPageCount))) {
             exchange.getIn().setHeader("batchSize", 0);
             return true;
         }
