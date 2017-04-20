@@ -23,10 +23,6 @@ public class DataDumpSolrService {
         return solrClientUrl;
     }
 
-    public void setSolrClientUrl(String solrClientUrl) {
-        this.solrClientUrl = solrClientUrl;
-    }
-
     public RestTemplate getRestTemplate(){
         return new RestTemplate();
     }

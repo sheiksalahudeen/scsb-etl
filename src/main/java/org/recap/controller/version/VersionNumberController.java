@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * Created by hemalathas on 17/10/16.
  */
 @Controller
-public class VersionNumber {
+public class VersionNumberController {
 
     @Value("${version.number}")
-    String versionNumber;
+    private String versionNumber;
+
+    public void setVersionNumber(String versionNumber) {
+        this.versionNumber = versionNumber;
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/getVersionNumber")
     @ResponseBody

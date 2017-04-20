@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.HoldingsPK;
 import org.recap.model.jpa.ItemEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -104,6 +105,14 @@ public class HoldingsDetailsRepositoryUT extends BaseTestCase{
         assertNotNull(holdingsEntityByPK.getItemEntities());
         assertEquals(holdingsEntityByPK.getCreatedBy(), holdingsEntity.getCreatedBy());
         assertEquals(holdingsEntityByPK.getLastUpdatedBy(), holdingsEntity.getLastUpdatedBy());
+    }
+
+    @Test
+    public void testHoldingPK(){
+        HoldingsPK holdingsPK = new HoldingsPK();
+        HoldingsPK holdingsPK1 = new HoldingsPK(1,"45656456456");
+        assertNotNull(holdingsPK1.getOwningInstitutionHoldingsId());
+        assertNotNull(holdingsPK1.getOwningInstitutionId());
     }
 
 }

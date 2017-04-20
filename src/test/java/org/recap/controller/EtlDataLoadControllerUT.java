@@ -54,6 +54,9 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    @Mock
+    MultipartFile multipartFile;
+
     @Value("${etl.report.directory}")
     private String reportDirectory;
 
@@ -174,6 +177,35 @@ public class EtlDataLoadControllerUT extends BaseTestCase {
 
         boolean directoryContains = new File(directory, reportFileName).exists();
         assertTrue(directoryContains);
+    }
+
+    @Test
+    public void testEtlLoadRequest(){
+        EtlLoadRequest etlLoadRequest = new EtlLoadRequest();
+        etlLoadRequest.setFileName("test");
+        etlLoadRequest.setFile(multipartFile);
+        etlLoadRequest.setUserName("john");
+        etlLoadRequest.setReportFileName("test");
+        etlLoadRequest.setReportType(RecapConstants.FAILURE);
+        etlLoadRequest.setDateFrom(new Date());
+        etlLoadRequest.setDateTo(new Date());
+        etlLoadRequest.setTransmissionType(RecapConstants.FILE_SYSTEM);
+        etlLoadRequest.setOwningInstitutionName("NYPL");
+        etlLoadRequest.setReportInstitutionName("NYPL");
+        etlLoadRequest.setOperationType("ETL");
+        etlLoadRequest.setBatchSize(1);
+        assertNotNull(etlLoadRequest.getFileName());
+        assertNotNull(etlLoadRequest.getBatchSize());
+        assertNotNull(etlLoadRequest.getFile());
+        assertNotNull(etlLoadRequest.getUserName());
+        assertNotNull(etlLoadRequest.getOwningInstitutionName());
+        assertNotNull(etlLoadRequest.getReportFileName());
+        assertNotNull(etlLoadRequest.getReportType());
+        assertNotNull(etlLoadRequest.getOperationType());
+        assertNotNull(etlLoadRequest.getTransmissionType());
+        assertNotNull(etlLoadRequest.getReportInstitutionName());
+        assertNotNull(etlLoadRequest.getDateFrom());
+        assertNotNull(etlLoadRequest.getDateTo());
     }
 
 }
