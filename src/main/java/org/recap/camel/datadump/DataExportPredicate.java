@@ -24,9 +24,9 @@ public class DataExportPredicate implements Predicate {
         Integer totalPageCount = BatchCounter.getTotalPages();
         Integer currentPageCount = BatchCounter.getCurrentPage();
 
-        logger.info("Total page count: {} and Current page count: {} " , totalPageCount ,  currentPageCount);
+        logger.info("Total page count: {} and Current page count: {}, configured batch size-> {}, current batch size-> {}" , totalPageCount ,  currentPageCount,this.batchSize,batchSize);
 
-        if (this.batchSize.equals(batchSize) || (currentPageCount.equals(totalPageCount))) {
+        if (this.batchSize.equals(batchSize) || batchSize > this.batchSize || (currentPageCount.equals(totalPageCount))) {
             exchange.getIn().setHeader("batchSize", 0);
             return true;
         }

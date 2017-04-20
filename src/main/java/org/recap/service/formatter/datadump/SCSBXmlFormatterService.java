@@ -256,10 +256,10 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         dataFieldType.setInd1(" ");
         dataFieldType.setInd2(" ");
         subfieldatafieldTypes.add(getSubfieldatafieldType("p", itemEntity.getBarcode()));
-        subfieldatafieldTypes.add(getSubfieldatafieldType("h", itemEntity.getUseRestrictions()));
+        subfieldatafieldTypes.add(getSubfieldatafieldType("h", itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions():""));
         subfieldatafieldTypes.add(getSubfieldatafieldType("a", itemEntity.getOwningInstitutionItemId()));
-        subfieldatafieldTypes.add(getSubfieldatafieldType("j", itemEntity.getItemStatusEntity().getStatusCode()));
-        subfieldatafieldTypes.add(getSubfieldatafieldType("t", itemEntity.getCopyNumber().toString()));
+        subfieldatafieldTypes.add(getSubfieldatafieldType("j", itemEntity.getItemStatusEntity() != null ? itemEntity.getItemStatusEntity().getStatusCode():""));
+        subfieldatafieldTypes.add(getSubfieldatafieldType("t", itemEntity.getCopyNumber() != null ? itemEntity.getCopyNumber().toString() : ""));
         subfieldatafieldTypes.add(getSubfieldatafieldType("3", itemEntity.getVolumePartYear()));
         dataFieldType.setSubfield(subfieldatafieldTypes);
         return dataFieldType;
