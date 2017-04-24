@@ -318,6 +318,17 @@ public class DataDumpRestControllerUT extends BaseControllerUT {
         file.delete();
     }
 
+    @Test
+    public void testDataDumpSearchResult(){
+        DataDumpSearchResult dataDumpSearchResult = new DataDumpSearchResult();
+        List<Integer> itemIdList = new ArrayList<>();
+        itemIdList.add(1);
+        dataDumpSearchResult.setBibId(1);
+        dataDumpSearchResult.setItemIds(itemIdList);
+        assertNotNull(dataDumpSearchResult.getBibId());
+        assertNotNull(dataDumpSearchResult.getItemIds());
+    }
+
     private List<MvcResult> getResults(List<Future<Map<String, String>>> futures) {
         List<MvcResult> mvcResults = new ArrayList<>();
         for (Iterator<Future<Map<String, String>>> iterator = futures.iterator(); iterator.hasNext(); ) {

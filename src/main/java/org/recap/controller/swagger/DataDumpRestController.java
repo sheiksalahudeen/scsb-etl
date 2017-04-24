@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @Api(value="dataDump", description="Export data dump", position = 1)
 public class DataDumpRestController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataDumpRestController.class);
 
     @Autowired
     private DataDumpExportService dataDumpExportService;
@@ -31,16 +30,8 @@ public class DataDumpRestController {
         return dataDumpExportService;
     }
 
-    public void setDataDumpExportService(DataDumpExportService dataDumpExportService) {
-        this.dataDumpExportService = dataDumpExportService;
-    }
-
     public DynamicRouteBuilder getDynamicRouteBuilder() {
         return dynamicRouteBuilder;
-    }
-
-    public void setDynamicRouteBuilder(DynamicRouteBuilder dynamicRouteBuilder) {
-        this.dynamicRouteBuilder = dynamicRouteBuilder;
     }
 
     @RequestMapping(value="/exportDataDump", method = RequestMethod.GET)
