@@ -25,7 +25,7 @@ public class DataExportCsvReportRouteBuilder {
     private static final Logger logger = LoggerFactory.getLogger(DataExportCsvReportRouteBuilder.class);
 
     @Autowired
-    public DataExportCsvReportRouteBuilder(CamelContext camelContext, @Value("${etl.report.directory}") String reportsDirectory) {
+    public DataExportCsvReportRouteBuilder(CamelContext camelContext, @Value("${etl.dump.report.directory}") String reportsDirectory) {
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override

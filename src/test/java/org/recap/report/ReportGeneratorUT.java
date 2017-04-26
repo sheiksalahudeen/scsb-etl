@@ -33,6 +33,9 @@ public class ReportGeneratorUT extends BaseTestCase {
     @Value("${etl.report.directory}")
     private String reportDirectory;
 
+    @Value("${etl.dump.report.directory}")
+    private String dataDumpReportDirectory;
+
     @Autowired
     ReportGenerator reportGenerator;
 
@@ -85,7 +88,7 @@ public class ReportGeneratorUT extends BaseTestCase {
 
         assertNotNull(generatedReportFileName);
 
-        File directory = new File(reportDirectory);
+        File directory = new File(dataDumpReportDirectory);
         assertTrue(directory.isDirectory());
 
         boolean directoryContains = new File(directory, generatedReportFileName).exists();
@@ -100,15 +103,8 @@ public class ReportGeneratorUT extends BaseTestCase {
         String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport", RecapConstants.SUCCESS, savedReportEntity1.getInstitutionName(), RecapConstants.FTP,savedReportEntity1.getFileName());
 
         assertNotNull(generatedReportFileName);
-
-        File directory = new File(reportDirectory);
-        assertTrue(directory.isDirectory());
-
-        boolean directoryContains = new File(directory, generatedReportFileName).exists();
-        assertTrue(directoryContains);
     }
 
-    @Ignore
     @Test
     public void generateDataDumpFileSystemFailureReportTest() throws Exception {
 
@@ -118,14 +114,13 @@ public class ReportGeneratorUT extends BaseTestCase {
 
         assertNotNull(generatedReportFileName);
 
-        File directory = new File(reportDirectory);
+        File directory = new File(dataDumpReportDirectory);
         assertTrue(directory.isDirectory());
 
         boolean directoryContains = new File(directory, generatedReportFileName).exists();
         assertTrue(directoryContains);
     }
 
-    @Ignore
     @Test
     public void generateDataDumpFtpFailureReportTest() throws Exception {
 
@@ -134,12 +129,6 @@ public class ReportGeneratorUT extends BaseTestCase {
         String generatedReportFileName = dataDumpGenerateReport(savedReportEntity1.getCreatedDate(), "BatchExport", RecapConstants.FAILURE, savedReportEntity1.getInstitutionName(), RecapConstants.FTP,savedReportEntity1.getFileName());
 
         assertNotNull(generatedReportFileName);
-
-        File directory = new File(reportDirectory);
-        assertTrue(directory.isDirectory());
-
-        boolean directoryContains = new File(directory, generatedReportFileName).exists();
-        assertTrue(directoryContains);
     }
 
 
