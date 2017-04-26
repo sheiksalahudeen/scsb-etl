@@ -45,21 +45,26 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
     public String generateReport(List<ReportEntity> reportEntities, String fileName) {
 
         if(!CollectionUtils.isEmpty(reportEntities)) {
-            DataDumpFailureReport dataDumpFailureReport = new DataDumpFailureReport();
-            List<DataDumpFailureReport> dataDumpSuccessReportList = new ArrayList<>();
-            for(ReportEntity reportEntity : reportEntities) {
-                DataDumpFailureReport dataDumpFailureReportRecord = new DataDumpFailureReportGenerator().prepareDataDumpCSVFailureRecord(reportEntity);
-                dataDumpSuccessReportList.add(dataDumpFailureReportRecord);
-            }
-            ReportEntity reportEntity = reportEntities.get(0);
-            dataDumpFailureReport.setReportType(reportEntity.getType());
-            dataDumpFailureReport.setInstitutionName(reportEntity.getInstitutionName());
-            dataDumpFailureReport.setFileName(fileName);
-            dataDumpFailureReport.setDataDumpFailureReportRecordList(dataDumpSuccessReportList);
+            DataDumpFailureReport dataDumpFailureReport = getDataDumpFailureReport(reportEntities, fileName);
             producerTemplate.sendBody(RecapConstants.DATADUMP_FAILURE_REPORT_FTP_Q, dataDumpFailureReport);
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             return FilenameUtils.removeExtension(dataDumpFailureReport.getFileName()) + "-" + dataDumpFailureReport.getReportType() + "-" + df.format(new Date()) + ".csv";
         }
         return null;
+    }
+
+    public DataDumpFailureReport getDataDumpFailureReport(List<ReportEntity> reportEntities, String fileName) {
+        DataDumpFailureReport dataDumpFailureReport = new DataDumpFailureReport();
+        List<DataDumpFailureReport> dataDumpSuccessReportList = new ArrayList<>();
+        for(ReportEntity reportEntity : reportEntities) {
+            DataDumpFailureReport dataDumpFailureReportRecord = new DataDumpFailureReportGenerator().prepareDataDumpCSVFailureRecord(reportEntity);
+            dataDumpSuccessReportList.add(dataDumpFailureReportRecord);
+        }
+        ReportEntity reportEntity = reportEntities.get(0);
+        dataDumpFailureReport.setReportType(reportEntity.getType());
+        dataDumpFailureReport.setInstitutionName(reportEntity.getInstitutionName());
+        dataDumpFailureReport.setFileName(fileName);
+        dataDumpFailureReport.setDataDumpFailureReportRecordList(dataDumpSuccessReportList);
+        return dataDumpFailureReport;
     }
 }

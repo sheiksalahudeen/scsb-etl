@@ -2,9 +2,15 @@ package org.recap.camel.datadump;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
+import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
+import org.recap.model.csv.DataDumpFailureReport;
+import org.recap.model.csv.DataDumpSuccessReport;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.report.FTPDataDumpFailureReportGenerator;
+import org.recap.report.FTPDataDumpSuccessReportGenerator;
 import org.recap.repository.ReportDetailRepository;
 import org.recap.service.email.datadump.DataDumpEmailService;
 import org.recap.util.datadump.DataExportHeaderUtil;
@@ -17,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +50,15 @@ public class DataExportEmailProcessor implements Processor {
     @Value("${datadump.fetchtype.full}")
     private String fetchTypeFull;
 
+    @Autowired
+    FTPDataDumpSuccessReportGenerator ftpDataDumpSuccessReportGenerator;
+
+    @Autowired
+    FTPDataDumpFailureReportGenerator ftpDataDumpFailureReportGenerator;
+
+    @Autowired
+    ProducerTemplate producerTemplate;
+
     private String transmissionType;
     private List<String> institutionCodes;
     private String requestingInstitutionCode;
@@ -57,6 +73,8 @@ public class DataExportEmailProcessor implements Processor {
         String totalRecordCount = "0";
         String failedBibs = "0";
         List<ReportEntity> byFileName = reportDetailRepository.findByFileName(requestId);
+        List<ReportEntity> successReportEntities = new ArrayList<>();
+        List<ReportEntity> failureReportEntities = new ArrayList<>();
         for (ReportEntity reportEntity:byFileName) {
             List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
             for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
@@ -68,10 +86,31 @@ public class DataExportEmailProcessor implements Processor {
                     failedBibs = reportDataEntity.getHeaderValue();
                 }
             }
+            if(reportEntity.getType().equalsIgnoreCase(RecapConstants.BATCH_EXPORT_SUCCESS)) {
+                successReportEntities.add(reportEntity);
+            } else if(reportEntity.getType().equalsIgnoreCase(RecapConstants.BATCH_EXPORT_FAILURE)) {
+                failureReportEntities.add(reportEntity);
+            }
         }
+        sendBatchExportReportToFTP(successReportEntities, RecapConstants.SUCCESS);
+        sendBatchExportReportToFTP(failureReportEntities, RecapConstants.FAILURE);
         processEmail(totalRecordCount,failedBibs);
         if(fetchType.equals(fetchTypeFull)) {
             writeFullDumpStatusToFile();
+        }
+    }
+
+    private void sendBatchExportReportToFTP(List<ReportEntity> reportEntities, String type) {
+        if(CollectionUtils.isNotEmpty(reportEntities)) {
+            if(type.equalsIgnoreCase(RecapConstants.SUCCESS)) {
+                DataDumpSuccessReport dataDumpSuccessReport = ftpDataDumpSuccessReportGenerator.getDataDumpSuccessReport(reportEntities, folderName);
+                producerTemplate.sendBody(RecapConstants.DATAEXPORT_WITH_SUCCESS_REPORT_FTP_Q, dataDumpSuccessReport);
+                logger.info("The Success Report folder : {}", folderName);
+            } else if (type.equalsIgnoreCase(RecapConstants.FAILURE)) {
+                DataDumpFailureReport dataDumpFailureReport = ftpDataDumpFailureReportGenerator.getDataDumpFailureReport(reportEntities, folderName);
+                producerTemplate.sendBody(RecapConstants.DATAEXPORT_WITH_FAILURE_REPORT_FTP_Q, dataDumpFailureReport);
+                logger.info("The Failure Report folder : {}", folderName);
+            }
         }
     }
 

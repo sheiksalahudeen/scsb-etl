@@ -43,10 +43,10 @@ public class ReportGenerator {
     FTPSuccessReportGenerator ftpSuccessReportGenerator;
 
     @Autowired
-    CSVDataDumpSuccessReportGenreator csvDataDumpSuccessReportGenreator;
+    CSVDataDumpSuccessReportGenerator csvDataDumpSuccessReportGenerator;
 
     @Autowired
-    CSVDataDumpFailureReportGenreator csvDataDumpFailureReportGenreator;
+    CSVDataDumpFailureReportGenerator csvDataDumpFailureReportGenerator;
 
     @Autowired
     FTPDataDumpSuccessReportGenerator ftpDataDumpSuccessReportGenerator;
@@ -61,8 +61,9 @@ public class ReportGenerator {
         List<ReportEntity> reportEntities;
         if(operationType.equals(RecapConstants.BATCH_EXPORT)){
             reportType = operationType+reportType;
-        }
-        if(StringUtils.isNotBlank(fileName)) {
+            reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(institutionName, reportType, from, to);
+            fileName = institutionName;
+        } else if(StringUtils.isNotBlank(fileName)) {
             reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         } else {
             reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(institutionName, reportType, from, to);
@@ -86,8 +87,8 @@ public class ReportGenerator {
             reportGenerators.add(csvSuccessReportGenerator);
             reportGenerators.add(ftpFailureReportGenerator);
             reportGenerators.add(ftpSuccessReportGenerator);
-            reportGenerators.add(csvDataDumpSuccessReportGenreator);
-            reportGenerators.add(csvDataDumpFailureReportGenreator);
+            reportGenerators.add(csvDataDumpSuccessReportGenerator);
+            reportGenerators.add(csvDataDumpFailureReportGenerator);
             reportGenerators.add(ftpDataDumpSuccessReportGenerator);
             reportGenerators.add(ftpDataDumpFailureReportGenerator);
         }

@@ -4,6 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.DefaultFluentProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.util.datadump.DataExportHeaderUtil;
 import org.recap.model.export.DataDumpRequest;
@@ -141,10 +142,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     }
 
     private String getFileName(DataDumpRequest dataDumpRequest, int pageNum) {
+        String institutions = StringUtils.join(dataDumpRequest.getInstitutionCodes(), "-");
         return dataDumpRequest.getRequestingInstitutionCode()
                 + File.separator
                 + getOutputFormat(dataDumpRequest)
                 + File.separator
+                + institutions
+                + "-"
                 + dataDumpRequest.getDateTimeString()
                 + File.separator
                 + pageNum;
@@ -164,10 +168,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     }
 
     private String getFolderName(DataDumpRequest dataDumpRequest) {
+        String institutions = StringUtils.join(dataDumpRequest.getInstitutionCodes(), "-");
         return dataDumpRequest.getRequestingInstitutionCode()
                 + File.separator
                 + getOutputFormat(dataDumpRequest)
                 + File.separator
+                + institutions
+                + "-"
                 + dataDumpRequest.getDateTimeString();
     }
 
