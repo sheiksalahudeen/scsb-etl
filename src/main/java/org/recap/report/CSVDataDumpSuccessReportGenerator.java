@@ -20,7 +20,7 @@ import java.util.List;
  * Created by premkb on 29/9/16.
  */
 @Component
-public class CSVDataDumpSuccessReportGenreator implements ReportGeneratorInterface {
+public class CSVDataDumpSuccessReportGenerator implements ReportGeneratorInterface {
 
     @Autowired
     private ProducerTemplate producerTemplate;

@@ -47,9 +47,10 @@ public class RecapConstants {
     public static final String DATADUMP_FAILURE_REPORT_CSV_Q = "scsbactivemq:queue:dataDumpFailureReportCsvQ";
     public static final String DATADUMP_SUCCESS_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpSuccessReportFtpQ";
     public static final String DATADUMP_FAILURE_REPORT_FTP_Q = "scsbactivemq:queue:dataDumpFailureReportFtpQ";
+    public static final String DATAEXPORT_WITH_SUCCESS_REPORT_FTP_Q = "scsbactivemq:queue:dataExportWithSuccessReportFtpQ";
+    public static final String DATAEXPORT_WITH_FAILURE_REPORT_FTP_Q = "scsbactivemq:queue:dataExportWithFailureReportFtpQ";
     public static final String DATADUMP_FILE_SYSTEM_Q = "scsbactivemq:queue:dataDumpFileSystemQ";
     public static final String EMAIL_Q = "scsbactivemq:queue:emailQ";
-    public static final String DATADUMP_ZIPALLFILE_FILESYSTEM_Q = "direct:zipAllFileSystemQ";
     public static final String DATADUMP_ZIPFILE_FTP_Q = "scsbactivemq:queue:zipFileFtpQ";
     public static final String DATADUMP_HTTP_Q = "scsbactivemq:queue:dataExportHttpQ";
     public static final String DATADUMP_IS_RECORD_AVAILABLE_Q = "scsbactivemq:queue:dataExportIsRecordAvailableQ";
@@ -186,10 +187,12 @@ public class RecapConstants {
     public static final String FETCH_TYPE = "fetchType";
     public static final String EXPORT_FROM_DATE = "exportFromDate";
 
-    public static final String DATADUMP_SUCCESS_REPORT_CSV_ROUTE_ID = "dataExportSucccessReportCsvRouteId";
-    public static final String DATADUMP_FAILURE_REPORT_CSV_ROUTE_ID = "dataExportFailureReportCsvRouteId";
-    public static final String DATADUMP_SUCCESS_REPORT_FTP_ROUTE_ID = "dataExportSuccessReportFtpRouteId";
-    public static final String DATADUMP_FAILURE_REPORT_FTP_ROUTE_ID = "dataExportFailureReportFtpRouteId";
+    public static final String DATADUMP_SUCCESS_REPORT_CSV_ROUTE_ID = "dataDumpSucccessReportCsvRouteId";
+    public static final String DATADUMP_FAILURE_REPORT_CSV_ROUTE_ID = "dataDumpFailureReportCsvRouteId";
+    public static final String DATADUMP_SUCCESS_REPORT_FTP_ROUTE_ID = "dataDumpSuccessReportFtpRouteId";
+    public static final String DATADUMP_FAILURE_REPORT_FTP_ROUTE_ID = "dataDumpFailureReportFtpRouteId";
+    public static final String DATAEXPORT_WITH_SUCCESS_REPORT_FTP_ROUTE_ID = "dataExportWithSuccessReportFtpRouteId";
+    public static final String DATAEXPORT_WITH_FAILURE_REPORT_FTP_ROUTE_ID = "dataExportWithFailureReportFtpRouteId";
     public static final String DATADUMP_SUCCESS_REPORT_ROUTE_ID = "dataExportSuccessReportRouteId";
     public static final String DATADUMP_FAILURE_REPORT_ROUTE_ID = "dataExportFailureReportRouteId";
 
