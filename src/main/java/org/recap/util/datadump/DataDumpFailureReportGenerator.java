@@ -1,12 +1,12 @@
 package org.recap.util.datadump;
 
-import info.freelibrary.util.LoggerFactory;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.recap.RecapConstants;
 import org.recap.model.csv.DataDumpFailureReport;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
