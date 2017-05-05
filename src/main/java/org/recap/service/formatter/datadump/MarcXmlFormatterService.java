@@ -41,6 +41,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
     @Value("${datadump.marc.nypl}")
     private String holdingNYPL;
+
     private MarcFactory factory;
 
     @Override
@@ -58,13 +59,10 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             BibliographicEntity bibliographicEntity = iterator.next();
             if(CollectionUtils.isNotEmpty(bibliographicEntity.getItemEntities())) {
                 Map<String, Object> stringObjectMap = prepareMarcRecord(bibliographicEntity);
-
                 Record record = (Record) stringObjectMap.get(RecapConstants.SUCCESS);
-
                 if (null != record) {
                     records.add(record);
                 }
-
                 String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
                 if (null != failureMsg) {
                     errors.add(failureMsg);
@@ -84,6 +82,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         try {
             record = getRecordFromContent(bibliographicEntity.getContent());
             update001Field(record, bibliographicEntity);
+            stripTagsFromBib(record,Arrays.asList("852","876"));
             add009Field(record, bibliographicEntity);
             List<Integer> itemIds = getItemIds(bibliographicEntity);
             record = addHoldingInfo(record, bibliographicEntity.getHoldingsEntities(),itemIds);
@@ -94,6 +93,17 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
         }
         return results;
+    }
+
+    private void stripTagsFromBib(Record record,List<String> tagList){
+        for(Iterator<DataField> dataFieldIterator = record.getDataFields().iterator();dataFieldIterator.hasNext();) {
+            DataField dataField = dataFieldIterator.next();
+            for (String tag : tagList) {
+                if (tag.equals(dataField.getTag())) {
+                    dataFieldIterator.remove();
+                }
+            }
+        }
     }
 
     private List<Integer> getItemIds(BibliographicEntity bibliographicEntity){
