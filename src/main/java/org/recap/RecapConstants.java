@@ -208,4 +208,12 @@ public class RecapConstants {
     //Logger
     public static final String ERROR = "error-->";
 
+    public class MarcFields {
+        public static final String CF_001 = "001";
+        public static final String CF_009 = "009";
+        public static final String DF_852 = "852";
+        public static final String DF_876 = "876";
+        public static final String DF_866 = "866";
+    }
+
 }
