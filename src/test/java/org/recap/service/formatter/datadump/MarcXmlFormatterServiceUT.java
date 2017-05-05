@@ -188,6 +188,13 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
             "        <datafield ind1=\"2\" ind2=\" \" tag=\"710\">\n" +
             "            <subfield code=\"a\">United States Gypsum Co.</subfield>\n" +
             "        </datafield>\n" +
+            "        <datafield tag=\"852\" ind1=\" \" ind2=\" \">\n" +
+            "              <subfield code=\"a\">NNC-EA</subfield>\n" +
+            "              <subfield code=\"b\">eax</subfield>\n" +
+            "              <subfield code=\"h\">UB271.J3</subfield>\n" +
+            "              <subfield code=\"i\">W8 2005</subfield>\n" +
+            "              <subfield code=\"x\">CIN=AC; OID=AC</subfield>\n" +
+            "        </datafield>" +
             "    </record>\n" +
             "</collection>\n";
 
@@ -213,10 +220,10 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         List<Record> recordList = readMarcXml(marcXmlString);
         assertNotNull(recordList);
         assertEquals("SCSB-100", recordList.get(0).getControlFields().get(0).getData());
-        assertEquals("x", String.valueOf(recordList.get(0).getDataFields().get(19).getSubfields().get(9).getCode()));
-        assertEquals("Shared", recordList.get(0).getDataFields().get(19).getSubfields().get(9).getData());
-        assertEquals("z", String.valueOf(recordList.get(0).getDataFields().get(19).getSubfields().get(10).getCode()));
-        assertEquals("PA", recordList.get(0).getDataFields().get(19).getSubfields().get(10).getData());
+        assertEquals("x", String.valueOf(recordList.get(0).getDataFields().get(20).getSubfields().get(9).getCode()));
+        assertEquals("Shared", recordList.get(0).getDataFields().get(20).getSubfields().get(9).getData());
+        assertEquals("z", String.valueOf(recordList.get(0).getDataFields().get(20).getSubfields().get(10).getCode()));
+        assertEquals("PA", recordList.get(0).getDataFields().get(20).getSubfields().get(10).getData());
 
     }
 
