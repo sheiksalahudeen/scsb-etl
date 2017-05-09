@@ -154,7 +154,6 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             for (DataField dataField : holdingRecord.getDataFields()) {
                 if (RecapConstants.MarcFields.DF_852.equals(dataField.getTag())) {
                     add0SubField(dataField, holdingsEntity);
-                    add852Subfield1(dataField, holdingsEntity);
                     update852bField(dataField, holdingsEntity);
                     record.addVariableField(dataField);
                 }
@@ -180,10 +179,6 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
     }
 
-    private void add852Subfield1(DataField dataField, HoldingsEntity holdingEntity){
-        dataField.addSubfield(getFactory().newSubfield('1', holdingEntity.getOwningInstitutionHoldingsId()));
-    }
-
     private void update852bField(DataField dataField, HoldingsEntity holdingEntity){
         if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.PRINCETON)) {
             dataField.getSubfield('b').setData(holdingPUL);
@@ -197,8 +192,6 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     private Record addItemInfo(Record record, ItemEntity itemEntity,HoldingsEntity holdingsEntity) {
         DataField dataField = getFactory().newDataField(RecapConstants.MarcFields.DF_876, ' ', ' ');
         dataField.addSubfield(getFactory().newSubfield('0', String.valueOf(holdingsEntity.getHoldingsId())));
-        dataField.addSubfield(getFactory().newSubfield('1', holdingsEntity.getOwningInstitutionHoldingsId()));
-        dataField.addSubfield(getFactory().newSubfield('2', itemEntity.getOwningInstitutionItemId()));
         dataField.addSubfield(getFactory().newSubfield('3', itemEntity.getVolumePartYear() != null ? itemEntity.getVolumePartYear() : ""));
         dataField.addSubfield(getFactory().newSubfield('a', String.valueOf(itemEntity.getItemId())));
         dataField.addSubfield(getFactory().newSubfield('h', itemEntity.getUseRestrictions() != null ? itemEntity.getUseRestrictions() : ""));
