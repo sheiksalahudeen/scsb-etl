@@ -5,10 +5,7 @@ import org.marc4j.MarcReader;
 import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlReader;
 import org.marc4j.MarcXmlWriter;
-import org.marc4j.marc.ControlField;
-import org.marc4j.marc.DataField;
-import org.marc4j.marc.MarcFactory;
-import org.marc4j.marc.Record;
+import org.marc4j.marc.*;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -180,13 +177,23 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     private void update852bField(DataField dataField, HoldingsEntity holdingEntity){
-        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.PRINCETON)) {
-            dataField.getSubfield('b').setData(holdingPUL);
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.COLUMBIA)) {
-            dataField.getSubfield('b').setData(holdingCUL);
-        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.NYPL)) {
-            dataField.getSubfield('b').setData(holdingNYPL);
+        String partnerInfo = "";
+        List<Subfield> subfields = dataField.getSubfields('b');
+        if(CollectionUtils.isNotEmpty(subfields)) {
+            for (Iterator<Subfield> iterator = subfields.iterator(); iterator.hasNext(); ) {
+                Subfield subfield = iterator.next();
+                dataField.removeSubfield(subfield);
+            }
         }
+        if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.PRINCETON)) {
+            partnerInfo = holdingPUL;
+        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.COLUMBIA)) {
+            partnerInfo = holdingCUL;
+        } else if (holdingEntity.getInstitutionEntity().getInstitutionCode().equals(RecapConstants.NYPL)) {
+            partnerInfo = holdingNYPL;
+        }
+        Subfield subfield = factory.newSubfield('b', partnerInfo);
+        dataField.addSubfield(subfield);
     }
 
     private Record addItemInfo(Record record, ItemEntity itemEntity,HoldingsEntity holdingsEntity) {
