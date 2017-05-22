@@ -1,11 +1,19 @@
 package org.recap.camel;
 
+import com.google.common.base.Utf8;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.Holding;
+import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.JAXBHandler;
+import org.recap.model.jaxb.marc.CollectionType;
+import org.recap.model.jaxb.marc.ContentType;
+import org.recap.model.jaxb.marc.ControlFieldType;
+import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.*;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.recap.repository.InstitutionDetailsRepository;
@@ -14,10 +22,13 @@ import org.recap.util.DBReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -35,6 +46,9 @@ public class RecordProcessor {
     private JAXBHandler jaxbHandler;
     private String xmlFileName;
     private String institutionName;
+
+    @Value("${error.output.file.path}")
+    private String errorEutputFilePath;
 
     @Autowired
     private ProducerTemplate producer;
@@ -121,16 +135,21 @@ public class RecordProcessor {
             String xml = new String(xmlRecordEntity.getXml());
             try {
                 bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
-                BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
-                bibPersisterCallable.setDbReportUtil(dbReportUtil);
-                bibPersisterCallable.setBibRecord(bibRecord);
-                bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
-                bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
-                bibPersisterCallable.setItemStatusMap(getItemStatusMap());
-                bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
-                bibPersisterCallable.setInstitutionName(institutionName);
+                boolean valid = validateHoldingsContent(bibRecord.getHoldings());
+                if (valid) {
+                    BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+                    bibPersisterCallable.setDbReportUtil(dbReportUtil);
+                    bibPersisterCallable.setBibRecord(bibRecord);
+                    bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
+                    bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
+                    bibPersisterCallable.setItemStatusMap(getItemStatusMap());
+                    bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
+                    bibPersisterCallable.setInstitutionName(institutionName);
 
-                callables.add(bibPersisterCallable);
+                    callables.add(bibPersisterCallable);
+                } else {
+                    writeNonHoldingInformationTofile(bibRecord, xmlRecordEntity.getXmlFileName());
+                }
 
             } catch (Exception e) {
                 logger.error(RecapConstants.ERROR,e);
@@ -186,6 +205,64 @@ public class RecordProcessor {
                 });
 
         return futures;
+    }
+
+    private boolean validateHoldingsContent(List<Holdings> holdings) {
+        if(!CollectionUtils.isEmpty(holdings)) {
+            for (Iterator<Holdings> iterator = holdings.iterator(); iterator.hasNext(); ) {
+                Holdings holding = iterator.next();
+                if(null != holding) {
+                    List<Holding> holdingList = holding.getHolding();
+                    if(!CollectionUtils.isEmpty(holdingList)) {
+                        for (Iterator<Holding> holdingIterator = holdingList.iterator(); holdingIterator.hasNext(); ) {
+                            Holding holdingNew = holdingIterator.next();
+                            if(null == holdingNew) {
+                                return false;
+                            }
+                        }
+                    }else {
+                        return false;
+                    }
+                } else
+                    return false;
+            }
+            return true;
+        } else  {
+            return false;
+        }
+    }
+
+    private void writeNonHoldingInformationTofile(BibRecord bibRecord, String xmlFileName) {
+        File directory = new File(errorEutputFilePath);
+        if(!directory.exists()) {
+            directory.mkdirs();
+        }
+        File file = new File(directory, "holdingErrors.txt");
+        ContentType content = bibRecord.getBib().getContent();
+        String institutionBibId = getInstitutionBibId(content);
+        try {
+            String data = "\n FileName :  " + xmlFileName + ", Owning Institution BibId : " + institutionBibId;
+            FileUtils.write(file, data, "UTF-8", true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String getInstitutionBibId(ContentType contentType) {
+        CollectionType collection = contentType.getCollection();
+        List<RecordType> record = collection.getRecord();
+        for (Iterator<RecordType> iterator = record.iterator(); iterator.hasNext(); ) {
+            RecordType next = iterator.next();
+            List<ControlFieldType> controlfield = next.getControlfield();
+            for (Iterator<ControlFieldType> controlFieldTypeIterator = controlfield.iterator(); controlFieldTypeIterator.hasNext(); ) {
+                ControlFieldType controlFieldType = controlFieldTypeIterator.next();
+                if(StringUtils.equalsIgnoreCase("001", controlFieldType.getTag())) {
+                    return controlFieldType.getValue();
+                }
+            }
+        }
+        return null;
     }
 
 
