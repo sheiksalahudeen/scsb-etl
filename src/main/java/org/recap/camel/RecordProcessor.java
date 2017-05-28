@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.etl.BibPersisterCallable;
 import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.Holding;
+import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.*;
 import org.recap.repository.CollectionGroupDetailsRepository;
@@ -121,16 +123,22 @@ public class RecordProcessor {
             String xml = new String(xmlRecordEntity.getXml());
             try {
                 bibRecord = (BibRecord) getJaxbHandler().unmarshal(xml, BibRecord.class);
-                BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
-                bibPersisterCallable.setDbReportUtil(dbReportUtil);
-                bibPersisterCallable.setBibRecord(bibRecord);
-                bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
-                bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
-                bibPersisterCallable.setItemStatusMap(getItemStatusMap());
-                bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
-                bibPersisterCallable.setInstitutionName(institutionName);
+                boolean valid = validateHoldingsContent(bibRecord.getHoldings());
+                if (valid) {
+                    BibPersisterCallable bibPersisterCallable = new BibPersisterCallable();
+                    bibPersisterCallable.setDbReportUtil(dbReportUtil);
+                    bibPersisterCallable.setBibRecord(bibRecord);
+                    bibPersisterCallable.setCollectionGroupMap(getCollectionGroupMap());
+                    bibPersisterCallable.setInstitutionEntitiesMap(getInstitutionEntityMap());
+                    bibPersisterCallable.setItemStatusMap(getItemStatusMap());
+                    bibPersisterCallable.setXmlRecordEntity(xmlRecordEntity);
+                    bibPersisterCallable.setInstitutionName(institutionName);
 
-                callables.add(bibPersisterCallable);
+                    callables.add(bibPersisterCallable);
+                } else {
+                    ReportEntity reportEntityForFailure = getReportEntityForFailure(xmlRecordEntity, "Holding content missing");
+                    reportEntities.add(reportEntityForFailure);
+                }
 
             } catch (Exception e) {
                 logger.error(RecapConstants.ERROR,e);
@@ -186,6 +194,65 @@ public class RecordProcessor {
                 });
 
         return futures;
+    }
+
+    private ReportEntity getReportEntityForFailure(XmlRecordEntity xmlRecordEntity, String message) {
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        String owningInst = xmlRecordEntity.getOwningInst();
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType(RecapConstants.FAILURE);
+        reportEntity.setFileName(xmlRecordEntity.getXmlFileName());
+        reportEntity.setInstitutionName(owningInst);
+
+        if(StringUtils.isNotBlank(owningInst)) {
+            ReportDataEntity reportDataEntity = new ReportDataEntity();
+            reportDataEntity.setHeaderName(RecapConstants.OWNING_INSTITUTION);
+            reportDataEntity.setHeaderValue(String.valueOf(getInstitutionEntityMap().get(owningInst)));
+            reportDataEntities.add(reportDataEntity);
+        }
+
+        if(StringUtils.isNotBlank(xmlRecordEntity.getOwningInstBibId())) {
+            ReportDataEntity reportDataEntity = new ReportDataEntity();
+            reportDataEntity.setHeaderName(RecapConstants.OWNING_INSTITUTION_BIB_ID);
+            reportDataEntity.setHeaderValue(xmlRecordEntity.getOwningInstBibId());
+            reportDataEntities.add(reportDataEntity);
+        }
+
+        ReportDataEntity reportDataEntity = new ReportDataEntity();
+        reportDataEntity.setHeaderName(RecapConstants.EXCEPTION_MESSAGE);
+        reportDataEntity.setHeaderValue(message);
+        reportDataEntities.add(reportDataEntity);
+
+        reportEntity.setReportDataEntities(reportDataEntities);
+
+        return reportEntity;
+
+    }
+
+    private boolean validateHoldingsContent(List<Holdings> holdings) {
+        if(!CollectionUtils.isEmpty(holdings)) {
+            for (Iterator<Holdings> iterator = holdings.iterator(); iterator.hasNext(); ) {
+                Holdings holding = iterator.next();
+                if(null != holding) {
+                    List<Holding> holdingList = holding.getHolding();
+                    if(!CollectionUtils.isEmpty(holdingList)) {
+                        for (Iterator<Holding> holdingIterator = holdingList.iterator(); holdingIterator.hasNext(); ) {
+                            Holding holdingNew = holdingIterator.next();
+                            if(null == holdingNew) {
+                                return false;
+                            }
+                        }
+                    }else {
+                        return false;
+                    }
+                } else
+                    return false;
+            }
+            return true;
+        } else  {
+            return false;
+        }
     }
 
 

@@ -64,19 +64,20 @@ public class EtlDataLoadProcessor {
                     int loopCount = remainder == 0 ? quotient : quotient + 1;
 
                     Page<XmlRecordEntity> xmlRecordEntities = null;
-                    for (int i = 0; i < loopCount; i++) {
+                    for (int iteration = 0; iteration < loopCount; iteration++) {
                         long startTime = System.currentTimeMillis();
-                        xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(i, batchSize), distinctFileName);
+                        xmlRecordEntities = xmlRecordRepository.findByXmlFileName(new PageRequest(iteration, batchSize), distinctFileName);
                         recordProcessor.setXmlFileName(distinctFileName);
                         recordProcessor.setInstitutionName(institutionName);
                         recordProcessor.process(xmlRecordEntities);
                         long endTime = System.currentTimeMillis();
-                        logger.info("Time taken to save: {} bibs and related data is: {} seconds." , xmlRecordEntities.getNumberOfElements() , (endTime - startTime) / 1000 );
+                        logger.info("File name : {} , Total Docs : {}, Total Loops : {}, Current Iteration : {} , Time taken to save: {} bibs and related data is: {} seconds." ,
+                                distinctFileName, totalDocCount, loopCount, iteration, xmlRecordEntities.getNumberOfElements() , (endTime - startTime) / 1000 );
                     }
 
 
                     long totalEndTime = System.currentTimeMillis();
-                    logger.info("Total time taken to save: {} bibs and related data is: {} seconds." , xmlRecordEntities.getTotalElements() , (totalEndTime - totalStartTime) / 1000);
+                    logger.info("File name : {} , Total time taken to save: {} bibs and related data is: {} seconds." ,distinctFileName, xmlRecordEntities.getTotalElements() , (totalEndTime - totalStartTime) / 1000);
                 } else {
                     logger.info("No records found to load into DB");
                 }
