@@ -14,19 +14,61 @@ import java.util.List;
  */
 public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, ItemPK> {
 
+    /**
+     * Find by item id item entity.
+     *
+     * @param itemId the item id
+     * @return the item entity
+     */
     ItemEntity findByItemId(Integer itemId);
 
+    /**
+     * Count by owning institution id long.
+     *
+     * @param owningInstitutionId the owning institution id
+     * @return the long
+     */
     Long countByOwningInstitutionId(Integer owningInstitutionId);
 
+    /**
+     * Find by owning institution id page.
+     *
+     * @param pageable            the pageable
+     * @param owningInstitutionId the owning institution id
+     * @return the page
+     */
     Page<ItemEntity> findByOwningInstitutionId(Pageable pageable, Integer owningInstitutionId);
 
+    /**
+     * Find by owning institution id list.
+     *
+     * @param owningInstitutionId the owning institution id
+     * @return the list
+     */
     List<ItemEntity> findByOwningInstitutionId(Integer owningInstitutionId);
 
+    /**
+     * Find by owning institution item id item entity.
+     *
+     * @param owningInstitutionItemId the owning institution item id
+     * @return the item entity
+     */
     ItemEntity findByOwningInstitutionItemId(String owningInstitutionItemId);
 
+    /**
+     * Find count of bibliographic items long.
+     *
+     * @return the long
+     */
     @Query(value = "select count(*) from bibliographic_item_t",  nativeQuery = true)
     Long findCountOfBibliographicItems();
 
+    /**
+     * Find count of bibliographic items by inst id long.
+     *
+     * @param instId the inst id
+     * @return the long
+     */
     @Query(value = "select count(*) from bibliographic_item_t where bib_inst_id = ?1",  nativeQuery = true)
     Long findCountOfBibliographicItemsByInstId(Integer instId);
 

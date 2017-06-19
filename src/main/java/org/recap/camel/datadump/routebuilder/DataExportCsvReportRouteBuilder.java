@@ -24,6 +24,12 @@ public class DataExportCsvReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(DataExportCsvReportRouteBuilder.class);
 
+    /**
+     * Instantiates a new Data export csv report route builder.
+     *
+     * @param camelContext     the camel context
+     * @param reportsDirectory the reports directory
+     */
     @Autowired
     public DataExportCsvReportRouteBuilder(CamelContext camelContext, @Value("${etl.dump.report.directory}") String reportsDirectory) {
         try {

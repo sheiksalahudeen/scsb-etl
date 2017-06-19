@@ -17,6 +17,14 @@ import java.util.Date;
 public class DateUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
+
+    /**
+     * Get date from string date.
+     *
+     * @param inputDateString the input date string
+     * @param dateFormat      the date format
+     * @return the date
+     */
     public static Date getDateFromString(String inputDateString,String dateFormat){
         Date outputDate=null;
         try {
@@ -30,6 +38,13 @@ public class DateUtil {
         return outputDate;
     }
 
+    /**
+     * Get date time from string date.
+     *
+     * @param inputDateTimeString the input date time string
+     * @param dateTimeFormat      the date time format
+     * @return the date
+     */
     public static Date getDateTimeFromString(String inputDateTimeString, String dateTimeFormat){
         Date outputDateTime = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat);

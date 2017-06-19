@@ -22,6 +22,12 @@ public class ReCAPCSVFailureRecordGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(ReCAPCSVFailureRecordGenerator.class);
 
+    /**
+     * Prepare failure records csv report for initial data load.
+     *
+     * @param reportEntity the report entity
+     * @return the failure report re capcsv record
+     */
     public FailureReportReCAPCSVRecord prepareFailureReportReCAPCSVRecord(ReportEntity reportEntity) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -44,6 +50,12 @@ public class ReCAPCSVFailureRecordGenerator {
         return failureReportReCAPCSVRecord;
     }
 
+    /**
+     * Gets setter method for the given name.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -54,6 +66,12 @@ public class ReCAPCSVFailureRecordGenerator {
         return null;
     }
 
+    /**
+     * Gets getter method for the given name.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

@@ -17,6 +17,9 @@ import java.util.List;
 @Component
 public class XMLFileLoadValidator implements Processor {
 
+    /**
+     * The Report detail repository.
+     */
     @Autowired
     ReportDetailRepository reportDetailRepository;
 

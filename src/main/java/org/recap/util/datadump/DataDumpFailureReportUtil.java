@@ -16,6 +16,13 @@ import java.util.Map;
 @Component
 public class DataDumpFailureReportUtil {
 
+    /**
+     * Generate data dump failure report list.
+     *
+     * @param successAndFailureFormattedFullList the success and failure formatted full list
+     * @param dataDumpRequest                    the data dump request
+     * @return the list
+     */
     public List<ReportDataEntity> generateDataDumpFailureReport(List<Map<String,Object>> successAndFailureFormattedFullList, DataDumpRequest dataDumpRequest){
         int totalNoOfBibsFailedExported = 0;
         StringBuilder formatError = new StringBuilder();
@@ -83,6 +90,11 @@ public class DataDumpFailureReportUtil {
         return reportEntities;
     }
 
+    /**
+     * Builds a string appending by comma for the given list of strings.
+     * @param stringList
+     * @return
+     */
     private String getStringFromStringList(List<String> stringList){
         StringBuilder stringFromList = new StringBuilder();
         int count = 0;
@@ -96,6 +108,11 @@ public class DataDumpFailureReportUtil {
         return stringFromList.toString();
     }
 
+    /**
+     * Builds a string appending by comma for the given list of integers.
+     * @param integerList
+     * @return
+     */
     private String getStringFromIntegerList(List<Integer> integerList){
         int count = 0;
         StringBuilder stringFromList = new StringBuilder();

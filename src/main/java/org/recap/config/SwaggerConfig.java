@@ -24,6 +24,11 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
     @Value("${version.number}")
     private String buildVersionNumber;
 
+    /**
+     * Documentation docket.
+     *
+     * @return the docket
+     */
     @Bean
     public Docket documentation() {
         return new Docket(DocumentationType.SWAGGER_2)

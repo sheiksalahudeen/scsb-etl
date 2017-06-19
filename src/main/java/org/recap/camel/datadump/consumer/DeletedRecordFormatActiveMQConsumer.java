@@ -20,19 +20,32 @@ import java.util.concurrent.*;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class DeletedRecordFormatActiveMQConsumer {
     private static final Logger logger = LoggerFactory.getLogger(DeletedRecordFormatActiveMQConsumer.class);
 
+    /**
+     * The Deleted json formatter service.
+     */
     DeletedJsonFormatterService deletedJsonFormatterService;
 
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
+    /**
+     * Instantiates a new Deleted record format active mq consumer.
+     *
+     * @param deletedJsonFormatterService the deleted json formatter service
+     */
     public DeletedRecordFormatActiveMQConsumer(DeletedJsonFormatterService deletedJsonFormatterService) {
         this.deletedJsonFormatterService = deletedJsonFormatterService;
     }
 
+    /**
+     * This method is invoked by the route to prepare deleted record list for data export.
+     *
+     * @param exchange the exchange
+     * @throws Exception the exception
+     */
     public void processRecords(Exchange exchange) throws Exception {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
 
@@ -98,6 +111,13 @@ public class DeletedRecordFormatActiveMQConsumer {
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Process the failure records for deleted records export.
+     * @param exchange
+     * @param failures
+     * @param batchHeaders
+     * @param requestId
+     */
     private void processFailures(Exchange exchange, List failures, String batchHeaders, String requestId) {
         HashMap values = new HashMap();
         values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
@@ -123,6 +143,12 @@ public class DeletedRecordFormatActiveMQConsumer {
                 .withHeader(RecapConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(RecapConstants.TRANSMISSION_TYPE));
         fluentProducerTemplate.send();
     }
+
+    /**
+     * Gets data export header util.
+     *
+     * @return the data export header util
+     */
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {
             dataExportHeaderUtil = new DataExportHeaderUtil();
@@ -130,11 +156,21 @@ public class DeletedRecordFormatActiveMQConsumer {
         return dataExportHeaderUtil;
     }
 
+    /**
+     * Sets data export header util.
+     *
+     * @param dataExportHeaderUtil the data export header util
+     */
     public void setDataExportHeaderUtil(DataExportHeaderUtil dataExportHeaderUtil) {
         this.dataExportHeaderUtil = dataExportHeaderUtil;
     }
 
 
+    /**
+     * Gets executor service.
+     *
+     * @return the executor service
+     */
     public ExecutorService getExecutorService() {
         if (null == executorService) {
             executorService = Executors.newFixedThreadPool(500);

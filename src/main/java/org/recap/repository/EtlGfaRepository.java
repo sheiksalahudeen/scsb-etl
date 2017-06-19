@@ -10,7 +10,20 @@ import java.util.List;
  */
 public interface EtlGfaRepository extends JpaRepository<EtlGfaEntity,Integer>{
 
+    /**
+     * Find bystatus list.
+     *
+     * @param status the status
+     * @return the list
+     */
     List<EtlGfaEntity> findBystatus(String status);
+
+    /**
+     * Find by item barcode list.
+     *
+     * @param itemBarcode the item barcode
+     * @return the list
+     */
     List<EtlGfaEntity> findByItemBarcode(String itemBarcode);
 
 

@@ -16,11 +16,31 @@ import java.util.List;
  */
 public class MarcUtil {
 
+    /**
+     * Gets data field value for the given tag and subfield from marc record.
+     *
+     * @param marcRecord the marc record
+     * @param field      the field
+     * @param ind1       the ind 1
+     * @param ind2       the ind 2
+     * @param subField   the sub field
+     * @return the data field value
+     */
     public String getDataFieldValue(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
         List<String> strings = resolveValue(marcRecord, field, ind1, ind2, subField);
         return CollectionUtils.isEmpty(strings) ? "" : strings.get(0);
     }
 
+    /**
+     * Gets multi data field values for the given tag and subfield from marc record.
+     *
+     * @param marcRecord the marc record
+     * @param field      the field
+     * @param ind1       the ind 1
+     * @param ind2       the ind 2
+     * @param subField   the sub field
+     * @return the multi data field values
+     */
     public List<String> getMultiDataFieldValues(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
         return resolveValue(marcRecord, field, ind1, ind2, subField);
     }
@@ -49,6 +69,14 @@ public class MarcUtil {
         return values;
     }
 
+    /**
+     * Gets indicator 1 value for the given tag and subfield from marc record.
+     *
+     * @param marcRecord the marc record
+     * @param field      the field
+     * @param subField   the sub field
+     * @return the ind 1
+     */
     public String getInd1(RecordType marcRecord, String field, String subField) {
         List<DataFieldType> dataFields = marcRecord.getDatafield();
 
@@ -67,6 +95,13 @@ public class MarcUtil {
         return null;
     }
 
+    /**
+     * Checks if given indicators match with the data field.
+     * @param indicator1
+     * @param indicator2
+     * @param dataField
+     * @return
+     */
     private boolean doIndicatorsMatch(String indicator1, String indicator2, DataFieldType dataField) {
         boolean result = true;
         if (StringUtils.isNotBlank(indicator1)) {
@@ -78,6 +113,13 @@ public class MarcUtil {
         return result;
     }
 
+    /**
+     * Gets control field value from marc record.
+     *
+     * @param marcRecord the marc record
+     * @param field      the field
+     * @return the control field value
+     */
     public String getControlFieldValue(RecordType marcRecord, String field) {
         List<ControlFieldType> controlFields = marcRecord.getControlfield();
         for (Iterator<ControlFieldType> variableFieldIterator = controlFields.iterator(); variableFieldIterator.hasNext(); ) {
@@ -89,6 +131,13 @@ public class MarcUtil {
         return null;
     }
 
+    /**
+     * Returns true if the given sub field exists in the marc record.
+     *
+     * @param marcRecord the marc record
+     * @param field      the field
+     * @return the boolean
+     */
     public boolean isSubFieldExists(RecordType marcRecord, String field) {
         List<DataFieldType> dataFields = marcRecord.getDatafield();
         for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {

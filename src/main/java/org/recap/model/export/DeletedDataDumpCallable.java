@@ -26,6 +26,14 @@ public class DeletedDataDumpCallable implements Callable {
     @Autowired
     private ApplicationContext appContext;
 
+    /**
+     * Instantiates a new Deleted data dump callable.
+     *
+     * @param pageNum                        the page num
+     * @param batchSize                      the batch size
+     * @param dataDumpRequest                the data dump request
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     */
     public DeletedDataDumpCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository){
         this.pageNum = pageNum;
         this.batchSize = batchSize;

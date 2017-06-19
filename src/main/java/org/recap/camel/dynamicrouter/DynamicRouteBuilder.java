@@ -32,6 +32,9 @@ public class DynamicRouteBuilder {
     @Value("${datadump.records.per.file}")
     String dataDumpRecordsPerFile;
 
+    /**
+     * This method initiates the camel routes for data dump dynamically.
+     */
     public void addDataDumpExportRoutes() {
         new DataExportRouteBuilder(camelContext, bibliographicDetailsRepository, marcXmlFormatterService, scsbXmlFormatterService,
                 deletedJsonFormatterService, xmlFormatter, dataDumpRecordsPerFile);

@@ -18,20 +18,38 @@ import java.util.Map;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class SCSBXMLFormatActiveMQConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(SCSBXMLFormatActiveMQConsumer.class);
 
+    /**
+     * The Scsb xml formatter service.
+     */
     SCSBXmlFormatterService scsbXmlFormatterService;
+    /**
+     * The Xml formatter.
+     */
     XmlFormatter xmlFormatter;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
+    /**
+     * Instantiates a new Scsbxml format active mq consumer.
+     *
+     * @param scsbXmlFormatterService the scsb xml formatter service
+     * @param xmlFormatter            the xml formatter
+     */
     public SCSBXMLFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService, XmlFormatter xmlFormatter) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
         this.xmlFormatter = xmlFormatter;
     }
 
+    /**
+     * This method is invoked by the route to build the scsb xml format string with the bib records list for data export.
+     *
+     * @param exchange the exchange
+     * @return the string
+     * @throws Exception the exception
+     */
     public String processSCSBXmlString(Exchange exchange) throws Exception {
         List<BibRecord> records = (List<BibRecord>) exchange.getIn().getBody();
         logger.info("Num records to generate scsb XMl for: {} " , records.size());
@@ -54,6 +72,13 @@ public class SCSBXMLFormatActiveMQConsumer {
         return toSCSBXmlString;
     }
 
+    /**
+     * This method builds a map with the values for success report entity and sends to the route to save the report entity.
+     * @param exchange
+     * @param size
+     * @param batchHeaders
+     * @param requestId
+     */
     private void processSuccessReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId) {
         Map values = new HashMap<>();
         values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
@@ -80,6 +105,14 @@ public class SCSBXMLFormatActiveMQConsumer {
 
     }
 
+    /**
+     * This method builds a map with the values for failure report entity and sends to the route to save the report entity.
+     * @param exchange
+     * @param size
+     * @param batchHeaders
+     * @param requestId
+     * @param e
+     */
     private void processFailureReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId, Exception e) {
         HashMap values = new HashMap();
 
@@ -107,6 +140,11 @@ public class SCSBXMLFormatActiveMQConsumer {
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Gets data export header util.
+     *
+     * @return the data export header util
+     */
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {
             dataExportHeaderUtil = new DataExportHeaderUtil();
@@ -114,6 +152,11 @@ public class SCSBXMLFormatActiveMQConsumer {
         return dataExportHeaderUtil;
     }
 
+    /**
+     * Sets data export header util.
+     *
+     * @param dataExportHeaderUtil the data export header util
+     */
     public void setDataExportHeaderUtil(DataExportHeaderUtil dataExportHeaderUtil) {
         this.dataExportHeaderUtil = dataExportHeaderUtil;
     }

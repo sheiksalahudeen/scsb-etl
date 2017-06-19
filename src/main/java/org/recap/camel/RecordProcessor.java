@@ -26,7 +26,6 @@ import java.util.concurrent.*;
 /**
  * Created by pvsubrah on 6/21/16.
  */
-
 @Component
 public class RecordProcessor {
     private static final Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
@@ -50,15 +49,26 @@ public class RecordProcessor {
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
+    /**
+     * The Bib data processor.
+     */
     @Autowired
     BibDataProcessor bibDataProcessor;
 
+    /**
+     * The Db report util.
+     */
     @Autowired
     DBReportUtil dbReportUtil;
 
     private ExecutorService executorService;
 
 
+    /**
+     * This method processes the xml record entities in scsb format and builds bibliographic entities to persist.
+     *
+     * @param xmlRecordEntities the xml record entities
+     */
     public void process(Page<XmlRecordEntity> xmlRecordEntities) {
         logger.info("Processor: " + Thread.currentThread().getName());
 
@@ -98,6 +108,13 @@ public class RecordProcessor {
 
     }
 
+    /**
+     * Bibliographic entities and failure report entities are built from the map.
+     *
+     * @param object
+     * @param bibliographicEntities
+     * @param reportEntities
+     */
     private void processFutureResults(Object object, List<BibliographicEntity> bibliographicEntities, List<ReportEntity> reportEntities) {
         Map<String, Object> resultMap = (Map<String, Object>) object;
 
@@ -113,6 +130,13 @@ public class RecordProcessor {
         }
     }
 
+    /**
+     * This method takes xml records and processes them in multithreading to build bibliographic entities and failure report enitites.
+     *
+     * @param xmlRecordEntities
+     * @param reportEntities
+     * @return
+     */
     private List<Future<Map<String, String>>> prepareFutureTasks(Page<XmlRecordEntity> xmlRecordEntities, List<ReportEntity> reportEntities) {
         BibRecord bibRecord;
 
@@ -196,6 +220,13 @@ public class RecordProcessor {
         return futures;
     }
 
+    /**
+     * Prepares a failure report entity from xml record and with the given message.
+     *
+     * @param xmlRecordEntity
+     * @param message
+     * @return
+     */
     private ReportEntity getReportEntityForFailure(XmlRecordEntity xmlRecordEntity, String message) {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
@@ -230,6 +261,11 @@ public class RecordProcessor {
 
     }
 
+    /**
+     * Validates holdings content.
+     * @param holdings
+     * @return
+     */
     private boolean validateHoldingsContent(List<Holdings> holdings) {
         if(!CollectionUtils.isEmpty(holdings)) {
             for (Iterator<Holdings> iterator = holdings.iterator(); iterator.hasNext(); ) {
@@ -256,6 +292,11 @@ public class RecordProcessor {
     }
 
 
+    /**
+     * Gets jaxb handler.
+     *
+     * @return the jaxb handler
+     */
     public JAXBHandler getJaxbHandler() {
         if (null == jaxbHandler) {
             jaxbHandler = JAXBHandler.getInstance();
@@ -263,6 +304,11 @@ public class RecordProcessor {
         return jaxbHandler;
     }
 
+    /**
+     * Gets institution entity map.
+     *
+     * @return the institution entity map
+     */
     public Map getInstitutionEntityMap() {
         if (null == institutionEntityMap) {
             institutionEntityMap = new HashMap();
@@ -275,6 +321,11 @@ public class RecordProcessor {
         return institutionEntityMap;
     }
 
+    /**
+     * Gets item status map.
+     *
+     * @return the item status map
+     */
     public Map getItemStatusMap() {
         if (null == itemStatusMap) {
             itemStatusMap = new HashMap();
@@ -287,6 +338,11 @@ public class RecordProcessor {
         return itemStatusMap;
     }
 
+    /**
+     * Gets collection group map.
+     *
+     * @return the collection group map
+     */
     public Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
@@ -299,6 +355,11 @@ public class RecordProcessor {
         return collectionGroupMap;
     }
 
+    /**
+     * Gets executor service.
+     *
+     * @return the executor service
+     */
     public ExecutorService getExecutorService() {
         if (null == executorService || executorService.isShutdown()) {
             executorService = Executors.newFixedThreadPool(50);
@@ -306,26 +367,54 @@ public class RecordProcessor {
         return executorService;
     }
 
+    /**
+     * Gets xml file name.
+     *
+     * @return the xml file name
+     */
     public String getXmlFileName() {
         return xmlFileName;
     }
 
+    /**
+     * Sets xml file name.
+     *
+     * @param xmlFileName the xml file name
+     */
     public void setXmlFileName(String xmlFileName) {
         this.xmlFileName = xmlFileName;
     }
 
+    /**
+     * Gets institution name.
+     *
+     * @return the institution name
+     */
     public String getInstitutionName() {
         return institutionName;
     }
 
+    /**
+     * Sets institution name.
+     *
+     * @param institutionName the institution name
+     */
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;
     }
 
+    /**
+     * Sets executor service.
+     *
+     * @param executorService the executor service
+     */
     public void setExecutorService(ExecutorService executorService) {
         this.executorService = executorService;
     }
 
+    /**
+     * Shutdown executor service.
+     */
     public void shutdownExecutorService() {
         getExecutorService().shutdown();
     }

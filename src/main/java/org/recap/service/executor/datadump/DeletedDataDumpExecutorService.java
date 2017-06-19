@@ -12,11 +12,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeletedDataDumpExecutorService extends AbstractDataDumpExecutorService {
 
+    /**
+     * Returns true if selected fetch type is deleted records data dump.
+     *
+     * @param fetchType the fetch type
+     * @return
+     */
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(RecapConstants.DATADUMP_FETCHTYPE_DELETED) ? true:false;
     }
 
+    /**
+     * Populates search request with deleted flag and item last updated date.
+     *
+     * @param searchRecordsRequest the search records request
+     * @param dataDumpRequest      the data dump request
+     */
     @Override
     public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
         searchRecordsRequest.setDeleted(true);

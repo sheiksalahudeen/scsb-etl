@@ -17,29 +17,56 @@ import java.util.Map;
 /**
  * Created by peris on 8/10/16.
  */
-
 @Component
 public class DBReportUtil {
 
     private Map<String, Integer> institutionEntitiesMap;
     private Map<String, Integer> collectionGroupMap;
 
+    /**
+     * Gets institution entities map.
+     *
+     * @return the institution entities map
+     */
     public Map<String, Integer> getInstitutionEntitiesMap() {
         return institutionEntitiesMap;
     }
 
+    /**
+     * Sets institution entities map.
+     *
+     * @param institutionEntitiesMap the institution entities map
+     */
     public void setInstitutionEntitiesMap(Map<String, Integer> institutionEntitiesMap) {
         this.institutionEntitiesMap = institutionEntitiesMap;
     }
 
+    /**
+     * Gets collection group map.
+     *
+     * @return the collection group map
+     */
     public Map<String, Integer> getCollectionGroupMap() {
         return collectionGroupMap;
     }
 
+    /**
+     * Sets collection group map.
+     *
+     * @param collectionGroupMap the collection group map
+     */
     public void setCollectionGroupMap(Map<String, Integer> collectionGroupMap) {
         this.collectionGroupMap = collectionGroupMap;
     }
 
+    /**
+     * Generate bib holdings and items failure report entities list from bibliographic, holdings and item entity.
+     *
+     * @param bibliographicEntity the bibliographic entity
+     * @param holdingsEntity      the holdings entity
+     * @param itemEntity          the item entity
+     * @return the list
+     */
     public List<ReportDataEntity> generateBibHoldingsAndItemsFailureReportEntities(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, ItemEntity itemEntity) {
         List<ReportDataEntity> reportEntities = new ArrayList<>();
         reportEntities.addAll(generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity));
@@ -97,7 +124,13 @@ public class DBReportUtil {
     }
 
 
-
+    /**
+     * Generate bib holdings failure report entity list from bibliographic and holdings entity.
+     *
+     * @param bibliographicEntity the bibliographic entity
+     * @param holdingsEntity      the holdings entity
+     * @return the list
+     */
     public List<ReportDataEntity> generateBibHoldingsFailureReportEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         reportDataEntities.addAll(generateBibFailureReportEntity(bibliographicEntity));
@@ -110,6 +143,12 @@ public class DBReportUtil {
         return reportDataEntities;
     }
 
+    /**
+     * Generate bib failure report entity list from bibliographic entity.
+     *
+     * @param bibliographicEntity the bibliographic entity
+     * @return the list
+     */
     public List<ReportDataEntity> generateBibFailureReportEntity(BibliographicEntity bibliographicEntity) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 

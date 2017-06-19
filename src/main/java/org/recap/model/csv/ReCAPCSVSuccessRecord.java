@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * Created by angelind on 18/8/16.
  */
-
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
 public class ReCAPCSVSuccessRecord implements Serializable{
 
@@ -39,37 +38,80 @@ public class ReCAPCSVSuccessRecord implements Serializable{
     @Ignore
     private String institutionName;
 
+    /**
+     * The Success report re capcsv record list.
+     */
     @OneToMany(mappedTo = "org.recap.model.csv.SuccessReportReCAPCSVRecord")
     List<SuccessReportReCAPCSVRecord> successReportReCAPCSVRecordList;
 
+    /**
+     * Gets report file name.
+     *
+     * @return the report file name
+     */
     public String getReportFileName() {
         return reportFileName;
     }
 
+    /**
+     * Sets report file name.
+     *
+     * @param reportFileName the report file name
+     */
     public void setReportFileName(String reportFileName) {
         this.reportFileName = reportFileName;
     }
 
+    /**
+     * Gets report type.
+     *
+     * @return the report type
+     */
     public String getReportType() {
         return reportType;
     }
 
+    /**
+     * Sets report type.
+     *
+     * @param reportType the report type
+     */
     public void setReportType(String reportType) {
         this.reportType = reportType;
     }
 
+    /**
+     * Gets institution name.
+     *
+     * @return the institution name
+     */
     public String getInstitutionName() {
         return institutionName;
     }
 
+    /**
+     * Sets institution name.
+     *
+     * @param institutionName the institution name
+     */
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;
     }
 
+    /**
+     * Gets success report re capcsv record list.
+     *
+     * @return the success report re capcsv record list
+     */
     public List<SuccessReportReCAPCSVRecord> getSuccessReportReCAPCSVRecordList() {
         return successReportReCAPCSVRecordList;
     }
 
+    /**
+     * Sets success report re capcsv record list.
+     *
+     * @param successReportReCAPCSVRecordList the success report re capcsv record list
+     */
     public void setSuccessReportReCAPCSVRecordList(List<SuccessReportReCAPCSVRecord> successReportReCAPCSVRecordList) {
         this.successReportReCAPCSVRecordList = successReportReCAPCSVRecordList;
     }

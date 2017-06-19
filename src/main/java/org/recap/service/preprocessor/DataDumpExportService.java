@@ -35,6 +35,9 @@ public class DataDumpExportService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpExportService.class);
 
+    /**
+     * The App context.
+     */
     @Autowired
     ApplicationContext appContext;
 
@@ -56,6 +59,12 @@ public class DataDumpExportService {
     @Value("${datadump.fetchtype.full}")
     private String fetchTypeFull;
 
+    /**
+     * Start the data dump process.
+     *
+     * @param dataDumpRequest the data dump request
+     * @return the response message
+     */
     public String startDataDumpProcess(DataDumpRequest dataDumpRequest) {
         String outputString = null;
         String responseMessage = null;
@@ -96,6 +105,10 @@ public class DataDumpExportService {
         return responseMessage;
     }
 
+    /**
+     * Gets the message from HTTP queue for the status of the data dump process.
+     * @return
+     */
     private String getMessageFromHttpQ(){
         String outputString;
         Exchange receive = consumerTemplate.receive(RecapConstants.DATADUMP_HTTP_Q);
@@ -108,6 +121,10 @@ public class DataDumpExportService {
         return outputString;
     }
 
+    /**
+     * Gets the message from record available queue to identity if the records are available for data dump processing.
+     * @return
+     */
     private String getMessageFromIsRecordAvailableQ(){
         String outputString;
         Exchange receive = consumerTemplate.receive(RecapConstants.DATADUMP_IS_RECORD_AVAILABLE_Q);
@@ -120,11 +137,21 @@ public class DataDumpExportService {
         return outputString;
     }
 
+    /**
+     * Splits the given string by comma and prepares a list.
+     * @param inputString
+     * @return
+     */
     private List<String> splitStringAndGetList(String inputString) {
         String[] splittedString = inputString.split(",");
         return Arrays.asList(splittedString);
     }
 
+    /**
+     * Convert string type list to integer type list.
+     * @param stringList
+     * @return
+     */
     private List<Integer> getIntegerListFromStringList(List<String> stringList) {
         List<Integer> integerList = new ArrayList<>();
         for (String stringValue : stringList) {
@@ -133,10 +160,28 @@ public class DataDumpExportService {
         return integerList;
     }
 
+    /**
+     * Splits the string by comma and gets integer type list from string type list.
+     * @param inputString
+     * @return
+     */
     private List<Integer> splitStringAndGetIntegerList(String inputString) {
         return getIntegerListFromStringList(splitStringAndGetList(inputString));
     }
 
+    /**
+     * Sets the request values to data dump request object.
+     *
+     * @param dataDumpRequest           the data dump request
+     * @param fetchType                 the fetch type
+     * @param institutionCodes          the institution codes
+     * @param date                      the date
+     * @param collectionGroupIds        the collection group ids
+     * @param transmissionType          the transmission type
+     * @param requestingInstitutionCode the requesting institution code
+     * @param toEmailAddress            the to email address
+     * @param outputFormat              the output format
+     */
     public void setDataDumpRequest(DataDumpRequest dataDumpRequest, String fetchType, String institutionCodes, String date, String collectionGroupIds,
                                    String transmissionType, String requestingInstitutionCode, String toEmailAddress, String outputFormat) {
         if (fetchType != null) {
@@ -182,6 +227,12 @@ public class DataDumpExportService {
         dataDumpRequest.setRequestId(new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM).format(new Date()));
     }
 
+    /**
+     * Validate incoming data dump request.
+     *
+     * @param dataDumpRequest the data dump request
+     * @return the string
+     */
     public String validateIncomingRequest(DataDumpRequest dataDumpRequest) {
         String validationMessage = null;
         Map<Integer, String> errorMessageMap = new HashMap<>();
@@ -251,6 +302,10 @@ public class DataDumpExportService {
         return validationMessage;
     }
 
+    /**
+     * Gets the data dump export status reading from status file.
+     * @return
+     */
     private String getDataExportCurrentStatus(){
         File file = new File(dataDumpStatusFileName);
         String dataDumpStatus = null;
@@ -265,7 +320,9 @@ public class DataDumpExportService {
         return dataDumpStatus;
     }
 
-
+    /**
+     * Sets the data dump export status to a file.
+     */
     private void setDataExportCurrentStatus(){
         File file = new File(dataDumpStatusFileName);
         File parentFile = file.getParentFile();
@@ -288,6 +345,12 @@ public class DataDumpExportService {
         }
     }
 
+    /**
+     * Writes data dump status to a file.
+     * @param file
+     * @param status
+     * @throws IOException
+     */
     private void writeStatusToFile(File file, String status) throws IOException {
         FileWriter fileWriter = new FileWriter(file, false);
         try {
@@ -301,12 +364,22 @@ public class DataDumpExportService {
         }
     }
 
+    /**
+     * Builds error message string from map.
+     * @param erroMessageMap
+     * @return
+     */
     private String buildErrorMessage(Map<Integer, String> erroMessageMap) {
         StringBuilder errorMessageBuilder = new StringBuilder();
         erroMessageMap.entrySet().forEach(entry -> errorMessageBuilder.append(entry.getKey()).append(". ").append(entry.getValue()).append("\n"));
         return errorMessageBuilder.toString();
     }
 
+    /**
+     * Validates email address.
+     * @param toEmailAddress
+     * @return
+     */
     private boolean validateEmailAddress(String toEmailAddress) {
         String regex = RecapConstants.REGEX_FOR_EMAIL_ADDRESS;
         Pattern pattern = Pattern.compile(regex);
@@ -314,6 +387,13 @@ public class DataDumpExportService {
         return matcher.matches();
     }
 
+    /**
+     * Gets response message for the data dump process.
+     * @param outputString
+     * @param dataDumpRequest
+     * @return
+     * @throws Exception
+     */
     private String getResponseMessage(String outputString, DataDumpRequest dataDumpRequest) throws Exception {
         HttpHeaders responseHeaders = new HttpHeaders();
         String date = new Date().toString();

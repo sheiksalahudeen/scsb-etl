@@ -26,6 +26,14 @@ public class DataDumpExecutorService {
     @Autowired
     private DeletedDataDumpExecutorService deletedDataDumpExecutorService;
 
+    /**
+     * Generate full data dump or incremental data dump or deleted records data dump.
+     *
+     * @param dataDumpRequest the data dump request
+     * @return the string
+     * @throws ExecutionException   the execution exception
+     * @throws InterruptedException the interrupted exception
+     */
     public String generateDataDump(DataDumpRequest dataDumpRequest) throws ExecutionException, InterruptedException {
         String outputString = null;
         for(DataDumpExecutorInterface dataDumpExecutorInterface:getExecutor()){
@@ -36,6 +44,11 @@ public class DataDumpExecutorService {
         return outputString;
     }
 
+    /**
+     * Get data dump executor list.
+     *
+     * @return the list
+     */
     public List<DataDumpExecutorInterface> getExecutor(){
         if(CollectionUtils.isEmpty(dataDumpExecutorInterfaceList)){
             dataDumpExecutorInterfaceList = new ArrayList<>();

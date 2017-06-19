@@ -23,26 +23,56 @@ public class EtlGfaEntity implements Serializable {
     @Column(name = "ITEM_STATUS")
     private String status;
 
+    /**
+     * Gets item barcode.
+     *
+     * @return the item barcode
+     */
     public String getItemBarcode() {
         return itemBarcode;
     }
 
+    /**
+     * Sets item barcode.
+     *
+     * @param itemBarcode the item barcode
+     */
     public void setItemBarcode(String itemBarcode) {
         this.itemBarcode = itemBarcode;
     }
 
+    /**
+     * Gets customer.
+     *
+     * @return the customer
+     */
     public String getCustomer() {
         return customer;
     }
 
+    /**
+     * Sets customer.
+     *
+     * @param customer the customer
+     */
     public void setCustomer(String customer) {
         this.customer = customer;
     }
 
+    /**
+     * Gets status.
+     *
+     * @return the status
+     */
     public String getStatus() {
         return status;
     }
 
+    /**
+     * Sets status.
+     *
+     * @param status the status
+     */
     public void setStatus(String status) {
         this.status = status;
     }

@@ -1,4 +1,3 @@
-
 package org.recap.model.jaxb;
 
 import javax.xml.bind.annotation.*;
@@ -7,9 +6,9 @@ import java.io.Serializable;
 
 /**
  * <p>Java class for matchingInstitutionBibIdType complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType name="matchingInstitutionBibIdType">
  *   &lt;simpleContent>
@@ -19,8 +18,6 @@ import java.io.Serializable;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "matchingInstitutionBibIdType", propOrder = {
@@ -28,18 +25,21 @@ import java.io.Serializable;
 })
 public class MatchingInstitutionBibIdType implements Serializable{
 
+    /**
+     * The Value.
+     */
     @XmlValue
     protected String value;
+    /**
+     * The Source.
+     */
     @XmlAttribute(name = "source")
     protected String source;
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible      object is     {@link String }
      */
     public String getValue() {
         return value;
@@ -47,11 +47,8 @@ public class MatchingInstitutionBibIdType implements Serializable{
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is     {@link String }
      */
     public void setValue(String value) {
         this.value = value;
@@ -59,11 +56,8 @@ public class MatchingInstitutionBibIdType implements Serializable{
 
     /**
      * Gets the value of the source property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible      object is     {@link String }
      */
     public String getSource() {
         return source;
@@ -71,11 +65,8 @@ public class MatchingInstitutionBibIdType implements Serializable{
 
     /**
      * Sets the value of the source property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is     {@link String }
      */
     public void setSource(String value) {
         this.source = value;

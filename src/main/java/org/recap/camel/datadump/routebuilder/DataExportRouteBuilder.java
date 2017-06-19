@@ -20,11 +20,21 @@ import org.springframework.beans.factory.annotation.Value;
 /**
  * Created by peris on 11/5/16.
  */
-
 public class DataExportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(DataExportRouteBuilder.class);
 
+    /**
+     * Instantiates a new Data export route builder.
+     *
+     * @param camelContext                   the camel context
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     * @param marcXmlFormatterService        the marc xml formatter service
+     * @param scsbXmlFormatterService        the scsb xml formatter service
+     * @param deletedJsonFormatterService    the deleted json formatter service
+     * @param xmlFormatter                   the xml formatter
+     * @param dataDumpRecordsPerFile         the data dump records per file
+     */
     public DataExportRouteBuilder(CamelContext camelContext,
                                   BibliographicDetailsRepository bibliographicDetailsRepository,
                                   MarcXmlFormatterService marcXmlFormatterService,

@@ -17,17 +17,31 @@ import java.util.Map;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class DeletedJsonFormatActiveMQConsumer {
     private static final Logger logger = LoggerFactory.getLogger(DeletedJsonFormatActiveMQConsumer.class);
 
+    /**
+     * The Deleted json formatter service.
+     */
     DeletedJsonFormatterService deletedJsonFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
+    /**
+     * Instantiates a new Deleted json format active mq consumer.
+     *
+     * @param deletedJsonFormatterService the deleted json formatter service
+     */
     public DeletedJsonFormatActiveMQConsumer(DeletedJsonFormatterService deletedJsonFormatterService) {
         this.deletedJsonFormatterService = deletedJsonFormatterService;
     }
 
+    /**
+     * This method is invoked by the route to build the json format string with the deleted records list for data export.
+     *
+     * @param exchange the exchange
+     * @return the string
+     * @throws Exception the exception
+     */
     public String processDeleteJsonString(Exchange exchange) throws Exception {
         List<DeletedRecord> deletedRecordList = (List<DeletedRecord>) exchange.getIn().getBody();
         logger.info("Num records to generate json for: {} " , deletedRecordList.size());
@@ -52,6 +66,13 @@ public class DeletedJsonFormatActiveMQConsumer {
         return deletedJsonString;
     }
 
+    /**
+     * This method builds a map with the values for success report entity and sends to the route to save the report entity.
+     * @param exchange
+     * @param size
+     * @param batchHeaders
+     * @param requestId
+     */
     private void processSuccessReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId) {
         Map values = new HashMap<>();
         values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
@@ -78,6 +99,14 @@ public class DeletedJsonFormatActiveMQConsumer {
 
     }
 
+    /**
+     * This method builds a map with the values for failure report entity and sends to the route to save the report entity.
+     * @param exchange
+     * @param size
+     * @param batchHeaders
+     * @param requestId
+     * @param e
+     */
     private void processFailureReportEntity(Exchange exchange, Integer size, String batchHeaders, String requestId, Exception e) {
         Map values = new HashMap();
         values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
@@ -104,6 +133,11 @@ public class DeletedJsonFormatActiveMQConsumer {
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Gets data export header util.
+     *
+     * @return the data export header util
+     */
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {
             dataExportHeaderUtil = new DataExportHeaderUtil();

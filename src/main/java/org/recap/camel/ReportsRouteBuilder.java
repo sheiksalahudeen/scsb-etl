@@ -11,11 +11,16 @@ import org.springframework.stereotype.Component;
 /**
  * Created by peris on 8/12/16.
  */
-
 @Component
 public class ReportsRouteBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
+    /**
+     * Instantiates a new Reports route builder.
+     *
+     * @param camelContext    the camel context
+     * @param reportProcessor the report processor
+     */
     @Autowired
     public ReportsRouteBuilder(CamelContext camelContext, ReportProcessor reportProcessor) {
         try {

@@ -51,6 +51,11 @@ public class BibDataProcessor {
     @Autowired
     DBReportUtil dbReportUtil;
 
+    /**
+     * This method persists the bibliographic entities. If errors encountered prepares report entities and sends to report queue for persisting.
+     *
+     * @param etlExchange
+     */
     @Transactional
     public void processETLExchagneAndPersistToDB(ETLExchange etlExchange) {
         ReportEntity reportEntity = null;
@@ -82,6 +87,13 @@ public class BibDataProcessor {
         }
     }
 
+    /**
+     * Persists bibliographic entities and returns a report entity if an exception is encountered.
+     *
+     * @param dbReportUtil
+     * @param bibliographicEntity
+     * @return
+     */
     public ReportEntity processBibHoldingsItems(DBReportUtil dbReportUtil, BibliographicEntity bibliographicEntity) {
         ReportEntity reportEntity = new ReportEntity();
 
@@ -165,6 +177,9 @@ public class BibDataProcessor {
         return reportEntity;
     }
 
+    /**
+     * Flush and clear hibernate session.
+     */
     private void flushAndClearSession() {
         entityManager.flush();
         entityManager.clear();

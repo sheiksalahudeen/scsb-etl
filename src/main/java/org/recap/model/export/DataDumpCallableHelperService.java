@@ -19,6 +19,15 @@ import java.util.List;
 @Scope("prototype")
 public class DataDumpCallableHelperService {
 
+    /**
+     * Gets full data dump records.
+     *
+     * @param page                           the page
+     * @param size                           the size
+     * @param dataDumpRequest                the data dump request
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     * @return the full data dump records
+     */
     public List<BibliographicEntity> getFullDataDumpRecords(int page, int size, DataDumpRequest dataDumpRequest
             , BibliographicDetailsRepository bibliographicDetailsRepository) {
         Page<BibliographicEntity> bibliographicEntities;
@@ -27,6 +36,15 @@ public class DataDumpCallableHelperService {
         return bibliographicEntities.getContent();
     }
 
+    /**
+     * Gets incremental data dump records.
+     *
+     * @param page                           the page
+     * @param size                           the size
+     * @param dataDumpRequest                the data dump request
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     * @return the incremental data dump records
+     */
     public List<BibliographicEntity> getIncrementalDataDumpRecords(int page, int size, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository) {
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         Page<BibliographicEntity> bibliographicEntities;
@@ -35,6 +53,15 @@ public class DataDumpCallableHelperService {
         return bibliographicEntities.getContent();
     }
 
+    /**
+     * Gets deleted records.
+     *
+     * @param page                           the page
+     * @param size                           the size
+     * @param dataDumpRequest                the data dump request
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     * @return the deleted records
+     */
     public List<BibliographicEntity> getDeletedRecords(int page, int size, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository) {
         Page<BibliographicEntity> bibliographicEntities;
         Date inputDate = DateUtil.getDateFromString(dataDumpRequest.getDate(), RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);

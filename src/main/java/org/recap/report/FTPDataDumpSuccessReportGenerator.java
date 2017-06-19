@@ -19,28 +19,55 @@ import java.util.List;
 /**
  * Created by premkb on 29/9/16.
  */
-
 @Component
 public class FTPDataDumpSuccessReportGenerator implements ReportGeneratorInterface {
 
+    /**
+     * The Producer template.
+     */
     @Autowired
     ProducerTemplate producerTemplate;
 
+    /**
+     * Returns true if report type is 'BatchExportSuccess'.
+     *
+     * @param reportType the report type
+     * @return
+     */
     @Override
     public boolean isInterested(String reportType) {
         return reportType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT_SUCCESS) ? true : false;
     }
 
+    /**
+     * Returns true if transmission type is 'FTP'.
+     *
+     * @param transmissionType the transmission type
+     * @return
+     */
     @Override
     public boolean isTransmitted(String transmissionType) {
         return transmissionType.equalsIgnoreCase(RecapConstants.FTP) ? true : false;
     }
 
+    /**
+     * Returns true if operation type is 'BatchExport'.
+     *
+     * @param operationType the operation type
+     * @return
+     */
     @Override
     public boolean isOperationType(String operationType) {
         return operationType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT) ? true : false;
     }
 
+    /**
+     * Generates CSV report with success records for data dump.
+     *
+     * @param reportEntities the report entities
+     * @param fileName       the file name
+     * @return the file name
+     */
     @Override
     public String generateReport(List<ReportEntity> reportEntities, String fileName) {
 
@@ -53,6 +80,13 @@ public class FTPDataDumpSuccessReportGenerator implements ReportGeneratorInterfa
         return null;
     }
 
+    /**
+     * Gets data dump success report.
+     *
+     * @param reportEntities the report entities
+     * @param fileName       the file name
+     * @return the data dump success report
+     */
     public DataDumpSuccessReport getDataDumpSuccessReport(List<ReportEntity> reportEntities, String fileName) {
         DataDumpSuccessReport dataDumpSuccessReport = new DataDumpSuccessReport();
         List<DataDumpSuccessReport> dataDumpSuccessReportList = new ArrayList<>();

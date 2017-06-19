@@ -14,19 +14,28 @@ import org.springframework.stereotype.Component;
 /**
  * Created by chenchulakshmig on 10/8/16.
  */
-
 @Component
 public class DataDumpFtpRouteBuilder extends RouteBuilder {
 
     @Value("${etl.dump.ftp.staging.directory}")
     private String ftpStagingDir;
 
+    /**
+     * The File name processor for data export.
+     */
     @Autowired
     FileNameProcessorForDataExport fileNameProcessorForDataExport;
 
+    /**
+     * The Zip file processor.
+     */
     @Autowired
     ZipFileProcessor zipFileProcessor;
 
+    /**
+     * This method is to configure the route to zip the data export file and send it to FTP.
+     * @throws Exception
+     */
     @Override
     public void configure() throws Exception {
         interceptFrom(RecapConstants.DATADUMP_ZIPFILE_FTP_Q)
@@ -41,6 +50,14 @@ public class DataDumpFtpRouteBuilder extends RouteBuilder {
     }
 
     private class ExportFileDumpComplete implements Predicate {
+
+        /**
+         * Evaluates the predicate on the message exchange and returns true if this exchange matches the predicate
+         * This predicate evaluates the current page count with total pages count to identify if the exporting of data dump to a file is complete.
+         *
+         * @param exchange
+         * @return
+         */
         @Override
         public boolean matches(Exchange exchange) {
             String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
@@ -49,6 +66,12 @@ public class DataDumpFtpRouteBuilder extends RouteBuilder {
             return totalPageCount.equals(currentPageCount);
         }
 
+        /**
+         * Get the value for the key from headers.
+         * @param batchHeaderString
+         * @param key
+         * @return
+         */
         private String getValueFor(String batchHeaderString, String key) {
             return new DataExportHeaderUtil().getValueFor(batchHeaderString, key);
         }

@@ -19,10 +19,12 @@ import java.util.List;
 /**
  * Created by premkb on 29/9/16.
  */
-
 @Component
 public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterface {
 
+    /**
+     * The Producer template.
+     */
     @Autowired
     ProducerTemplate producerTemplate;
 
@@ -31,16 +33,35 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
         return reportType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT_FAILURE) ? true : false;
     }
 
+    /**
+     * Returns true if transmission type is 'FTP'.
+     *
+     * @param transmissionType the transmission type
+     * @return
+     */
     @Override
     public boolean isTransmitted(String transmissionType) {
         return transmissionType.equalsIgnoreCase(RecapConstants.FTP) ? true : false;
     }
 
+    /**
+     * Returns true if operation type is 'BatchExport'.
+     *
+     * @param operationType the operation type
+     * @return
+     */
     @Override
     public boolean isOperationType(String operationType) {
         return operationType.equalsIgnoreCase(RecapConstants.BATCH_EXPORT) ? true : false;
     }
 
+    /**
+     * Generates CSV report with failure records for data dump.
+     *
+     * @param reportEntities the report entities
+     * @param fileName       the file name
+     * @return the file name
+     */
     @Override
     public String generateReport(List<ReportEntity> reportEntities, String fileName) {
 
@@ -53,6 +74,13 @@ public class FTPDataDumpFailureReportGenerator implements ReportGeneratorInterfa
         return null;
     }
 
+    /**
+     * Gets data dump failure report.
+     *
+     * @param reportEntities the report entities
+     * @param fileName       the file name
+     * @return the data dump success report
+     */
     public DataDumpFailureReport getDataDumpFailureReport(List<ReportEntity> reportEntities, String fileName) {
         DataDumpFailureReport dataDumpFailureReport = new DataDumpFailureReport();
         List<DataDumpFailureReport> dataDumpSuccessReportList = new ArrayList<>();

@@ -13,13 +13,28 @@ import java.util.concurrent.Callable;
 public class MarcRecordPreparerCallable implements Callable {
 
     private final MarcXmlFormatterService marcXmlFormatterService;
+    /**
+     * The Bibliographic entities.
+     */
     List<BibliographicEntity> bibliographicEntities;
 
+    /**
+     * Instantiates a new Marc record preparer callable which is used for multithreading.
+     *
+     * @param bibliographicEntities   the bibliographic entities
+     * @param marcXmlFormatterService the marc xml formatter service
+     */
     public MarcRecordPreparerCallable(List<BibliographicEntity> bibliographicEntities, MarcXmlFormatterService marcXmlFormatterService) {
         this.bibliographicEntities = bibliographicEntities;
         this.marcXmlFormatterService = marcXmlFormatterService;
     }
 
+    /**
+     * This method is processed by thread to prepare MARC format bib records using bibliographic entities and are added to a Map.
+     *
+     * @return Map with success marc records and failure error messages.
+     * @throws Exception
+     */
     @Override
     public Map<String, Object> call() throws Exception {
         return marcXmlFormatterService.prepareMarcRecords(bibliographicEntities);

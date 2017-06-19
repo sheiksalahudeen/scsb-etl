@@ -23,6 +23,17 @@ public class EmailRouteBuilder {
     private String emailBodyForNoData;
     private String emailPassword;
 
+    /**
+     * Instantiates a new Email route builder.
+     *
+     * @param context           the context
+     * @param username          the username
+     * @param passwordDirectory the password directory
+     * @param from              the from
+     * @param subject           the subject
+     * @param noDataSubject     the no data subject
+     * @param smtpServer        the smtp server
+     */
     @Autowired
     public EmailRouteBuilder(CamelContext context, @Value("${data.dump.email.username}") String username, @Value("${data.dump.email.password.file}") String passwordDirectory,
                              @Value("${data.dump.email.from}") String from, @Value("${data.dump.email.subject}") String subject,@Value("${data.dump.email.nodata.subject}") String noDataSubject,

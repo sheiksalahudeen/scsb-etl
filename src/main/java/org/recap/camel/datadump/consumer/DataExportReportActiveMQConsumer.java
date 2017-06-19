@@ -13,13 +13,21 @@ import java.util.*;
 /**
  * Created by peris on 11/11/16.
  */
-
 @Component
 public class DataExportReportActiveMQConsumer {
 
+    /**
+     * The Report detail repository.
+     */
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    /**
+     * This method is invoked by the route to save the success report entity for data export using the values in Map.
+     *
+     * @param body the body
+     * @return the report entity
+     */
     public ReportEntity saveSuccessReportEntity(Map body){
         String requestingInstitutionCode = (String) body.get(RecapConstants.REQUESTING_INST_CODE);
         String institutionCodes = (String) body.get(RecapConstants.INSTITUTION_CODES);
@@ -107,6 +115,12 @@ public class DataExportReportActiveMQConsumer {
         return reportEntity;
     }
 
+    /**
+     * This method is invoked by the route to save the failure report entity for data export using the values in Map.
+     *
+     * @param body the body
+     * @return the report entity
+     */
     public ReportEntity saveFailureReportEntity(Map body){
 
         String requestingInstitutionCode = (String) body.get(RecapConstants.REQUESTING_INST_CODE);
@@ -211,10 +225,20 @@ public class DataExportReportActiveMQConsumer {
         return reportEntity;
     }
 
+    /**
+     * Gets report detail repository.
+     *
+     * @return ReportDetailRepository
+     */
     private ReportDetailRepository getReportDetailRepository() {
         return reportDetailRepository;
     }
 
+    /**
+     * Sets report detail repository.
+     *
+     * @param reportDetailRepository
+     */
     public void setReportDetailRepository(ReportDetailRepository reportDetailRepository) {
         this.reportDetailRepository = reportDetailRepository;
     }

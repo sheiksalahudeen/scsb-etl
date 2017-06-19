@@ -17,7 +17,6 @@ import java.util.concurrent.*;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class BibEntityGeneratorActiveMQConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
@@ -25,10 +24,22 @@ public class BibEntityGeneratorActiveMQConsumer {
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ExecutorService executorService;
 
+    /**
+     * Instantiates a new Bib entity generator active mq consumer.
+     *
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     */
     public BibEntityGeneratorActiveMQConsumer(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
+    /**
+     * This method is invoked by the route to build bibliographic entities using the data dump solr search results.
+     * The bibliographic entities are then passed to another route for data dump export.
+     *
+     * @param exchange the exchange
+     * @throws Exception the exception
+     */
     public void processBibEntities(Exchange exchange) throws Exception {
 
         long startTime = System.currentTimeMillis();
@@ -96,6 +107,11 @@ public class BibEntityGeneratorActiveMQConsumer {
         }
     }
 
+    /**
+     * Gets executor service.
+     *
+     * @return the executor service
+     */
     public ExecutorService getExecutorService() {
         if (null == executorService) {
             executorService = Executors.newFixedThreadPool(500);

@@ -11,6 +11,13 @@ import java.util.Map;
  * Created by peris on 11/8/16.
  */
 public class TransmissionTypeProcessorForDataExport implements Processor {
+
+    /**
+     * This method is invoked by route to set the transmission type to the exchanges for data dump process.
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");

@@ -15,6 +15,12 @@ public class FileNameProcessorForDataDumpFailure implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(FileNameProcessorForDataDumpFailure.class);
 
+    /**
+     * This method is invoked by route to set the data dump file name, report type and institution name in headers for failure data dump.
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         DataDumpFailureReport dataDumpFailureReport = (DataDumpFailureReport) exchange.getIn().getBody();

@@ -19,12 +19,24 @@ import java.io.File;
 /**
  * Created by angelind on 21/7/16.
  */
-
 @Component
 public class XmlRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
+    /**
+     * Instantiates a new Xml route builder.
+     *
+     * @param context                             the context
+     * @param xmlRecordRepository                 the xml record repository
+     * @param xmlFileLoadReportProcessor          the xml file load report processor
+     * @param xmlFileLoadExceptionReportProcessor the xml file load exception report processor
+     * @param xmlFileLoadValidator                the xml file load validator
+     * @param xmlTagName                          the xml tag name
+     * @param inputDirectoryPath                  the input directory path
+     * @param poolSize                            the pool size
+     * @param maxPoolSize                         the max pool size
+     */
     @Autowired
     public XmlRouteBuilder(CamelContext context, XmlRecordRepository xmlRecordRepository, XMLFileLoadReportProcessor xmlFileLoadReportProcessor, XMLFileLoadExceptionReportProcessor xmlFileLoadExceptionReportProcessor, XMLFileLoadValidator xmlFileLoadValidator,
                            @Value("${etl.split.xml.tag.name}") String xmlTagName,
@@ -59,6 +71,9 @@ public class XmlRouteBuilder {
 
     }
 
+    /**
+     * The type Xml file filter.
+     */
     class XmlFileFilter implements GenericFileFilter {
         @Override
         public boolean accept(GenericFile file) {

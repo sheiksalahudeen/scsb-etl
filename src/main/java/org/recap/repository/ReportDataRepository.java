@@ -11,6 +11,13 @@ import java.util.List;
  */
 public interface ReportDataRepository extends JpaRepository<ReportDataEntity, Integer> {
 
+    /**
+     * Gets report data for matching institution bib.
+     *
+     * @param recordNumList  the record num list
+     * @param headerNameList the header name list
+     * @return the report data for matching institution bib
+     */
     @Query(value="SELECT REPORTDATA FROM ReportDataEntity REPORTDATA WHERE REPORTDATA.recordNum IN (?1) AND REPORTDATA.headerName IN (?2) ORDER BY REPORTDATA.recordNum")
     List<ReportDataEntity> getReportDataForMatchingInstitutionBib(List<String> recordNumList,List<String> headerNameList);
 }

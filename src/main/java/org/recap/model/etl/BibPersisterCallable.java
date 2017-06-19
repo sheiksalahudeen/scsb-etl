@@ -320,54 +320,119 @@ public class BibPersisterCallable implements Callable {
         return getMarcUtil().getControlFieldValue(marcRecord, "001");
     }
 
+    /**
+     * Gets bib record.
+     *
+     * @return the bib record
+     */
     public BibRecord getBibRecord() {
         return bibRecord;
     }
 
+    /**
+     * Sets bib record.
+     *
+     * @param bibRecord the bib record
+     */
     public void setBibRecord(BibRecord bibRecord) {
         this.bibRecord = bibRecord;
     }
 
+    /**
+     * Gets institution entities map.
+     *
+     * @return the institution entities map
+     */
     public Map getInstitutionEntitiesMap() {
         return institutionEntitiesMap;
     }
 
+    /**
+     * Sets institution entities map.
+     *
+     * @param institutionEntitiesMap the institution entities map
+     */
     public void setInstitutionEntitiesMap(Map institutionEntitiesMap) {
         this.institutionEntitiesMap = institutionEntitiesMap;
     }
 
+    /**
+     * Gets institution name.
+     *
+     * @return the institution name
+     */
     public String getInstitutionName() {
         return institutionName;
     }
 
+    /**
+     * Sets institution name.
+     *
+     * @param institutionName the institution name
+     */
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;
     }
 
+    /**
+     * Gets item status map.
+     *
+     * @return the item status map
+     */
     public Map getItemStatusMap() {
         return itemStatusMap;
     }
 
+    /**
+     * Sets item status map.
+     *
+     * @param itemStatusMap the item status map
+     */
     public void setItemStatusMap(Map itemStatusMap) {
         this.itemStatusMap = itemStatusMap;
     }
 
+    /**
+     * Gets collection group map.
+     *
+     * @return the collection group map
+     */
     public Map getCollectionGroupMap() {
         return collectionGroupMap;
     }
 
+    /**
+     * Sets collection group map.
+     *
+     * @param collectionGroupMap the collection group map
+     */
     public void setCollectionGroupMap(Map collectionGroupMap) {
         this.collectionGroupMap = collectionGroupMap;
     }
 
+    /**
+     * Gets xml record entity.
+     *
+     * @return the xml record entity
+     */
     public XmlRecordEntity getXmlRecordEntity() {
         return xmlRecordEntity;
     }
 
+    /**
+     * Sets xml record entity.
+     *
+     * @param xmlRecordEntity the xml record entity
+     */
     public void setXmlRecordEntity(XmlRecordEntity xmlRecordEntity) {
         this.xmlRecordEntity = xmlRecordEntity;
     }
 
+    /**
+     * Gets marc util.
+     *
+     * @return the marc util
+     */
     public MarcUtil getMarcUtil() {
         if (null == marcUtil) {
             marcUtil = new MarcUtil();
@@ -375,10 +440,20 @@ public class BibPersisterCallable implements Callable {
         return marcUtil;
     }
 
+    /**
+     * Gets db report util.
+     *
+     * @return the db report util
+     */
     public DBReportUtil getDbReportUtil() {
         return dbReportUtil;
     }
 
+    /**
+     * Sets db report util.
+     *
+     * @param dbReportUtil the db report util
+     */
     public void setDbReportUtil(DBReportUtil dbReportUtil) {
         this.dbReportUtil = dbReportUtil;
     }

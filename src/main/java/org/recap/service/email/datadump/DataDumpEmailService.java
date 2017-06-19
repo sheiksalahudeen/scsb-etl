@@ -25,6 +25,17 @@ public class DataDumpEmailService {
     @Autowired
     private ProducerTemplate producer;
 
+    /**
+     * Send email with the given parameters.
+     *
+     * @param institutionCodes        the institution codes
+     * @param totalRecordCount        the total record count
+     * @param failedRecordCount       the failed record count
+     * @param transmissionType        the transmission type
+     * @param dateTimeStringForFolder the date time string for folder
+     * @param toEmailAddress          the to email address
+     * @param emailBodyFor            the email body for
+     */
     public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, Integer failedRecordCount, String transmissionType, String dateTimeStringForFolder, String toEmailAddress,String emailBodyFor) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
@@ -35,6 +46,13 @@ public class DataDumpEmailService {
         producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.DATADUMP_EMAILBODY_FOR,emailBodyFor);
     }
 
+    /**
+     * Gets the location to write data dump files for the given transmission type.
+     *
+     * @param transmissionType
+     * @param dateTimeStringForFolder
+     * @return
+     */
     private String getLocation(String transmissionType,String dateTimeStringForFolder) {
         String location = null;
         if ("0".equals(transmissionType)) {

@@ -15,10 +15,20 @@ public class VersionNumberController {
     @Value("${version.number}")
     private String versionNumber;
 
+    /**
+     * Sets application version number.
+     *
+     * @param versionNumber the version number
+     */
     public void setVersionNumber(String versionNumber) {
         this.versionNumber = versionNumber;
     }
 
+    /**
+     * API to get application version number.
+     *
+     * @return the version number
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/getVersionNumber")
     @ResponseBody
     public String getVersionNumber() {
