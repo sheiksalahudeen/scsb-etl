@@ -41,12 +41,24 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
     private MarcFactory factory;
 
+    /**
+     * Returns true if selected file format is Marc Xml format for deleted records data dump.
+     *
+     * @param formatType the format type
+     * @return
+     */
     @Override
     public boolean isInterested(String formatType) {
         return formatType.equals(RecapConstants.DATADUMP_XML_FORMAT_MARC) ? true : false;
     }
 
 
+    /**
+     * Prepare a map with marc records and failures for list of bibliographic entities.
+     *
+     * @param bibliographicEntities the bibliographic entities
+     * @return the map
+     */
     public Map<String, Object> prepareMarcRecords(List<BibliographicEntity> bibliographicEntities) {
         Map resultsMap = new HashMap();
         List<Record> records = new ArrayList<>();
@@ -73,6 +85,12 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return resultsMap;
     }
 
+    /**
+     * Prepare a map with marc record or failure for a bibliographic entity.
+     *
+     * @param bibliographicEntity the bibliographic entity
+     * @return the map
+     */
     public Map<String, Object> prepareMarcRecord(BibliographicEntity bibliographicEntity) {
         Record record = null;
         Map results = new HashMap();
@@ -92,6 +110,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return results;
     }
 
+    /**
+     * Remove selected tags from marc record.
+     * @param record
+     * @param tagList
+     */
     private void stripTagsFromBib(Record record,List<String> tagList){
         for(Iterator<DataField> dataFieldIterator = record.getDataFields().iterator();dataFieldIterator.hasNext();) {
             DataField dataField = dataFieldIterator.next();
@@ -103,6 +126,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         }
     }
 
+    /**
+     * Gets item ids from bibliographic entity
+     * @param bibliographicEntity
+     * @return
+     */
     private List<Integer> getItemIds(BibliographicEntity bibliographicEntity){
         List<Integer> itemIds = new ArrayList<>();
         List<ItemEntity> itemEntityList = bibliographicEntity.getItemEntities();
@@ -112,6 +140,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return itemIds;
     }
 
+    /**
+     * Build marc record from byte array marc content.
+     * @param content
+     * @return
+     */
     private Record getRecordFromContent(byte[] content) {
         MarcReader reader;
         Record record = null;
@@ -123,6 +156,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return record;
     }
 
+    /**
+     * Set 00l control field value with SCSB bibliographic id in the marc record.
+     * @param record
+     * @param bibliographicEntity
+     */
     private void update001Field(Record record, BibliographicEntity bibliographicEntity) {
         boolean is001Available = false;
         for (ControlField controlField : record.getControlFields()) {
@@ -144,6 +182,13 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         record.addVariableField(controlField);
     }
 
+    /**
+     * Adds holdings information tags to the marc record.
+     * @param record
+     * @param holdingsEntityList
+     * @param itemIds
+     * @return
+     */
     private Record addHoldingInfo(Record record, List<HoldingsEntity> holdingsEntityList,List<Integer> itemIds) {
         Record holdingRecord;
         for (HoldingsEntity holdingsEntity : holdingsEntityList) {
@@ -172,10 +217,20 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return record;
     }
 
+    /**
+     * Adds a '0' subfield with SCSB holdings id to the given data field.
+     * @param dataField
+     * @param holdingEntity
+     */
     private void add0SubField(DataField dataField, HoldingsEntity holdingEntity) {
         dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
     }
 
+    /**
+     * Updates 852 b field with the institution information.
+     * @param dataField
+     * @param holdingEntity
+     */
     private void update852bField(DataField dataField, HoldingsEntity holdingEntity){
         String partnerInfo = "";
         List<Subfield> subfields = dataField.getSubfields('b');
@@ -196,6 +251,13 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         dataField.addSubfield(subfield);
     }
 
+    /**
+     * Adds item information tags to the marc record.
+     * @param record
+     * @param itemEntity
+     * @param holdingsEntity
+     * @return
+     */
     private Record addItemInfo(Record record, ItemEntity itemEntity,HoldingsEntity holdingsEntity) {
         DataField dataField = getFactory().newDataField(RecapConstants.MarcFields.DF_876, ' ', ' ');
         dataField.addSubfield(getFactory().newSubfield('0', String.valueOf(holdingsEntity.getHoldingsId())));
@@ -212,6 +274,13 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return record;
     }
 
+    /**
+     * Covert marc records to marc xml string.
+     *
+     * @param recordList the record list
+     * @return the string
+     * @throws Exception the exception
+     */
     public String covertToMarcXmlString(List<Record> recordList) throws Exception {
         OutputStream out = new ByteArrayOutputStream();
         MarcWriter writer = new MarcXmlWriter(out, "UTF-8", true);
@@ -222,6 +291,11 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         return out.toString();
     }
 
+    /**
+     * Gets marc factory.
+     *
+     * @return the factory
+     */
     public MarcFactory getFactory() {
         if (null == factory) {
             factory = MarcFactory.newInstance();

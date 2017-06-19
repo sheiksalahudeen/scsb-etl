@@ -17,12 +17,21 @@ import org.springframework.stereotype.Component;
 /**
  * Created by premkb on 01/10/16.
  */
-
 @Component
 public class DataExportReportFtpRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(DataExportReportFtpRouteBuilder.class);
 
+    /**
+     * Instantiates a new Data export report ftp route builder.
+     *
+     * @param context                       the context
+     * @param ftpUserName                   the ftp user name
+     * @param ftpOnlyReportRemoteServer     the ftp only report remote server
+     * @param ftpKnownHost                  the ftp known host
+     * @param ftpPrivateKey                 the ftp private key
+     * @param ftpDumpWithReportRemoteServer the ftp dump with report remote server
+     */
     @Autowired
     public DataExportReportFtpRouteBuilder(CamelContext context,
                                            @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.datadump.report.remote.server}") String ftpOnlyReportRemoteServer,

@@ -24,11 +24,21 @@ public class DataDumpFileSystemTranmissionService implements DataDumpTransmissio
     @Autowired
     private CamelContext camelContext;
 
+    /**
+     * Returns true if transmission type is 'FileSystem' for data dump.
+     * @param dataDumpRequest the data dump request
+     * @return
+     */
     @Override
     public boolean isInterested(DataDumpRequest dataDumpRequest) {
         return dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM) ? true : false;
     }
 
+    /**
+     * Transmit data dump file to the specified path after completion.
+     * @param routeMap the route map
+     * @throws Exception
+     */
     @Override
     public void transmitDataDump(Map<String, String> routeMap) throws Exception {
         String requestingInstitutionCode = routeMap.get(RecapConstants.REQUESTING_INST_CODE);

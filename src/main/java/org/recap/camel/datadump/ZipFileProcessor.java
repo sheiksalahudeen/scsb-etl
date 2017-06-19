@@ -21,24 +21,44 @@ import java.util.StringTokenizer;
  */
 @Component
 public class ZipFileProcessor implements Processor {
+    /**
+     * The Ftp user name.
+     */
     @Value("${ftp.userName}")
     String ftpUserName;
 
+    /**
+     * The Ftp known host.
+     */
     @Value("${ftp.knownHost}")
     String ftpKnownHost;
 
+    /**
+     * The Ftp private key.
+     */
     @Value("${ftp.privateKey}")
     String ftpPrivateKey;
 
+    /**
+     * The Ftp data dump remote server.
+     */
     @Value("${ftp.datadump.remote.server}")
     String ftpDataDumpRemoteServer;
 
     @Value("${etl.dump.ftp.staging.directory}")
     private String ftpStagingDir;
 
+    /**
+     * The Data export email processor.
+     */
     @Autowired
     DataExportEmailProcessor dataExportEmailProcessor;
 
+    /**
+     * This method is invoked by route to zip the data dump files.
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");

@@ -16,10 +16,16 @@ import java.io.File;
 /**
  * Created by angelind on 18/8/16.
  */
-
 @Component
 public class CSVSuccessReportRouteBuilder {
     private static final Logger logger = LoggerFactory.getLogger(CSVSuccessReportRouteBuilder.class);
+
+    /**
+     * Instantiates a new Csv success report route builder.
+     *
+     * @param context          the context
+     * @param reportsDirectory the reports directory
+     */
     @Autowired
     public CSVSuccessReportRouteBuilder(CamelContext context, @Value("${etl.report.directory}") String reportsDirectory) {
         try {

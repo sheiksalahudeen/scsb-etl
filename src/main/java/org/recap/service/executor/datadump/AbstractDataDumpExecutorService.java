@@ -53,6 +53,14 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
     @Value("${datadump.batch.size}")
     private String dataDumpBatchSize;
 
+    /**
+     * Initiates the data dump process.
+     *
+     * @param dataDumpRequest the data dump request
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @Override
     public String process(DataDumpRequest dataDumpRequest) throws ExecutionException, InterruptedException {
         String outputString;
@@ -104,6 +112,12 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return outputString;
     }
 
+    /**
+     * Returns true if data dump search results has item ids.
+     *
+     * @param results
+     * @return
+     */
     private boolean bibHasItems(Map results) {
         List<HashMap> dataDumpSearchResults = (List<HashMap>) results.get("dataDumpSearchResults");
         for (Iterator<HashMap> iterator = dataDumpSearchResults.iterator(); iterator.hasNext(); ) {
@@ -116,6 +130,12 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return false;
     }
 
+    /**
+     * Sends the data dump solr search results to the queue to produce dump files.
+     *
+     * @param results
+     * @param headerString
+     */
     private void sendBodyAndHeader(Map results, String headerString) {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
@@ -125,6 +145,11 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Send data to HTTP queue for processing.
+     *
+     * @param outputString
+     */
     private void sendBodyForHttp(String outputString) {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
@@ -133,6 +158,11 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Send appropriate message to queue for records availability.
+     *
+     * @param outputString
+     */
     private void sendBodyForIsRecordAvailableMessage(String outputString) {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(camelContext);
         fluentProducerTemplate
@@ -141,6 +171,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Get file name for data dump.
+     *
+     * @param dataDumpRequest
+     * @param pageNum
+     * @return
+     */
     private String getFileName(DataDumpRequest dataDumpRequest, int pageNum) {
         String institutions = StringUtils.join(dataDumpRequest.getInstitutionCodes(), "-");
         return dataDumpRequest.getRequestingInstitutionCode()
@@ -154,6 +191,12 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 + pageNum;
     }
 
+    /**
+     * Get output format for the selected data dump request.
+     *
+     * @param dataDumpRequest
+     * @return
+     */
     private String getOutputFormat(DataDumpRequest dataDumpRequest) {
         switch (dataDumpRequest.getOutputFileFormat()) {
             case "0":
@@ -167,6 +210,12 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         }
     }
 
+    /**
+     * Get folder name for data dump as per the selected institution.
+     *
+     * @param dataDumpRequest
+     * @return
+     */
     private String getFolderName(DataDumpRequest dataDumpRequest) {
         String institutions = StringUtils.join(dataDumpRequest.getInstitutionCodes(), "-");
         return dataDumpRequest.getRequestingInstitutionCode()
@@ -178,6 +227,13 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
                 + dataDumpRequest.getDateTimeString();
     }
 
+    /**
+     * Returns true if the response records limit is less than or equal to total record count.
+     *
+     * @param totalRecordCount
+     * @param transmissionType
+     * @return
+     */
     private boolean canProcessRecords(Integer totalRecordCount, String transmissionType) {
         boolean canProcess = true;
         if (totalRecordCount > Integer.parseInt(httpResonseRecordLimit) && transmissionType.equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP)) {
@@ -186,6 +242,12 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return canProcess;
     }
 
+    /**
+     * Gets collection group codes for collection group ids.
+     *
+     * @param collectionGroupIds
+     * @return
+     */
     private List<String> getCodesForIds(List<Integer> collectionGroupIds) {
         List codes = new ArrayList();
         Iterable<CollectionGroupEntity> all =
@@ -200,8 +262,20 @@ public abstract class AbstractDataDumpExecutorService implements DataDumpExecuto
         return codes;
     }
 
+    /**
+     * Populate search request.
+     *
+     * @param searchRecordsRequest the search records request
+     * @param dataDumpRequest      the data dump request
+     */
     public abstract void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest);
 
+    /**
+     * Gets UTC formatted date string.
+     *
+     * @param inputDateString the input date string
+     * @return the formatted date string
+     */
     public String getFormattedDateString(String inputDateString) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         String utcStr = null;

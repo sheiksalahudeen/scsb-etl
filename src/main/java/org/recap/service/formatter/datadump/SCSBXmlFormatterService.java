@@ -34,11 +34,23 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
     @Autowired
     private MatchingBibInfoDetailRepository matchingBibInfoDetailRepository;
 
+    /**
+     * Returns true if selected file format is SCSB Xml format for deleted records data dump.
+     * @param formatType the format type
+     * @return
+     */
     @Override
     public boolean isInterested(String formatType) {
         return formatType.equals(RecapConstants.DATADUMP_XML_FORMAT_SCSB) ? true:false;
     }
 
+    /**
+     * Gets scsb format xml for list of bib records.
+     *
+     * @param bibRecords the bib records
+     * @return the scsb xml for bib records
+     * @throws Exception the exception
+     */
     public String getSCSBXmlForBibRecords(List<BibRecord> bibRecords) throws Exception{
         String formattedString;
         BibRecords bibRecords1 = new BibRecords();
@@ -48,6 +60,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return formattedString;
     }
 
+    /**
+     * Convert bib records list to scsb format xml.
+     * @param bibRecords
+     * @return
+     * @throws Exception
+     */
     private String convertToXml(BibRecords bibRecords) throws Exception {
         StringWriter stringWriter = new StringWriter();
             Marshaller jaxbMarshaller = JAXBContextHandler.getInstance().getJAXBContextForClass(BibRecords.class).createMarshaller();
@@ -57,6 +75,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return stringWriter.toString();
     }
 
+    /**
+     * Prepare a map with bib records and failures for list of bibliographic entities.
+     *
+     * @param bibliographicEntities the bibliographic entities
+     * @return the map
+     */
     public Map<String, Object> prepareBibRecords(List<BibliographicEntity> bibliographicEntities) {
         Map resultsMap = new HashMap();
         List<BibRecord> records = new ArrayList<>();
@@ -98,6 +122,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return resultsMap;
     }
 
+    /**
+     * To put bib id and record num from report table in a map.
+     * @param matchingBibInfoDetailList
+     * @return
+     */
     private Map<Integer, List<MatchingBibInfoDetail>> getRecordNumReportDataEntityMap(List<MatchingBibInfoDetail> matchingBibInfoDetailList) {
         Map<Integer, List<MatchingBibInfoDetail>> recordNumMatchingBibInfoDetailMap = new HashMap<>();
         for (MatchingBibInfoDetail matchingBibInfoDetail : matchingBibInfoDetailList) {
@@ -112,6 +141,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return recordNumMatchingBibInfoDetailMap;
     }
 
+    /**
+     * Gets bib id list from list of bibliographic entities.
+     * @param bibliographicEntityList
+     * @return
+     */
     private List<String> getBibIdList(List<BibliographicEntity> bibliographicEntityList){
         List<String> bibIdList = new ArrayList<>();
         for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
@@ -120,6 +154,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return bibIdList;
     }
 
+    /**
+     * Prepares a map with bib id as key annd matching bib record num as value using matching bib info list.
+     * @param matchingBibInfoDetailList
+     * @return
+     */
     private Map<String,Integer> getBibIdRowNumMap(List<MatchingBibInfoDetail> matchingBibInfoDetailList){
         Map<String,Integer> bibIdRownumMap = new HashMap<>();
         for(MatchingBibInfoDetail matchingBibInfoDetail: matchingBibInfoDetailList){
@@ -128,6 +167,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return bibIdRownumMap;
     }
 
+    /**
+     * Prepare a map with bib record or failure for a bibliographic entity.
+     * @param bibliographicEntity
+     * @param matchingBibInfoDetailList
+     * @return
+     */
     private Map<String, Object> prepareBibRecord(BibliographicEntity bibliographicEntity,List<MatchingBibInfoDetail> matchingBibInfoDetailList) {
         BibRecord bibRecord = null;
         Map results = new HashMap();
@@ -146,6 +191,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return results;
     }
 
+    /**
+     * Gets item ids for the given bibliographic entity.
+     * @param bibliographicEntity
+     * @return
+     */
     private List<Integer> getItemIds(BibliographicEntity bibliographicEntity){
         List<Integer> itemIds = new ArrayList<>();
         List<ItemEntity> itemEntityList = bibliographicEntity.getItemEntities();
@@ -155,6 +205,13 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return itemIds;
     }
 
+    /**
+     * Gets bib from bibliographic entity.
+     * @param bibliographicEntity
+     * @param matchingBibInfoDetailList
+     * @return
+     * @throws Exception
+     */
     private Bib getBib(BibliographicEntity bibliographicEntity,List<MatchingBibInfoDetail> matchingBibInfoDetailList) throws Exception{
         Bib bib = new Bib();
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
@@ -171,6 +228,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return bib;
     }
 
+    /**
+     * Gets matching institution bib id from list of matching bib information details.
+     * @param bibId
+     * @param matchingBibInfoDetailList
+     * @return
+     */
     private List<MatchingInstitutionBibIdType> getMatchingInstitutionBibId(String bibId,List<MatchingBibInfoDetail> matchingBibInfoDetailList) {
         List<MatchingInstitutionBibIdType> matchingInstitutionBibIdTypeList = new ArrayList<>();
         for(MatchingBibInfoDetail matchingBibInfoDetail:matchingBibInfoDetailList){
@@ -184,6 +247,13 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return matchingInstitutionBibIdTypeList;
     }
 
+    /**
+     * Gets holdinds records for the given holdings entities.
+     * @param holdingsEntityList
+     * @param itemIds
+     * @return
+     * @throws Exception
+     */
     private List<Holdings> getHoldings(List<HoldingsEntity> holdingsEntityList,List<Integer> itemIds) throws Exception{
         List<Holdings> holdingsList = new ArrayList<>();
         if (holdingsEntityList!=null && !CollectionUtils.isEmpty(holdingsEntityList)) {
@@ -210,6 +280,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return holdingsList;
     }
 
+    /**
+     * Prepares item records from item entities.
+     * @param itemEntities
+     * @return
+     */
     private Items getItems(List<ItemEntity> itemEntities) {
         Items items = new Items();
         ContentType itemContentType = new ContentType();
@@ -220,6 +295,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return items;
     }
 
+    /**
+     * Builds RecordType object from item entities for preparing bib records.
+     * @param itemEntities
+     * @return
+     */
     private List<RecordType> buildRecordTypes(List<ItemEntity> itemEntities) {
         List<RecordType> recordTypes = new ArrayList<>();
         if (itemEntities!=null) {
@@ -237,6 +317,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return recordTypes;
     }
 
+    /**
+     * Build 900 data field from item entity.
+     * @param itemEntity
+     * @return
+     */
     private DataFieldType build900DataField(ItemEntity itemEntity) {
         DataFieldType dataFieldType = new DataFieldType();
         List<SubfieldatafieldType> subfieldatafieldTypes = new ArrayList<>();
@@ -249,6 +334,11 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return dataFieldType;
     }
 
+    /**
+     * Build 876 data field from item entity.
+     * @param itemEntity
+     * @return
+     */
     private DataFieldType build876DataField(ItemEntity itemEntity) {
         DataFieldType dataFieldType = new DataFieldType();
         List<SubfieldatafieldType> subfieldatafieldTypes = new ArrayList<>();
@@ -265,6 +355,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return dataFieldType;
     }
 
+    /**
+     * Builds sub field for the given code and value.
+     * @param code
+     * @param value
+     * @return
+     */
     private SubfieldatafieldType getSubfieldatafieldType(String code, String value) {
         SubfieldatafieldType subfieldatafieldType = new SubfieldatafieldType();
         subfieldatafieldType.setCode(code);
@@ -272,6 +368,12 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         return subfieldatafieldType;
     }
 
+    /**
+     * Builds ContentType object from byte array marc content to prepare bib records.
+     * @param byteContent
+     * @return
+     * @throws Exception
+     */
     private ContentType getContentType(byte[] byteContent) throws Exception{
         String content = new String(byteContent, Charset.forName("UTF-8"));
         CollectionType collectionType;

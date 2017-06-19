@@ -14,12 +14,20 @@ import org.springframework.stereotype.Component;
 /**
  * Created by peris on 8/16/16.
  */
-
 @Component
 public class FtpFailureReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FtpFailureReportRouteBuilder.class);
 
+    /**
+     * Instantiates a new Ftp failure report route builder.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FtpFailureReportRouteBuilder(CamelContext context,
                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.remote.server}") String ftpRemoteServer,

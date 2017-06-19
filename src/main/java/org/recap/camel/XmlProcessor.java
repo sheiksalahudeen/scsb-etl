@@ -18,18 +18,28 @@ import java.util.Map;
 /**
  * Created by peris on 7/17/16.
  */
-
 public class XmlProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlProcessor.class);
 
     private final XmlRecordRepository xmlRecordRepository;
 
+    /**
+     * Instantiates a new Xml processor.
+     *
+     * @param xmlRecordRepository the xml record repository
+     */
     @Autowired
     public XmlProcessor(XmlRecordRepository xmlRecordRepository) {
         this.xmlRecordRepository = xmlRecordRepository;
     }
 
+    /**
+     * This method is invoked by route to process the xml record entity from exchange and persist.
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         String xmlRecord = (String) exchange.getIn().getBody();

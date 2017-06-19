@@ -21,11 +21,24 @@ import java.util.Map;
 public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(DeletedJsonFormatterService.class);
+
+    /**
+     * Returns true if selected file format is Json for deleted records data dump.
+     *
+     * @param formatType the format type
+     * @return
+     */
     @Override
     public boolean isInterested(String formatType) {
         return formatType.equals(RecapConstants.DATADUMP_DELETED_JSON_FORMAT) ? true:false;
     }
 
+    /**
+     * Prepare a map with deleted records and failures.
+     *
+     * @param bibliographicEntityList the bibliographic entity list
+     * @return the map
+     */
     public Map<String, Object> prepareDeletedRecords(List<BibliographicEntity> bibliographicEntityList){
         Map resultsMap = new HashMap();
         List<DeletedRecord> deletedRecords = new ArrayList<>();
@@ -53,6 +66,13 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
         return resultsMap;
     }
 
+    /**
+     * Converts deleted records list to Json string.
+     *
+     * @param deletedRecordList the deleted record list
+     * @return the json for deleted records
+     * @throws Exception the exception
+     */
     public String getJsonForDeletedRecords(List<DeletedRecord> deletedRecordList) throws Exception{
         String formattedString;
         ObjectMapper mapper = new ObjectMapper();

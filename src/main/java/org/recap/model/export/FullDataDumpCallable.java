@@ -26,6 +26,14 @@ public class FullDataDumpCallable implements Callable {
     @Autowired
     private ApplicationContext appContext;
 
+    /**
+     * Instantiates a new Full data dump callable.
+     *
+     * @param pageNum                        the page num
+     * @param batchSize                      the batch size
+     * @param dataDumpRequest                the data dump request
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     */
     public FullDataDumpCallable(int pageNum, int batchSize, DataDumpRequest dataDumpRequest, BibliographicDetailsRepository bibliographicDetailsRepository){
         this.pageNum = pageNum;
         this.batchSize = batchSize;

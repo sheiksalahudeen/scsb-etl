@@ -17,6 +17,11 @@ public class DataExportReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(DataExportReportRouteBuilder.class);
 
+    /**
+     * Instantiates a new Data export report route builder.
+     *
+     * @param camelContext the camel context
+     */
     @Autowired
     public DataExportReportRouteBuilder(CamelContext camelContext) {
         try {

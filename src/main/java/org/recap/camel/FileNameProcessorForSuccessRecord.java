@@ -15,6 +15,12 @@ public class FileNameProcessorForSuccessRecord implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(FileNameProcessorForSuccessRecord.class);
 
+    /**
+     * This method is invoked by route to set the data load report file name, directory name and report type in headers for success data load.
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         ReCAPCSVSuccessRecord reCAPCSVSuccessRecord = (ReCAPCSVSuccessRecord) exchange.getIn().getBody();

@@ -29,6 +29,12 @@ public class DataDumpTransmissionService {
     private DataDumpFtpTransmissionService dataDumpFtpTransmissionService;
 
 
+    /**
+     * Starts transmitting data dump files to a specified path.
+     *
+     * @param dataDumpRequest the data dump request
+     * @param routeMap        the route map
+     */
     public void startTranmission(DataDumpRequest dataDumpRequest, Map<String,String> routeMap){
         for(DataDumpTransmissionInterface dataDumpTransmissionInterface:getTransmissionService()){
             if(dataDumpTransmissionInterface.isInterested(dataDumpRequest)){
@@ -41,6 +47,11 @@ public class DataDumpTransmissionService {
         }
     }
 
+    /**
+     * Get transmission service list.
+     *
+     * @return the list
+     */
     public List<DataDumpTransmissionInterface> getTransmissionService(){
         if(CollectionUtils.isEmpty(dataDumpTransmissionInterfaceList)){
             dataDumpTransmissionInterfaceList = new ArrayList<>();

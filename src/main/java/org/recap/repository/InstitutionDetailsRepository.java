@@ -8,8 +8,20 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface InstitutionDetailsRepository extends PagingAndSortingRepository<InstitutionEntity, Integer> {
 
+    /**
+     * Find by institution code institution entity.
+     *
+     * @param institutionCode the institution code
+     * @return the institution entity
+     */
     InstitutionEntity findByInstitutionCode(String institutionCode);
 
+    /**
+     * Find by institution name institution entity.
+     *
+     * @param institutionName the institution name
+     * @return the institution entity
+     */
     InstitutionEntity findByInstitutionName(String institutionName);
 
 }

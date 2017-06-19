@@ -34,6 +34,9 @@ public class EtlDataLoadProcessor {
 
     private RecordProcessor recordProcessor;
 
+    /**
+     * The Producer.
+     */
     ProducerTemplate producer;
 
     private XmlRecordRepository xmlRecordRepository;
@@ -41,6 +44,9 @@ public class EtlDataLoadProcessor {
     private HoldingsDetailsRepository holdingsDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
+    /**
+     * Starts initial data load process.
+     */
     public void startLoadProcess() {
         List distinctFileNames = xmlRecordRepository.findDistinctFileNames();
         long totalStartTime = System.currentTimeMillis();
@@ -88,6 +94,17 @@ public class EtlDataLoadProcessor {
         recordProcessor.shutdownExecutorService();
     }
 
+    /**
+     * Generates success report for the initial data load.
+     * 
+     * @param oldBibsCount
+     * @param oldHoldingsCount
+     * @param oldItemsCount
+     * @param fileName
+     * @param oldBibHoldingsCount
+     * @param oldBibItemsCount
+     * @param instIdByFileName
+     */
     private void generateSuccessReport(long oldBibsCount, long oldHoldingsCount, long oldItemsCount, String fileName, long oldBibHoldingsCount, long oldBibItemsCount, Integer instIdByFileName) {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
@@ -147,74 +164,164 @@ public class EtlDataLoadProcessor {
         producer.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
+    /**
+     * Gets producer.
+     *
+     * @return the producer
+     */
     public ProducerTemplate getProducer() {
         return producer;
     }
 
+    /**
+     * Sets producer.
+     *
+     * @param producer the producer
+     */
     public void setProducer(ProducerTemplate producer) {
         this.producer = producer;
     }
 
+    /**
+     * Gets item details repository.
+     *
+     * @return the item details repository
+     */
     public ItemDetailsRepository getItemDetailsRepository() {
         return itemDetailsRepository;
     }
 
+    /**
+     * Sets item details repository.
+     *
+     * @param itemDetailsRepository the item details repository
+     */
     public void setItemDetailsRepository(ItemDetailsRepository itemDetailsRepository) {
         this.itemDetailsRepository = itemDetailsRepository;
     }
 
+    /**
+     * Gets holdings details repository.
+     *
+     * @return the holdings details repository
+     */
     public HoldingsDetailsRepository getHoldingsDetailsRepository() {
         return holdingsDetailsRepository;
     }
 
+    /**
+     * Sets holdings details repository.
+     *
+     * @param holdingsDetailsRepository the holdings details repository
+     */
     public void setHoldingsDetailsRepository(HoldingsDetailsRepository holdingsDetailsRepository) {
         this.holdingsDetailsRepository = holdingsDetailsRepository;
     }
 
+    /**
+     * Gets bibliographic details repository.
+     *
+     * @return the bibliographic details repository
+     */
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
         return bibliographicDetailsRepository;
     }
 
+    /**
+     * Sets bibliographic details repository.
+     *
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     */
     public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
+    /**
+     * Gets batch size.
+     *
+     * @return the batch size
+     */
     public Integer getBatchSize() {
         return batchSize;
     }
 
+    /**
+     * Sets batch size.
+     *
+     * @param batchSize the batch size
+     */
     public void setBatchSize(Integer batchSize) {
         this.batchSize = batchSize;
     }
 
+    /**
+     * Gets file name.
+     *
+     * @return the file name
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * Sets file name.
+     *
+     * @param fileName the file name
+     */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * Gets institution name.
+     *
+     * @return the institution name
+     */
     public String getInstitutionName() {
         return institutionName;
     }
 
+    /**
+     * Sets institution name.
+     *
+     * @param institutionName the institution name
+     */
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;
     }
 
+    /**
+     * Gets xml record repository.
+     *
+     * @return the xml record repository
+     */
     public XmlRecordRepository getXmlRecordRepository() {
         return xmlRecordRepository;
     }
 
+    /**
+     * Sets xml record repository.
+     *
+     * @param xmlRecordRepository the xml record repository
+     */
     public void setXmlRecordRepository(XmlRecordRepository xmlRecordRepository) {
         this.xmlRecordRepository = xmlRecordRepository;
     }
 
+    /**
+     * Gets record processor.
+     *
+     * @return the record processor
+     */
     public RecordProcessor getRecordProcessor() {
         return recordProcessor;
     }
 
+    /**
+     * Sets record processor.
+     *
+     * @param recordProcessor the record processor
+     */
     public void setRecordProcessor(RecordProcessor recordProcessor) {
         this.recordProcessor = recordProcessor;
     }

@@ -22,6 +22,12 @@ public class DataDumpSuccessReportGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpSuccessReportGenerator.class);
 
+    /**
+     * Prepare data dump csv success record data dump success report.
+     *
+     * @param reportEntity the report entity
+     * @return the data dump success report
+     */
     public DataDumpSuccessReport prepareDataDumpCSVSuccessRecord(ReportEntity reportEntity) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -44,6 +50,12 @@ public class DataDumpSuccessReportGenerator {
         return dataDumpSuccessReport;
     }
 
+    /**
+     * Gets setter method for the given name.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -54,6 +66,12 @@ public class DataDumpSuccessReportGenerator {
         return null;
     }
 
+    /**
+     * Gets getter method for the given name.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

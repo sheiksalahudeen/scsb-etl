@@ -21,41 +21,86 @@ import java.util.List;
 @Component
 public class ReportGenerator {
 
+    /**
+     * The Report detail repository.
+     */
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    /**
+     * The Producer template.
+     */
     @Autowired
     ProducerTemplate producerTemplate;
 
     @Value("${etl.report.directory}")
     private String reportDirectory;
 
+    /**
+     * The Csv failure report generator.
+     */
     @Autowired
     CSVFailureReportGenerator csvFailureReportGenerator;
 
+    /**
+     * The Csv success report generator.
+     */
     @Autowired
     CSVSuccessReportGenerator csvSuccessReportGenerator;
 
+    /**
+     * The Ftp failure report generator.
+     */
     @Autowired
     FTPFailureReportGenerator ftpFailureReportGenerator;
 
+    /**
+     * The Ftp success report generator.
+     */
     @Autowired
     FTPSuccessReportGenerator ftpSuccessReportGenerator;
 
+    /**
+     * The Csv data dump success report generator.
+     */
     @Autowired
     CSVDataDumpSuccessReportGenerator csvDataDumpSuccessReportGenerator;
 
+    /**
+     * The Csv data dump failure report generator.
+     */
     @Autowired
     CSVDataDumpFailureReportGenerator csvDataDumpFailureReportGenerator;
 
+    /**
+     * The Ftp data dump success report generator.
+     */
     @Autowired
     FTPDataDumpSuccessReportGenerator ftpDataDumpSuccessReportGenerator;
 
+    /**
+     * The Ftp data dump failure report generator.
+     */
     @Autowired
     FTPDataDumpFailureReportGenerator ftpDataDumpFailureReportGenerator;
 
+    /**
+     * The Report generators.
+     */
     List<ReportGeneratorInterface> reportGenerators;
 
+    /**
+     * Generate report for the type of operation.
+     *
+     * @param fileName         the file name
+     * @param operationType    the operation type
+     * @param reportType       the report type
+     * @param institutionName  the institution name
+     * @param from             the from
+     * @param to               the to
+     * @param transmissionType the transmission type
+     * @return the string
+     */
     public String generateReport(String fileName, String operationType, String reportType, String institutionName, Date from, Date to, String transmissionType) {
 
         List<ReportEntity> reportEntities;
@@ -80,6 +125,11 @@ public class ReportGenerator {
         return null;
     }
 
+    /**
+     * Gets report generators.
+     *
+     * @return the report generators
+     */
     public List<ReportGeneratorInterface> getReportGenerators() {
         if(CollectionUtils.isEmpty(reportGenerators)) {
             reportGenerators = new ArrayList<>();

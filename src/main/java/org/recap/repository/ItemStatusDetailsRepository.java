@@ -8,6 +8,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface ItemStatusDetailsRepository extends PagingAndSortingRepository<ItemStatusEntity, Integer> {
 
+    /**
+     * Find by status code item status entity.
+     *
+     * @param statusCode the status code
+     * @return the item status entity
+     */
     ItemStatusEntity findByStatusCode(String statusCode);
 
 }

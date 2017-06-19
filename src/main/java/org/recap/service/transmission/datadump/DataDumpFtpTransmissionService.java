@@ -21,26 +21,48 @@ public class DataDumpFtpTransmissionService implements DataDumpTransmissionInter
     @Value("${etl.dump.directory}")
     private String dumpDirectoryPath;
 
+    /**
+     * The Ftp user name.
+     */
     @Value("${ftp.userName}")
     String ftpUserName;
 
+    /**
+     * The Ftp known host.
+     */
     @Value("${ftp.knownHost}")
     String ftpKnownHost;
 
+    /**
+     * The Ftp private key.
+     */
     @Value("${ftp.privateKey}")
     String ftpPrivateKey;
 
+    /**
+     * The Ftp data dump remote server.
+     */
     @Value("${ftp.datadump.remote.server}")
     String ftpDataDumpRemoteServer;
 
     @Autowired
     private CamelContext camelContext;
 
+    /**
+     * Returns true if transmission type is 'FTP' for data dump.
+     * @param dataDumpRequest the data dump request
+     * @return
+     */
     @Override
     public boolean isInterested(DataDumpRequest dataDumpRequest) {
         return dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP) ? true : false;
     }
 
+    /**
+     * Transmit data dump file to the specified path after completion.
+     * @param routeMap the route map
+     * @throws Exception
+     */
     @Override
     public void transmitDataDump(Map<String, String> routeMap) throws Exception {
         String requestingInstitutionCode = routeMap.get(RecapConstants.REQUESTING_INST_CODE);

@@ -13,10 +13,22 @@ public class DataExportPredicate implements Predicate {
     private static final Logger logger = LoggerFactory.getLogger(DataExportPredicate.class);
     private Integer batchSize;
 
+    /**
+     * Instantiates a new Data export predicate.
+     *
+     * @param batchSize the batch size
+     */
     public DataExportPredicate(Integer batchSize) {
         this.batchSize = batchSize;
     }
 
+    /**
+     * Evaluates the predicate on the message exchange and returns true if this exchange matches the predicate
+     * This predicate evaluates the current page count with total pages count or the current batch size with total batch size to identify if the exporting of data export process is complete.
+     *
+     * @param exchange
+     * @return
+     */
     @Override
     public boolean matches(Exchange exchange) {
         Integer batchSizeFromHeader = (Integer) exchange.getIn().getHeader("batchSize");

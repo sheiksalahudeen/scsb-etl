@@ -14,11 +14,19 @@ import org.springframework.stereotype.Component;
 /**
  * Created by angelind on 18/8/16.
  */
-
 @Component
 public class FtpSuccessReportRouteBuilder {
     private static final Logger logger = LoggerFactory.getLogger(FtpFailureReportRouteBuilder.class);
 
+    /**
+     * Instantiates a new Ftp success report route builder.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FtpSuccessReportRouteBuilder(CamelContext context,
                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.remote.server}") String ftpRemoteServer,

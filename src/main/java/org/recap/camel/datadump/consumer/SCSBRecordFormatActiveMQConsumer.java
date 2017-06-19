@@ -20,19 +20,32 @@ import java.util.concurrent.*;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class SCSBRecordFormatActiveMQConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(SCSBRecordFormatActiveMQConsumer.class);
 
+    /**
+     * The Scsb xml formatter service.
+     */
     SCSBXmlFormatterService scsbXmlFormatterService;
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
+    /**
+     * Instantiates a new Scsb record format active mq consumer.
+     *
+     * @param scsbXmlFormatterService the scsb xml formatter service
+     */
     public SCSBRecordFormatActiveMQConsumer(SCSBXmlFormatterService scsbXmlFormatterService) {
         this.scsbXmlFormatterService = scsbXmlFormatterService;
     }
 
+    /**
+     * This method is invoked by the route to prepare bib records for data export.
+     *
+     * @param exchange the exchange
+     * @throws Exception the exception
+     */
     public void processRecords(Exchange exchange) throws Exception {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
 
@@ -95,6 +108,13 @@ public class SCSBRecordFormatActiveMQConsumer {
         fluentProducerTemplate.send();
    }
 
+    /**
+     * Process the failure records for bib records export.
+     * @param failures
+     * @param batchHeaders
+     * @param requestId
+     * @param fluentProducerTemplate
+     */
     private void processFailures(List failures, String batchHeaders, String requestId, FluentProducerTemplate fluentProducerTemplate) {
         if (!CollectionUtils.isEmpty(failures)) {
             HashMap values = new HashMap();
@@ -121,6 +141,11 @@ public class SCSBRecordFormatActiveMQConsumer {
         }
     }
 
+    /**
+     * Gets executor service.
+     *
+     * @return the executor service
+     */
     public ExecutorService getExecutorService() {
         if (null == executorService) {
             executorService = Executors.newFixedThreadPool(500);
@@ -131,6 +156,11 @@ public class SCSBRecordFormatActiveMQConsumer {
         return executorService;
     }
 
+    /**
+     * Gets data export header util.
+     *
+     * @return the data export header util
+     */
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {
             dataExportHeaderUtil = new DataExportHeaderUtil();
@@ -138,6 +168,11 @@ public class SCSBRecordFormatActiveMQConsumer {
         return dataExportHeaderUtil;
     }
 
+    /**
+     * Sets data export header util.
+     *
+     * @param dataExportHeaderUtil the data export header util
+     */
     public void setDataExportHeaderUtil(DataExportHeaderUtil dataExportHeaderUtil) {
         this.dataExportHeaderUtil = dataExportHeaderUtil;
     }

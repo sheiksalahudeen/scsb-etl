@@ -10,9 +10,15 @@ import java.util.StringTokenizer;
 /**
  * Created by peris on 11/5/16.
  */
-
 @Component
 public class DataExportHeaderUtil {
+    /**
+     * Gets value for given key from headers.
+     *
+     * @param batchHeaderString the batch header string
+     * @param key               the key
+     * @return the value for
+     */
     public String getValueFor(String batchHeaderString, String key) {
         StringTokenizer stringTokenizer = new StringTokenizer(batchHeaderString, ";");
         while(stringTokenizer.hasMoreTokens()){
@@ -24,6 +30,16 @@ public class DataExportHeaderUtil {
         return null;
     }
 
+    /**
+     * Gets batch header string.
+     *
+     * @param totalPageCount   the total page count
+     * @param currentPageCount the current page count
+     * @param folderName       the folder name
+     * @param fileName         the file name
+     * @param dataDumpRequest  the data dump request
+     * @return the batch header string
+     */
     public String getBatchHeaderString(Integer totalPageCount, Integer currentPageCount, String folderName, String fileName, DataDumpRequest dataDumpRequest) {
         StringBuilder headerString = new StringBuilder();
         headerString.append("totalPageCount")
@@ -89,6 +105,11 @@ public class DataExportHeaderUtil {
         return headerString.toString();
     }
 
+    /**
+     * Gets a string with institution codes appended by comma from data dump request.
+     * @param dataDumpRequest
+     * @return
+     */
     private String getInstitutionCodes(DataDumpRequest dataDumpRequest) {
         List<String> institutionCodes = dataDumpRequest.getInstitutionCodes();
         StringBuilder stringBuilder = new StringBuilder();
@@ -102,6 +123,11 @@ public class DataExportHeaderUtil {
         return stringBuilder.toString();
     }
 
+    /**
+     * Gets a string with collection group ids appended by comma from data dump request.
+     * @param dataDumpRequest
+     * @return
+     */
     private String getCollectionGroupIds(DataDumpRequest dataDumpRequest) {
         List<Integer> institutionCodes = dataDumpRequest.getCollectionGroupIds();
         StringBuilder stringBuilder = new StringBuilder();

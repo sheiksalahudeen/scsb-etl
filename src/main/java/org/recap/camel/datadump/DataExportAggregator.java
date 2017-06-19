@@ -13,7 +13,13 @@ import java.util.Map;
  * Created by peris on 11/5/16.
  */
 public class DataExportAggregator implements AggregationStrategy {
-
+    /**
+     * This method aggregates an old and new exchange together to create a single combined exchange.
+     * The strategy is to update the batch size in old exchange with the records size in the new exchange.
+     * @param oldExchange
+     * @param newExchange
+     * @return
+     */
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
         if (oldExchange == null) {

@@ -12,9 +12,14 @@ import java.io.StringWriter;
 /**
  * Created by peris on 11/8/16.
  */
-
 @Component
 public class XmlFormatter {
+    /**
+     * Formats the given xml string.
+     *
+     * @param xml the xml
+     * @return the string
+     */
     public String prettyPrint(final String xml) {
         if (StringUtils.isBlank(xml)) {
             throw new RuntimeException("xml was null or blank in prettyPrint()");

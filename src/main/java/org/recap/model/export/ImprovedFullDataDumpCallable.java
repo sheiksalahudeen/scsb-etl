@@ -16,10 +16,22 @@ import java.util.concurrent.Callable;
 @Scope("prototype")
 public class ImprovedFullDataDumpCallable implements Callable {
 
+    /**
+     * The Data dump search results.
+     */
     List<LinkedHashMap> dataDumpSearchResults;
 
+    /**
+     * The Bibliographic details repository.
+     */
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
+    /**
+     * Instantiates a new Improved full data dump callable.
+     *
+     * @param dataDumpSearchResults          the data dump search results
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     */
     public ImprovedFullDataDumpCallable(List<LinkedHashMap> dataDumpSearchResults, BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.dataDumpSearchResults = dataDumpSearchResults;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;

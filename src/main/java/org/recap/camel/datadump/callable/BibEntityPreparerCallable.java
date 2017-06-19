@@ -14,13 +14,28 @@ import java.util.concurrent.Callable;
 public class BibEntityPreparerCallable implements Callable {
 
     private final List<Integer> itemIds;
+    /**
+     * The Bibliographic entity.
+     */
     BibliographicEntity bibliographicEntity;
 
+    /**
+     * Instantiates a new Bib entity preparer callable which is used for multithreading.
+     *
+     * @param bibliographicEntity the bibliographic entity
+     * @param itemIds             the item ids
+     */
     public BibEntityPreparerCallable(BibliographicEntity bibliographicEntity, List<Integer> itemIds) {
         this.bibliographicEntity = bibliographicEntity;
         this.itemIds = itemIds;
     }
 
+    /**
+     * This method is processed by thread to build bibliographic entity with the item entities that are part of the passed item ids.
+     *
+     * @return BibliographicEntity
+     * @throws Exception
+     */
     @Override
     public BibliographicEntity call() throws Exception {
         List<ItemEntity> itemEntities =  bibliographicEntity.getItemEntities();

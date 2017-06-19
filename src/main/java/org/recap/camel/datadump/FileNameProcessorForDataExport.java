@@ -12,9 +12,15 @@ import java.util.Map;
 /**
  * Created by peris on 11/4/16.
  */
-
 @Component
 public class FileNameProcessorForDataExport implements Processor {
+
+    /**
+     * This method is invoked by route to set the data dump file name, report type and institution name in headers for failure data dump.
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");

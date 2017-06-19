@@ -17,11 +17,23 @@ public class FullDataDumpExecutorService extends AbstractDataDumpExecutorService
     @Value("${datadump.fetchtype.full}")
     private String fetchTypeFull;
 
+    /**
+     * Returns true if selected fetch type is full data dump.
+     *
+     * @param fetchType the fetch type
+     * @return
+     */
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(fetchTypeFull) ? true:false;
     }
 
+    /**
+     * Implementation method for populate search request for full data dump.
+     *
+     * @param searchRecordsRequest the search records request
+     * @param dataDumpRequest      the data dump reques
+     */
     @Override
     public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
         //Do nothing

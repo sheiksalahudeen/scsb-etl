@@ -17,17 +17,28 @@ import java.util.Map;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class MarcXMLFormatActiveMQConsumer {
     private static final Logger logger = LoggerFactory.getLogger(BibEntityGeneratorActiveMQConsumer.class);
 
     private MarcXmlFormatterService marcXmlFormatterService;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
+    /**
+     * Instantiates a new Marc xml format active mq consumer.
+     *
+     * @param marcXmlFormatterService the marc xml formatter service
+     */
     public MarcXMLFormatActiveMQConsumer(MarcXmlFormatterService marcXmlFormatterService) {
         this.marcXmlFormatterService = marcXmlFormatterService;
     }
 
+    /**
+     * This method is invoked by the route to build the marc xml format string with the marc records list for data export.
+     *
+     * @param exchange the exchange
+     * @return the string
+     * @throws Exception the exception
+     */
     public String processMarcXmlString(Exchange exchange) throws Exception {
         List<Record> records = (List<Record>) exchange.getIn().getBody();
         logger.info("Num records to generate marc XMl for: {} " , records.size());
@@ -51,6 +62,13 @@ public class MarcXMLFormatActiveMQConsumer {
         return toMarcXmlString;
     }
 
+    /**
+     * This method builds a map with the values for success report entity and sends to the route to save the report entity.
+     * @param exchange
+     * @param records
+     * @param batchHeaders
+     * @param requestId
+     */
     private void processSuccessReportEntity(Exchange exchange, List<Record> records, String batchHeaders, String requestId) {
         Map values = new HashMap<>();
         values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
@@ -77,6 +95,14 @@ public class MarcXMLFormatActiveMQConsumer {
 
     }
 
+    /**
+     * This method builds a map with the values for failure report entity and sends to the route to save the report entity.
+     * @param exchange
+     * @param records
+     * @param batchHeaders
+     * @param requestId
+     * @param e
+     */
     private void processFailureReportEntity(Exchange exchange, List<Record> records, String batchHeaders, String requestId, Exception e) {
         HashMap values = new HashMap();
         values.put(RecapConstants.REQUESTING_INST_CODE, getDataExportHeaderUtil().getValueFor(batchHeaders, RecapConstants.REQUESTING_INST_CODE));
@@ -103,6 +129,11 @@ public class MarcXMLFormatActiveMQConsumer {
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Gets data export header util.
+     *
+     * @return the data export header util
+     */
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {
             dataExportHeaderUtil = new DataExportHeaderUtil();
@@ -110,6 +141,11 @@ public class MarcXMLFormatActiveMQConsumer {
         return dataExportHeaderUtil;
     }
 
+    /**
+     * Sets data export header util.
+     *
+     * @param dataExportHeaderUtil the data export header util
+     */
     public void setDataExportHeaderUtil(DataExportHeaderUtil dataExportHeaderUtil) {
         this.dataExportHeaderUtil = dataExportHeaderUtil;
     }

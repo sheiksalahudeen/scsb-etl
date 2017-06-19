@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * Created by peris on 7/21/16.
  */
-
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
 public class ReCAPCSVFailureRecord implements Serializable{
     @DataField(pos = 1, columnName = "Owning Institution")
@@ -49,37 +48,80 @@ public class ReCAPCSVFailureRecord implements Serializable{
     @Ignore
     private String institutionName;
 
+    /**
+     * The Failure report re capcsv record list.
+     */
     @OneToMany(mappedTo = "org.recap.model.csv.FailureReportReCAPCSVRecord")
     List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecordList;
 
+    /**
+     * Gets failure report re capcsv record list.
+     *
+     * @return the failure report re capcsv record list
+     */
     public List<FailureReportReCAPCSVRecord> getFailureReportReCAPCSVRecordList() {
         return failureReportReCAPCSVRecordList;
     }
 
+    /**
+     * Sets failure report re capcsv record list.
+     *
+     * @param failureReportReCAPCSVRecordList the failure report re capcsv record list
+     */
     public void setFailureReportReCAPCSVRecordList(List<FailureReportReCAPCSVRecord> failureReportReCAPCSVRecordList) {
         this.failureReportReCAPCSVRecordList = failureReportReCAPCSVRecordList;
     }
 
+    /**
+     * Gets file name.
+     *
+     * @return the file name
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * Sets file name.
+     *
+     * @param fileName the file name
+     */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * Gets report type.
+     *
+     * @return the report type
+     */
     public String getReportType() {
         return reportType;
     }
 
+    /**
+     * Sets report type.
+     *
+     * @param reportType the report type
+     */
     public void setReportType(String reportType) {
         this.reportType = reportType;
     }
 
+    /**
+     * Gets institution name.
+     *
+     * @return the institution name
+     */
     public String getInstitutionName() {
         return institutionName;
     }
 
+    /**
+     * Sets institution name.
+     *
+     * @param institutionName the institution name
+     */
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;
     }

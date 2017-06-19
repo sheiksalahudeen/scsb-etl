@@ -20,19 +20,32 @@ import java.util.concurrent.*;
 /**
  * Created by peris on 11/1/16.
  */
-
 public class MarcRecordFormatActiveMQConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(MarcRecordFormatActiveMQConsumer.class);
 
+    /**
+     * The Marc xml formatter service.
+     */
     MarcXmlFormatterService marcXmlFormatterService;
     private ExecutorService executorService;
     private DataExportHeaderUtil dataExportHeaderUtil;
 
+    /**
+     * Instantiates a new Marc record format active mq consumer.
+     *
+     * @param marcXmlFormatterService the marc xml formatter service
+     */
     public MarcRecordFormatActiveMQConsumer(MarcXmlFormatterService marcXmlFormatterService) {
         this.marcXmlFormatterService = marcXmlFormatterService;
     }
 
+    /**
+     * This method is invoked by the route to prepare marc records for data export.
+     *
+     * @param exchange the exchange
+     * @throws Exception the exception
+     */
     public void processRecords(Exchange exchange) throws Exception {
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
 
@@ -96,6 +109,13 @@ public class MarcRecordFormatActiveMQConsumer {
         fluentProducerTemplate.send();
     }
 
+    /**
+     * Process the failure records for marc records export.
+     * @param exchange
+     * @param failures
+     * @param batchHeaders
+     * @param requestId
+     */
     private void processFailures(Exchange exchange, List failures, String batchHeaders, String requestId) {
         if (!CollectionUtils.isEmpty(failures)) {
             HashMap values = new HashMap();
@@ -125,6 +145,11 @@ public class MarcRecordFormatActiveMQConsumer {
         }
     }
 
+    /**
+     * Gets executor service.
+     *
+     * @return the executor service
+     */
     public ExecutorService getExecutorService() {
         if (null == executorService) {
             executorService = Executors.newFixedThreadPool(10);
@@ -135,6 +160,11 @@ public class MarcRecordFormatActiveMQConsumer {
         return executorService;
     }
 
+    /**
+     * Gets data export header util.
+     *
+     * @return the data export header util
+     */
     public DataExportHeaderUtil getDataExportHeaderUtil() {
         if (null == dataExportHeaderUtil) {
             dataExportHeaderUtil = new DataExportHeaderUtil();
@@ -142,6 +172,11 @@ public class MarcRecordFormatActiveMQConsumer {
         return dataExportHeaderUtil;
     }
 
+    /**
+     * Sets data export header util.
+     *
+     * @param dataExportHeaderUtil the data export header util
+     */
     public void setDataExportHeaderUtil(DataExportHeaderUtil dataExportHeaderUtil) {
         this.dataExportHeaderUtil = dataExportHeaderUtil;
     }

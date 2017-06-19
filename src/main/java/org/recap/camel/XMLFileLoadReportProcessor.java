@@ -17,13 +17,20 @@ import java.util.Date;
 /**
  * Created by peris on 8/19/16.
  */
-
 @Component
 public class XMLFileLoadReportProcessor implements Processor {
 
+    /**
+     * The Report detail repository.
+     */
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    /**
+     * This method is invoked by route to prepare report entity from exchange and persist.
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception {
         String institutionName = (String) exchange.getProperty(RecapConstants.INST_NAME);

@@ -13,11 +13,23 @@ import org.springframework.stereotype.Service;
 @Scope("prototype")
 public class IncrementalDataDumpExecutorService extends AbstractDataDumpExecutorService {
 
+    /**
+     * Returns true if selected fetch type is incremental data dump.
+     *
+     * @param fetchType the fetch type
+     * @return
+     */
     @Override
     public boolean isInterested(String fetchType) {
         return fetchType.equals(RecapConstants.DATADUMP_FETCHTYPE_INCREMENTAL) ? true:false;
     }
 
+    /**
+     * Populates search request with bib item last updated date.
+     *
+     * @param searchRecordsRequest the search records request
+     * @param dataDumpRequest      the data dump request
+     */
     @Override
     public void populateSearchRequest(SearchRecordsRequest searchRecordsRequest, DataDumpRequest dataDumpRequest) {
         searchRecordsRequest.setFieldName(RecapConstants.BIBITEM_LASTUPDATED_DATE);
