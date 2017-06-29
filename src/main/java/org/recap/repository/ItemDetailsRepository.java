@@ -73,4 +73,12 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
     Long findCountOfBibliographicItemsByInstId(Integer instId);
 
 
+    /**
+     * Find itementity for the given barcode .
+     *
+     * @param barcode the barcodes
+     * @return the list
+     */
+    List<ItemEntity> findByBarcode(String barcode);
+
 }
