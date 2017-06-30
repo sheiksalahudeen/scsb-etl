@@ -108,14 +108,14 @@ public class DBReportUtil {
             if(itemEntity.getCreatedDate() != null) {
                 ReportDataEntity createDateItemEntity = new ReportDataEntity();
                 createDateItemEntity.setHeaderName(RecapConstants.CREATE_DATE_ITEM);
-                createDateItemEntity.setHeaderValue(new SimpleDateFormat("mm-dd-yyyy").format(itemEntity.getCreatedDate()));
+                createDateItemEntity.setHeaderValue(new SimpleDateFormat("MM-dd-yyyy").format(itemEntity.getCreatedDate()));
                 reportEntities.add(createDateItemEntity);
             }
 
             if(itemEntity.getLastUpdatedDate() != null) {
                 ReportDataEntity lastUpdateItemEntity = new ReportDataEntity();
                 lastUpdateItemEntity.setHeaderName(RecapConstants.LAST_UPDATED_DATE_ITEM);
-                lastUpdateItemEntity.setHeaderValue(new SimpleDateFormat("mm-dd-yyyy").format(itemEntity.getLastUpdatedDate()));
+                lastUpdateItemEntity.setHeaderValue(new SimpleDateFormat("MM-dd-yyyy").format(itemEntity.getLastUpdatedDate()));
                 reportEntities.add(lastUpdateItemEntity);
             }
 
