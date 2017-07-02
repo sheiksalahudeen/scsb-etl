@@ -58,7 +58,7 @@ public class BibDataProcessor {
                 etlDataLoadDAOService.saveBibliographicEntityList(bibliographicEntityList);
             } catch (PersistenceException pe){
                 try {
-                    reportEntity = processRecordWhenDuplicateBarcodeException(reportEntity, bibliographicEntityList, pe);
+                    processRecordWhenDuplicateBarcodeException(bibliographicEntityList, pe);
                 } catch(Exception e) {
                     logger.info("exception while eliminating..");
                     logger.error(RecapConstants.ERROR,e);
@@ -84,35 +84,42 @@ public class BibDataProcessor {
         }
     }
 
-    private ReportEntity processRecordWhenDuplicateBarcodeException(ReportEntity reportEntity, List<BibliographicEntity> bibliographicEntityList, PersistenceException pe) {
+    private void processRecordWhenDuplicateBarcodeException(List<BibliographicEntity> bibliographicEntityList, PersistenceException pe) {
         logger.error("persistence exe-->",pe);
         etlDataLoadDAOService.clearSession();
         for(BibliographicEntity bibliographicEntity:bibliographicEntityList){
-            reportEntity = processDuplicatedRecord(reportEntity,bibliographicEntity);
+            List<ReportEntity> reportEntityList = processDuplicatedRecord(bibliographicEntity);
+            for(ReportEntity reportEntity1:reportEntityList){
+                producer.sendBody(RecapConstants.REPORT_Q, reportEntity1);
+            }
         }
-        return reportEntity;
     }
 
-    private ReportEntity processDuplicatedRecord(ReportEntity reportEntity,  BibliographicEntity bibliographicEntity) {
+    private List<ReportEntity> processDuplicatedRecord(BibliographicEntity bibliographicEntity) {
+        List<ReportEntity> reportEntityList = new ArrayList<>();
         bibliographicEntity.setItemEntities(new ArrayList<>());
         List<HoldingsEntity> updatedHoldingEntityList = new ArrayList<>();
+        List<ItemEntity> nonDuplicateItemsForABib = new ArrayList<>();//This list is used to eliminate the duplicate barcode if found in the same bib
         for (HoldingsEntity holdingsEntity:bibliographicEntity.getHoldingsEntities()){
             List<ItemEntity> itemEntityListWithNoDuplicatedBarcode = new ArrayList<>();
             for (ItemEntity itemEntity:holdingsEntity.getItemEntities()){
                 List<ItemEntity> existingItemEntityList = itemDetailsRepository.findByBarcode(itemEntity.getBarcode());
                 logger.info("Processing own bib {}, own hold id {}, own item id {}",bibliographicEntity.getOwningInstitutionBibId(),
                         holdingsEntity.getOwningInstitutionHoldingsId(),itemEntity.getOwningInstitutionItemId());
-                 if(isDuplicateItem(existingItemEntityList,itemEntity))   {//Add to report if duplicate barcode found
+                if(isDuplicateItem(existingItemEntityList,itemEntity))   {//Add to report if duplicate barcode found
                     logger.info("existing barcode--->{}",existingItemEntityList.get(0).getBarcode());
                     ItemEntity existingItemEntity = existingItemEntityList.get(0);
-                    reportEntity = setDuplicateBarcodeReportInfo(itemEntity.getBarcode(),existingItemEntity,dbReportUtil,bibliographicEntity, reportEntity, holdingsEntity, itemEntity);
+                    ReportEntity reportEntity = setDuplicateBarcodeReportInfo(itemEntity.getBarcode(),existingItemEntity,dbReportUtil,bibliographicEntity, holdingsEntity, itemEntity);
+                    reportEntityList.add(reportEntity);
                 } else {
-                    logger.info("Duplicate not found for the barcode in other bib, barcode-->{}",itemEntity.getBarcode());
-                    ItemEntity existingItemEntity = getExistingBarcodeItemWithinSameBib(itemEntityListWithNoDuplicatedBarcode,itemEntity);//If the item is not available in db but barcode is duplicated in the same bib,so this is to find the barcode already added to the bib to save, if the barcode is already there the current item which is having same barcode will be eliminated by below conditions
+                    logger.info("Duplicate not found for the barcode-->{}",itemEntity.getBarcode());
+                    ItemEntity existingItemEntity = getExistingBarcodeItemWithinSameBib(nonDuplicateItemsForABib,itemEntity);//If the item is not available in db but barcode is duplicated in the same bib,so this is to find the barcode already added to the bib to save, if the barcode is already there the current item which is having same barcode will be eliminated by below conditions
                     if (existingItemEntity == null) {
                         itemEntityListWithNoDuplicatedBarcode.add(itemEntity);
+                        nonDuplicateItemsForABib.add(itemEntity);
                     } else {
-                        reportEntity = setDuplicateBarcodeReportInfoForItemsinSameBib(existingItemEntity.getBarcode(),existingItemEntity,dbReportUtil,bibliographicEntity, reportEntity, holdingsEntity, itemEntity);
+                        ReportEntity reportEntity = setDuplicateBarcodeReportInfoForItemsinSameBib(existingItemEntity.getBarcode(),existingItemEntity,dbReportUtil,bibliographicEntity, holdingsEntity, itemEntity);
+                        reportEntityList.add(reportEntity);
                     }
                 }
             }
@@ -127,7 +134,7 @@ public class BibDataProcessor {
             logger.info("saving bib id--->{} item ids - barcodes-->{}",bibliographicEntity.getOwningInstitutionBibId(),getBarcodeList(bibliographicEntity.getItemEntities()));
             etlDataLoadDAOService.saveBibliographicEntity(bibliographicEntity);
         }
-        return reportEntity;
+        return reportEntityList;
     }
 
     private boolean isDuplicateItem(List<ItemEntity> existingItemEntityList,ItemEntity itemEntity ){
@@ -160,22 +167,22 @@ public class BibDataProcessor {
         return null;
     }
 
-    private ReportEntity setDuplicateBarcodeReportInfo(String barcode, ItemEntity existingItemEntity,DBReportUtil dbReportUtil, BibliographicEntity bibliographicEntity, ReportEntity reportEntity,HoldingsEntity holdingsEntity, ItemEntity itemEntity){
+    private ReportEntity setDuplicateBarcodeReportInfo(String barcode, ItemEntity existingItemEntity,DBReportUtil dbReportUtil, BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, ItemEntity itemEntity){
         String failureMessage = "Item barcode "+barcode+" is duplicated, existing record info owning inst bib id "
                 +existingItemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId()
                 +", owning inst holding id "+existingItemEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId()
                 +", owning inst item id "+existingItemEntity.getOwningInstitutionItemId();
-        reportEntity = new ReportEntity();
+        ReportEntity reportEntity = new ReportEntity();
         setItemFailureReportInfo(dbReportUtil, bibliographicEntity, reportEntity, holdingsEntity, itemEntity, null,failureMessage);
         return reportEntity;
     }
 
-    private ReportEntity setDuplicateBarcodeReportInfoForItemsinSameBib(String barcode, ItemEntity existingItemEntity,DBReportUtil dbReportUtil, BibliographicEntity bibliographicEntity, ReportEntity reportEntity,HoldingsEntity holdingsEntity, ItemEntity itemEntity){
+    private ReportEntity setDuplicateBarcodeReportInfoForItemsinSameBib(String barcode, ItemEntity existingItemEntity,DBReportUtil dbReportUtil, BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, ItemEntity itemEntity){
         String failureMessage = "Item barcode "+barcode+" is duplicated, existing record info owning inst bib id "
                 +bibliographicEntity.getOwningInstitutionBibId()
                 +", owning inst holding id "+holdingsEntity.getOwningInstitutionHoldingsId()
                 +", owning inst item id "+existingItemEntity.getOwningInstitutionItemId();
-        reportEntity = new ReportEntity();
+        ReportEntity reportEntity = new ReportEntity();
         setItemFailureReportInfo(dbReportUtil, bibliographicEntity, reportEntity, holdingsEntity, itemEntity, null,failureMessage);
         return reportEntity;
     }
@@ -259,10 +266,11 @@ public class BibDataProcessor {
                                           Exception itemEx,String failureMessage) {
         List<ReportDataEntity> reportDataEntities = dbReportUtil.generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
         ReportDataEntity exceptionReportDataEntity = new ReportDataEntity();
-        exceptionReportDataEntity.setHeaderName(RecapConstants.EXCEPTION_MESSAGE);
         if (failureMessage!=null) {
+            exceptionReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
             exceptionReportDataEntity.setHeaderValue(failureMessage);
         } else {
+            exceptionReportDataEntity.setHeaderName(RecapConstants.EXCEPTION_MESSAGE);
             exceptionReportDataEntity.setHeaderValue(itemEx.getCause().getCause().getMessage());
         }
         reportDataEntities.add(exceptionReportDataEntity);
