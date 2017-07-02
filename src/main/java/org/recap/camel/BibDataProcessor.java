@@ -99,6 +99,7 @@ public class BibDataProcessor {
         List<ReportEntity> reportEntityList = new ArrayList<>();
         bibliographicEntity.setItemEntities(new ArrayList<>());
         List<HoldingsEntity> updatedHoldingEntityList = new ArrayList<>();
+        List<ItemEntity> nonDuplicateItemsForABib = new ArrayList<>();//This list is used to eliminate the duplicate barcode if found in the same bib
         for (HoldingsEntity holdingsEntity:bibliographicEntity.getHoldingsEntities()){
             List<ItemEntity> itemEntityListWithNoDuplicatedBarcode = new ArrayList<>();
             for (ItemEntity itemEntity:holdingsEntity.getItemEntities()){
@@ -111,10 +112,11 @@ public class BibDataProcessor {
                     ReportEntity reportEntity = setDuplicateBarcodeReportInfo(itemEntity.getBarcode(),existingItemEntity,dbReportUtil,bibliographicEntity, holdingsEntity, itemEntity);
                     reportEntityList.add(reportEntity);
                 } else {
-                    logger.info("Duplicate not found for the barcode in other bib, barcode-->{}",itemEntity.getBarcode());
-                    ItemEntity existingItemEntity = getExistingBarcodeItemWithinSameBib(itemEntityListWithNoDuplicatedBarcode,itemEntity);//If the item is not available in db but barcode is duplicated in the same bib,so this is to find the barcode already added to the bib to save, if the barcode is already there the current item which is having same barcode will be eliminated by below conditions
+                    logger.info("Duplicate not found for the barcode-->{}",itemEntity.getBarcode());
+                    ItemEntity existingItemEntity = getExistingBarcodeItemWithinSameBib(nonDuplicateItemsForABib,itemEntity);//If the item is not available in db but barcode is duplicated in the same bib,so this is to find the barcode already added to the bib to save, if the barcode is already there the current item which is having same barcode will be eliminated by below conditions
                     if (existingItemEntity == null) {
                         itemEntityListWithNoDuplicatedBarcode.add(itemEntity);
+                        nonDuplicateItemsForABib.add(itemEntity);
                     } else {
                         ReportEntity reportEntity = setDuplicateBarcodeReportInfoForItemsinSameBib(existingItemEntity.getBarcode(),existingItemEntity,dbReportUtil,bibliographicEntity, holdingsEntity, itemEntity);
                         reportEntityList.add(reportEntity);
