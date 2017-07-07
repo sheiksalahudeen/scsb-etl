@@ -88,7 +88,7 @@ public class SCSBRecordFormatActiveMQConsumer {
             if (!CollectionUtils.isEmpty(failureRecords)) {
                 failures.addAll(failureRecords);
             }
-            Integer itemCount = (Integer) results.get("itemExportedCount");
+            Integer itemCount = (Integer) results.get(RecapConstants.ITEM_EXPORTED_COUNT);
             if (itemCount !=0 && itemCount != null){
                 itemExportedCountList.add(itemCount);
             }
@@ -112,7 +112,7 @@ public class SCSBRecordFormatActiveMQConsumer {
                 .withHeader(RecapConstants.BATCH_HEADERS, exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
                 .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"))
-                .withHeader("itemExportedCount",itemExportedCount);
+                .withHeader(RecapConstants.ITEM_EXPORTED_COUNT,itemExportedCount);
         fluentProducerTemplate.send();
    }
 

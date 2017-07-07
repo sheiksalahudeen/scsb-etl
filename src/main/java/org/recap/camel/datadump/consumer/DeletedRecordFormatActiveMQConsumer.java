@@ -90,7 +90,7 @@ public class DeletedRecordFormatActiveMQConsumer {
             if (CollectionUtils.isNotEmpty(failureRecords)) {
                 failures.addAll(failureRecords);
             }
-            Integer itemCount = (Integer) results.get("itemExportedCount");
+            Integer itemCount = (Integer) results.get(RecapConstants.ITEM_EXPORTED_COUNT);
             if (itemCount !=0 && itemCount != null){
                 itemExportedCountList.add(itemCount);
             }
