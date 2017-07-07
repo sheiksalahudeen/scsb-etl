@@ -78,7 +78,7 @@ public class MarcRecordFormatActiveMQConsumer {
                         throw new RuntimeException(e);
                     }
                 });
-
+        List<Integer> itemExportedCountList = new ArrayList<>();
         List failures = new ArrayList();
         for (Future future : futureList) {
             Map<String, Object> results = (Map<String, Object>) future.get();
@@ -90,8 +90,15 @@ public class MarcRecordFormatActiveMQConsumer {
             if (!CollectionUtils.isEmpty(failureRecords)) {
                 failures.addAll(failureRecords);
             }
+            Integer itemCount = (Integer) results.get("itemExportedCount");
+            if (itemCount !=0 && itemCount != null){
+                itemExportedCountList.add(itemCount);
+            }
         }
-
+        Integer itemExportedCount = 0;
+        for (Integer itemCount : itemExportedCountList) {
+            itemExportedCount = itemExportedCount + itemCount;
+        }
         String batchHeaders = (String) exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         processFailures(exchange, failures, batchHeaders, requestId);
@@ -105,7 +112,8 @@ public class MarcRecordFormatActiveMQConsumer {
                 .withBody(records)
                 .withHeader(RecapConstants.BATCH_HEADERS, exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS))
                 .withHeader(RecapConstants.EXPORT_FORMAT, exchange.getIn().getHeader(RecapConstants.EXPORT_FORMAT))
-                .withHeader(RecapConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(RecapConstants.TRANSMISSION_TYPE));
+                .withHeader(RecapConstants.TRANSMISSION_TYPE, exchange.getIn().getHeader(RecapConstants.TRANSMISSION_TYPE))
+                .withHeader(RecapConstants.ITEM_EXPORTED_COUNT,itemExportedCount);
         fluentProducerTemplate.send();
     }
 

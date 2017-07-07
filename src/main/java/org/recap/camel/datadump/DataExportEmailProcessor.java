@@ -97,6 +97,7 @@ public class DataExportEmailProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         String totalRecordCount = "0";
         String failedBibs = "0";
+        String exportedItemCount = "0";
         List<ReportEntity> byFileName = reportDetailRepository.findByFileName(requestId);
         List<ReportEntity> successReportEntities = new ArrayList<>();
         List<ReportEntity> failureReportEntities = new ArrayList<>();
@@ -110,6 +111,9 @@ public class DataExportEmailProcessor implements Processor {
                 if(reportDataEntity.getHeaderName().equals(RecapConstants.FAILED_BIBS)){
                     failedBibs = reportDataEntity.getHeaderValue();
                 }
+                if(reportDataEntity.getHeaderName().equals("ExportedItemCount")){
+                    exportedItemCount = reportDataEntity.getHeaderValue();
+                }
             }
             if(reportEntity.getType().equalsIgnoreCase(RecapConstants.BATCH_EXPORT_SUCCESS)) {
                 successReportEntities.add(reportEntity);
@@ -119,7 +123,7 @@ public class DataExportEmailProcessor implements Processor {
         }
         sendBatchExportReportToFTP(successReportEntities, RecapConstants.SUCCESS);
         sendBatchExportReportToFTP(failureReportEntities, RecapConstants.FAILURE);
-        processEmail(totalRecordCount,failedBibs);
+        processEmail(totalRecordCount,failedBibs,exportedItemCount);
         if(fetchType.equals(fetchTypeFull)) {
             writeFullDumpStatusToFile();
         }
@@ -168,8 +172,9 @@ public class DataExportEmailProcessor implements Processor {
      * To send an email for data dump export process.
      * @param totalRecordCount
      * @param failedBibs
+     * @param exportedItemCount
      */
-    private void processEmail(String totalRecordCount,String failedBibs){
+    private void processEmail(String totalRecordCount, String failedBibs, String exportedItemCount){
         if (transmissionType.equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)
                 ||transmissionType.equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FILESYSTEM)) {
             dataDumpEmailService.sendEmail(institutionCodes,
@@ -178,7 +183,8 @@ public class DataExportEmailProcessor implements Processor {
                     transmissionType,
                     this.folderName,
                     toEmailId,
-                    RecapConstants.DATADUMP_DATA_AVAILABLE
+                    RecapConstants.DATADUMP_DATA_AVAILABLE,
+                    Integer.valueOf(exportedItemCount)
             );
         }
     }

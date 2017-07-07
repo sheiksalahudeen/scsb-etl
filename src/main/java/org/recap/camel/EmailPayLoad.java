@@ -13,6 +13,7 @@ public class EmailPayLoad implements Serializable{
     private Integer count;
     private Integer failedCount;
     private String to;
+    private Integer itemCount;
 
     /**
      * Gets institutions.
@@ -102,5 +103,13 @@ public class EmailPayLoad implements Serializable{
      */
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public Integer getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(Integer itemCount) {
+        this.itemCount = itemCount;
     }
 }

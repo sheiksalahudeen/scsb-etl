@@ -40,6 +40,7 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
      * @return the map
      */
     public Map<String, Object> prepareDeletedRecords(List<BibliographicEntity> bibliographicEntityList){
+        int itemExportedCount = 0;
         Map resultsMap = new HashMap();
         List<DeletedRecord> deletedRecords = new ArrayList<>();
         List<String> errors = new ArrayList<>();
@@ -53,6 +54,7 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
                 }
                 deletedRecord.setItemBarcodes(itemBarcodes);
                 deletedRecords.add(deletedRecord);
+                itemExportedCount = itemExportedCount + bibliographicEntity.getItemEntities().size();
             } catch (Exception e) {
                 logger.error(RecapConstants.ERROR,e);
                 errors.add(String.valueOf(e.getCause()));
@@ -61,6 +63,7 @@ public class DeletedJsonFormatterService implements DataDumpFormatterInterface {
 
         resultsMap.put(RecapConstants.SUCCESS, deletedRecords);
         resultsMap.put(RecapConstants.FAILURE, errors);
+        resultsMap.put(RecapConstants.ITEM_EXPORTED_COUNT, itemExportedCount);
 
 
         return resultsMap;

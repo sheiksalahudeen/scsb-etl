@@ -83,6 +83,7 @@ public class MarcXMLFormatActiveMQConsumer {
         values.put(RecapConstants.NUM_BIBS_EXPORTED, RecapConstants.NUM_BIBS_EXPORTED);
         values.put(RecapConstants.BATCH_EXPORT, RecapConstants.BATCH_EXPORT_SUCCESS);
         values.put(RecapConstants.REQUEST_ID, requestId);
+        values.put(RecapConstants.ITEM_EXPORTED_COUNT,exchange.getIn().getHeader(RecapConstants.ITEM_EXPORTED_COUNT));
 
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate
