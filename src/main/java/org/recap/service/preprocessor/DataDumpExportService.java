@@ -93,7 +93,8 @@ public class DataDumpExportService {
                             dataDumpRequest.getTransmissionType(),
                             null,
                             dataDumpRequest.getToEmailAddress(),
-                            RecapConstants.DATADUMP_NO_DATA_AVAILABLE
+                            RecapConstants.DATADUMP_NO_DATA_AVAILABLE,
+                            Integer.valueOf(0)
                     );
                 }
             }

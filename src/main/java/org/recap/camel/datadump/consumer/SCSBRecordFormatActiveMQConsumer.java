@@ -76,7 +76,7 @@ public class SCSBRecordFormatActiveMQConsumer {
                         throw new RuntimeException(e);
                     }
                 });
-
+        List<Integer> itemExportedCountList = new ArrayList<>();
         List failures = new ArrayList();
         for (Future future : futureList) {
             Map<String, Object> results = (Map<String, Object>) future.get();
@@ -88,8 +88,15 @@ public class SCSBRecordFormatActiveMQConsumer {
             if (!CollectionUtils.isEmpty(failureRecords)) {
                 failures.addAll(failureRecords);
             }
+            Integer itemCount = (Integer) results.get(RecapConstants.ITEM_EXPORTED_COUNT);
+            if (itemCount !=0 && itemCount != null){
+                itemExportedCountList.add(itemCount);
+            }
         }
-
+        Integer itemExportedCount = 0;
+        for (Integer itemCount : itemExportedCountList) {
+            itemExportedCount = itemExportedCount + itemCount;
+        }
         String batchHeaders = (String) exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS);
         String requestId = getDataExportHeaderUtil().getValueFor(batchHeaders, "requestId");
         processFailures(failures, batchHeaders, requestId, fluentProducerTemplate);
@@ -104,7 +111,8 @@ public class SCSBRecordFormatActiveMQConsumer {
                 .withBody(records)
                 .withHeader(RecapConstants.BATCH_HEADERS, exchange.getIn().getHeader(RecapConstants.BATCH_HEADERS))
                 .withHeader("exportFormat", exchange.getIn().getHeader("exportFormat"))
-                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"));
+                .withHeader("transmissionType", exchange.getIn().getHeader("transmissionType"))
+                .withHeader(RecapConstants.ITEM_EXPORTED_COUNT,itemExportedCount);
         fluentProducerTemplate.send();
    }
 

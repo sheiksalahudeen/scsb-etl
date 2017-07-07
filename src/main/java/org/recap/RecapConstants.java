@@ -207,6 +207,7 @@ public class RecapConstants {
 
     //Logger
     public static final String ERROR = "error-->";
+    public static final String ITEM_EXPORTED_COUNT = "itemExportedCount";
 
     public class MarcFields {
         public static final String CF_001 = "001";

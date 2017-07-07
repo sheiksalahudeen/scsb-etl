@@ -41,6 +41,7 @@ public class DataExportReportActiveMQConsumer {
         String requestId = (String) (body.get(RecapConstants.REQUEST_ID));
         String numBibsExported = (String) body.get(RecapConstants.NUM_BIBS_EXPORTED);
         String numRecords = (String) body.get(RecapConstants.NUM_RECORDS);
+        Integer exportedItemCount = (Integer) body.get(RecapConstants.ITEM_EXPORTED_COUNT);
 
         List<ReportEntity> byFileName = getReportDetailRepository().findByFileNameAndType(requestId, RecapConstants.BATCH_EXPORT_SUCCESS);
 
@@ -98,6 +99,12 @@ public class DataExportReportActiveMQConsumer {
             reportDataEntities.add(reportDataEntityMailedTo);
             reportDataEntityMailedTo.setHeaderName("ToEmailId");
             reportDataEntityMailedTo.setHeaderValue(toEmailId);
+
+            ReportDataEntity reportDataEntityExportedItemCount = new ReportDataEntity();
+            reportDataEntities.add(reportDataEntityExportedItemCount);
+            reportDataEntityExportedItemCount.setHeaderName("ExportedItemCount");
+            reportDataEntityExportedItemCount.setHeaderValue(String.valueOf(exportedItemCount));
+
 
         } else {
             reportEntity = byFileName.get(0);

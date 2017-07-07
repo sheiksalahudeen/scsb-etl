@@ -36,13 +36,14 @@ public class DataDumpEmailService {
      * @param toEmailAddress          the to email address
      * @param emailBodyFor            the email body for
      */
-    public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, Integer failedRecordCount, String transmissionType, String dateTimeStringForFolder, String toEmailAddress,String emailBodyFor) {
+    public void sendEmail(List<String> institutionCodes, Integer totalRecordCount, Integer failedRecordCount, String transmissionType, String dateTimeStringForFolder, String toEmailAddress,String emailBodyFor,Integer exportedItemCount) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setInstitutions(institutionCodes);
         emailPayLoad.setLocation(getLocation(transmissionType,dateTimeStringForFolder));
         emailPayLoad.setCount(totalRecordCount);
         emailPayLoad.setFailedCount(failedRecordCount);
         emailPayLoad.setTo(toEmailAddress);
+        emailPayLoad.setItemCount(exportedItemCount);
         producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.DATADUMP_EMAILBODY_FOR,emailBodyFor);
     }
 

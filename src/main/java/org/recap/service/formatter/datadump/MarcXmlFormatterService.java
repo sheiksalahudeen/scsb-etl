@@ -63,7 +63,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
         Map resultsMap = new HashMap();
         List<Record> records = new ArrayList<>();
         List<String> errors = new ArrayList<>();
-
+        int itemExportedCount = 0;
         for (Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator(); iterator.hasNext(); ) {
             BibliographicEntity bibliographicEntity = iterator.next();
             if(CollectionUtils.isNotEmpty(bibliographicEntity.getItemEntities())) {
@@ -71,6 +71,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
                 Record record = (Record) stringObjectMap.get(RecapConstants.SUCCESS);
                 if (null != record) {
                     records.add(record);
+                    itemExportedCount = itemExportedCount + bibliographicEntity.getItemEntities().size();
                 }
                 String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
                 if (null != failureMsg) {
@@ -81,6 +82,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
 
         resultsMap.put(RecapConstants.SUCCESS, records);
         resultsMap.put(RecapConstants.FAILURE, errors);
+        resultsMap.put(RecapConstants.ITEM_EXPORTED_COUNT, itemExportedCount);
 
         return resultsMap;
     }

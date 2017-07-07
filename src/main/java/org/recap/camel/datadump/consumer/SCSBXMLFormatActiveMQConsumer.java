@@ -93,6 +93,7 @@ public class SCSBXMLFormatActiveMQConsumer {
         values.put(RecapConstants.NUM_BIBS_EXPORTED, RecapConstants.NUM_BIBS_EXPORTED);
         values.put(RecapConstants.BATCH_EXPORT, RecapConstants.BATCH_EXPORT_SUCCESS);
         values.put(RecapConstants.REQUEST_ID, requestId);
+        values.put(RecapConstants.ITEM_EXPORTED_COUNT,exchange.getIn().getHeader("itemExportedCount"));
 
         FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
         fluentProducerTemplate

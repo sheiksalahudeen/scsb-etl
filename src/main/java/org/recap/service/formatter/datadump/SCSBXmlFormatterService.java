@@ -82,6 +82,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
      * @return the map
      */
     public Map<String, Object> prepareBibRecords(List<BibliographicEntity> bibliographicEntities) {
+        int itemExportedCount = 0;
         Map resultsMap = new HashMap();
         List<BibRecord> records = new ArrayList<>();
         List<String> errors = new ArrayList<>();
@@ -110,6 +111,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
                 BibRecord bibRecord = (BibRecord) stringObjectMap.get(RecapConstants.SUCCESS);
                 if (null != bibRecord) {
                     records.add(bibRecord);
+                    itemExportedCount = itemExportedCount + bibliographicEntity.getItemEntities().size();
                 }
                 String failureMsg = (String) stringObjectMap.get(RecapConstants.FAILURE);
                 if (null != failureMsg) {
@@ -119,6 +121,7 @@ public class SCSBXmlFormatterService implements DataDumpFormatterInterface {
         }
         resultsMap.put(RecapConstants.SUCCESS, records);
         resultsMap.put(RecapConstants.FAILURE, errors);
+        resultsMap.put(RecapConstants.ITEM_EXPORTED_COUNT, itemExportedCount);
         return resultsMap;
     }
 

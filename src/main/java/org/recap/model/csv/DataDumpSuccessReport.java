@@ -32,7 +32,8 @@ public class DataDumpSuccessReport implements Serializable{
     private String toEmailId;
     @DataField(pos = 9, columnName = "No of Bibs Exported")
     private String noOfBibsExported;
-
+    @DataField(pos = 10, columnName = "No of Items Exported")
+    private String exportedItemCount;
 
     @Ignore
     private String fileName;
@@ -282,5 +283,13 @@ public class DataDumpSuccessReport implements Serializable{
      */
     public void setDataDumpSuccessReportList(List<DataDumpSuccessReport> dataDumpSuccessReportList) {
         this.dataDumpSuccessReportList = dataDumpSuccessReportList;
+    }
+
+    public String getExportedItemCount() {
+        return exportedItemCount;
+    }
+
+    public void setExportedItemCount(String exportedItemCount) {
+        this.exportedItemCount = exportedItemCount;
     }
 }
