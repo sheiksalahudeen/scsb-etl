@@ -41,7 +41,8 @@ public class DataExportRouteBuilder {
                                   SCSBXmlFormatterService scsbXmlFormatterService,
                                   DeletedJsonFormatterService deletedJsonFormatterService,
                                   XmlFormatter xmlFormatter,
-                                  @Value("${datadump.records.per.file}") String dataDumpRecordsPerFile) {
+                                  @Value("${datadump.records.per.file}") String dataDumpRecordsPerFile,
+                                  DataExportCompletionStatusActiveMQConsumer dataExportCompletionStatusActiveMQConsumer) {
         try {
 
             camelContext.addRoutes(new RouteBuilder() {
@@ -66,12 +67,12 @@ public class DataExportRouteBuilder {
                             .routeId(RecapConstants.BIB_ENTITY_DATA_EXPORT_ROUTE_ID)
                             .threads(20)
                             .choice()
-                                .when(header(RecapConstants.EXPORT_FORMAT).isEqualTo(RecapConstants.DATADUMP_XML_FORMAT_MARC))
-                                    .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), RecapConstants.PROCESS_RECORDS)
-                                .when(header(RecapConstants.EXPORT_FORMAT).isEqualTo(RecapConstants.DATADUMP_XML_FORMAT_SCSB))
-                                    .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), RecapConstants.PROCESS_RECORDS)
-                                .when(header(RecapConstants.EXPORT_FORMAT).isEqualTo(RecapConstants.DATADUMP_DELETED_JSON_FORMAT))
-                                    .bean(new DeletedRecordFormatActiveMQConsumer(deletedJsonFormatterService), RecapConstants.PROCESS_RECORDS)
+                            .when(header(RecapConstants.EXPORT_FORMAT).isEqualTo(RecapConstants.DATADUMP_XML_FORMAT_MARC))
+                            .bean(new MarcRecordFormatActiveMQConsumer(marcXmlFormatterService), RecapConstants.PROCESS_RECORDS)
+                            .when(header(RecapConstants.EXPORT_FORMAT).isEqualTo(RecapConstants.DATADUMP_XML_FORMAT_SCSB))
+                            .bean(new SCSBRecordFormatActiveMQConsumer(scsbXmlFormatterService), RecapConstants.PROCESS_RECORDS)
+                            .when(header(RecapConstants.EXPORT_FORMAT).isEqualTo(RecapConstants.DATADUMP_DELETED_JSON_FORMAT))
+                            .bean(new DeletedRecordFormatActiveMQConsumer(deletedJsonFormatterService), RecapConstants.PROCESS_RECORDS)
                     ;
 
                 }
@@ -111,22 +112,58 @@ public class DataExportRouteBuilder {
                 }
             });
 
-
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
                     from(RecapConstants.DATADUMP_STAGING_Q)
                             .routeId(RecapConstants.DATADUMP_STAGING_ROUTE_ID)
                             .choice()
-                                .when(header("transmissionType").isEqualTo(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP))
-                                    .to(RecapConstants.DATADUMP_ZIPFILE_FTP_Q)
-                                .when(header("transmissionType").isEqualTo(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP))
-                                    .to(RecapConstants.DATADUMP_HTTP_Q);
+                            .when(header("transmissionType").isEqualTo(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP))
+                            .to(RecapConstants.DATADUMP_ZIPFILE_FTP_Q)
+                            .when(header("transmissionType").isEqualTo(RecapConstants.DATADUMP_TRANSMISSION_TYPE_HTTP))
+                            .to(RecapConstants.DATADUMP_HTTP_Q);
                 }
             });
 
+            // Router for FTP process completion and tracking with message
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from(RecapConstants.DATA_DUMP_COMPLETION_FROM)
+                            .routeId(RecapConstants.DATA_DUMP_COMPLETION_ROUTE_ID)
+                            .to(RecapConstants.DATA_DUMP_COMPLETION_TO)
+                            .onCompletion().log(RecapConstants.DATA_DUMP_COMPLETION_LOG);
+                }
+            });
+
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_PUL)
+                            .routeId(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_PUL_ROUTE_ID)
+                            .bean(dataExportCompletionStatusActiveMQConsumer, "pulOnCompletionTopicOnMessage");
+                }
+            });
+
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_CUL)
+                            .routeId(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_CUL_ROUTE_ID)
+                            .bean(dataExportCompletionStatusActiveMQConsumer, "culOnCompletionTopicOnMessage");
+                }
+            });
+
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_NYPL)
+                            .routeId(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_NYPL_ROUTE_ID)
+                            .bean(dataExportCompletionStatusActiveMQConsumer, "nyplOnCompletionTopicOnMessage");
+                }
+            });
         } catch (Exception e) {
-            logger.error(RecapConstants.ERROR,e);
+            logger.error(RecapConstants.ERROR, e);
         }
     }
 }

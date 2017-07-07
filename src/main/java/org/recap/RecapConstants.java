@@ -55,6 +55,21 @@ public class RecapConstants {
     public static final String DATADUMP_HTTP_Q = "scsbactivemq:queue:dataExportHttpQ";
     public static final String DATADUMP_IS_RECORD_AVAILABLE_Q = "scsbactivemq:queue:dataExportIsRecordAvailableQ";
 
+
+    public static final String DATA_DUMP_COMPLETION_ROUTE_ID = "dataDumpCompletionFromQRoute";
+    public static final String DATA_DUMP_COMPLETION_TOPIC_STATUS_PUL_ROUTE_ID = "pulExportProcessCompletionRouteId";
+    public static final String DATA_DUMP_COMPLETION_TOPIC_STATUS_CUL_ROUTE_ID = "culExportProcessCompletionRouteId";
+    public static final String DATA_DUMP_COMPLETION_TOPIC_STATUS_NYPL_ROUTE_ID = "nyplExportProcessCompletionRouteId";
+
+    public static final String DATA_DUMP_COMPLETION_FROM = "scsbactivemq:queue:dataDumpCompletionFromQ";
+    public static final String DATA_DUMP_COMPLETION_TO = "scsbactivemq:queue:dataDumpCompletionToQ";
+    public static final String DATA_DUMP_COMPLETION_LOG = "Scheduled ongoing data export queue consumed";
+    public static final String DATA_DUMP_COMPLETION_TOPIC_STATUS_CUL = "scsbactivemq:topic:CUL.ExportProcessCompletion";
+    public static final String DATA_DUMP_COMPLETION_TOPIC_STATUS_PUL = "scsbactivemq:topic:PUL.ExportProcessCompletion";
+    public static final String DATA_DUMP_COMPLETION_TOPIC_STATUS_NYPL = "scsbactivemq:topic:NYPL.ExportProcessCompletion";
+
+    public static final String DATA_DUMP_COMPLETION_TOPIC_MESSAGE = "Incremental datadump is compeleted";
+
     //Camel Route Ids
     public static final String REPORT_ROUTE_ID = "reportQRoute";
     public static final String CSV_SUCCESS_ROUTE_ID = "csvSuccessQ";
