@@ -232,4 +232,18 @@ public class RecapConstants {
         public static final String DF_866 = "866";
     }
 
+    // Data export scheduler sequence job
+    public static boolean EXPORT_SCHEDULER_CALL = false;
+    public static String EXPORT_DATE_SCHEDULER = "";
+    public static String EXPORT_FETCH_TYPE_INSTITUTION = "";
+
+    public static final String INCREMENTAL = "Incremental";
+    public static final String DELETED = "Deleted";
+    public static final String EXPORT_INCREMENTAL_PUL = "IncrementalRecordsExportPul";
+    public static final String EXPORT_INCREMENTAL_CUL = "IncrementalRecordsExportCul";
+    public static final String EXPORT_INCREMENTAL_NYPL = "IncrementalRecordsExportNypl";
+    public static final String EXPORT_DELETED_PUL = "DeletedRecordsExportPul";
+    public static final String EXPORT_DELETED_CUL = "DeletedRecordsExportCul";
+    public static final String EXPORT_DELETED_NYPL = "DeletedRecordsExportNypl";
+
 }

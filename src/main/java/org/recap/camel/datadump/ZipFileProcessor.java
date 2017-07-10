@@ -132,7 +132,9 @@ public class ZipFileProcessor implements Processor {
         String batchHeaders = (String) exchange.getIn().getHeader("batchHeaders");
         String reqestingInst = getValueFor(batchHeaders, "requestingInstitutionCode");
         logger.info("Req Inst -> " + reqestingInst);
-        producer.sendBody(RecapConstants.DATA_DUMP_COMPLETION_FROM, reqestingInst);
+        if (RecapConstants.EXPORT_SCHEDULER_CALL) {
+            producer.sendBody(RecapConstants.DATA_DUMP_COMPLETION_FROM, reqestingInst);
+        }
         if(reqestingInst.equalsIgnoreCase(RecapConstants.PRINCETON)){
             producer.sendBody(RecapConstants.DATA_DUMP_COMPLETION_TOPIC_STATUS_PUL, RecapConstants.DATA_DUMP_COMPLETION_TOPIC_MESSAGE);
         }else if(reqestingInst.equalsIgnoreCase(RecapConstants.COLUMBIA)){

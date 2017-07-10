@@ -2,6 +2,7 @@ package org.recap.service.preprocessor;
 
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.recap.RecapConstants;
 import org.recap.model.export.DataDumpRequest;
@@ -53,6 +54,9 @@ public class DataDumpExportService {
     @Autowired
     private ConsumerTemplate consumerTemplate;
 
+    @Autowired
+    private ProducerTemplate producerTemplate;
+
     @Value("${datadump.status.file.name}")
     private String dataDumpStatusFileName;
 
@@ -96,6 +100,9 @@ public class DataDumpExportService {
                             RecapConstants.DATADUMP_NO_DATA_AVAILABLE,
                             Integer.valueOf(0)
                     );
+                    if (RecapConstants.EXPORT_SCHEDULER_CALL) {
+                        producerTemplate.sendBody(RecapConstants.DATA_DUMP_COMPLETION_FROM, dataDumpRequest.getRequestingInstitutionCode());
+                    }
                 }
             }
             responseMessage = getResponseMessage(outputString, dataDumpRequest);
