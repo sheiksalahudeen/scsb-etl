@@ -3,10 +3,7 @@ package org.recap.camel.datadump.routebuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.recap.RecapConstants;
-import org.recap.camel.datadump.DataExportAggregator;
-import org.recap.camel.datadump.DataExportPredicate;
-import org.recap.camel.datadump.FileFormatProcessorForDataExport;
-import org.recap.camel.datadump.TransmissionTypeProcessorForDataExport;
+import org.recap.camel.datadump.*;
 import org.recap.camel.datadump.consumer.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.service.formatter.datadump.DeletedJsonFormatterService;
@@ -42,7 +39,8 @@ public class DataExportRouteBuilder {
                                   DeletedJsonFormatterService deletedJsonFormatterService,
                                   XmlFormatter xmlFormatter,
                                   @Value("${datadump.records.per.file}") String dataDumpRecordsPerFile,
-                                  DataExportCompletionStatusActiveMQConsumer dataExportCompletionStatusActiveMQConsumer) {
+                                  DataExportCompletionStatusActiveMQConsumer dataExportCompletionStatusActiveMQConsumer,
+                                  DataDumpSequenceProcessor dataDumpSequenceProcessor) {
         try {
 
             camelContext.addRoutes(new RouteBuilder() {
@@ -131,7 +129,7 @@ public class DataExportRouteBuilder {
                 public void configure() throws Exception {
                     from(RecapConstants.DATA_DUMP_COMPLETION_FROM)
                             .routeId(RecapConstants.DATA_DUMP_COMPLETION_ROUTE_ID)
-                            .to(RecapConstants.DATA_DUMP_COMPLETION_TO)
+                            .process(dataDumpSequenceProcessor)
                             .onCompletion().log(RecapConstants.DATA_DUMP_COMPLETION_LOG);
                 }
             });

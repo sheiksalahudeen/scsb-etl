@@ -1,6 +1,7 @@
 package org.recap.camel.dynamicrouter;
 
 import org.apache.camel.CamelContext;
+import org.recap.camel.datadump.DataDumpSequenceProcessor;
 import org.recap.camel.datadump.consumer.DataExportCompletionStatusActiveMQConsumer;
 import org.recap.camel.datadump.routebuilder.DataExportRouteBuilder;
 import org.recap.repository.BibliographicDetailsRepository;
@@ -39,6 +40,9 @@ public class DynamicRouteBuilder {
     @Autowired
     private DataExportCompletionStatusActiveMQConsumer dataExportCompletionStatusActiveMQConsumer;
 
+    @Autowired
+    private DataDumpSequenceProcessor dataDumpSequenceProcessor;
+
     @Value("${datadump.records.per.file}")
     String dataDumpRecordsPerFile;
 
@@ -47,6 +51,6 @@ public class DynamicRouteBuilder {
      */
     public void addDataDumpExportRoutes() {
         new DataExportRouteBuilder(camelContext, bibliographicDetailsRepository, marcXmlFormatterService, scsbXmlFormatterService,
-                deletedJsonFormatterService, xmlFormatter, dataDumpRecordsPerFile, dataExportCompletionStatusActiveMQConsumer);
+                deletedJsonFormatterService, xmlFormatter, dataDumpRecordsPerFile, dataExportCompletionStatusActiveMQConsumer, dataDumpSequenceProcessor);
     }
 }

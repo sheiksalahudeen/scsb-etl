@@ -70,6 +70,7 @@ public class DataDumpRestController {
                                          @ApiParam(value = "Type of transmission - FTP (use 0), HTTP Response (use 1) this parameter is not considered for full dump. Default will be ftp ", name = "transmissionType")@RequestParam(required=false) String transmissionType,
                                          @ApiParam(value = "Email address to whom we need to send an email" , name = "emailToAddress")@RequestParam(required=false) String emailToAddress
     ){
+        RecapConstants.EXPORT_SCHEDULER_CALL = false;
         DataDumpRequest dataDumpRequest = new DataDumpRequest();
         getDynamicRouteBuilder().addDataDumpExportRoutes();
         getDataDumpExportService().setDataDumpRequest(dataDumpRequest,fetchType,institutionCodes,date,collectionGroupIds,transmissionType,requestingInstitutionCode,emailToAddress,outputFormat);
