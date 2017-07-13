@@ -197,7 +197,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
             holdingRecord = getRecordFromContent(holdingsEntity.getContent());
             for (DataField dataField : holdingRecord.getDataFields()) {
                 if (RecapConstants.MarcFields.DF_852.equals(dataField.getTag())) {
-                    add0SubField(dataField, holdingsEntity);
+                    updateDatafield852Subfield0(dataField,holdingsEntity);
                     update852bField(dataField, holdingsEntity);
                     record.addVariableField(dataField);
                 }
@@ -205,7 +205,7 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
                     if(dataField.getSubfield('a')!=null && (dataField.getSubfield('a').getData()==null || "".equals(dataField.getSubfield('a').getData()))){
                         continue;
                     }else {
-                        add0SubField(dataField, holdingsEntity);
+                        updateDatafield852Subfield0(dataField,holdingsEntity);
                         record.addVariableField(dataField);
                     }
                 }
@@ -220,12 +220,19 @@ public class MarcXmlFormatterService implements DataDumpFormatterInterface {
     }
 
     /**
-     * Adds a '0' subfield with SCSB holdings id to the given data field.
+     * Updates 852 0 field value with the scsb holding id information.
      * @param dataField
      * @param holdingEntity
      */
-    private void add0SubField(DataField dataField, HoldingsEntity holdingEntity) {
-        dataField.addSubfield(getFactory().newSubfield('0', holdingEntity.getHoldingsId().toString()));
+    private void updateDatafield852Subfield0(DataField dataField, HoldingsEntity holdingEntity){
+        List<Subfield> subfields = dataField.getSubfields('0');
+        if(CollectionUtils.isNotEmpty(subfields)){
+            for(Subfield subfield:subfields){
+                if(subfield.getCode()=='0'){
+                    subfield.setData(holdingEntity.getHoldingsId().toString());
+                }
+            }
+        }
     }
 
     /**
