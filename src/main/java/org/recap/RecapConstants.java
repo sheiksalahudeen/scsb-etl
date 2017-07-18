@@ -123,6 +123,7 @@ public class RecapConstants {
     //Date Util
     public static final String DATE_FORMAT_MMDDYYY = "MM-dd-yyyy";
     public static final String DATE_FORMAT_YYYYMMDDHHMM = "yyyy-MM-dd HH:mm";
+    public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
     public static final String DATE_FORMAT_DDMMMYYYYHHMM = "ddMMMyyyyHHmm";
     public static final String UTC = "UTC";
     public static final String UTC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
@@ -165,6 +166,10 @@ public class RecapConstants {
     public static final String COMPLETED = "Completed";
     public static final String IN_PROGRESS = "InProgress";
     public static final String FULLDUMP_INPROGRESS_ERR_MSG = "Can't run data export now, already full data export in progress, wait until it completes.";
+    public static final String INCREMENTAL_DATE_LIMIT_EMPTY_ERR_MSG = "The incremental Date limit is missing. Please contact HTC Support {0} for assistance.";
+    public static final String INITIAL_DATA_LOAD_DATE_MISSING_ERR_MSG = "The initial data load Date is missing for the institution {0}. Please contact HTC Support {1} for assistance.";
+    public static final String DATADUMP_DAYS_LIMIT_EXCEEDED_ERROR_MSG = "The date used for incremental data dump cannot be older than {0} days from the date of request. Please contact HTC Support {1} for assistance.";
+    public static final String RESTRICT_FULLDUMP_VIA_INCREMENTAL_ERROR_MSG = "The date used for incremental data dump precedes (or) is the date on which records for the institution {0} were created. Kindly use a later date or contact HTC Support {1} for assistance.";
 
     public static final String  BIB_LASTUPDATED_DATE = "BibLastUpdatedDate";
     public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";

@@ -17,14 +17,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,6 +65,21 @@ public class DataDumpExportService {
 
     @Value("${datadump.fetchtype.full}")
     private String fetchTypeFull;
+
+    @Value("${datadump.incremental.date.limit}")
+    private String incrementalDateLimit;
+
+    @Value("${recap.assist.email.to}")
+    private String recapAssistEmailAddress;
+
+    @Value("${etl.pul.data.loaded.date}")
+    private String pulInitialDataLoadedDate;
+
+    @Value("${etl.cul.data.loaded.date}")
+    private String culInitialDataLoadedDate;
+
+    @Value("${etl.nypl.data.loaded.date}")
+    private String nyplInitialDataLoadedDate;
 
     /**
      * Start the data dump process.
@@ -243,6 +261,7 @@ public class DataDumpExportService {
      */
     public String validateIncomingRequest(DataDumpRequest dataDumpRequest) {
         String validationMessage = null;
+        Date currentDate = new Date();
         Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorcount = 1;
         if (!dataDumpRequest.getInstitutionCodes().isEmpty()) {
@@ -283,6 +302,26 @@ public class DataDumpExportService {
                 errorMessageMap.put(errorcount, RecapConstants.DATADUMP_DATE_ERR_MSG);
                 errorcount++;
         }
+        if(dataDumpRequest.getFetchType().equals(RecapConstants.DATADUMP_FETCHTYPE_INCREMENTAL) || dataDumpRequest.getFetchType().equals(RecapConstants.DATADUMP_FETCHTYPE_DELETED)) {
+            String dataDumpRequestDateString = dataDumpRequest.getDate();
+            List<String> institutionCodes = dataDumpRequest.getInstitutionCodes();
+            if(StringUtils.isNotBlank(dataDumpRequestDateString)) {
+                try {
+                    if(institutionCodes.contains(RecapConstants.PRINCETON)) {
+                        errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, pulInitialDataLoadedDate, RecapConstants.PRINCETON);
+                    }
+                    if(institutionCodes.contains(RecapConstants.COLUMBIA)) {
+                        errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, culInitialDataLoadedDate, RecapConstants.COLUMBIA);
+                    }
+                    if(institutionCodes.contains(RecapConstants.NYPL)) {
+                        errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, nyplInitialDataLoadedDate, RecapConstants.NYPL);
+                    }
+                    errorcount = checkForIncrementalDateLimit(currentDate, errorMessageMap, errorcount, dataDumpRequestDateString);
+                } catch (ParseException e) {
+                    logger.error("Exception while Parsing Date : {}", e);
+                }
+            }
+        }
         if (dataDumpRequest.getTransmissionType().equals(RecapConstants.DATADUMP_TRANSMISSION_TYPE_FTP)) {
             if (StringUtils.isEmpty(dataDumpRequest.getToEmailAddress())) {
                 errorMessageMap.put(errorcount, RecapConstants.DATADUMP_EMAIL_TO_ADDRESS_REQUIRED);
@@ -308,6 +347,47 @@ public class DataDumpExportService {
             validationMessage = buildErrorMessage(errorMessageMap);
         }
         return validationMessage;
+    }
+
+    private Integer checkForIncrementalDateLimit(Date currentDate, Map<Integer, String> errorMessageMap, Integer errorcount, String dataDumpRequestDateString) {
+        Date dataDumpRequestDateTime = getFormattedDate(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM, dataDumpRequestDateString);
+        long dateDifference = currentDate.getTime() - dataDumpRequestDateTime.getTime();
+        long days = TimeUnit.DAYS.convert(dateDifference, TimeUnit.MILLISECONDS);
+        if(StringUtils.isBlank(incrementalDateLimit)) {
+            errorMessageMap.put(errorcount, MessageFormat.format(RecapConstants.INCREMENTAL_DATE_LIMIT_EMPTY_ERR_MSG, recapAssistEmailAddress));
+            errorcount++;
+        } else {
+            if(Math.toIntExact(days) > Integer.valueOf(incrementalDateLimit)) {
+                errorMessageMap.put(errorcount, MessageFormat.format(RecapConstants.DATADUMP_DAYS_LIMIT_EXCEEDED_ERROR_MSG, incrementalDateLimit, recapAssistEmailAddress));
+                errorcount++;
+            }
+        }
+        return errorcount;
+    }
+
+    private Integer checkToRestrictFullDumpViaIncremental(Map<Integer, String> errorMessageMap, Integer errorcount, String dataDumpRequestDateString, String initialDataLoadDateString, String institutionCode) throws ParseException {
+        if(StringUtils.isBlank(initialDataLoadDateString)) {
+            errorMessageMap.put(errorcount, MessageFormat.format(RecapConstants.INITIAL_DATA_LOAD_DATE_MISSING_ERR_MSG, institutionCode, recapAssistEmailAddress));
+            errorcount++;
+        } else {
+            Date dataDumpRequestDate = getFormattedDate(RecapConstants.DATE_FORMAT_YYYYMMDD, dataDumpRequestDateString);
+            Date initialDataLoadDate = getFormattedDate(RecapConstants.DATE_FORMAT_YYYYMMDD, initialDataLoadDateString);
+            if(initialDataLoadDate.after(dataDumpRequestDate) || initialDataLoadDate.equals(dataDumpRequestDate)) {
+                errorMessageMap.put(errorcount, MessageFormat.format(RecapConstants.RESTRICT_FULLDUMP_VIA_INCREMENTAL_ERROR_MSG, institutionCode, recapAssistEmailAddress));
+                errorcount++;
+            }
+        }
+        return errorcount;
+    }
+
+    private Date getFormattedDate(String dateFormat, String dateString) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        try {
+            return simpleDateFormat.parse(dateString);
+        } catch (ParseException e) {
+            logger.error("Exception while Parsing Date : {}", e);
+        }
+        return null;
     }
 
     /**
