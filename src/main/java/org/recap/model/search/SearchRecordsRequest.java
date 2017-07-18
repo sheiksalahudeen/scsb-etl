@@ -77,6 +77,9 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "isDeleted", value= "Is Deleted",position = 21)
     private boolean isDeleted = false;
 
+    @ApiModelProperty(name= "requestingInstitution", value= "Requesting Institution",position = 22)
+    private String requestingInstitution = "";
+
     /**
      * Gets field value.
      *
@@ -478,6 +481,25 @@ public class SearchRecordsRequest implements Serializable {
      */
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+
+    /**
+     * Gets requesting institution.
+     *
+     * @return the requesting institution
+     */
+    public String getRequestingInstitution() {
+        return requestingInstitution;
+    }
+
+    /**
+     * Sets requesting institution.
+     *
+     * @param requestingInstitution the requesting institution
+     */
+    public void setRequestingInstitution(String requestingInstitution) {
+        this.requestingInstitution = requestingInstitution;
     }
 
     /**

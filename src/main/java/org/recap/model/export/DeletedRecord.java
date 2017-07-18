@@ -8,43 +8,24 @@ import java.util.List;
  */
 public class DeletedRecord implements Serializable{
 
-    private String bibId;
-
-    private List<String> itemBarcodes;
+    private Bib bib;
 
     /**
-     * Gets bib id.
+     * Gets bib.
      *
-     * @return the bib id
+     * @return the bib
      */
-    public String getBibId() {
-        return bibId;
+    public Bib getBib() {
+        return bib;
     }
 
     /**
-     * Sets bib id.
+     * Sets bib.
      *
-     * @param bibId the bib id
+     * @param bib the bib
      */
-    public void setBibId(String bibId) {
-        this.bibId = bibId;
+    public void setBib(Bib bib) {
+        this.bib = bib;
     }
 
-    /**
-     * Gets item barcodes.
-     *
-     * @return the item barcodes
-     */
-    public List<String> getItemBarcodes() {
-        return itemBarcodes;
-    }
-
-    /**
-     * Sets item barcodes.
-     *
-     * @param itemBarcodes the item barcodes
-     */
-    public void setItemBarcodes(List<String> itemBarcodes) {
-        this.itemBarcodes = itemBarcodes;
-    }
 }

@@ -251,4 +251,7 @@ public class RecapConstants {
     public static final String EXPORT_DELETED_CUL = "DeletedRecordsExportCul";
     public static final String EXPORT_DELETED_NYPL = "DeletedRecordsExportNypl";
 
+    public static final String CGD_CHANGE_LOG_SHARED_TO_PRIVATE = "SharedToPrivate";
+    public static final String CGD_CHANGE_LOG_OPEN_TO_PRIVATE = "OpenToPrivate";
+
 }
