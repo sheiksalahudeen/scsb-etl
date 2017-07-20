@@ -90,7 +90,7 @@ public class FullDataDumpCallableUT extends BaseTestCase {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("tst");
-        String barcode = "1234";
+        String barcode = "0306";
         itemEntity.setBarcode(barcode);
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);

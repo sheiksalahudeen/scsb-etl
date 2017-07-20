@@ -273,7 +273,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("tst");
-        itemEntity.setBarcode("1231");
+        itemEntity.setBarcode("00998745632");
         itemEntity.setOwningInstitutionItemId(".i1231");
         itemEntity.setOwningInstitutionId(3);
         itemEntity.setCollectionGroupId(1);
@@ -329,7 +329,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("tst");
-        itemEntity.setBarcode("1231");
+        itemEntity.setBarcode("0012003654");
         itemEntity.setOwningInstitutionItemId(".i1231");
         itemEntity.setOwningInstitutionId(3);
         itemEntity.setCollectionGroupId(1);
@@ -365,7 +365,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
 
     @Test
     public void generatedFormattedString() throws Exception {
-        saveBibSingleHoldingsSingleItem("100");
+        saveBibSingleHoldingsSingleItem("100","330033001");
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findOne(new BibliographicPK(1, "100"));
 
         ArrayList<Record> recordList = new ArrayList<>();
@@ -376,7 +376,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         OutputStream out = new ByteArrayOutputStream();
         MarcWriter writer = new MarcXmlWriter(out, "UTF-8", true);
         writeMarcXml(recordList, writer);
-        saveBibSingleHoldingsSingleItem("10002");
+        saveBibSingleHoldingsSingleItem("10002","33003302");
         BibliographicEntity bibliographicEntity1 = bibliographicDetailsRepository.findOne(new BibliographicPK(1, "10002"));
 
         ArrayList<Record> recordList1 = new ArrayList<>();
@@ -408,7 +408,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         }
     }
 
-    public void saveBibSingleHoldingsSingleItem(String owningInstBibId) throws Exception {
+    public void saveBibSingleHoldingsSingleItem(String owningInstBibId,String barcode) throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = getBibEntity(1,owningInstBibId);
 
@@ -422,7 +422,7 @@ public class MarcXmlFormatterServiceUT extends BaseTestCase {
         itemEntity.setCreatedBy("etl");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("etl");
-        itemEntity.setBarcode("123");
+        itemEntity.setBarcode(barcode);
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");
