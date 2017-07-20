@@ -145,6 +145,7 @@ public class RecapConstants {
     public static final String DATADUMP_HTTP_REPONSE_RECORD_LIMIT_ERR_MSG = "There are more than 100 records. Use transmission type ftp to dump the data";
     public static final String DATADUMP_EMAIL_TO_ADDRESS_REQUIRED = "Please enter a valid email address";
     public static final String INVALID_EMAIL_ADDRESS = "Email address is invalid.";
+    public static final String INVALID_DATE_FORMAT = "Please enter the date in \"{0}\" format.";
     public static final String REGEX_FOR_EMAIL_ADDRESS = "^[A-Za-z0-9+_.-]+@(.+)$";
     public static final String DATADUMP_FETCHTYPE_FULL = "0";
     public static final String DATADUMP_FETCHTYPE_INCREMENTAL = "1";
