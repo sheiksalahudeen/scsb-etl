@@ -89,7 +89,7 @@ public class DeletedDataDumpCallableUT extends BaseTestCase {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("tst");
-        String barcode = "1234";
+        String barcode = "0102";
         itemEntity.setBarcode(barcode);
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
