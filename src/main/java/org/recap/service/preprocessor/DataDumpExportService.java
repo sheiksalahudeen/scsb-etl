@@ -220,7 +220,6 @@ public class DataDumpExportService {
         if (date != null && !"".equals(date)) {
             dataDumpRequest.setDate(date);
         }
-
         if (collectionGroupIds != null && !"".equals(collectionGroupIds)) {
             List<Integer> collectionGroupIdList = splitStringAndGetIntegerList(collectionGroupIds);
             dataDumpRequest.setCollectionGroupIds(collectionGroupIdList);
@@ -307,18 +306,24 @@ public class DataDumpExportService {
             List<String> institutionCodes = dataDumpRequest.getInstitutionCodes();
             if(StringUtils.isNotBlank(dataDumpRequestDateString)) {
                 try {
-                    if(institutionCodes.contains(RecapConstants.PRINCETON)) {
-                        errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, pulInitialDataLoadedDate, RecapConstants.PRINCETON);
+                    boolean isValidDate = validateDate(dataDumpRequestDateString);
+                    if(isValidDate) {
+                        if(institutionCodes.contains(RecapConstants.PRINCETON)) {
+                            errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, pulInitialDataLoadedDate, RecapConstants.PRINCETON);
+                        }
+                        if(institutionCodes.contains(RecapConstants.COLUMBIA)) {
+                            errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, culInitialDataLoadedDate, RecapConstants.COLUMBIA);
+                        }
+                        if(institutionCodes.contains(RecapConstants.NYPL)) {
+                            errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, nyplInitialDataLoadedDate, RecapConstants.NYPL);
+                        }
+                        errorcount = checkForIncrementalDateLimit(currentDate, errorMessageMap, errorcount, dataDumpRequestDateString);
+                    } else {
+                        errorMessageMap.put(errorcount, MessageFormat.format(RecapConstants.INVALID_DATE_FORMAT, RecapConstants.DATE_FORMAT_YYYYMMDDHHMM));
+                        errorcount++;
                     }
-                    if(institutionCodes.contains(RecapConstants.COLUMBIA)) {
-                        errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, culInitialDataLoadedDate, RecapConstants.COLUMBIA);
-                    }
-                    if(institutionCodes.contains(RecapConstants.NYPL)) {
-                        errorcount = checkToRestrictFullDumpViaIncremental(errorMessageMap, errorcount, dataDumpRequestDateString, nyplInitialDataLoadedDate, RecapConstants.NYPL);
-                    }
-                    errorcount = checkForIncrementalDateLimit(currentDate, errorMessageMap, errorcount, dataDumpRequestDateString);
-                } catch (ParseException e) {
-                    logger.error("Exception while Parsing Date : {}", e);
+                } catch (Exception e) {
+                    logger.error("Exception : {}", e);
                 }
             }
         }
@@ -347,6 +352,19 @@ public class DataDumpExportService {
             validationMessage = buildErrorMessage(errorMessageMap);
         }
         return validationMessage;
+    }
+
+    private boolean validateDate(String dataDumpRequestDateString) {
+        String[] dateStringArray = dataDumpRequestDateString.split(" ");
+        if(dateStringArray.length == 1) {
+            return false;
+        } else {
+            Date formattedDate = getFormattedDate(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM, dataDumpRequestDateString);
+            if(formattedDate == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Integer checkForIncrementalDateLimit(Date currentDate, Map<Integer, String> errorMessageMap, Integer errorcount, String dataDumpRequestDateString) {
