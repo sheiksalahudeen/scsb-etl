@@ -36,5 +36,6 @@ public class DeletedDataDumpExecutorService extends AbstractDataDumpExecutorServ
             searchRecordsRequest.setFieldName(RecapConstants.ITEM_LASTUPDATED_DATE);
             searchRecordsRequest.setFieldValue(getFormattedDateString(dataDumpRequest.getDate()));
         }
+        searchRecordsRequest.setRequestingInstitution(dataDumpRequest.getRequestingInstitutionCode());
     }
 }

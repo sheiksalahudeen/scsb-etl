@@ -88,6 +88,9 @@ public class ItemEntity implements Serializable{
     @Column(name = "CATALOGING_STATUS")
     private String catalogingStatus;
 
+    @Column(name = "CGD_CHANGE_LOG")
+    private String cgdChangeLog;
+
     /**
      * Instantiates a new Item entity.
      */
@@ -508,6 +511,25 @@ public class ItemEntity implements Serializable{
      */
     public void setCatalogingStatus(String catalogingStatus) {
         this.catalogingStatus = catalogingStatus;
+    }
+
+
+    /**
+     * Gets cgd change log value.
+     *
+     * @return the cgd change log
+     */
+    public String getCgdChangeLog() {
+        return cgdChangeLog;
+    }
+
+    /**
+     * Sets cgd change log value.
+     *
+     * @param cgdChangeLog the cgd change log
+     */
+    public void setCgdChangeLog(String cgdChangeLog) {
+        this.cgdChangeLog = cgdChangeLog;
     }
 }
 
