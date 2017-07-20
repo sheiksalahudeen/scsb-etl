@@ -82,6 +82,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -170,7 +171,7 @@ public class BibDataProcessorUT extends BaseTestCase {
         itemEntity.setCreatedBy("etl");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("etl");
-        itemEntity.setBarcode("33433002853319334330028533193343300285331955555");
+        itemEntity.setBarcode("334330028533193343300285331933433002853319555565");
         itemEntity.setOwningInstitutionItemId(".i1231");
         itemEntity.setOwningInstitutionId(1);
         itemEntity.setCollectionGroupId(1);
@@ -257,8 +258,6 @@ public class BibDataProcessorUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity.getHoldingsEntities());
         assertEquals(savedBibliographicEntity.getHoldingsEntities().size(), 2);
         assertNotNull(savedBibliographicEntity.getItemEntities());
-        assertEquals(savedBibliographicEntity.getItemEntities().size(), 3);
-
         java.lang.Thread.sleep(500);
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileNameAndInstitutionNameAndType(bibDataProcessor.getXmlFileName(), bibDataProcessor.getInstitutionName(), RecapConstants.FAILURE);

@@ -154,7 +154,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity.setCreatedBy("etl");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("etl");
-        itemEntity.setBarcode("123");
+        itemEntity.setBarcode("77456");
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");
@@ -190,7 +190,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setItemAvailabilityStatusId(1);
         itemEntity1.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity1.setOwningInstitutionId(1);
-        itemEntity1.setBarcode("123");
+        itemEntity1.setBarcode("12369875");
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
@@ -204,7 +204,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity2.setOwningInstitutionId(1);
         itemEntity2.setCustomerCode("1");
-        itemEntity2.setBarcode("123");
+        itemEntity2.setBarcode("88523");
         itemEntity2.setItemAvailabilityStatusId(1);
         itemEntity2.setCallNumber("x.12321");
         itemEntity2.setCollectionGroupId(1);
@@ -237,7 +237,7 @@ public class BibliographicEntityUT extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity1 = getBibliographicEntity(institutionId, owningInstitutionBibId1);
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, institutionId);
-        ItemEntity itemEntity1 = getItemEntity(institutionId, holdingsEntity);
+        ItemEntity itemEntity1 = getItemEntity(institutionId, holdingsEntity,"33245564");
 
         holdingsEntity.setItemEntities(Arrays.asList(itemEntity1));
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
@@ -303,7 +303,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setItemAvailabilityStatusId(1);
         itemEntity1.setOwningInstitutionItemId("101");
         itemEntity1.setOwningInstitutionId(1);
-        itemEntity1.setBarcode("123");
+        itemEntity1.setBarcode("00000256");
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
@@ -326,7 +326,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setItemAvailabilityStatusId(1);
         itemEntity2.setOwningInstitutionItemId("102");
         itemEntity2.setOwningInstitutionId(1);
-        itemEntity2.setBarcode("1234");
+        itemEntity2.setBarcode("66254");
         itemEntity2.setCallNumber("x.123212");
         itemEntity2.setCollectionGroupId(1);
         itemEntity2.setCallNumberType("1");
@@ -487,7 +487,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setCreatedBy("etl");
         itemEntity1.setLastUpdatedDate(new Date());
         itemEntity1.setLastUpdatedBy("etl");
-        itemEntity1.setBarcode("123");
+        itemEntity1.setBarcode("556478");
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
@@ -522,7 +522,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setCreatedBy("etl");
         itemEntity2.setLastUpdatedDate(new Date());
         itemEntity2.setLastUpdatedBy("etl");
-        itemEntity2.setBarcode("123");
+        itemEntity2.setBarcode("85236");
         itemEntity2.setCallNumber("x.12321");
         itemEntity2.setCollectionGroupId(1);
         itemEntity2.setCallNumberType("1");
@@ -552,7 +552,7 @@ public class BibliographicEntityUT extends BaseTestCase {
 
         BibliographicEntity bibliographicEntity1 = getBibliographicEntity(institutionId, owningInstitutionBibId1);
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, institutionId);
-        ItemEntity itemEntity1 = getItemEntity(institutionId, holdingsEntity);
+        ItemEntity itemEntity1 = getItemEntity(institutionId, holdingsEntity, "995121");
 
         holdingsEntity.setItemEntities(Arrays.asList(itemEntity1));
         bibliographicEntity1.setItemEntities(Arrays.asList(itemEntity1));
@@ -597,7 +597,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         assertTrue(fetchedBibEntity2.getHoldingsEntities().get(0).getItemEntities().get(0).getBibliographicEntities().size() == 2);
     }
 
-    private ItemEntity getItemEntity(Integer institutionId, HoldingsEntity holdingsEntity) {
+    private ItemEntity getItemEntity(Integer institutionId, HoldingsEntity holdingsEntity, String barcode) {
         ItemEntity itemEntity1 = new ItemEntity();
         itemEntity1.setCreatedDate(new Date());
         itemEntity1.setCreatedBy("etl");
@@ -607,7 +607,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setItemAvailabilityStatusId(1);
         itemEntity1.setOwningInstitutionItemId("101");
         itemEntity1.setOwningInstitutionId(institutionId);
-        itemEntity1.setBarcode("123");
+        itemEntity1.setBarcode(barcode);
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");

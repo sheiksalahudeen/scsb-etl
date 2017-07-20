@@ -91,6 +91,13 @@ public class ItemEntity implements Serializable{
     @Column(name = "CGD_CHANGE_LOG")
     private String cgdChangeLog;
 
+    @Column(name = "IS_CGD_PROTECTION")
+    private boolean isCgdProtection;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "INITIAL_MATCHING_DATE")
+    private Date initialMatchingDate;
+
     /**
      * Instantiates a new Item entity.
      */
@@ -530,6 +537,42 @@ public class ItemEntity implements Serializable{
      */
     public void setCgdChangeLog(String cgdChangeLog) {
         this.cgdChangeLog = cgdChangeLog;
+    }
+
+    /**
+     * Is cgd protection boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isCgdProtection() {
+        return isCgdProtection;
+    }
+
+    /**
+     * Sets cgd protection.
+     *
+     * @param cgdProtection the cgd protection
+     */
+    public void setCgdProtection(boolean cgdProtection) {
+        isCgdProtection = cgdProtection;
+    }
+
+    /**
+     * Gets initial matching date.
+     *
+     * @return the initial matching date
+     */
+    public Date getInitialMatchingDate() {
+        return initialMatchingDate;
+    }
+
+    /**
+     * Sets initial matching date.
+     *
+     * @param initialMatchingDate the initial matching date
+     */
+    public void setInitialMatchingDate(Date initialMatchingDate) {
+        this.initialMatchingDate = initialMatchingDate;
     }
 }
 
